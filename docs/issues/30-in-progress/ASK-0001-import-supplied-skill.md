@@ -1,7 +1,7 @@
 ---
 id: ASK-0001
 title: Import supplied implement-rfc as the first skill
-status: Ready
+status: In Progress
 rfc: RFC-ASK-0001
 depends_on: []
 ---
