@@ -1,6 +1,6 @@
 ---
 name: implement-rfc
-description: Implement one or more RFCs end to end for the project described in config/project.json. Use when the user asks to implement or resume an RFC or RFC pack, break it into bounded issue slices, keep affected documentation current, run acceptance-focused verification, commit each completed slice, and reconcile RFC and issue-board status.
+description: Implement one or more RFCs end to end for the selected consumer repository and its external project context. Use when the user asks to implement or resume an RFC or RFC pack, break it into bounded issue slices, keep affected documentation current, run acceptance-focused verification, commit each completed slice, and reconcile RFC and issue-board status.
 ---
 
 # Implement RFC
@@ -9,13 +9,25 @@ Carry requested RFCs from the live RFC and issue-board state to a truthful
 closeout. Verification proves the named acceptance boundary; it does not
 become a second deliverable.
 
-This body is portable and identical across projects. Everything
-project-specific lives in two files: `config/project.json` (machine-read
-facts: name tokens, tracker paths, lane names, the structure gate, the
-attended-review skill) and [references/project.md](references/project.md)
-(the project's own rules: what to read first, the side-effect boundary, what
-counts as a direct surface, the closeout-card contract). Read `project.md` at
-Start; every `project.json` key named below means the value it holds.
+This directory is shared portable source. Select the consumer repository before
+editing: run `scripts/project_config.py --repo-root /absolute/consumer` from this
+skill's physical asset root, or use its `resolve_context(repo_root=...)` API.
+Report the selected repository and branch, then read that context's
+`project_rules_path`. Shared project facts and rules are exactly:
+
+- `<consumer>/.mask/skill-config/implement-rfc/project.json`
+- `<consumer>/.mask/skill-config/implement-rfc/project.md`
+
+Selection is explicit `--repo-root` / API `repo_root=`, then
+`IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation CWD's Git worktree root.
+Invalid explicit values and missing or mismatched context refuse. Keep the
+selected root explicit in later helper calls, even after changing CWD to the
+skill directory. Never infer a consumer from a resolved skill symlink.
+All supporting references remain relative to the physical asset root; only the
+two project-context files are external. Below, `project.json` and `project.md`
+mean these selected files. Legacy embedded context is supported only for an
+unlinked `.agents/skills/implement-rfc` local copy whose identity agrees with
+its consumer. Inherited example facts are not active defaults.
 
 ## Finish Condition
 
@@ -46,7 +58,9 @@ The issue board and closeout cards remain authoritative, and a goal-tool failure
 must not block implementation.
 
 1. Confirm from live Git state that this checkout is the project
-   `project.json` names and note the current branch. Read
+   `project.json` names and note the current branch. Verify its configured
+   origin repository name from live Git before real implementation; fixture
+   checkouts may deliberately omit a remote. Read
    [references/remote-routing.md](references/remote-routing.md) only when
    `.remote-station.json` exists, a `remote-task` envelope arrived, or this
    session will dispatch work to a station. Otherwise follow the local rules
@@ -58,7 +72,7 @@ must not block implementation.
 3. Recover or record the RFC's immutable `RFC_BASE_SHA` in its closeout card.
    Conversation memory is not a durable home. For work that predates a
    closeout card, use the first parent of the earliest in-scope commit.
-4. Read `references/project.md` and the repository instructions it names
+4. Read `project.md` and the repository instructions it names
    (root and nested `AGENTS.md`, read-first documents) before editing source.
    Open a deeper reference only when the change intersects a hazard it names.
 5. Read the requested live RFCs, the tracker READMEs under `rfc_root` and
@@ -118,7 +132,7 @@ For each dependency-ready card:
 2. Move the card through the board's normal lifecycle and keep its
    front-matter status equal to its lane.
 3. Implement the smallest coherent change, keeping each concern in the layer
-   `references/project.md` assigns it.
+   `project.md` assigns it.
 4. Add focused tests for changed behavior. Update an instruction or reference
    only when the change makes a purpose, ownership, hazard, or verification
    rule it states untrue.
@@ -146,7 +160,7 @@ the RFC's stated acceptance criteria.
 
 - Run focused changed-surface tests.
 - Add one public or selected-path lane when focused tests do not exercise it;
-  `references/project.md` names what counts as a direct surface.
+  `project.md` names what counts as a direct surface.
 - Let one command prove several related claims.
 - Treat verification tables and preset catalogs as catalogs of available
   lanes, not matrices. Select only lanes relevant to the changed surface.
@@ -168,7 +182,7 @@ A source checkout is never retained as evidence.
 
 An attended human verdict is never a stop condition and never blocks a card's
 unattended work: finish the unattended evidence, park the card as
-`references/project.md` describes, and continue with work that does not
+`project.md` describes, and continue with work that does not
 depend on it. Present pending verdicts together at the run boundary.
 
 ## Findings And Convergence
@@ -231,7 +245,7 @@ Documentation never invalidates otherwise unchanged product evidence.
 
 ## Status And Closeout
 
-Use the RFC status vocabulary `references/project.md` lists; `Proposed` means
+Use the RFC status vocabulary `project.md` lists; `Proposed` means
 design not yet approved, `terminal_rfc_status` means the finish condition
 above is satisfied, and any intermediate or rejection statuses mean what the
 project defines.
@@ -245,7 +259,7 @@ a record look more complete. Unrelated pre-existing findings remain separate
 work.
 
 The closeout card is the durable run anchor. Keep it in the project's
-closeout-card contract (`references/project.md`): `RFC_BASE_SHA`, the planned
+closeout-card contract (`project.md`): `RFC_BASE_SHA`, the planned
 cards, and for each acceptance criterion the check run, its result, and the
 commit it was produced at; add the `Closeout review runtime:` line when an
 independent review ran. On a station branch the status flip is a proposal the
@@ -280,7 +294,7 @@ worktree cleanup follows
 
 The canonical skill and role semantics are vendor-neutral. Generated Codex and
 Claude adapters come from `config/roles.json`, `config/routing.json`, and the
-per-role addenda in `config/project.json`. Read
+per-role addenda in the selected external `project.json`. Read
 [references/runtime-compatibility.md](references/runtime-compatibility.md)
 only when using those adapters or remote runtime features. Regenerate and
 drift-check every adapter whenever `SKILL.md`, a config source, a reference,

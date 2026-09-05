@@ -71,10 +71,6 @@ from codex_station import (  # noqa: E402
     release_named_threads,
 )
 
-PROJECT = project_config.load()
-WORKSTREAMS = PROJECT["workstreams"]
-
-
 STATION_SCHEMA = "implement-rfc.remote-station.v2"
 MINIMUM_CODEX_VERSION = (0, 151, 0)
 CLAUDE_RESUME_FAILURE_WINDOW_SECONDS = 30.0
@@ -104,6 +100,7 @@ class StationContext:
     authority: str
     lease_role: str
     station_file: pathlib.Path
+    project_context: project_config.ProjectContext
 
 
 def run_git(root: pathlib.Path | None, *arguments: str) -> str:
@@ -139,13 +136,13 @@ def host_platform() -> tuple[str, str]:
     raise LaunchRefusal(f"unsupported platform: {system}")
 
 
-def is_project_origin(origin: str) -> bool:
+def is_project_origin(origin: str, config: dict) -> bool:
     """Match the repository token in SSH and URL-style Git origins."""
     trimmed = origin.rstrip("/")
     if trimmed.endswith(".git"):
         trimmed = trimmed[: -len(".git")]
     tail = trimmed.rsplit("/", maxsplit=1)[-1].rsplit(":", maxsplit=1)[-1]
-    return tail == PROJECT["origin_repo_name"]
+    return tail == config["origin_repo_name"]
 
 
 def load_station_file(station_file: pathlib.Path) -> dict[str, Any]:
@@ -209,7 +206,7 @@ def station_document(
         "schema": STATION_SCHEMA,
         "station_id": station_id,
         "station": context.name,
-        "project": PROJECT["project"],
+        "project": context.project_context.config["project"],
         "workstream": context.workstream,
         "environment": context.environment,
         "branch": context.branch,
@@ -225,38 +222,34 @@ def interpreter_spelling() -> str:
 
 
 def station_lease_path(context: StationContext) -> pathlib.Path:
-    return (
-        context.root
-        / ".agents"
-        / "skills"
-        / "implement-rfc"
-        / "scripts"
-        / "station_lease.py"
-    )
+    return context.project_context.asset_root / "scripts/station_lease.py"
 
 
 def resolve_context(arguments: argparse.Namespace) -> StationContext:
-    try:
-        root = pathlib.Path(run_git(None, "rev-parse", "--show-toplevel")).resolve()
-    except LaunchRefusal as error:
-        raise LaunchRefusal("not inside a git checkout") from error
+    selected = project_config.resolve_context(repo_root=getattr(arguments, "repo_root", None))
+    root = selected.repo_root
+    config = selected.config
+    workstreams = config["workstreams"]
+    arguments.repo_root = root
 
     try:
         origin = run_git(root, "remote", "get-url", "origin")
     except LaunchRefusal:
         origin = ""
-    if not is_project_origin(origin):
+    if not is_project_origin(origin, config):
         raise LaunchRefusal(
-            f"this checkout's origin ({origin}) is not the "
-            f"{PROJECT['display_name']} repository"
+            "this checkout's origin is not the "
+            f"{config['display_name']} repository"
         )
 
     current = run_git(root, "branch", "--show-current")
     if arguments.workstream is None:
         arguments.workstream = infer_workstream(
-            root / ".remote-station.json", current
+            root / ".remote-station.json", current, config
         )
-    workstream = WORKSTREAMS[arguments.workstream]
+    if arguments.workstream not in workstreams:
+        raise LaunchRefusal(f"unknown workstream {arguments.workstream!r}; choices: {', '.join(sorted(workstreams))}")
+    workstream = workstreams[arguments.workstream]
     branch = workstream["branch"]
     if current != branch:
         raise LaunchRefusal(
@@ -280,7 +273,7 @@ def resolve_context(arguments: argparse.Namespace) -> StationContext:
         )
     station_file = root / ".remote-station.json"
     canonical = project_config.station_name(
-        PROJECT, arguments.workstream, platform_token
+        config, arguments.workstream, platform_token
     )
     recorded_machine = (
         "" if arguments.fresh_station else infer_machine(station_file, canonical)
@@ -294,7 +287,7 @@ def resolve_context(arguments: argparse.Namespace) -> StationContext:
         )
     arguments.machine = arguments.machine or recorded_machine
     name = project_config.station_name(
-        PROJECT, arguments.workstream, platform_token, arguments.machine
+        config, arguments.workstream, platform_token, arguments.machine
     )
     lease_role = (
         "project-integrator" if arguments.workstream == "main" else "station-writer"
@@ -308,10 +301,11 @@ def resolve_context(arguments: argparse.Namespace) -> StationContext:
         authority=arguments.authority,
         lease_role=lease_role,
         station_file=station_file,
+        project_context=selected,
     )
 
 
-def infer_workstream(station_file: pathlib.Path, current_branch: str) -> str:
+def infer_workstream(station_file: pathlib.Path, current_branch: str, config: dict) -> str:
     """The workstream this checkout is, without being told.
 
     A checkout launched before says so in its station file. A fresh one says
@@ -320,23 +314,24 @@ def infer_workstream(station_file: pathlib.Path, current_branch: str) -> str:
     at all. Nothing is inferred from the host platform — a Windows host can
     hold the integrator checkout, and the branch is what makes that unambiguous.
     """
+    workstreams = config["workstreams"]
     try:
         recorded = load_station_file(station_file)
     except LaunchRefusal:
         recorded = {}
     recorded_workstream = recorded.get("workstream")
-    if isinstance(recorded_workstream, str) and recorded_workstream in WORKSTREAMS:
+    if isinstance(recorded_workstream, str) and recorded_workstream in workstreams:
         return recorded_workstream
     matches = [
         name
-        for name, workstream in WORKSTREAMS.items()
+        for name, workstream in workstreams.items()
         if workstream["branch"] == current_branch
     ]
     if len(matches) == 1:
         return matches[0]
     branches = ", ".join(
         f"{name} ({workstream['branch']})"
-        for name, workstream in sorted(WORKSTREAMS.items())
+        for name, workstream in sorted(workstreams.items())
     )
     raise LaunchRefusal(
         f"cannot infer a workstream: this checkout is on '{current_branch}', "
@@ -464,6 +459,7 @@ def start_codex_desktop_app(context: StationContext) -> None:
 def initialize_codex_proxy(context: StationContext) -> ProxyAppServerClient:
     client = ProxyAppServerClient(
         cwd=context.root,
+        context=context.project_context,
         connect_timeout=CODEX_DESKTOP_PROXY_ATTEMPT_SECONDS,
     )
     try:
@@ -651,13 +647,14 @@ def provision_codex(
             )
         start_codex_desktop_app(context)
         try:
-            with AppServerClient(cwd=context.root) as client:
+            with AppServerClient(cwd=context.root, context=context.project_context) as client:
                 forget_recorded_tasks(client)
                 thread_id = provision_named_thread(
                     client,
                     cwd=context.root,
                     name=context.name,
                     expected_thread_id=expected_thread_id,
+                    context=context.project_context,
                 )
         except CodexStationError as error:
             raise LaunchRefusal(str(error)) from error
@@ -678,6 +675,7 @@ def provision_codex(
             cwd=context.root,
             name=context.name,
             expected_thread_id=expected_thread_id,
+            context=context.project_context,
         )
         yield {
             "thread_id": thread_id,
@@ -1042,7 +1040,7 @@ def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
             if context.environment == "windows-native":
                 print(
                     "Codex Desktop sidebar: if this task is under Recents, drag "
-                    f"{context.name} onto the {PROJECT['display_name']} project; Desktop exposes no "
+                    f"{context.name} onto the {context.project_context.config['display_name']} project; Desktop exposes no "
                     "supported project-placement RPC.",
                     flush=True,
                 )
@@ -1075,7 +1073,7 @@ def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
                 session_id=claude_session_id,
                 record_session=record_claude_session,
             )
-    except LaunchRefusal as refusal:
+    except (LaunchRefusal, project_config.ProjectConfigError) as refusal:
         print(f"station refused: {refusal}", file=sys.stderr)
         return 2
     except OSError as error:
@@ -1095,6 +1093,8 @@ def internal_supervisor_arguments(arguments: argparse.Namespace) -> list[str]:
         "--permission-mode",
         arguments.permission_mode,
     ]
+    if getattr(arguments, "repo_root", None) is not None:
+        command += ["--repo-root", str(arguments.repo_root)]
     if arguments.machine:
         command += ["--machine", arguments.machine]
     if arguments.authority == "read-only-proof":
@@ -1119,6 +1119,8 @@ def run_under_lease(arguments: argparse.Namespace, context: StationContext) -> i
         context.lease_role,
         "--station",
         context.name,
+        "--repo-root",
+        str(context.root),
         "--",
         *internal_supervisor_arguments(arguments),
     ]
@@ -1172,9 +1174,9 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
         "workstream",
         nargs="?",
         default=None,
-        choices=sorted(WORKSTREAMS),
         help="optional; inferred from the station file or the checkout's branch",
     )
+    parser.add_argument("--repo-root", type=pathlib.Path)
     parser.add_argument("--machine", default="")
     parser.add_argument(
         "--read-only",
@@ -1237,7 +1239,7 @@ def main(argv: list[str] | None = None) -> int:
         arguments.new_claude_session = True
     try:
         context = resolve_context(arguments)
-    except LaunchRefusal as refusal:
+    except (LaunchRefusal, project_config.ProjectConfigError) as refusal:
         print(refusal, file=sys.stderr)
         return 2
 

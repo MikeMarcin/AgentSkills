@@ -14,9 +14,9 @@ from unittest import mock
 
 SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "codex_lane.py"
 
-PROJECT = json.loads(
-    (Path(__file__).resolve().parent.parent / "config" / "project.json").read_text(encoding="utf-8")
-)
+from project_fixtures import CONFIG, write_context
+
+PROJECT = CONFIG
 LANE_LOG_NAME = f"{PROJECT['project']}-codex-lanes.jsonl"
 
 FAKE_COMPANION = """\
@@ -55,6 +55,7 @@ class CodexLaneTest(unittest.TestCase):
         self.repo = self.root / "repo"
         self.repo.mkdir()
         _git(self.repo, "init", "--initial-branch=main")
+        write_context(self.repo, config=PROJECT)
         (self.repo / "seed.txt").write_text("seed\n", encoding="utf-8")
         _git(self.repo, "add", "seed.txt")
         _git(self.repo, "commit", "-m", "seed")
@@ -144,6 +145,7 @@ class CodexLaneTest(unittest.TestCase):
             role="rfc-utility", task_file=None, task="Inventory changed files.",
             lane_name=None, write=False, allow_shared_write=False,
             cwd=str(self.repo), repo_root=self.repo, background=False,
+            context=module.project_config.resolve_context(repo_root=self.repo),
         )
         stderr = io.StringIO()
 
@@ -236,7 +238,7 @@ class ComposePromptNamingTests(unittest.TestCase):
         # identically to every other lane of any role.
         role, route = _load_codex_lane().load_role_route("rfc-reviewer")
         prompt = _load_codex_lane().compose_prompt(
-            "rfc-reviewer", role, route, "rfc_reviewer_snp_0042_closeout", "Do the thing."
+            "rfc-reviewer", role, route, "rfc_reviewer_snp_0042_closeout", "Do the thing.", PROJECT
         )
         first_line = prompt.splitlines()[0]
         self.assertIn("rfc_reviewer_snp_0042_closeout", first_line)
@@ -245,7 +247,7 @@ class ComposePromptNamingTests(unittest.TestCase):
     def test_two_lanes_of_one_role_get_distinct_names(self) -> None:
         role, route = _load_codex_lane().load_role_route("rfc-reviewer")
         first, second = (
-            _load_codex_lane().compose_prompt("rfc-reviewer", role, route, lane, "task").splitlines()[0]
+            _load_codex_lane().compose_prompt("rfc-reviewer", role, route, lane, "task", PROJECT).splitlines()[0]
             for lane in ("rfc_reviewer_alpha", "rfc_reviewer_beta")
         )
         self.assertNotEqual(first, second)
@@ -254,7 +256,7 @@ class ComposePromptNamingTests(unittest.TestCase):
         # The banner is a label, not a replacement: the role's own instructions
         # must still be the first thing the agent is told to do.
         role, route = _load_codex_lane().load_role_route("rfc-reviewer")
-        prompt = _load_codex_lane().compose_prompt("rfc-reviewer", role, route, "rfc_reviewer_x", "task")
+        prompt = _load_codex_lane().compose_prompt("rfc-reviewer", role, route, "rfc_reviewer_x", "task", PROJECT)
         self.assertIn("emit exactly this startup line", prompt)
         self.assertLess(prompt.index(f"{PROJECT['display_name']} lane"), prompt.index("emit exactly this startup line"))
 

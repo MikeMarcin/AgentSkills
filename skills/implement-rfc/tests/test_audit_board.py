@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 import subprocess
@@ -7,6 +8,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+from project_fixtures import write_context
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "audit_board.py"
@@ -144,6 +147,10 @@ class BoardAuditTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.build_clean(root)
+            subprocess.run(["git", "-C", str(root), "init"], check=True, capture_output=True)
+            rules = root / ".mask/skill-config/implement-rfc/project.md"
+            rules.parent.mkdir(parents=True)
+            rules.write_text("Fixture project rules")
             config_path = root / "project.json"
             config_path.write_text(json.dumps(CONFIG), encoding="utf-8")
             result = subprocess.run(
@@ -164,6 +171,30 @@ class BoardAuditTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout)
             self.assertIn("board conforms: no violations, no warnings", result.stdout)
+
+    def test_shared_cli_selects_each_consumers_facts_and_board(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("alpha", "beta"):
+                root = Path(tmp) / name
+                root.mkdir()
+                subprocess.run(["git", "-C", str(root), "init"], check=True, capture_output=True)
+                self.build_clean(root)
+                config = copy.deepcopy(CONFIG)
+                config.update(project=name, display_name=name.title(), origin_repo_name=name)
+                if name == "beta":
+                    (root / "docs/issues").rename(root / "docs/cards")
+                    config["issue_root"] = "docs/cards"
+                    config["next_id"]["path"] = "docs/cards/NEXT_ID"
+                    config["reservations_dir"] = "docs/cards/_reservations"
+                write_context(root, config=config)
+                nested = root / "src/nested"
+                nested.mkdir(parents=True)
+                entry = root / ".agents/skills/implement-rfc"
+                entry.parent.mkdir(parents=True)
+                entry.symlink_to(SCRIPT.parents[1], target_is_directory=True)
+                result = subprocess.run([sys.executable, str(entry / "scripts/audit_board.py"), "--repo-root", str(root)], cwd=nested, text=True, capture_output=True)
+                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                self.assertIn("board conforms: no violations, no warnings", result.stdout)
 
     def test_detects_noncanonical_folder_and_status_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -33,7 +33,6 @@ ROLES = ("station-writer", "project-integrator")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import project_config  # noqa: E402
 
-PROJECT_TOKEN = project_config.load()["project"]
 
 if os.name == "posix":
     import fcntl
@@ -68,6 +67,7 @@ def _git_dir(role: str, repo: Path) -> Path:
     flag = "--git-common-dir" if role == "project-integrator" else "--git-dir"
     proc = subprocess.run(
         ["git", "-C", str(repo), "rev-parse", flag],
+        env=project_config.git_environment(),
         capture_output=True,
         text=True,
     )
@@ -80,8 +80,8 @@ def _git_dir(role: str, repo: Path) -> Path:
     return path
 
 
-def _lock_path(role: str, repo: Path) -> Path:
-    return _git_dir(role, repo) / f"{PROJECT_TOKEN}-{role}.lock"
+def _lock_path(role: str, repo: Path, config: dict) -> Path:
+    return _git_dir(role, repo) / f"{config['project']}-{role}.lock"
 
 
 def _holder_path(lock_path: Path) -> Path:
@@ -91,7 +91,7 @@ def _holder_path(lock_path: Path) -> Path:
 def _holder_record(args: argparse.Namespace, command: list[str]) -> dict:
     return {
         "schema": "implement-rfc.station-lease.v1",
-        "project": PROJECT_TOKEN,
+        "project": args.context.config["project"],
         "role": args.role,
         "station": args.station,
         "pid": os.getpid(),
@@ -115,7 +115,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     if not args.command:
         sys.stderr.write("run: missing command after --\n")
         return 2
-    path = _lock_path(args.role, args.repo)
+    path = _lock_path(args.role, args.repo, args.context.config)
     holder_path = _holder_path(path)
     fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
     if not _try_lock(fd):
@@ -143,7 +143,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def cmd_status(args: argparse.Namespace) -> int:
-    path = _lock_path(args.role, args.repo)
+    path = _lock_path(args.role, args.repo, args.context.config)
     holder_path = _holder_path(path)
     if not path.exists():
         print(f"{args.role}: free")
@@ -167,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
 
     def common(p: argparse.ArgumentParser) -> None:
         p.add_argument("--role", choices=ROLES, default="station-writer")
-        p.add_argument("--repo", type=Path, default=Path.cwd())
+        p.add_argument("--repo", "--repo-root", dest="repo", type=Path, default=None)
 
     run_p = sub.add_parser("run", help="acquire the lease and run a command")
     common(run_p)
@@ -179,6 +179,11 @@ def main(argv: list[str] | None = None) -> int:
     status_p.set_defaults(station=None)
 
     args = parser.parse_args(argv)
+    try:
+        args.context = project_config.resolve_context(repo_root=args.repo)
+    except project_config.ProjectConfigError as error:
+        parser.error(str(error))
+    args.repo = args.context.repo_root
     if args.mode == "run":
         if args.command and args.command[0] == "--":
             args.command = args.command[1:]

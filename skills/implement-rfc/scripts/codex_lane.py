@@ -42,9 +42,6 @@ sys.path.insert(0, str(SCRIPT_DIR))
 import project_config  # noqa: E402
 import render_runtime_adapters as renderer  # noqa: E402
 
-PROJECT = project_config.load()
-LANE_LOG_NAME = project_config.lane_log_name(PROJECT)
-
 
 class LaunchError(Exception):
     pass
@@ -95,6 +92,7 @@ def effective_effort(route: dict) -> tuple[str | None, str | None]:
 def git_toplevel(directory: Path) -> Path | None:
     result = subprocess.run(
         ["git", "-C", str(directory), "rev-parse", "--show-toplevel"],
+        env=project_config.git_environment(),
         capture_output=True,
         text=True,
     )
@@ -103,9 +101,10 @@ def git_toplevel(directory: Path) -> Path | None:
     return Path(result.stdout.strip()).resolve()
 
 
-def lane_log_path(repo_root: Path) -> Path | None:
+def lane_log_path(repo_root: Path, config: dict | None = None) -> Path | None:
     result = subprocess.run(
         ["git", "-C", str(repo_root), "rev-parse", "--git-common-dir"],
+        env=project_config.git_environment(),
         capture_output=True,
         text=True,
     )
@@ -114,11 +113,11 @@ def lane_log_path(repo_root: Path) -> Path | None:
     common = Path(result.stdout.strip())
     if not common.is_absolute():
         common = (repo_root / common).resolve()
-    return common / LANE_LOG_NAME
+    return common / project_config.lane_log_name(config or project_config.load(repo_root=repo_root))
 
 
-def record_launch(repo_root: Path, record: dict) -> None:
-    log_path = lane_log_path(repo_root)
+def record_launch(repo_root: Path, record: dict, config: dict | None = None) -> None:
+    log_path = lane_log_path(repo_root, config)
     if log_path is None:
         print("warning: not a git checkout; codex lane launch not logged", file=sys.stderr)
         return
@@ -126,15 +125,16 @@ def record_launch(repo_root: Path, record: dict) -> None:
         handle.write(json.dumps(record, sort_keys=True) + "\n")
 
 
-def compose_prompt(role_name: str, role: dict, route: dict, lane_name: str, task_text: str) -> str:
-    role_prompt = renderer.role_prompt(role_name, role, route, PROJECT)
+def compose_prompt(role_name: str, role: dict, route: dict, lane_name: str, task_text: str, config: dict | None = None) -> str:
+    config = config or project_config.load()
+    role_prompt = renderer.role_prompt(role_name, role, route, config)
     # The companion names a job by shortening the first line of the prompt, so
     # whatever leads the text becomes the label in the operator's task list.
     # Leading with the role prompt would make every lane read identically.
-    banner = f"{PROJECT['display_name']} lane {lane_name} ({role_name})\n\n"
+    banner = f"{config['display_name']} lane {lane_name} ({role_name})\n\n"
     header = (
         f"Session name: {lane_name}\n"
-        f"Lane assignment from the primary {PROJECT['display_name']} RFC integrator follows. "
+        f"Lane assignment from the primary {config['display_name']} RFC integrator follows. "
         "Honor every role instruction above; the assignment can narrow, never widen, your authority. "
         "This runtime returns only your final message, so begin that final message with your startup "
         "identity line, then the role's compact sections.\n"
@@ -143,6 +143,7 @@ def compose_prompt(role_name: str, role: dict, route: dict, lane_name: str, task
 
 
 def cmd_launch(args: argparse.Namespace) -> int:
+    context = getattr(args, "context", None) or project_config.resolve_context(repo_root=args.repo_root)
     role, route = load_role_route(args.role)
     if args.task_file:
         task_text = Path(args.task_file).read_text(encoding="utf-8")
@@ -160,7 +161,7 @@ def cmd_launch(args: argparse.Namespace) -> int:
         raise LaunchError(f"role {args.role} is read-only; do not launch it with --write")
 
     cwd = Path(args.cwd).resolve() if args.cwd else Path.cwd().resolve()
-    repo_root = args.repo_root.resolve()
+    repo_root = context.repo_root
     if write and not args.allow_shared_write:
         target_top = git_toplevel(cwd)
         if target_top is not None and target_top == git_toplevel(repo_root):
@@ -179,7 +180,7 @@ def cmd_launch(args: argparse.Namespace) -> int:
         )
 
     route_for_prompt = {**route, "effort": effort}
-    prompt = compose_prompt(args.role, role, route_for_prompt, lane_name, task_text)
+    prompt = compose_prompt(args.role, role, route_for_prompt, lane_name, task_text, context.config)
     prompt_file = tempfile.NamedTemporaryFile(
         "w", encoding="utf-8", suffix=".md", prefix=f"{lane_name}-", delete=False
     )
@@ -212,6 +213,7 @@ def cmd_launch(args: argparse.Namespace) -> int:
             "background": bool(args.background),
             "cwd": str(cwd),
         },
+        context.config,
     )
     try:
         # The companion reads the prompt file before returning, even for
@@ -232,7 +234,7 @@ def cmd_forward(args: argparse.Namespace) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repo-root", type=Path, default=SKILL_DIR.parents[2])
+    parser.add_argument("--repo-root", type=Path, default=None)
     sub = parser.add_subparsers(dest="command", required=True)
 
     launch = sub.add_parser("launch", help="Launch one routed Codex lane through the companion runtime.")
@@ -269,6 +271,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except LaunchError as exc:
+    except (LaunchError, project_config.ProjectConfigError) as exc:
         print(f"codex lane error: {exc}", file=sys.stderr)
         raise SystemExit(2)

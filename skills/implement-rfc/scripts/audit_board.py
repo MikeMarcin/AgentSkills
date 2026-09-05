@@ -230,16 +230,18 @@ def audit(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repo-root", type=Path, default=project_config.repo_root())
+    parser.add_argument("--repo-root", type=Path, default=None)
     parser.add_argument("--transcripts-dir", type=Path, default=None)
     parser.add_argument(
         "--project-config",
         type=Path,
-        default=project_config.PROJECT_PATH,
+        default=None,
         help=argparse.SUPPRESS,
     )
     args = parser.parse_args()
-    config = project_config.load(args.project_config)
+    context = project_config.resolve_context(repo_root=args.repo_root, project_config_path=args.project_config)
+    config = context.config
+    args.repo_root = context.repo_root
 
     transcripts = args.transcripts_dir
     if transcripts is None:

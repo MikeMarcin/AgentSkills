@@ -91,8 +91,9 @@ class RemoteStationGuardTests(unittest.TestCase):
         lease_target.parent.mkdir(parents=True)
         shutil.copy2(LEASE, lease_target)
         shutil.copy2(PROJECT_CONFIG_MODULE, lease_target.with_name("project_config.py"))
-        config_dir = lease_target.parent.parent / "config"
-        config_dir.mkdir()
+        config_dir = self.repo / ".mask/skill-config/implement-rfc"
+        config_dir.mkdir(parents=True)
+        (config_dir / "project.md").write_text("Fixture rules")
         (config_dir / "project.json").write_text(
             json.dumps(FIXTURE_PROJECT, indent=2) + "\n", encoding="utf-8"
         )

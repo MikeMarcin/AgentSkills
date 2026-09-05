@@ -34,15 +34,16 @@ import sys as _sys
 _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import project_config  # noqa: E402
 
-PROJECT = project_config.load()
 STATION_SANDBOX = "danger-full-access"
-STATION_BOOTSTRAP_TEXT = (
-    f"This is the persistent {PROJECT['display_name']} remote station endpoint. "
-    "Do not inspect or modify files. Reply exactly STATION READY."
-)
 TERMINAL_TURN_STATUSES = {"completed", "failed", "interrupted"}
 STATION_BOOTSTRAP_TIMEOUT_SECONDS = 120.0
 
+
+def station_bootstrap_text(config: dict[str, Any]) -> str:
+    return (
+        f"This is the persistent {config['display_name']} remote station endpoint. "
+        "Do not inspect or modify files. Reply exactly STATION READY."
+    )
 
 class CodexStationError(Exception):
     """A capability, protocol, or station-identity failure."""
@@ -62,7 +63,8 @@ class CodexStationError(Exception):
 class _AppServerRpcClient:
     """Shared JSON-RPC lifecycle over a transport-specific message stream."""
 
-    def __init__(self, timeout: float) -> None:
+    def __init__(self, timeout: float, context: project_config.ProjectContext) -> None:
+        self.context = context
         self._timeout = timeout
         self._next_id = 0
         self._messages: queue.Queue[dict[str, Any] | None] = queue.Queue()
@@ -76,8 +78,8 @@ class _AppServerRpcClient:
                 "initialize",
                 {
                     "clientInfo": {
-                        "name": f"{PROJECT['project'].replace('-', '_')}_remote_station",
-                        "title": f"{PROJECT['display_name']} Remote Station",
+                        "name": f"{self.context.config['project'].replace('-', '_')}_remote_station",
+                        "title": f"{self.context.config['display_name']} Remote Station",
                         "version": "1.0.0",
                     },
                     "capabilities": {"experimentalApi": True},
@@ -226,10 +228,14 @@ class AppServerClient(_AppServerRpcClient):
         self,
         *,
         cwd: pathlib.Path,
+        context: project_config.ProjectContext | None = None,
         timeout: float = 30.0,
         popen: Callable[..., subprocess.Popen[bytes]] = subprocess.Popen,
     ) -> None:
-        super().__init__(timeout)
+        selected = context or project_config.resolve_context(repo_root=cwd)
+        if selected.repo_root != cwd.resolve():
+            raise CodexStationError("project context does not match transport checkout")
+        super().__init__(timeout, selected)
         try:
             self._process = popen(
                 ["codex", "app-server", "--listen", "stdio://"],
@@ -288,11 +294,15 @@ class ProxyAppServerClient(_AppServerRpcClient):
         self,
         *,
         cwd: pathlib.Path,
+        context: project_config.ProjectContext | None = None,
         timeout: float = 30.0,
         connect_timeout: float | None = None,
         popen: Callable[..., subprocess.Popen[bytes]] = subprocess.Popen,
     ) -> None:
-        super().__init__(timeout)
+        selected = context or project_config.resolve_context(repo_root=cwd)
+        if selected.repo_root != cwd.resolve():
+            raise CodexStationError("project context does not match transport checkout")
+        super().__init__(timeout, selected)
         self._connect_timeout = (
             timeout if connect_timeout is None else connect_timeout
         )
@@ -729,6 +739,7 @@ def _materialize_thread(
     *,
     cwd: pathlib.Path,
     thread_id: str,
+    bootstrap_text: str,
     timeout: float = STATION_BOOTSTRAP_TIMEOUT_SECONDS,
 ) -> None:
     """Run the first harmless turn so Managed Remote indexes a new task."""
@@ -738,7 +749,7 @@ def _materialize_thread(
             {
                 "approvalPolicy": "never",
                 "cwd": str(cwd),
-                "input": [{"type": "text", "text": STATION_BOOTSTRAP_TEXT}],
+                "input": [{"type": "text", "text": bootstrap_text}],
                 "sandboxPolicy": {"type": "readOnly", "networkAccess": False},
                 "threadId": thread_id,
             },
@@ -764,7 +775,7 @@ def _materialize_thread(
         )
 
 
-def _is_station_bootstrap_turn(turn: dict[str, Any]) -> bool:
+def _is_station_bootstrap_turn(turn: dict[str, Any], bootstrap_text: str) -> bool:
     """Recognize the exact non-mutating turn created by this provisioner."""
     if turn.get("status") != "completed" or turn.get("itemsView", "full") != "full":
         return False
@@ -787,12 +798,12 @@ def _is_station_bootstrap_turn(turn: dict[str, Any]) -> bool:
     user_input = content[0]
     if not isinstance(user_input, dict) or user_input.get("type") != "text":
         return False
-    return user_input.get("text") == STATION_BOOTSTRAP_TEXT
+    return user_input.get("text") == bootstrap_text
 
 
-def _is_disposable_registered_task(thread: dict[str, Any]) -> bool:
+def _is_disposable_registered_task(thread: dict[str, Any], bootstrap_text: str) -> bool:
     turns = _thread_turns(thread, "duplicate recovery")
-    return not turns or (len(turns) == 1 and _is_station_bootstrap_turn(turns[0]))
+    return not turns or (len(turns) == 1 and _is_station_bootstrap_turn(turns[0], bootstrap_text))
 
 
 def _is_active_writer_error(error: CodexStationError, thread_id: str) -> bool:
@@ -843,6 +854,7 @@ def _recover_registered_replacement(
     name: str,
     matches: list[dict[str, Any]],
     expected_thread_id: str | None,
+    bootstrap_text: str,
 ) -> tuple[list[dict[str, Any]], bool]:
     """Archive one empty or bootstrap-only registered task for a real replacement."""
     if expected_thread_id is None or len(matches) not in (1, 2):
@@ -872,10 +884,10 @@ def _recover_registered_replacement(
         isinstance(expected_cwd, str)
         and _normalized_path(expected_cwd) == _normalized_path(cwd)
         and expected_name in (None, "", name)
-        and _is_disposable_registered_task(expected_full)
+        and _is_disposable_registered_task(expected_full, bootstrap_text)
     )
     replacement_has_user_history = not _is_disposable_registered_task(
-        replacement_full
+        replacement_full, bootstrap_text
     )
     if not expected_is_disposable or not replacement_has_user_history:
         return matches, False
@@ -891,9 +903,14 @@ def provision_named_thread(
     cwd: pathlib.Path,
     name: str,
     expected_thread_id: str | None,
+    context: project_config.ProjectContext | None = None,
 ) -> str:
     """Create or verify the only task bound to ``name`` and ``cwd``."""
     cwd = cwd.resolve()
+    selected = context or project_config.resolve_context(repo_root=cwd)
+    if selected.repo_root != cwd:
+        raise CodexStationError("project context does not match station checkout")
+    bootstrap_text = station_bootstrap_text(selected.config)
     project_id = _project_id_for_cwd(client, cwd)
     matches = _list_named_threads(client, cwd=cwd, name=name)
     matches, recovered_registered_task = _recover_registered_replacement(
@@ -902,6 +919,7 @@ def provision_named_thread(
         name=name,
         matches=matches,
         expected_thread_id=expected_thread_id,
+        bootstrap_text=bootstrap_text,
     )
     if recovered_registered_task:
         expected_thread_id = None
@@ -988,7 +1006,7 @@ def provision_named_thread(
             if not subscribed:
                 verified = _resume_thread(client, cwd=cwd, thread=verified)
                 subscribed = True
-            _materialize_thread(client, cwd=cwd, thread_id=thread_id)
+            _materialize_thread(client, cwd=cwd, thread_id=thread_id, bootstrap_text=bootstrap_text)
             client.request("thread/name/set", {"threadId": thread_id, "name": name})
             verified = _read_thread(client, thread_id, include_turns=True)
             if verified.get("name") != name:

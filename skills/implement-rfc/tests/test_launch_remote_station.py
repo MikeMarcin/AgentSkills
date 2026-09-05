@@ -12,6 +12,8 @@ from dataclasses import replace
 from pathlib import Path
 from unittest import mock
 
+from project_fixtures import CONFIG, context_for
+
 SCRIPTS_ROOT = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_ROOT))
 
@@ -64,11 +66,11 @@ class LauncherTests(unittest.TestCase):
             "win": {"branch": "windows-lane", "platform": "win"},
             "linux": {"branch": "linux-lane", "platform": "linux"},
         }
-        project = {**launcher.PROJECT, "workstreams": workstreams}
-        self.enterContext(mock.patch.object(launcher, "PROJECT", project))
-        self.enterContext(mock.patch.object(launcher, "WORKSTREAMS", workstreams))
+        self.project = {**CONFIG, "workstreams": workstreams}
         self._temporary = tempfile.TemporaryDirectory()
         root = Path(self._temporary.name).resolve()
+        self.selected = context_for(root, self.project)
+        self.enterContext(mock.patch.object(launcher.project_config, "resolve_context", return_value=self.selected))
         self.context = launcher.StationContext(
             root=root,
             workstream="main",
@@ -78,6 +80,7 @@ class LauncherTests(unittest.TestCase):
             authority="lane-commit",
             lease_role="project-integrator",
             station_file=root / ".remote-station.json",
+            project_context=self.selected,
         )
 
     def tearDown(self) -> None:
@@ -285,15 +288,15 @@ class LauncherTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.assertEqual(
-            launcher.infer_workstream(self.context.station_file, "unrelated"),
+            launcher.infer_workstream(self.context.station_file, "unrelated", self.project),
             "linux",
         )
 
     def test_workstream_is_inferred_from_the_branch(self) -> None:
-        for name, workstream in launcher.WORKSTREAMS.items():
+        for name, workstream in self.project["workstreams"].items():
             self.assertEqual(
                 launcher.infer_workstream(
-                    self.context.station_file, workstream["branch"]
+                    self.context.station_file, workstream["branch"], self.project
                 ),
                 name,
             )
@@ -340,13 +343,13 @@ class LauncherTests(unittest.TestCase):
 
     def resolve(self, argv: list[str]) -> launcher.StationContext:
         """`resolve_context` for a checkout on the `win` workstream's branch."""
-        workstream = launcher.WORKSTREAMS["win"]
+        workstream = self.project["workstreams"]["win"]
 
         def fake_git(root: object, *command: str) -> str:
             if command[0] == "rev-parse":
                 return str(self.context.root)
             if command[0] == "remote":
-                return f"git@github.com:owner/{launcher.PROJECT['origin_repo_name']}.git"
+                return f"git@github.com:owner/{self.project['origin_repo_name']}.git"
             return workstream["branch"]
 
         with (
@@ -363,14 +366,14 @@ class LauncherTests(unittest.TestCase):
                 {
                     "schema": launcher.STATION_SCHEMA,
                     "workstream": "win",
-                    "station": f"{launcher.PROJECT['session_prefix']}-win-example-win-host",
+                    "station": f"{self.project['session_prefix']}-win-example-win-host",
                 }
             ),
             encoding="utf-8",
         )
         self.assertEqual(
             self.resolve([]).name,
-            f"{launcher.PROJECT['session_prefix']}-win-example-win-host",
+            f"{self.project['session_prefix']}-win-example-win-host",
         )
 
     def test_fresh_station_takes_the_canonical_name_again(self) -> None:
@@ -379,14 +382,14 @@ class LauncherTests(unittest.TestCase):
                 {
                     "schema": launcher.STATION_SCHEMA,
                     "workstream": "win",
-                    "station": f"{launcher.PROJECT['session_prefix']}-win-example-win-host",
+                    "station": f"{self.project['session_prefix']}-win-example-win-host",
                 }
             ),
             encoding="utf-8",
         )
         self.assertEqual(
             self.resolve(["--fresh-station"]).name,
-            f"{launcher.PROJECT['session_prefix']}-win",
+            f"{self.project['session_prefix']}-win",
         )
 
     def test_an_explicit_machine_that_contradicts_the_record_refuses(self) -> None:
@@ -395,7 +398,7 @@ class LauncherTests(unittest.TestCase):
                 {
                     "schema": launcher.STATION_SCHEMA,
                     "workstream": "win",
-                    "station": f"{launcher.PROJECT['session_prefix']}-win-example-win-host",
+                    "station": f"{self.project['session_prefix']}-win-example-win-host",
                 }
             ),
             encoding="utf-8",
@@ -405,12 +408,12 @@ class LauncherTests(unittest.TestCase):
         # The same token the record already carries is not a contradiction.
         self.assertEqual(
             self.resolve(["--machine", "example-win-host"]).name,
-            f"{launcher.PROJECT['session_prefix']}-win-example-win-host",
+            f"{self.project['session_prefix']}-win-example-win-host",
         )
         # `--fresh-station` is how a station is deliberately renamed.
         self.assertEqual(
             self.resolve(["--fresh-station", "--machine", "nuc"]).name,
-            f"{launcher.PROJECT['session_prefix']}-win-nuc",
+            f"{self.project['session_prefix']}-win-nuc",
         )
 
     def test_the_resolved_machine_reaches_the_supervised_child(self) -> None:
@@ -419,19 +422,19 @@ class LauncherTests(unittest.TestCase):
                 {
                     "schema": launcher.STATION_SCHEMA,
                     "workstream": "win",
-                    "station": f"{launcher.PROJECT['session_prefix']}-win-example-win-host",
+                    "station": f"{self.project['session_prefix']}-win-example-win-host",
                 }
             ),
             encoding="utf-8",
         )
         parsed = launcher.parse_arguments([])
-        workstream = launcher.WORKSTREAMS["win"]
+        workstream = self.project["workstreams"]["win"]
 
         def fake_git(root: object, *command: str) -> str:
             if command[0] == "rev-parse":
                 return str(self.context.root)
             if command[0] == "remote":
-                return f"git@github.com:owner/{launcher.PROJECT['origin_repo_name']}.git"
+                return f"git@github.com:owner/{self.project['origin_repo_name']}.git"
             return workstream["branch"]
 
         with (
@@ -445,7 +448,7 @@ class LauncherTests(unittest.TestCase):
 
     def test_unknown_branch_without_a_station_file_refuses_to_guess(self) -> None:
         with self.assertRaisesRegex(launcher.LaunchRefusal, "cannot infer a workstream"):
-            launcher.infer_workstream(self.context.station_file, "feature/x")
+            launcher.infer_workstream(self.context.station_file, "feature/x", self.project)
 
     def test_omitted_workstream_resolves_from_the_checkout(self) -> None:
         """`launch_remote_station.py` with no argument is the documented command."""
@@ -455,21 +458,15 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(parsed.workstream, "linux")
 
     def test_main_only_project_does_not_require_platform_workstreams(self) -> None:
-        workstreams = {"main": {"branch": "main"}}
-        project = {**launcher.PROJECT, "workstreams": workstreams}
-        with (
-            mock.patch.object(launcher, "PROJECT", project),
-            mock.patch.object(launcher, "WORKSTREAMS", workstreams),
-        ):
-            self.assertIsNone(launcher.parse_arguments([]).workstream)
-            self.assertEqual(launcher.parse_arguments(["main"]).workstream, "main")
-            self.assertEqual(
-                launcher.infer_workstream(self.context.station_file, "main"), "main"
-            )
-            with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
-                launcher.parse_arguments(["linux"])
-            with self.assertRaisesRegex(launcher.LaunchRefusal, "cannot infer a workstream"):
-                launcher.infer_workstream(self.context.station_file, "linux-lane")
+        project = {**self.project, "workstreams": {"main": {"branch": "main"}}}
+        self.assertIsNone(launcher.parse_arguments([]).workstream)
+        self.assertEqual(launcher.parse_arguments(["main"]).workstream, "main")
+        self.assertEqual(launcher.infer_workstream(self.context.station_file, "main", project), "main")
+        with self.assertRaisesRegex(launcher.LaunchRefusal, "cannot infer a workstream"):
+            launcher.infer_workstream(self.context.station_file, "linux-lane", project)
+        with mock.patch.object(launcher.project_config, "resolve_context", return_value=context_for(self.context.root, project)), mock.patch.object(launcher, "run_git", return_value="Fixture"):
+            with self.assertRaisesRegex(launcher.LaunchRefusal, "unknown workstream"):
+                launcher.resolve_context(launcher.parse_arguments(["linux"]))
 
     def test_supervisor_migrates_v1_and_preserves_station_id(self) -> None:
         self.context.station_file.write_text(
@@ -756,6 +753,7 @@ class LauncherTests(unittest.TestCase):
             cwd=context.root,
             name=context.name,
             expected_thread_id=None,
+            context=context.project_context,
         )
 
     def test_a_normal_relaunch_archives_nothing(self) -> None:
@@ -981,12 +979,13 @@ class LauncherTests(unittest.TestCase):
                 app_server.return_value.__exit__.assert_called_once()
 
         start_app.assert_called_once_with(context)
-        app_server.assert_called_once_with(cwd=context.root)
+        app_server.assert_called_once_with(cwd=context.root, context=context.project_context)
         provision.assert_called_once_with(
             client,
             cwd=context.root,
             name=context.name,
             expected_thread_id=None,
+            context=context.project_context,
         )
         connect.assert_not_called()
         ensure_remote.assert_not_called()
@@ -1029,7 +1028,7 @@ class LauncherTests(unittest.TestCase):
 
         self.assertEqual(result, 0)
         self.assertIn(
-            f"drag fx-main-win onto the {launcher.PROJECT['display_name']} project",
+            f"drag fx-main-win onto the {self.project['display_name']} project",
             output.getvalue(),
         )
         self.assertIn("no supported project-placement RPC", output.getvalue())

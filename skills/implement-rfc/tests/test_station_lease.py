@@ -6,6 +6,8 @@ import time
 import unittest
 from pathlib import Path
 
+from project_fixtures import write_context
+
 SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "station_lease.py"
 SUCCESS_COMMAND = (sys.executable, "-c", "pass")
 
@@ -81,8 +83,9 @@ class StationLeaseTest(unittest.TestCase):
         self.repo = Path(self._tmp.name) / "repo"
         self.repo.mkdir()
         _git(self.repo, "init", "-b", "main")
+        write_context(self.repo)
         (self.repo / "seed.txt").write_text("seed\n")
-        _git(self.repo, "add", "seed.txt")
+        _git(self.repo, "add", "seed.txt", ".mask")
         _git(self.repo, "commit", "-m", "seed")
 
     def tearDown(self) -> None:

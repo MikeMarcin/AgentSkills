@@ -1,9 +1,8 @@
 # Portable `implement-rfc`
 
-This directory is the canonical RFC implementation skill for this repository
-and the sources used to generate its native Codex and Claude Code agent
-definitions. The same directory, minus two files, is carried verbatim between
-projects.
+This directory is shared RFC workflow source. Each consumer keeps its own
+project facts and rules outside the skill. A single local agent can use
+`SKILL.md`; native role adapters and remote station helpers are optional.
 
 ## Policy
 
@@ -29,15 +28,15 @@ formats.
 
 ## What is project-specific
 
-Exactly two files:
+Exactly two files under each consumer repository:
 
-- `config/project.json` — machine-read facts: project tokens, tracker paths,
+- `.mask/skill-config/implement-rfc/project.json` — machine-read facts: project tokens, tracker paths,
   lane names and their status words, the next-ID source, the closeout-card
   detection rule, the structure-gate commands, the attended-review skill (or
   `null`), the station registry document, workstream branches, and per-role
   instruction addenda. `schemas/project.schema.json` documents the contract;
   `scripts/project_config.py` enforces it.
-- `references/project.md` — the project's own rules in prose: what to read
+- `.mask/skill-config/implement-rfc/project.md` — the project's own rules in prose: what to read
   first, the side-effect boundary, what counts as a direct surface, the
   closeout-card contract, attended checkpoints, platform lanes.
 
@@ -63,7 +62,7 @@ fails when two projects have drifted.
   runtime from a Claude driver.
 - `references/remote-routing.md`: remote-station identity and writer authority.
 - `references/runtime-compatibility.md`: adapter and runtime-specific facts.
-- `scripts/project_config.py`: loader and validator for `config/project.json`.
+- `scripts/project_config.py`: invocation context resolver and project schema validator.
 - `scripts/render_runtime_adapters.py`: deterministic native adapter renderer
   and portable-manifest writer.
 - `scripts/validate_portable_agents.py`: skill tests, adapter drift check,
@@ -79,28 +78,35 @@ fails when two projects have drifted.
 The primary agent remains the only tracker, commit, integration, and
 RFC-status authority. Delegated agents return bounded inputs to that decision.
 
-## Render And Validate
+## Select A Consumer
 
-From the repository root:
+Invoke the physical shared script or either skill link from the consumer:
 
 ```sh
-python3 .agents/skills/implement-rfc/scripts/render_runtime_adapters.py
-python3 .agents/skills/implement-rfc/scripts/validate_portable_agents.py
+python3 /path/to/implement-rfc/scripts/project_config.py --repo-root /path/to/consumer
+python3 /path/to/implement-rfc/scripts/audit_board.py --repo-root /path/to/consumer
 ```
 
-Merge `config/codex-config.fragment.toml` into `.codex/config.toml` when
-custom agents are not already enabled. Claude Code discovers the generated
-entrypoint at `.claude/skills/implement-rfc/SKILL.md`; it points back to the
-single canonical skill rather than duplicating it.
+Explicit `--repo-root PATH` (API `repo_root=PATH`) takes precedence over
+`IMPLEMENT_RFC_PROJECT_ROOT`, then Git's root for invocation CWD. Nested CWD
+and Git worktrees are supported. Explicit roots must name the worktree root;
+invalid roots never fall through. Origin repository-name mismatches refuse.
+Fixtures may use explicit identities without an origin remote.
 
-Generated files:
+`resolve_context()` returns `asset_root`, `repo_root`, `project_config_path`,
+`project_rules_path`, and validated `config`. Read the selected project rules
+before editing. Keep this object or pass its root explicitly after changing
+CWD. No helper selects a consumer when imported. Hidden config overrides are
+validated inputs inside the selected consumer; they cannot redirect output.
 
-- `.codex/agents/rfc-{utility,test-runner,scout,worker-routine,worker,reviewer,critical-reviewer}.toml`
-- `.claude/agents/rfc-{utility,test-runner,scout,worker-routine,worker,reviewer,critical-reviewer}.md`
-- `.claude/skills/implement-rfc/SKILL.md`
-- `generated/runtime-adapters.json`, `generated/portable-manifest.json`
+## Role Adapters
 
-Keep generated adapters in the same commit as their sources.
+Role adapter rendering is an explicit optional authoring command, separate
+from installing or upgrading a skill. The shared-source renderer migration
+is tracked separately: do not run the inherited renderer through a shared
+skill link until its consumer-only output safety changes have landed. It can
+otherwise overwrite shared source. The local bootstrap renderer is restricted
+to real project-local directories.
 
 ## Routing Changes
 
@@ -108,14 +114,26 @@ Change role assignments or provider routes only in `config/routing.json`,
 update `verified_as_of`, then render and validate. For candidate evaluation,
 use `--repo-root` and `--routing-override` with a temporary directory.
 
-## Porting To Another Project
+## Use From Another Project
 
-1. Copy this directory to `.agents/skills/implement-rfc/` in the new
-   repository.
-2. Rewrite `config/project.json` and `references/project.md` for that project.
-3. Render, validate, and commit the generated files.
-4. From either repository, run `validate_portable_agents.py --compare` against
-   the other to confirm the portable set is identical.
+1. Create the consumer's `.mask/skill-config/implement-rfc/project.json` and
+   `project.md`; the JSON file is complete facts under
+   `schemas/project.schema.json`, without a merge layer.
+2. Read the shared skill explicitly by path or through its managed directory
+   links. The linked skill's physical parent never chooses a consumer.
+3. Run `project_config.py --repo-root /path/to/consumer`, report the selected
+   checkout, and read its external rules before implementation.
+
+The inherited context is retained in
+`examples/projects/samplereview/project.json` and `project.md` as an
+example only. It is never a default for an arbitrary consumer.
+
+For isolated bootstrap, an unlinked real local copy at
+`.agents/skills/implement-rfc` can instead contain `config/project.json` and
+`references/project.md`. Its identity must match the selected checkout and
+both files must exist. External context takes priority; a broken external
+context never falls back to embedded facts. Retire a temporary bootstrap copy
+at managed cutover.
 
 ## Bedrock
 

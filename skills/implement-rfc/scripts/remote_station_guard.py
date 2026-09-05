@@ -67,6 +67,7 @@ class GuardRefusal(Exception):
 def _git(root: pathlib.Path, *arguments: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", "-C", str(root), *arguments],
+        env=project_config.git_environment(),
         capture_output=True,
         text=True,
         check=False,
@@ -74,10 +75,8 @@ def _git(root: pathlib.Path, *arguments: str) -> subprocess.CompletedProcess[str
 
 
 def _repo_root(cwd: str) -> pathlib.Path | None:
-    completed = _git(pathlib.Path(cwd), "rev-parse", "--show-toplevel")
-    if completed.returncode != 0:
-        return None
-    return pathlib.Path(completed.stdout.strip()).resolve()
+    top = project_config._git(pathlib.Path(cwd), "rev-parse", "--show-toplevel")
+    return pathlib.Path(top).resolve() if top is not None else None
 
 
 def _load_station(root: pathlib.Path) -> dict[str, Any] | None:
@@ -121,7 +120,7 @@ def _is_project_origin(origin: str, expected: str) -> bool:
 
 def _load_project(root: pathlib.Path) -> dict[str, Any]:
     try:
-        return project_config.load(root / SKILL_RELATIVE / "config" / "project.json")
+        return project_config.resolve_context(repo_root=root).config
     except project_config.ProjectConfigError as error:
         raise GuardRefusal("no-station", f"project configuration is unusable: {error}") from error
 

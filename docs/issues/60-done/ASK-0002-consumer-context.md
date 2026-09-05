@@ -1,7 +1,7 @@
 ---
 id: ASK-0002
 title: Resolve workflow context from the consumer project
-status: In Progress
+status: Done
 rfc: RFC-ASK-0001
 depends_on: ["ASK-0001"]
 ---
@@ -26,4 +26,4 @@ Implement/run the skill's focused `test_project_config.py` plus new shared-conte
 
 ## Run record
 
-Not started. Record actual commands, outcomes and commits here. Read the live board before claiming. Never stage unrelated paths.
+Implemented invocation-scoped context and all helper consumers. Primary reviewed complete diff and reproduced: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=skills/implement-rfc/tests python3 -m unittest test_project_config test_audit_board test_codex_lane test_codex_station test_launch_remote_station test_station_lease test_remote_station_guard — 143 tests, OK, 2 optional-jsonschema skips. Tests use local fixtures/mocked runtime calls; no remote station launched. Code-simplifier review and git diff --check passed. Commit: this Done move.

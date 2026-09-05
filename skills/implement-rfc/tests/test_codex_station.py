@@ -16,6 +16,13 @@ SCRIPTS_ROOT = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_ROOT))
 
 import codex_station  # noqa: E402
+from project_fixtures import CONFIG, context_for
+from unittest import mock
+
+
+class ContextTestCase(unittest.TestCase):
+    def setUp(self):
+        self.enterContext(mock.patch.object(codex_station.project_config, "resolve_context", side_effect=lambda **kwargs: context_for(Path(kwargs["repo_root"]))))
 
 
 class FakeStdioProcess:
@@ -189,7 +196,7 @@ class FakeProxyProcess:
         return self._returncode or 0
 
 
-class AppServerClientTests(unittest.TestCase):
+class AppServerClientTests(ContextTestCase):
     def test_malformed_rpc_result_is_refused(self) -> None:
         process = FakeStdioProcess(malformed_result=True)
         with codex_station.AppServerClient(
@@ -226,7 +233,7 @@ class AppServerClientTests(unittest.TestCase):
         self.assertTrue(initialize["params"]["capabilities"]["experimentalApi"])
 
 
-class ProxyAppServerClientTests(unittest.TestCase):
+class ProxyAppServerClientTests(ContextTestCase):
     def test_malformed_rpc_result_is_refused(self) -> None:
         process = FakeProxyProcess(malformed_result=True)
         with codex_station.ProxyAppServerClient(
@@ -391,7 +398,7 @@ def station_bootstrap_turn(
             "content": [
                 {
                     "type": "text",
-                    "text": codex_station.STATION_BOOTSTRAP_TEXT,
+                    "text": codex_station.station_bootstrap_text(CONFIG),
                     "text_elements": [],
                 }
             ],
@@ -411,8 +418,9 @@ def station_bootstrap_turn(
     }
 
 
-class ProvisionNamedThreadTests(unittest.TestCase):
+class ProvisionNamedThreadTests(ContextTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self._temporary = tempfile.TemporaryDirectory()
         self.cwd = Path(self._temporary.name).resolve()
         self.name = "fx-main-mac"
