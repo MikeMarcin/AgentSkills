@@ -7,7 +7,7 @@ Only the main integrator imports, renumbers, edits tracker rules and confirms te
 | RFC | Status | Title |
 |---|---|---|
 | RFC-ASK-0001 | Auto-Verified | Import and adapt the portable implement-rfc workflow |
-| RFC-ASK-0002 | Proposed | Agent-operated MASK management skill |
+| RFC-ASK-0002 | Implementing | Agent-operated MASK management skill |
 
 ## Import and verification
 

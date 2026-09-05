@@ -1,7 +1,7 @@
 ---
 id: ASK-0005
 title: Add the agent-facing MASK management workflow
-status: Backlog
+status: Done
 rfc: RFC-ASK-0002
 depends_on: ["ASK-0004"]
 external_depends_on: ["ManageAgentSkills:MASK-0014"]
@@ -27,4 +27,4 @@ Run `mask skill validate manage-agent-skills --json` against the local candidate
 
 ## Run record
 
-Not started. Record actual commands, outcomes and commits here. Read the live board before claiming. Never stage unrelated paths.
+MASK CLI handoff d8ffdec (runtime f23237d), v0.1.0. Added manage-agent-skills second after initial implement-rfc b7aa506. MASK skill validate and skill-creator quick_validate PASS. scripts/verify_mask_examples.py --mask-program /absolute/ManageAgentSkills PASS on macOS: actual JSON subprocess init/capabilities, add/remove/no-op, stale guard, preserved collision, separate-process intent crash/recover, local bare-remote frozen update, unregister preserving declaration. Structure/diff checks PASS. No private machine paths or engine copied into shared skill. Commit: this Done move.
