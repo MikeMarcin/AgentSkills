@@ -1,7 +1,7 @@
 ---
 id: ASK-0003
 title: Keep shared source immutable during adapter rendering
-status: In Progress
+status: Done
 rfc: RFC-ASK-0001
 depends_on: ["ASK-0002"]
 ---
@@ -26,4 +26,4 @@ Run focused `test_render_runtime_adapters.py` in MASK and AgentSkills contexts a
 
 ## Run record
 
-Not started. Record actual commands, outcomes and commits here. Read the live board before claiming. Never stage unrelated paths.
+Safe renderer/validator implemented. PYTHONDONTWRITEBYTECODE=1 IMPLEMENT_RFC_PROJECT_ROOT=<consumer> python3 -m unittest discover -s skills/implement-rfc/tests -p test_render_runtime_adapters.py: 11/11 pass for each real MASK and AgentSkills context. Final simplification rerun: 11/11. Includes both symlink families, two consumers, source-byte immutability, legacy copy, collisions/linked parents, observational check and positive/negative coupling lint. Source-only validator, quick_validate.py and git diff --check pass. No consumer adapters generated in real checkouts. Bootstrap suites previously reproduced 6/6 and 8/9 with known inherited lint failure in each context; repaired here. Commit: this Done move.

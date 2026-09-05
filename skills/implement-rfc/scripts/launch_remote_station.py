@@ -4,7 +4,7 @@
 usage: launch_remote_station.py [workstream] [options]
   workstream: optional. Inferred from `.remote-station.json` when the checkout
               was launched before, otherwise from the checkout's branch (each
-              workstream in config/project.json names its branch). Pass it only
+              workstream in the selected consumer project.json names its branch). Pass it only
               to be explicit; a value that disagrees with the checkout refuses.
               `main` is the integrator; a platform-bound workstream launches
               only on its host.
@@ -309,7 +309,7 @@ def infer_workstream(station_file: pathlib.Path, current_branch: str, config: di
     """The workstream this checkout is, without being told.
 
     A checkout launched before says so in its station file. A fresh one says
-    so by its branch: every workstream in `config/project.json` names the one
+    so by its branch: every workstream in `the selected consumer project.json` names the one
     branch it lives on, so the branch identifies the workstream exactly or not
     at all. Nothing is inferred from the host platform — a Windows host can
     hold the integrator checkout, and the branch is what makes that unambiguous.

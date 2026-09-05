@@ -6,7 +6,7 @@ it resolves the installed openai-codex plugin's companion script, maps the role
 to its checked-in Codex model/effort route, prepends the rendered role prompt
 (including the startup identity line) to the lane assignment, and records the
 launch in the checkout's Codex lane log (`<project>-codex-lanes.jsonl` under the
-git common directory, named from config/project.json).
+git common directory, named from the selected consumer project.json).
 
 Write-capable lanes must run in their own worktree: the launcher refuses
 --write when the target working directory is the shared integration checkout

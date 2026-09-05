@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Audit live issue-board and RFC state against the implement-rfc process contract.
 
-Repo-side checks, all driven by config/project.json: lane canonicality,
+Repo-side checks, all driven by the selected consumer project.json: lane canonicality,
 folder/status agreement, dangling dependencies, next-ID sanity (never below the
 highest ID on the board or the highest value the counter ever held in Git
 history), active work filed against terminal RFCs, and closeout-anchor presence.

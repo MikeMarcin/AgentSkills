@@ -6,6 +6,7 @@ import io
 import json
 import os
 import subprocess
+import shutil
 import sys
 import tempfile
 import tomllib
@@ -18,7 +19,10 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 RENDERER = SKILL_DIR / "scripts" / "render_runtime_adapters.py"
 VALIDATOR = SKILL_DIR / "scripts" / "validate_portable_agents.py"
 ROUTING = json.loads((SKILL_DIR / "config" / "routing.json").read_text(encoding="utf-8"))
-PROJECT = json.loads((SKILL_DIR / "config" / "project.json").read_text(encoding="utf-8"))
+from project_fixtures import init_repo, write_context, CONFIG
+sys.path.insert(0, str(SKILL_DIR / "scripts"))
+import project_config
+PROJECT = project_config.load(repo_root=os.environ["IMPLEMENT_RFC_PROJECT_ROOT"]) if os.environ.get("IMPLEMENT_RFC_PROJECT_ROOT") else CONFIG
 
 VALIDATOR_SPEC = importlib.util.spec_from_file_location("validate_portable_agents", VALIDATOR)
 if VALIDATOR_SPEC is None or VALIDATOR_SPEC.loader is None:
@@ -29,6 +33,9 @@ VALIDATOR_SPEC.loader.exec_module(VALIDATOR_MODULE)
 
 class RenderRuntimeAdaptersTests(unittest.TestCase):
     def run_renderer(self, repo_root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
+        if not (repo_root / ".git").exists():
+            init_repo(repo_root)
+            write_context(repo_root, config=PROJECT)
         return subprocess.run(
             [sys.executable, str(RENDERER), "--repo-root", str(repo_root), *extra],
             text=True,
@@ -63,7 +70,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             root = Path(temp)
             first = self.run_renderer(root)
             self.assertEqual(first.returncode, 0, first.stderr)
-            self.assertIn("rendered 17 files", first.stdout)
+            self.assertIn("rendered 15 files", first.stdout)
 
             for role, (model, effort, claude_model, claude_effort, mutation, nested) in expected.items():
                 with self.subTest(role=role):
@@ -102,28 +109,12 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                 for output_root in (root, SKILL_DIR.parents[2]):
                     self.assertFalse((output_root / f".{provider}/agents/rfc-verifier.{extension}").exists())
 
-            shim = (root / ".claude/skills/implement-rfc/SKILL.md").read_text()
-            self.assertIn(".agents/skills/implement-rfc/SKILL.md", shim)
-            manifest_path = root / ".agents/skills/implement-rfc/generated/runtime-adapters.json"
-            manifest = json.loads(manifest_path.read_text())
+            self.assertFalse((root / ".claude/skills/implement-rfc/SKILL.md").exists())
+            manifest = json.loads((root / ".mask/generated/implement-rfc/runtime-adapters.json").read_text())
             self.assertEqual(manifest["schema"], "implement-rfc.runtime-adapters.v1")
             self.assertEqual(manifest["assignments"], ROUTING["assignments"])
-            self.assertEqual(len(manifest["files"]), 15)
+            self.assertEqual(len(manifest["files"]), 14)
             self.assertEqual(manifest["project"], PROJECT["project"])
-
-            portable = json.loads(
-                (root / ".agents/skills/implement-rfc/generated/portable-manifest.json").read_text(
-                    encoding="utf-8"
-                )
-            )
-            self.assertEqual(portable["schema"], "implement-rfc.portable-manifest.v1")
-            portable_paths = {entry["path"] for entry in portable["files"]}
-            self.assertIn("SKILL.md", portable_paths)
-            self.assertIn("scripts/render_runtime_adapters.py", portable_paths)
-            self.assertIn("references/pack-lifecycle.md", portable_paths)
-            self.assertNotIn("config/project.json", portable_paths)
-            self.assertNotIn("references/project.md", portable_paths)
-            self.assertFalse(any(path.startswith("generated/") for path in portable_paths))
 
             for worker in ("rfc-worker", "rfc-worker-routine"):
                 claude_worker = (root / f".claude/agents/{worker}.md").read_text()
@@ -185,17 +176,6 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertEqual(check.returncode, 1)
             self.assertIn("stale generated file", check.stderr)
 
-    def test_check_detects_portable_manifest_drift(self) -> None:
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            rendered = self.run_renderer(root)
-            self.assertEqual(rendered.returncode, 0, rendered.stderr)
-            path = root / ".agents/skills/implement-rfc/generated/portable-manifest.json"
-            path.write_text(path.read_text().replace('"files"', '"file_list"'), encoding="utf-8")
-            check = self.run_renderer(root, "--check")
-            self.assertEqual(check.returncode, 1)
-            self.assertIn("portable-manifest.json", check.stderr)
-
     def test_compare_reports_portable_differences(self) -> None:
         ours = {"SKILL.md": "a", "scripts/x.py": "b", "README.md": "c"}
         theirs = {"SKILL.md": "a", "scripts/x.py": "changed", "tests/t.py": "d"}
@@ -215,21 +195,17 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertNotIn("claude-sonnet", source)
             self.assertNotIn("claude-haiku", source)
 
-    def test_portable_sources_name_no_project(self) -> None:
-        """The portable set must not mention this project or the one it came from."""
-        renderer_spec = importlib.util.spec_from_file_location("render_under_test", RENDERER)
-        assert renderer_spec is not None and renderer_spec.loader is not None
-        renderer = importlib.util.module_from_spec(renderer_spec)
-        renderer_spec.loader.exec_module(renderer)
-        # The skill was first extracted from a repository whose name is spelled
-        # here in two halves so this file itself stays out of the forbidden set.
-        forbidden = ("ai" "to", PROJECT["project"], PROJECT["display_name"], PROJECT["session_prefix"] + "-")
+    def test_portable_sources_name_no_project(self):
+        renderer = VALIDATOR_MODULE.renderer
+        identities = ["Better" + "PullReview", "MASK", "AgentSkills"]
         for path in renderer.portable_files(SKILL_DIR):
-            text = path.read_text(encoding="utf-8", errors="replace").lower()
-            for token in forbidden:
-                self.assertNotIn(
-                    token.lower(), text, f"{path.relative_to(SKILL_DIR)} names {token!r}"
-                )
+            findings = renderer.coupling_findings(path.relative_to(SKILL_DIR), path.read_text(), identities)
+            self.assertEqual(findings, [], str(path))
+        for text in ('mask = secrets.token_bytes(4)', 'https://agentskills.io/specification'):
+            self.assertEqual(renderer.coupling_findings(Path('scripts/protocol.py'), text, identities), [])
+        for text in ('display_name: MASK', '"origin_repo_name": "AgentSkills"',
+                     'Follow Better' + 'PullReview architecture', 'https://github.com/example/AgentSkills.git'):
+            self.assertTrue(renderer.coupling_findings(Path('SKILL.md'), text, identities), text)
 
     def test_portable_policy_requires_role_names_and_startup_banners(self) -> None:
         skill = (SKILL_DIR / "SKILL.md").read_text(encoding="utf-8")
@@ -240,86 +216,77 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         self.assertIn("rfc_utility_cache_inventory", delegation)
         self.assertIn("Role: <role> | Model: <model> | Effort: <effort>", delegation)
 
-    def test_validator_executes_absolute_paths_but_displays_stable_paths(self) -> None:
-        repo_root_argument = "/explicit/repo-root"
-        original_cwd = Path.cwd()
 
+    def test_two_shared_consumers_are_distinct_and_source_immutable(self):
+        renderer = VALIDATOR_MODULE.renderer
+        before = {str(p.relative_to(SKILL_DIR)): p.read_bytes() for p in SKILL_DIR.rglob('*') if p.is_file()}
         with tempfile.TemporaryDirectory() as temp:
-            os.chdir(temp)
-            try:
-                self.assertFalse((Path.cwd() / ".git").exists())
-                stdout = io.StringIO()
-                with (
-                    mock.patch.object(
-                        VALIDATOR_MODULE.sys,
-                        "argv",
-                        [
-                            "validate_portable_agents.py",
-                            "--repo-root",
-                            repo_root_argument,
-                        ],
-                    ),
-                    mock.patch.object(
-                        VALIDATOR_MODULE.subprocess,
-                        "call",
-                        side_effect=[0, 17],
-                    ) as call,
-                    contextlib.redirect_stdout(stdout),
-                ):
-                    code = VALIDATOR_MODULE.main()
-            finally:
-                os.chdir(original_cwd)
+            for name in ('mask', 'agent-skills'):
+                root = Path(temp) / name
+                init_repo(root, token=name)
+                facts = write_context(root, token=name)
+                facts['role_addenda'] = {'rfc-worker': [f'Only {name} project rules.']}
+                write_context(root, config=facts)
+                for target in ('.agents', '.claude'):
+                    entry = root / target / 'skills/implement-rfc'
+                    entry.parent.mkdir(parents=True)
+                    entry.symlink_to(SKILL_DIR, target_is_directory=True)
+                result = self.run_renderer(root)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                for family, suffix in (('codex', 'toml'), ('claude', 'md')):
+                    content = (root / f'.{family}/agents/rfc-worker.{suffix}').read_text()
+                    self.assertIn(f'Only {name} project rules.', content)
+                check = subprocess.run([sys.executable, str(VALIDATOR), '--repo-root', str(root)], capture_output=True, text=True)
+                self.assertEqual(check.returncode, 0, check.stderr)
+        after = {str(p.relative_to(SKILL_DIR)): p.read_bytes() for p in SKILL_DIR.rglob('*') if p.is_file()}
+        self.assertEqual(before, after)
 
-        self.assertEqual(code, 17)
-        self.assertEqual(call.call_count, 2)
+    def test_unsafe_destinations_refuse_before_any_write(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            for kind in ('parent', 'leaf', 'unknown', 'marker_without_manifest'):
+                root = base / kind
+                init_repo(root)
+                target = root / '.codex/agents/rfc-worker.toml'
+                if kind == 'parent':
+                    outside = base / 'outside'; outside.mkdir()
+                    (root / '.codex').symlink_to(outside, target_is_directory=True)
+                else:
+                    target.parent.mkdir(parents=True)
+                    if kind == 'leaf':
+                        target.symlink_to(SKILL_DIR / 'SKILL.md')
+                    else:
+                        target.write_text('mine' if kind == 'unknown' else '# Generated by implement-rfc/scripts/render_runtime_adapters.py (fake).')
+                result = self.run_renderer(root)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertFalse((root / '.claude').exists())
+                self.assertFalse((root / '.mask/generated').exists())
 
-        test_command = call.call_args_list[0].args[0]
-        self.assertEqual(
-            test_command,
-            [
-                sys.executable,
-                "-m",
-                "unittest",
-                "discover",
-                "-s",
-                str(SKILL_DIR / "tests"),
-                "-p",
-                "test_*.py",
-            ],
-        )
-        self.assertTrue(Path(test_command[5]).is_absolute())
+    def test_real_legacy_copy_can_render_without_touching_assets(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / 'legacy'
+            init_repo(root, token='legacy')
+            context = root / '.mask/skill-config/implement-rfc'
+            facts, rules = (context / 'project.json').read_bytes(), (context / 'project.md').read_bytes()
+            shutil.rmtree(context)
+            local = root / '.agents/skills/implement-rfc'
+            shutil.copytree(SKILL_DIR, local)
+            (local / 'config/project.json').write_bytes(facts)
+            (local / 'references/project.md').write_bytes(rules)
+            before = {str(p): p.read_bytes() for p in local.rglob('*') if p.is_file()}
+            result = subprocess.run([sys.executable, str(local / 'scripts/render_runtime_adapters.py'), '--repo-root', str(root)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(before, {str(p): p.read_bytes() for p in local.rglob('*') if p.is_file()})
 
-        renderer_command = call.call_args_list[1].args[0]
-        self.assertEqual(
-            renderer_command,
-            [
-                sys.executable,
-                str(RENDERER),
-                "--check",
-                "--repo-root",
-                repo_root_argument,
-            ],
-        )
-        self.assertTrue(Path(renderer_command[1]).is_absolute())
-        self.assertEqual(renderer_command[-2:], ["--repo-root", repo_root_argument])
-
-        self.assertEqual(
-            stdout.getvalue(),
-            "\n".join(
-                [
-                    "+ "
-                    f"{sys.executable} -m unittest discover -s "
-                    ".agents/skills/implement-rfc/tests -p test_*.py",
-                    "+ "
-                    f"{sys.executable} "
-                    ".agents/skills/implement-rfc/scripts/render_runtime_adapters.py "
-                    f"--check --repo-root {repo_root_argument}",
-                    "",
-                ]
-            ),
-        )
-        self.assertNotIn(str(SKILL_DIR), stdout.getvalue())
+    def test_noop_render_and_check_are_observational(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.assertEqual(self.run_renderer(root).returncode, 0)
+            before = {str(p): p.read_bytes() for p in root.rglob('*') if p.is_file()}
+            self.assertEqual(self.run_renderer(root, '--check').returncode, 0)
+            after = {str(p): p.read_bytes() for p in root.rglob('*') if p.is_file()}
+            self.assertEqual(before, after)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

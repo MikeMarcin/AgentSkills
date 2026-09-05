@@ -64,7 +64,7 @@ fails when two projects have drifted.
 - `references/runtime-compatibility.md`: adapter and runtime-specific facts.
 - `scripts/project_config.py`: invocation context resolver and project schema validator.
 - `scripts/render_runtime_adapters.py`: deterministic native adapter renderer
-  and portable-manifest writer.
+  and separate portable-manifest authoring command.
 - `scripts/validate_portable_agents.py`: skill tests, adapter drift check,
   cross-project comparison.
 - `scripts/audit_board.py`: issue-board/RFC conformance audit; transcripts
@@ -101,12 +101,21 @@ validated inputs inside the selected consumer; they cannot redirect output.
 
 ## Role Adapters
 
-Role adapter rendering is an explicit optional authoring command, separate
-from installing or upgrading a skill. The shared-source renderer migration
-is tracked separately: do not run the inherited renderer through a shared
-skill link until its consumer-only output safety changes have landed. It can
-otherwise overwrite shared source. The local bootstrap renderer is restricted
-to real project-local directories.
+Generate optional role adapters with `scripts/render_runtime_adapters.py --repo-root
+/path/to/consumer`; pass `--check` for observational drift checking. It writes
+`.codex/agents/rfc-*.toml`, `.claude/agents/rfc-*.md`, and
+`.mask/generated/implement-rfc/runtime-adapters.json`. It never emits a Claude
+skill shim or writes through either skill link. Linked destination parents and
+unrecognized existing files refuse. Replacement requires a generated marker
+and membership in the prior consumer manifest; reconcile legacy bootstrap
+adapters deliberately before first rendering.
+
+Author the source digest separately in the canonical checkout with
+`python3 scripts/render_runtime_adapters.py --write-source-manifest` (paths here
+are relative to the skill). `validate_portable_agents.py --source-only` checks
+the digest without writing. `--repo-root /path/to/consumer` checks only that
+consumer's adapters; `--compare /path/to/other/skill` compares actual source
+bytes. MASK never executes these commands during skill deployment.
 
 ## Routing Changes
 

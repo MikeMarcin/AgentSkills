@@ -40,7 +40,7 @@ The launcher resolves the installed openai-codex plugin's companion runtime
 Codex model and effort from `config/routing.json`, prepends the rendered
 role prompt — including the startup identity line — to the assignment, and
 appends a launch record to the checkout's Codex lane log
-(`<git-common-dir>/<project>-codex-lanes.jsonl`, named from `config/project.json`).
+(`<git-common-dir>/<project>-codex-lanes.jsonl`, named from the selected consumer's `project.json`).
 
 Native adapters and plugin launches use the same routing source for all seven
 roles, including `rfc-test-runner` and `rfc-worker-routine`. Model and effort are

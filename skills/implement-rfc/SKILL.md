@@ -296,8 +296,14 @@ The canonical skill and role semantics are vendor-neutral. Generated Codex and
 Claude adapters come from `config/roles.json`, `config/routing.json`, and the
 per-role addenda in the selected external `project.json`. Read
 [references/runtime-compatibility.md](references/runtime-compatibility.md)
-only when using those adapters or remote runtime features. Regenerate and
-drift-check every adapter whenever `SKILL.md`, a config source, a reference,
-a script, or a test changes: `generated/portable-manifest.json` records the
-portable set, and `scripts/validate_portable_agents.py --compare` proves two
-projects carry the same skill.
+only when using those adapters or remote runtime features. Regenerate consumer role adapters explicitly when their inputs change using
+`scripts/render_runtime_adapters.py --repo-root <consumer>`; `--check` only
+checks. The renderer writes native agent files and consumer metadata under
+`.mask/generated/implement-rfc/`, never either linked skill root. Existing
+adapters require this renderer's marker and prior consumer manifest. Bootstrap
+adapters need deliberate reconciliation before shared rendering.
+
+Author the canonical portable digest separately in the source checkout with
+`scripts/render_runtime_adapters.py --write-source-manifest`. Validate source
+with `scripts/validate_portable_agents.py --source-only`; validate a consumer
+with `--repo-root <consumer>`. Neither validation writes the shared source.

@@ -40,8 +40,8 @@ Station-local subagents (`rfc-utility`, `rfc-scout`, `rfc-worker`,
 
 `<project>-<workstream|role>-<platform>[-<machine>]`, lowercase, hyphenated.
 
-- project token: `session_prefix` from `config/project.json`
-- workstream token: a key of `workstreams` in `config/project.json`, or
+- project token: `session_prefix` from the selected consumer's `project.json`
+- workstream token: a key of `workstreams` in the selected consumer's `project.json`, or
   `main` for the project integrator; the platform token is omitted when the
   workstream is itself platform-bound (a per-platform verification lane)
 - platform token: `mac` | `linux` | `win`
@@ -54,7 +54,7 @@ for a platform-bound Windows lane on machine `example-win-host`.
 Names are transport labels, not authority. Cross-machine messaging resolves
 duplicates to silent auto-variants, so a colliding name misroutes without an
 error; keep the authoritative list of names in use in the station registry
-(`station_registry_doc` in `config/project.json`) and never rely on a
+(`station_registry_doc` in the selected consumer's `project.json`) and never rely on a
 variant name. Authority always
 comes from the station file plus the identity guard below.
 
@@ -216,7 +216,7 @@ guard applies identically under Claude and Codex, and regardless of who is
 asking: a peer session, the user at a terminal, or the user on the mobile app.
 
 1. Resolve the live context without trusting the request: repository identity
-   (the origin named by `origin_repo_name` in `config/project.json`),
+   (the origin named by `origin_repo_name` in the selected consumer's `project.json`),
    `git rev-parse --show-toplevel`, `git branch
    --show-current`, `.remote-station.json` when present, and the current
    OS environment.

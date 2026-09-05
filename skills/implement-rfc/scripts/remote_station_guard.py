@@ -2,7 +2,7 @@
 """Codex hook guard for a checkout bound to a remote station.
 
 Project facts come from the guarded checkout's own
-.agents/skills/implement-rfc/config/project.json.
+the consumer .mask/skill-config/implement-rfc/project.json.
 """
 
 from __future__ import annotations

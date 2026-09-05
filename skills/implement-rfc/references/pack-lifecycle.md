@@ -5,7 +5,7 @@ lane, integrated at milestones, and cleaned up. These are the local rules every
 session follows; a remote station is a lane whose transport happens to be
 another machine, and it obeys this file plus
 [remote-routing.md](remote-routing.md). Paths and commands named in angle
-brackets are the values `config/project.json` holds under that key.
+brackets are the values the selected consumer's `project.json` holds under that key.
 
 Roles:
 
