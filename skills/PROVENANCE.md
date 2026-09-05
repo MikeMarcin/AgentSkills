@@ -1,0 +1,1 @@
+implement-rfc imported unchanged from supplied SRV portable archive. Original archive SHA-256: 1043f25111969b1270870b566a705f22e6f6cb253d1a4ff0de3a0c2461cc4a90. All 39 retained source files compared byte-for-byte to the supplied clean seed. See docs/rfcs/assets/mask-v1-2026-09-05/SEED-PROVENANCE.json. This import precedes shared-consumer adaptation.

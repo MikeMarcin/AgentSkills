@@ -1,7 +1,7 @@
 ---
 id: ASK-0001
 title: Import supplied implement-rfc as the first skill
-status: In Progress
+status: Done
 rfc: RFC-ASK-0001
 depends_on: []
 ---
@@ -26,4 +26,4 @@ Compare retained relative-path SHA-256 values to the packet inventory and inspec
 
 ## Run record
 
-Not started. Record actual commands, outcomes and commits here. Read the live board before claiming. Never stage unrelated paths.
+Verified all 39 source files byte-for-byte against the supplied clean seed using Python pathlib. No second skill or cache/resource-fork files. Private visibility verified with gh repo view. Source commit is the commit moving this card to Done.
