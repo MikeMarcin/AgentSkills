@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0017"
 title: "Close out selected skill consolidation"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0004"]
 depends_on: ["ASK-0016"]
 closeout_for: ["RFC-ASK-0004"]
