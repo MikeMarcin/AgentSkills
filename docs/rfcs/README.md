@@ -10,6 +10,8 @@ Only the main integrator imports, renumbers, edits tracker rules and confirms te
 | RFC-ASK-0002 | Auto-Verified | Agent-operated MASK management skill |
 | RFC-ASK-0003 | Auto-Verified | Unified RFC implementation and attended workflow |
 
+| RFC-ASK-0004 | Implementing | Selected skill consolidation and consumer migration |
+
 ## Import and verification
 
 Reconcile live IDs before adopting packet IDs. Keep original packet IDs in provenance and record a LIVE_IMPORT mapping including external handoffs. Never rewind counters or recycle reservations. Run `python scripts/verify_documentation.py --root .` after import/integration and before terminal status. When working a lane, status changes are proposals until the integrator revalidates them on main.
