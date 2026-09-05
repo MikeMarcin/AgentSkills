@@ -1,0 +1,12 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0015",
+    "ASK-0016",
+    "ASK-0017"
+  ],
+  "reserve_for": "selected-skill-imports-2026-09-05",
+  "purpose": "",
+  "created": "2026-09-05T23:14:26.043690+00:00",
+  "base": "cda772731706c1736633f5c7240f7cac2e303f1d"
+}
