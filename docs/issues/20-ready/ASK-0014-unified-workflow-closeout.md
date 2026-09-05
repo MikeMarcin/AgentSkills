@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0014"
 title: "Unified workflow integration and closeout"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0013"]
 closeout_for: ["RFC-ASK-0003"]
