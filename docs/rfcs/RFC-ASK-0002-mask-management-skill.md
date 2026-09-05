@@ -1,7 +1,7 @@
 ---
 id: RFC-ASK-0002
 title: Agent-operated MASK management skill
-status: Implementing
+status: Auto-Verified
 owner: MikeMarcin
 created: 2026-09-05
 ---
