@@ -1,0 +1,24 @@
+{
+  "named_endpoints": {
+    "/start_session": { "parameters": [], "returns": [] },
+    "/lambda": { "parameters": [], "returns": [] },
+    "/preprocess_image": {
+      "parameters": [{ "parameter_name": "input", "component": "Image" }],
+      "returns": [{ "label": "Image Prompt", "component": "Image" }]
+    },
+    "/image_to_3d": {
+      "parameters": [
+        { "parameter_name": "image", "component": "Image" },
+        { "parameter_name": "resolution", "parameter_default": "1024", "component": "Radio" }
+      ],
+      "returns": [{ "label": "3D Asset Preview", "component": "Model3D" }]
+    },
+    "/extract_glb": {
+      "parameters": [
+        { "parameter_name": "decimation_target", "parameter_default": 300000, "component": "Slider" },
+        { "parameter_name": "texture_size", "parameter_default": 2048, "component": "Slider" }
+      ],
+      "returns": [{ "label": "Download GLB", "component": "File" }]
+    }
+  }
+}

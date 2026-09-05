@@ -1,0 +1,4 @@
+interface:
+  display_name: "Concept Art Approval Pipeline"
+  short_description: "Review exact art candidates through gated handoffs"
+  default_prompt: "Use $concept-art-approval-pipeline to prepare exact art candidates for human review, use an offline batch review page when appropriate, validate the resulting verdict, and advance only the approved identities through the current gate."

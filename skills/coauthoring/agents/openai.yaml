@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coauthoring"
+  short_description: "Write books and blogs in your voice"
+  default_prompt: "Use $coauthoring to help draft and refine this blog post in my voice."

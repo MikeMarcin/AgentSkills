@@ -1,0 +1,4 @@
+interface:
+  display_name: "TRELLIS Image to 3D"
+  short_description: "Probe providers and generate 3D assets"
+  default_prompt: "Use $trellis-image-to-3d to probe the right TRELLIS provider, prepare this reference, and generate a recorded 3D asset."

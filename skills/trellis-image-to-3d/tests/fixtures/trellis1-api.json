@@ -1,0 +1,23 @@
+{
+  "named_endpoints": {
+    "/start_session": { "parameters": [], "returns": [] },
+    "/lambda": { "parameters": [], "returns": [] },
+    "/lambda_1": { "parameters": [], "returns": [] },
+    "/preprocess_image": {
+      "parameters": [{ "parameter_name": "input", "component": "Image" }],
+      "returns": [{ "label": "Image", "component": "Image" }]
+    },
+    "/preprocess_images": {
+      "parameters": [{ "parameter_name": "inputs", "component": "Gallery" }],
+      "returns": [{ "label": "Images", "component": "Gallery" }]
+    },
+    "/generate_and_extract_glb": {
+      "parameters": [{ "parameter_name": "seed", "parameter_default": 0, "component": "Slider" }],
+      "returns": [{ "label": "Download GLB", "component": "File" }]
+    },
+    "/extract_gaussian": {
+      "parameters": [],
+      "returns": [{ "label": "Gaussian", "component": "File" }]
+    }
+  }
+}

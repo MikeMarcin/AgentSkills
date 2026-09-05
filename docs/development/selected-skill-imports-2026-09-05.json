@@ -1,0 +1,70 @@
+{
+  "schema": "agentskills.selected-import.v1",
+  "date": "2026-09-05",
+  "approved_imports": [
+    {
+      "skill": "coauthoring",
+      "original_location": "~/.agents/skills/coauthoring",
+      "original_tree_sha256": "0b579f8677caa849052700df90b6c577bbb4b7f7f34555a2bab3f652e85f1a42",
+      "imported_package_fingerprint": "sha256:0bc701a807ba0e1647133c52e8dd977bd7d69e2fa627c5368ae6baee91dbe6ae"
+    },
+    {
+      "skill": "code-simplifier",
+      "original_location": "~/.agents/skills/code-simplifier",
+      "original_tree_sha256": "6c380f13033a9e1f20dded5fbd28fca52b6d7305e814be388a29eb4fc466ed4e",
+      "imported_package_fingerprint": "sha256:f85b79a9fccc1f873babdded2a88ceaf0fa0dc52c007712f61a428140615db98"
+    },
+    {
+      "skill": "technical-book-humanizer",
+      "original_location": "~/.agents/skills/technical-book-humanizer",
+      "original_tree_sha256": "4b3a7203c3c3abf6b47fa63372028a400a2a615b1a6248ed0c9614bc7f2c759f",
+      "imported_package_fingerprint": "sha256:1a298014dca70777ad9bc832a54f9af84dd9f8f306fa900b9db3eafce80c0e86"
+    },
+    {
+      "skill": "instamat-image-to-pbr",
+      "original_location": "~/.codex/skills/instamat-image-to-pbr",
+      "original_tree_sha256": "680722f171fc7f0046d043875ed9bc209b92b3f7dd604a2c33fcc65df7d5964d",
+      "imported_package_fingerprint": "sha256:db9f498f8a109c7eacca117e6cdc1996285d30418dda2db580fbbb6ac11f6b5c"
+    },
+    {
+      "skill": "trellis-image-to-3d",
+      "original_location": "~/Documents/Personal/sample_studio/.agents/skills/trellis-image-to-3d",
+      "original_tree_sha256": "3d8fb3d646962e7483296c5f63fd6d45e78537fabe3353fd5f6287300eddd3b0",
+      "imported_package_fingerprint": "sha256:05f8f271a75557a5f0b841d135b2b7890ce684b2933fbb1e1aec318dc13875a4"
+    },
+    {
+      "skill": "concept-art-approval-pipeline",
+      "original_location": "~/Documents/Personal/sample_studio/.agents/skills/concept-art-approval-pipeline",
+      "original_tree_sha256": "ebd4533e2a349ef06c22fff43bbfd16e0db2952bd6520460695b084a704b8868",
+      "imported_package_fingerprint": "sha256:d850c8c56fc9a2f88cee155619c94537da4f7dc82fd920130e96b24942436500"
+    },
+    {
+      "skill": "sprite-sheet-animation-updater",
+      "original_location": "~/Documents/GitHub/SampleAssets/.codex/skills/sprite-sheet-animation-updater",
+      "original_tree_sha256": "c423572776ca9371b9fd45c1695610b72607402986882ab6797ca45d68b09ffe",
+      "imported_package_fingerprint": "sha256:2f9a793ac1305dd2db6847997b4c1b85e1d11944c5cae92d0094b7959893c391"
+    }
+  ],
+  "excluded_generated_entries": [
+    ".DS_Store",
+    "__pycache__",
+    "*.pyc"
+  ],
+  "adaptations": {
+    "trellis-image-to-3d": "Installed-path command examples; provider and receipt code unchanged.",
+    "concept-art-approval-pipeline": "Active ExampleScene profile moved to sample_studio consumer context; installed script resolution clarified; review formats unchanged.",
+    "sprite-sheet-animation-updater": "Generic workflow and validator retained. SampleCharacter generator and wrapper remain under AST tools, and product rules remain in AST documentation/context. Added synthetic validator acceptance test."
+  },
+  "deferred": [
+    "pbr-asset-refinement",
+    "stable-audio-3-music",
+    "sample_studio-agent-docs",
+    "publish-release",
+    "update-promo-assets"
+  ],
+  "inventory_findings": {
+    "sample_studio_writing_copies": "coauthoring and current technical-book-humanizer match personal sources; code-simplifier has SAMPLE_STUDIO conventions. These project copies remain unchanged.",
+    "other_projects": "SRV, PLN and LOG contain only already-shared workflow links. IMG contains no skill packages."
+  },
+  "verification": "17 offline tests passed through temporary project/personal MASK links from an unrelated cwd; seven skill-creator checks and MASK package validation passed."
+}

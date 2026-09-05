@@ -1,0 +1,139 @@
+:root {
+  color-scheme: dark;
+  --page: #101419;
+  --panel: #192027;
+  --panel-strong: #202a33;
+  --text: #edf3f7;
+  --muted: #a8b5bf;
+  --line: #3a4853;
+  --accent: #75b9d5;
+  --accept: #57c48c;
+  --reject: #ed7777;
+  --pending: #e6b85d;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+a { color: #9fdcf3; }
+header, main { width: min(1480px, calc(100% - 2rem)); margin-inline: auto; }
+header { padding: 2rem 0 1rem; }
+h1, h2, h3, p { margin-top: 0; }
+.lede, .muted { color: var(--muted); }
+.scope-warning {
+  border-left: 4px solid var(--pending);
+  background: #282418;
+  padding: 1rem;
+}
+.review-controls {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+  background: #081016;
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  box-shadow: 0 .25rem .75rem #0008;
+}
+.review-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .65rem 1rem;
+}
+.review-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .9rem;
+  font-weight: 700;
+}
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .65rem 1rem;
+  margin-left: auto;
+}
+#review-status {
+  min-height: 1.3em;
+  margin: .4rem 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+button, textarea { font: inherit; }
+button {
+  border: 1px solid var(--line);
+  border-radius: .35rem;
+  padding: .55rem .8rem;
+  background: #28343e;
+  color: var(--text);
+  cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+button:disabled {
+  cursor: not-allowed;
+  color: #c2cdd4;
+  background: #2f3b43;
+  border-color: #61717a;
+}
+.candidate {
+  scroll-margin-top: 8rem;
+  margin: 0 0 1.25rem;
+  padding: 1.1rem;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: .7rem;
+}
+.candidate[data-review-state="accept"] { border-color: var(--accept); }
+.candidate[data-review-state="reject"] { border-color: var(--reject); }
+.candidate[data-review-state="pending"] { border-color: var(--pending); }
+.candidate-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+.identity { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82rem; word-break: break-all; }
+.media-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .75rem; }
+figure { margin: 0; padding: .6rem; background: var(--panel-strong); border-radius: .4rem; }
+figure img, figure video {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  background-color: #6d7479;
+  background-image:
+    linear-gradient(45deg, #8a9297 25%, transparent 25%),
+    linear-gradient(-45deg, #8a9297 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #8a9297 75%),
+    linear-gradient(-45deg, transparent 75%, #8a9297 75%);
+  background-size: 24px 24px;
+  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+}
+figcaption { padding-top: .45rem; color: var(--muted); }
+.criteria { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+.identity-files { margin-top: 1rem; }
+.decision-row { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0; }
+button[data-decision="accept"][aria-pressed="true"] { color: #07150f; background: var(--accept); }
+button[data-decision="reject"][aria-pressed="true"] { color: #1b0808; background: var(--reject); }
+.notes { display: grid; gap: .35rem; }
+textarea { width: 100%; min-height: 5rem; padding: .65rem; color: var(--text); background: #11171c; border: 1px solid var(--line); border-radius: .35rem; }
+.export-panel { margin: 1rem 0 3rem; padding: 1rem; background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; }
+#verdict-output { min-height: 14rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82rem; }
+@media (max-width: 850px) {
+  .media-groups, .criteria { grid-template-columns: 1fr; }
+  .review-actions { margin-left: 0; }
+}
+@media (max-width: 620px) {
+  .review-summary, .review-actions { width: 100%; }
+}

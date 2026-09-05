@@ -17,3 +17,12 @@ SRV policy is retained only in the historical example. Source digests
 are regenerated locally; SRV runtime adapters, embedded active context,
 `.DS_Store` and Python caches are excluded. SampleReview and consumer
 configurations are unchanged.
+
+## Selected personal and project imports
+
+The seven user-approved packages imported on 2026-09-05 are recorded in
+[selected import provenance](selected-skill-imports-2026-09-05.json). Four personal
+packages retain authored bytes, excluding caches. TRELLIS and concept-art retain
+existing external formats; AST-specific sprite tooling stays in AST. The original
+installation inventory and restorable backups are machine-local under
+`~/.mask/migration-backups/selected-skills-2026-09-05/`.

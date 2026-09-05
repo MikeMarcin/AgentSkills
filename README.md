@@ -2,9 +2,9 @@
 
 **[Skill catalog](#available-skills) · [Use a skill](#use-the-skills-in-a-project) · [Workflow context](#configure-implement-rfc) · [Author a skill](#author-a-skill) · [Provenance](#provenance-and-current-deployment)**
 
-A private collection of canonical agent skills shared across projects. Each skill lives under `skills/<id>/`; projects keep their own requirements and configuration while using directory links to the shared instructions.
+A private collection of canonical agent skills shared across projects and personal installations. Each skill lives under `skills/<id>/`; projects keep their own requirements and configuration while using directory links to the shared instructions.
 
-The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarcin/ManageAgentSkills) contains the CLI that validates packages, manages project links and performs explicit source updates. This repository contains the skill payloads and their authoring workflow.
+The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarcin/ManageAgentSkills) contains the CLI that validates packages, manages personal and project links and performs explicit source updates. This repository contains the skill payloads and their authoring workflow.
 
 ## Available skills
 
@@ -13,9 +13,16 @@ The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarci
 | [implement-rfc](skills/implement-rfc/SKILL.md) | Carry RFCs or RFC packs through bounded implementation, acceptance verification, commits and issue-board closeout. Requires consumer workflow context. |
 | [attended-review](skills/attended-review/SKILL.md) | Prepare protected candidates and save partial human decisions through local HTML, with an offline fallback. |
 | [wizard](skills/wizard/SKILL.md) | Guide required manual steps one at a time with durable progress on native Windows and macOS. |
-| [manage-agent-skills](skills/manage-agent-skills/SKILL.md) | Inspect and manage project requirements, registration, deployment and authorized updates through MASK's JSON CLI. |
+| [manage-agent-skills](skills/manage-agent-skills/SKILL.md) | Inspect and manage personal and project selections through MASK's JSON CLI. |
+| [coauthoring](skills/coauthoring/SKILL.md) | Collaborate on long-form prose while preserving the author’s voice. |
+| [code-simplifier](skills/code-simplifier/SKILL.md) | Simplify touched code while preserving behavior and local conventions. |
+| [technical-book-humanizer](skills/technical-book-humanizer/SKILL.md) | Revise technical prose for precision, stance and an experienced engineering voice. |
+| [instamat-image-to-pbr](skills/instamat-image-to-pbr/SKILL.md) | Prepare and review PBR texture maps with the InstaMAT Pipeline CLI. |
+| [trellis-image-to-3d](skills/trellis-image-to-3d/SKILL.md) | Prepare images and use hosted TRELLIS providers, with offline validation and optional ExampleWorkflow receipts. |
+| [concept-art-approval-pipeline](skills/concept-art-approval-pipeline/SKILL.md) | Produce and review concept-art candidates with exact, persistent approval records. |
+| [sprite-sheet-animation-updater](skills/sprite-sheet-animation-updater/SKILL.md) | Preserve character identity and validate fixed-cell sprite animation layouts. |
 
-`implement-rfc` was imported first with the supplied seed provenance preserved. `manage-agent-skills` was added after the CLI contracts were verified. Skills are not installed globally by this repository.
+`implement-rfc` was imported first with the supplied seed provenance preserved. `manage-agent-skills` was added after the CLI contracts were verified. Source membership and deployment scope are separate. MASK user commands explicitly select personal skills; project declarations continue to select project workflows.
 
 ## Use the skills in a project
 
@@ -42,6 +49,25 @@ mask doctor --project /absolute/path/to/project --check --json
 > `require` and `unrequire` preserve unrelated requirements. Use `project set` only for a complete replacement.
 
 Commit `.mask.json` and consumer context; ignore generated entries under `.agents/skills/` and `.claude/skills/`. Preserve unrelated real skills.
+
+## Personal selections and project context
+
+Use `mask user init`, guarded `mask user register`, and
+`mask user require ID --apply --dry-run --json` followed by the matching guarded
+apply to select personal skills. Inspect with `mask user show --json` and
+`mask doctor --user --check --json`. See MASK's personal-skill guide for pinned
+home selection, backups, ownership, and state compatibility.
+
+The initial personal selection is coauthoring, code-simplifier,
+technical-book-humanizer, instamat-image-to-pbr, and manage-agent-skills.
+TRELLIS and concept-art approval are selected by sample_studio; sprite animation is
+selected by SampleAssets. These three are not personal defaults.
+
+Consumer-specific paths and behavior belong in
+`.mask/skill-config/<skill-id>/project.md`. SAMPLE_STUDIO owns its concept-art ExampleScene
+profile. AST owns its SampleCharacter defaults, generator, local validation/build wrapper,
+and complete contributor documentation. Bundled scripts resolve relative to the
+installed skill, while consumer paths resolve relative to the consumer.
 
 ## Configure implement-rfc
 

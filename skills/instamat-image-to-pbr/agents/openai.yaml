@@ -1,0 +1,4 @@
+interface:
+  display_name: "InstaMAT Image to PBR"
+  short_description: "Generate PBR texture sets from reference images"
+  default_prompt: "Use $instamat-image-to-pbr to generate a review-only PBR material set from this concept image."
