@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0016"
 title: "Migrate approved personal and project installations"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0004"]
 depends_on: ["ASK-0015"]
 ---
