@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0015"
 title: "Import approved portable skills and context"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0004"]
 depends_on: []
 ---
