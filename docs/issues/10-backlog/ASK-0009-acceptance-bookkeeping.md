@@ -1,8 +1,9 @@
 ---
-id: ASK-0009
-title: Explicit claims, finish and efficient workflow
-status: Backlog
-rfc: RFC-ASK-0003
+schema: "implement-rfc.card.v1"
+id: "ASK-0009"
+title: "Explicit claims, finish and efficient workflow"
+status: "Backlog"
+rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0008"]
 ---
 

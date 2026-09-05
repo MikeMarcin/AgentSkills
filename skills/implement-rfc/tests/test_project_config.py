@@ -36,7 +36,7 @@ class ProjectConfigTests(unittest.TestCase):
 
     def test_lane_order_and_activity(self) -> None:
         lanes = module.lane_names(self.config)
-        self.assertEqual(lanes[0], self.config["lanes"]["backlog"])
+        self.assertEqual(lanes[0], self.config["lanes"]["inbox"])
         self.assertEqual(lanes[-1], self.config["lanes"]["done"])
         self.assertEqual(module.active_lanes(self.config), lanes[:-1])
         self.assertEqual(set(self.config["lane_statuses"]), set(lanes))
@@ -54,18 +54,10 @@ class ProjectConfigTests(unittest.TestCase):
         self.assertTrue(pattern.fullmatch(f"{prefix}-main-mac"))
         self.assertFalse(pattern.fullmatch("other-main-mac"))
 
-    def test_closeout_matcher_supports_both_rules(self) -> None:
-        by_name = module.closeout_card_matcher(
-            dict(self.config, closeout_card={"filename_pattern": r"^X-\d{4}-close\.md$"})
-        )
-        self.assertTrue(by_name(Path("X-0001-close.md"), {}))
-        self.assertFalse(by_name(Path("X-0001-other.md"), {}))
-        by_field = module.closeout_card_matcher(
-            dict(self.config, closeout_card={"front_matter": {"closeout": "true"}})
-        )
-        self.assertTrue(by_field(Path("anything.md"), {"closeout": "true"}))
-        self.assertTrue(by_field(Path("anything.md"), {"closeout": '"True"'}))
-        self.assertFalse(by_field(Path("anything.md"), {}))
+    def test_explicit_closeout_membership(self):
+        matcher = module.closeout_card_matcher(self.config)
+        self.assertTrue(matcher(Path('card.md'), {'closeout_for': ['RFC-AAA-0001']}))
+        self.assertFalse(matcher(Path('closeout.md'), {}))
 
     def test_rejects_unknown_key_missing_key_and_bad_lane(self) -> None:
         config = copy.deepcopy(self.config)
@@ -173,13 +165,7 @@ class ConsumerContextTests(unittest.TestCase):
         (local / "config/project.json").write_text(config)
         (local / "references/project.md").write_text("alpha rules")
         with mock.patch.object(module, "SKILL_DIR", local):
-            selected = module.resolve_context(repo_root=self.a)
-            self.assertTrue(selected.legacy)
-            facts = json.loads(config)
-            facts["origin_repo_name"] = "wrong"
-            facts["project"] = "wrong"
-            (local / "config/project.json").write_text(json.dumps(facts))
-            with self.assertRaisesRegex(module.ProjectConfigError, "legacy project identity mismatch"):
+            with self.assertRaisesRegex(module.ProjectConfigError, "missing project configuration"):
                 module.resolve_context(repo_root=self.a)
         with self.assertRaisesRegex(module.ProjectConfigError, "missing project configuration"):
             module.resolve_context(repo_root=self.a)

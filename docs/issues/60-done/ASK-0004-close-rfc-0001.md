@@ -1,10 +1,12 @@
 ---
-id: ASK-0004
-title: Verify and close RFC-ASK-0001
-status: Done
-rfc: RFC-ASK-0001
-depends_on: ["ASK-0001", "ASK-0002", "ASK-0003"]
-closeout: true
+schema: "implement-rfc.card.v1"
+id: "ASK-0004"
+title: "Verify and close RFC-ASK-0001"
+status: "Done"
+rfcs: ["RFC-ASK-0001"]
+depends_on: ["ASK-0001","ASK-0002","ASK-0003"]
+closeout_for: ["RFC-ASK-0001"]
+metadata: {"closeout":true}
 ---
 
 # ASK-0004: Verify and close RFC-ASK-0001

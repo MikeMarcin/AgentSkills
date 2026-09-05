@@ -262,7 +262,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                 self.assertFalse((root / '.claude').exists())
                 self.assertFalse((root / '.mask/generated').exists())
 
-    def test_real_legacy_copy_can_render_without_touching_assets(self):
+    def test_legacy_copy_requires_external_context_without_touching_assets(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp) / 'legacy'
             init_repo(root, token='legacy')
@@ -275,7 +275,8 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             (local / 'references/project.md').write_bytes(rules)
             before = {str(p): p.read_bytes() for p in local.rglob('*') if p.is_file()}
             result = subprocess.run([sys.executable, str(local / 'scripts/render_runtime_adapters.py'), '--repo-root', str(root)], capture_output=True, text=True)
-            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertIn('missing project configuration', result.stderr)
             self.assertEqual(before, {str(p): p.read_bytes() for p in local.rglob('*') if p.is_file()})
 
     def test_noop_render_and_check_are_observational(self):

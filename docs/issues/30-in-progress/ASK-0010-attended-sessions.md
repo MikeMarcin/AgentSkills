@@ -1,8 +1,9 @@
 ---
-id: ASK-0010
-title: Portable attended sessions
-status: In Progress
-rfc: RFC-ASK-0003
+schema: "implement-rfc.card.v1"
+id: "ASK-0010"
+title: "Portable attended sessions"
+status: "In Progress"
+rfcs: ["RFC-ASK-0003"]
 depends_on: []
 ---
 

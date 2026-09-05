@@ -1,8 +1,9 @@
 ---
-id: ASK-0011
-title: Portable guided manual steps
-status: In Progress
-rfc: RFC-ASK-0003
+schema: "implement-rfc.card.v1"
+id: "ASK-0011"
+title: "Portable guided manual steps"
+status: "In Progress"
+rfcs: ["RFC-ASK-0003"]
 depends_on: []
 ---
 

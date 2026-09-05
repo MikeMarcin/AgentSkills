@@ -1,8 +1,9 @@
 ---
-id: ASK-0001
-title: Import supplied implement-rfc as the first skill
-status: Done
-rfc: RFC-ASK-0001
+schema: "implement-rfc.card.v1"
+id: "ASK-0001"
+title: "Import supplied implement-rfc as the first skill"
+status: "Done"
+rfcs: ["RFC-ASK-0001"]
 depends_on: []
 ---
 

@@ -29,25 +29,6 @@ CARD_ID = re.compile(r"^[A-Z]{2,8}-\d{4}$")
 ANCHOR_RE = re.compile(r"RFC_BASE_SHA|RFC base:")
 
 
-def counter_history_max(repo_root: Path, path: str) -> str | None:
-    """Highest ID the next-ID file ever held on this checkout's history, or None."""
-    result = subprocess.run(
-        ["git", "-C", str(repo_root), "log", "-p", "--format=", "--", path],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return None
-    best: tuple[str, int] | None = None
-    for match in re.finditer(r"^\+([A-Z]{2,8}-\d{4})\s*$", result.stdout, re.MULTILINE):
-        token = match.group(1)
-        number = int(token.rsplit("-", 1)[1])
-        if best is None or number > best[1]:
-            best = (token, number)
-    return best[0] if best else None
-
-
 def audit(
     repo_root: Path,
     config: dict[str, Any],
@@ -68,15 +49,6 @@ def audit(
     cards, structural_errors = board_model.validate_board(repo_root, config)
     violations.extend(map(str, structural_errors))
     active_cards = [card for card in cards.values() if card.lane in active]
-
-    next_id_path = repo_root / config["next_id"]["path"]
-    if next_id_path.is_file():
-        value = next_id_path.read_text(encoding="utf-8").strip()
-        historical = counter_history_max(repo_root, config["next_id"]["path"])
-        if CARD_ID.fullmatch(value) and historical:
-            area, number = value.rsplit("-", 1)
-            if historical.startswith(area + "-") and int(historical.rsplit("-", 1)[1]) > int(number):
-                violations.append(f"next {value} is below {historical}, which the counter already held in Git history")
 
     rfc_status: dict[str, str] = {}
     for card in active_cards:
@@ -103,7 +75,7 @@ def audit(
     )
     for rfc in open_rfcs:
         family = [card for card in cards.values() if rfc in card.rfcs]
-        closeouts = [card for card in family if is_closeout(card.path, card.fields)]
+        closeouts = [card for card in family if rfc in card.fields.get('closeout_for', [])]
         if not closeouts:
             warnings.append(f"{rfc}: no closeout card found among its {len(family)} cards")
         elif not any(ANCHOR_RE.search(card.body) for card in closeouts):

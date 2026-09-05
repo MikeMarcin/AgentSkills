@@ -26,16 +26,15 @@ class BoardTests(unittest.TestCase):
         self.config = copy.deepcopy(CONFIG)
         self.config.update(project='fixture', display_name='Fixture', session_prefix='fx',
                            origin_repo_name='Fixture', issue_root='tracker/cards',
-                           rfc_root='tracker/rfcs', rfc_link_field='spec',
-                           next_id={'mode': 'single-file', 'path': 'tracker/cards/NEXT_ID'},
-                           closeout_card={'front_matter': {'closeout': 'true'}})
+                           rfc_root='tracker/rfcs',
+                           next_id={'mode': 'single-file', 'path': 'tracker/cards/NEXT_ID'})
         self.config['lanes'] = {'backlog': 'backlog', 'ready': 'ready',
-            'platform_ready': {'mac': 'mac-ready', 'win': 'win-ready', 'linux': 'linux-ready'},
+            'inbox': 'inbox',
             'in_progress': 'working', 'parked': 'parked', 'blocked': 'blocked', 'done': 'done'}
         self.config['lane_statuses'] = {'backlog': 'Backlog', 'ready': 'Ready',
-            'mac-ready': 'Ready', 'win-ready': 'Ready', 'linux-ready': 'Ready',
+            'inbox': 'Inbox',
             'working': 'In Progress', 'parked': 'Parked', 'blocked': 'Blocked', 'done': 'Done'}
-        self.config['bookkeeping'] = {'deferring_lanes': ['backlog', 'blocked', 'mac-ready', 'win-ready', 'linux-ready'],
+        self.config['bookkeeping'] = {'deferring_lanes': ['inbox', 'backlog', 'blocked', 'parked'],
             'parked_on': ['awaiting-person'], 'blocked_by_forbidden_prefixes': ['platform-'],
             'link_roots': ['tracker', 'README.md'],
             'protected_globs': ['tracker/captured/**'],
@@ -51,9 +50,9 @@ class BoardTests(unittest.TestCase):
 
     def card(self, number=1, lane='backlog', deps=(), extra='', body='# Body\n'):
         path = self.root / 'tracker/cards' / lane / f'XYZ-{number:04d}-fixture.md'
-        path.write_text(f'---\nid: XYZ-{number:04d}\ntitle: Fixture\n'
-                        f'status: {self.config["lane_statuses"][lane]}\nspec: RFC-XYZ-0001\n'
-                        f'depends_on: [{", ".join(deps)}]\n{extra}---\n\n{body}')
+        path.write_text(f'---\nschema: implement-rfc.card.v1\nid: XYZ-{number:04d}\ntitle: Fixture\n'
+                        f'status: {self.config["lane_statuses"][lane]}\nrfcs: ["RFC-XYZ-0001"]\n'
+                        f'depends_on: {json.dumps(list(deps))}\n{extra}---\n\n{body}')
         return path
 
     def public(self, *args, expected=0):
@@ -90,18 +89,18 @@ class BoardTests(unittest.TestCase):
         self.assertEqual(result['changed_paths'], [])
         self.public('move', 'XYZ-0001', '--to', 'ready', expected=1)
         self.assertEqual(self.public('queue', '--rfc', 'RFC-XYZ-0001')['cards'], [])
-        self.assertEqual(len(self.public('queue', '--rfc', 'RFC-XYZ-0001', '--all')['cards']), 1)
+        self.assertEqual(len(self.public('queue', '--rfc', 'RFC-XYZ-0001', '--history')['cards']), 1)
 
     def test_schema_rejects_missing_unknown_duplicate_and_wrong_types(self):
         source = self.card()
         original = source.read_text()
         mutations = [('title: Fixture\n', '', 'title'),
                      ('status: Backlog', 'status: Backlog\nstatus: Done', 'duplicate front-matter'),
-                     ('title: Fixture', 'title: [Fixture]', 'expected string'),
+                     ('title: Fixture', 'title: ["Fixture"]', 'expected string'),
                      ('depends_on: []', 'depends_on: XYZ-0002', 'expected array'),
                      ('title: Fixture', 'title: Fixture\ntyop: value', 'unknown card field'),
-                     ('spec: RFC-XYZ-0001', 'spec: gibberish', 'invalid value format'),
-                     ('depends_on: []', 'depends_on: [XYZ-0002, XYZ-0002]', 'duplicate dependency')]
+                     ('rfcs: ["RFC-XYZ-0001"]', 'rfcs: ["gibberish"]', 'invalid value format'),
+                     ('depends_on: []', 'depends_on: ["XYZ-0002", "XYZ-0002"]', 'duplicate array value')]
         for before, after, reason in mutations:
             with self.subTest(reason=reason):
                 source.write_text(original.replace(before, after))
@@ -182,13 +181,13 @@ class BoardTests(unittest.TestCase):
         self.assertTrue((self.root / 'tracker/cards/ready/XYZ-0001-fixture.md').is_file())
 
     def test_platform_label_is_preserved_without_overriding_lane_eligibility(self):
-        source = self.card(lane='win-ready', extra='platform: windows\n')
+        source = self.card(lane='ready', extra='platforms: ["win"]\n')
         self.assertTrue(self.public('validate')['valid'])
         row = self.public('queue', '--rfc', 'RFC-XYZ-0001', '--platform', 'mac')['cards'][0]
         self.assertEqual(row['disposition'], 'deferred_platform')
         self.public('move', 'XYZ-0001', '--to', 'working')
         destination = source.parent.parent / 'working' / source.name
-        self.assertIn('platform: windows', destination.read_text())
+        self.assertIn('platforms: ["win"]', destination.read_text())
 
     def test_parser_rejects_multiline_and_ambiguous_yaml(self):
         for content in ('title: A: B', 'title: >\n  text', 'title: test # comment',
@@ -198,7 +197,7 @@ class BoardTests(unittest.TestCase):
 
     def test_no_rfc_and_quoted_fields_are_supported(self):
         path = self.card()
-        path.write_text(path.read_text().replace('spec: RFC-XYZ-0001', 'spec: none')
+        path.write_text(path.read_text().replace('rfcs: ["RFC-XYZ-0001"]', 'rfcs: []')
                         .replace('title: Fixture', 'title: "Colon: title"'))
         self.assertEqual(self.errors(), '')
         self.apply('ready')
@@ -208,7 +207,7 @@ class BoardTests(unittest.TestCase):
         source = self.card(deps=('XYZ-0002',))
         self.card(2, deps=('XYZ-0001',))
         self.assertIn('cycle', self.errors())
-        source.write_text(source.read_text().replace('XYZ-0002]', 'XYZ-0009]'))
+        source.write_text(source.read_text().replace('XYZ-0002"]', 'XYZ-0009"]'))
         self.assertIn('not found', self.errors())
         source.write_text(source.read_text().replace('RFC-XYZ-0001', 'RFC-XYZ-0009'))
         self.assertIn('has no RFC file', self.errors())
@@ -225,10 +224,10 @@ class BoardTests(unittest.TestCase):
     def test_dependency_and_reason_rules(self):
         source = self.card(deps=('XYZ-0002',))
         self.card(2)
-        for lane in ('ready', 'working', 'parked', 'done'):
+        for lane in ('ready', 'working', 'done'):
             with self.subTest(lane=lane), self.assertRaises(board.BoardError):
                 self.plan(lane, parked_on='awaiting-person' if lane == 'parked' else None)
-        self.apply('win-ready')
+        self.apply('backlog')
         self.apply('blocked', blocked_by='missing-design')
         with self.assertRaises(board.BoardError):
             self.plan('blocked', blocked_by='platform-win')
@@ -244,12 +243,12 @@ class BoardTests(unittest.TestCase):
         self.apply('parked', parked_on='awaiting-person')
 
     def test_queue_platform_backlog_and_explicit_extra_ids(self):
-        self.card(1, lane='win-ready', deps=('XYZ-0004',))
+        self.card(1, lane='backlog', deps=('XYZ-0004',), extra='platforms: ["win"]\n')
         self.card(2, lane='ready')
-        self.card(3, lane='mac-ready')
+        self.card(3, lane='ready', extra='platforms: ["mac"]\n')
         self.card(4)
         extra = self.card(5, lane='ready')
-        extra.write_text(extra.read_text().replace('spec: RFC-XYZ-0001', 'spec: none'))
+        extra.write_text(extra.read_text().replace('rfcs: ["RFC-XYZ-0001"]', 'rfcs: []'))
         result = self.public('queue', '--rfc', 'RFC-XYZ-0001', '--platform', 'mac', '--include', 'XYZ-0005')
         self.assertEqual(result['next'], 'XYZ-0002')
         rows = {r['id']: r for r in result['cards']}
@@ -261,7 +260,7 @@ class BoardTests(unittest.TestCase):
 
     def test_queue_ambiguity_and_closeout(self):
         self.card(1, lane='working')
-        self.card(2, lane='working', extra='closeout: true\n')
+        self.card(2, lane='working', extra='closeout_for: ["RFC-XYZ-0001"]\n')
         result = self.public('queue', '--rfc', 'RFC-XYZ-0001')
         self.assertIsNone(result['next'])
         self.assertEqual(result['ambiguous_in_progress'], ['XYZ-0001', 'XYZ-0002'])
@@ -287,7 +286,7 @@ class BoardTests(unittest.TestCase):
         original = source.read_bytes()
         self.public('move', 'XYZ-0001', '--to', 'working')
         dest = source.parent.parent / 'working' / source.name
-        expected = original.replace(b'status: Ready', b'status: In Progress').replace(
+        expected = original.replace(b'status: Ready', b'status: "In Progress"').replace(
             b'(XYZ-0002-fixture.md#section)', b'(../ready/XYZ-0002-fixture.md#section)')
         self.assertEqual(dest.read_bytes(), expected)
         content = readme.read_text()
@@ -385,16 +384,13 @@ class BoardTests(unittest.TestCase):
         schema['properties']['title']['pattern'] = '^Required title$'
         path = self.root / 'candidate.schema.json'
         path.write_text(json.dumps(schema))
-        with patch.object(board, 'SCHEMA_PATH', path):
+        with patch.object(board, 'CARD_SCHEMA', schema):
             self.assertIn('title: invalid value format', self.errors())
 
-    def test_custom_closeout_marker_and_rfc_field_collision(self):
-        self.config['closeout_card'] = {'front_matter': {'final_check': 'yes'}}
-        self.card(extra='final_check: yes\n')
-        self.assertEqual(self.errors(), '')
-        result = cli.queue(self.root, self.config, 'RFC-XYZ-0001', 'mac', [], False)
-        self.assertEqual(len(result['closeout_paths']), 1)
-        self.config['rfc_link_field'] = 'depends_on'
+    def test_canonical_closeout_and_no_custom_control_fields(self):
+        self.card(lane='ready', extra='closeout_for: ["RFC-XYZ-0001"]\n')
+        self.assertEqual(len(self.public('queue', '--rfc', 'RFC-XYZ-0001')['closeout_paths']), 1)
+        self.config['rfc_link_field'] = 'spec'
         with self.assertRaises(project_config.ProjectConfigError):
             project_config.validate(self.config)
 

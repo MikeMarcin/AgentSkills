@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 
 CONFIG = {
-    "schema": "implement-rfc.project.v1",
+    "schema": "implement-rfc.project.v2",
     "project": "fixture",
     "display_name": "Fixture",
     "session_prefix": "fx",
@@ -18,7 +18,7 @@ CONFIG = {
     "lanes": {
         "backlog": "10-backlog",
         "ready": "20-ready",
-        "platform_ready": {"win": "21-ready-win"},
+        "inbox": "00-inbox",
         "in_progress": "30-in-progress",
         "parked": "40-parked",
         "blocked": "50-blocked",
@@ -27,15 +27,13 @@ CONFIG = {
     "lane_statuses": {
         "10-backlog": "Backlog",
         "20-ready": "Ready",
-        "21-ready-win": "Ready",
+        "00-inbox": "Inbox",
         "30-in-progress": "In Progress",
         "40-parked": "Parked",
         "50-blocked": "Blocked",
         "60-done": "Done",
     },
-    "rfc_link_field": "rfc",
     "terminal_rfc_status": "Auto-Verified",
-    "closeout_card": {"front_matter": {"closeout": "true"}},
     "structure_gate": [],
     "attended_review_skill": None,
     "station_registry_doc": "docs/development/remote-stations.md",

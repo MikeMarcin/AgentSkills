@@ -1,8 +1,9 @@
 ---
-id: ASK-0007
-title: Refresh implement-rfc from SampleReview
-status: Done
-rfc: RFC-ASK-0001
+schema: "implement-rfc.card.v1"
+id: "ASK-0007"
+title: "Refresh implement-rfc from SampleReview"
+status: "Done"
+rfcs: ["RFC-ASK-0001"]
 depends_on: ["ASK-0004"]
 ---
 

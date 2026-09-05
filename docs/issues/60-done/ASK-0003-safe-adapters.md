@@ -1,8 +1,9 @@
 ---
-id: ASK-0003
-title: Keep shared source immutable during adapter rendering
-status: Done
-rfc: RFC-ASK-0001
+schema: "implement-rfc.card.v1"
+id: "ASK-0003"
+title: "Keep shared source immutable during adapter rendering"
+status: "Done"
+rfcs: ["RFC-ASK-0001"]
 depends_on: ["ASK-0002"]
 ---
 

@@ -1,8 +1,9 @@
 ---
-id: ASK-0005
-title: Add the agent-facing MASK management workflow
-status: Done
-rfc: RFC-ASK-0002
+schema: "implement-rfc.card.v1"
+id: "ASK-0005"
+title: "Add the agent-facing MASK management workflow"
+status: "Done"
+rfcs: ["RFC-ASK-0002"]
 depends_on: ["ASK-0004"]
 external_depends_on: ["ManageAgentSkills:MASK-0014"]
 ---

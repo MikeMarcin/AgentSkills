@@ -1,8 +1,9 @@
 ---
-id: ASK-0013
-title: One-off named consumer migrations
-status: Backlog
-rfc: RFC-ASK-0003
+schema: "implement-rfc.card.v1"
+id: "ASK-0013"
+title: "One-off named consumer migrations"
+status: "Backlog"
+rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0012"]
 ---
 

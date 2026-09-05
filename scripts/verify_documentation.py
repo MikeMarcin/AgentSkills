@@ -33,7 +33,7 @@ def main():
             if cid in cards: problems.append('duplicate card '+cid)
             if not path.name.startswith(cid+'-'): problems.append('card filename mismatch '+str(path))
             if f.get('status')!=status: problems.append('lane/status mismatch '+str(path))
-            if f.get('rfc') not in rfcs: problems.append('missing live RFC for '+cid)
+            if any(r not in rfcs for r in json.loads(f.get('rfcs','[]'))): problems.append('missing live RFC for '+cid)
             try: deps=json.loads(f.get('depends_on','[]'))
             except json.JSONDecodeError: deps=[];problems.append('invalid dependency array '+cid)
             cards[cid]=(f,b,path,deps)
@@ -66,10 +66,10 @@ def main():
     index=(rfcroot/'README.md').read_text(encoding='utf-8')
     for rid,(f,b,p) in rfcs.items():
         status=f.get('status')
-        if status not in {'Proposed','Accepted','Implementing','Auto-Verified','Rejected','Superseded'}:problems.append('invalid RFC status '+rid)
+        if status not in {'Proposed','Accepted','Implementing','Implemented','Auto-Verified','Rejected','Superseded'}:problems.append('invalid RFC status '+rid)
         if f'| {rid} | {status} |' not in index:problems.append('RFC index status mismatch '+rid)
-        family=[v for v in cards.values() if v[0].get('rfc')==rid]
-        close=[v for v in family if v[0].get('closeout','').lower()=='true']
+        family=[v for v in cards.values() if rid in json.loads(v[0].get('rfcs','[]'))]
+        close=[v for v in family if rid in json.loads(v[0].get('closeout_for','[]'))]
         if len(close)!=1:problems.append('exactly one closeout required '+rid);continue
         criteria=re.findall(r'\*\*('+re.escape(rid)+r'-AC\d{2})\*\*',b)
         for ac in criteria:

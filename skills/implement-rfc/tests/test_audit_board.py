@@ -22,7 +22,7 @@ SPEC.loader.exec_module(module)
 # A fixture project, deliberately not this repository's config, so the test is
 # identical in every project that carries the skill.
 CONFIG = {
-    "schema": "implement-rfc.project.v1",
+    "schema": "implement-rfc.project.v2",
     "project": "fixture",
     "display_name": "Fixture",
     "session_prefix": "fx",
@@ -35,7 +35,7 @@ CONFIG = {
     "lanes": {
         "backlog": "10-backlog",
         "ready": "20-ready",
-        "platform_ready": {"win": "21-ready-win"},
+        "inbox": "00-inbox",
         "in_progress": "30-in-progress",
         "parked": "40-parked",
         "blocked": "50-blocked",
@@ -44,15 +44,13 @@ CONFIG = {
     "lane_statuses": {
         "10-backlog": "Backlog",
         "20-ready": "Ready",
-        "21-ready-win": "Ready",
+        "00-inbox": "Inbox",
         "30-in-progress": "In Progress",
         "40-parked": "Parked",
         "50-blocked": "Blocked",
         "60-done": "Done",
     },
-    "rfc_link_field": "rfc",
     "terminal_rfc_status": "Auto-Verified",
-    "closeout_card": {"front_matter": {"closeout": "true"}},
     "structure_gate": [],
     "attended_review_skill": None,
     "station_registry_doc": "docs/development/remote-stations.md",
@@ -74,17 +72,18 @@ def write_card(
     closeout: bool = False,
     anchor: bool = False,
 ) -> Path:
-    depends_on = "[" + ", ".join(deps) + "]"
+    depends_on = json.dumps(list(deps))
     lines = [
         "---",
+        "schema: implement-rfc.card.v1",
         f"id: {card_id}",
         f"title: {slug}",
         f"status: {status or CONFIG['lane_statuses'][lane]}",
-        f"rfc: {rfc}",
+        f"rfcs: {json.dumps([] if rfc == 'none' else [rfc])}",
         f"depends_on: {depends_on}",
     ]
     if closeout:
-        lines.append("closeout: true")
+        lines.append("closeout_for: " + json.dumps([rfc]))
     lines += ["---", "", f"# {card_id}", ""]
     if anchor:
         lines.append("RFC base: `0123456789abcdef0123456789abcdef01234567`.")
@@ -247,7 +246,7 @@ class BoardAuditTests(unittest.TestCase):
             self.assertIn("next AAA-0001 <=", "\n".join(violations))
             write_next_id(root, "not-an-id")
             violations, _, _ = module.audit(root, CONFIG)
-            self.assertIn("malformed value 'not-an-id'", "\n".join(violations))
+            self.assertIn("malformed counter 'not-an-id'", "\n".join(violations))
 
     def test_next_id_below_git_history_is_a_violation(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -271,7 +270,7 @@ class BoardAuditTests(unittest.TestCase):
             git("commit", "-m", "advance counter")
             write_next_id(root, "AAA-0010")
             violations, _, _ = module.audit(root, CONFIG)
-            self.assertIn("below AAA-0020, which the counter already held", "\n".join(violations))
+            self.assertIn("rewinds historical high water AAA-0020", "\n".join(violations))
 
     def test_missing_linked_rfc_is_a_violation(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -313,15 +312,6 @@ class BoardAuditTests(unittest.TestCase):
             violations, warnings, _ = module.audit(root, CONFIG)
             self.assertEqual(violations, [])
             self.assertIn("no closeout card found", "\n".join(warnings))
-
-    def test_filename_pattern_closeout_detection(self) -> None:
-        config = dict(CONFIG, closeout_card={"filename_pattern": r"^AAA-\d{4}-close-rfc-\d{4}\.md$"})
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            self.build_clean(root)
-            violations, warnings, _ = module.audit(root, config)
-            self.assertEqual(violations, [])
-            self.assertEqual(warnings, [])
 
     def test_closeout_without_run_anchor_warns(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

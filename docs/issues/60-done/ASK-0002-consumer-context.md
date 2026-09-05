@@ -1,8 +1,9 @@
 ---
-id: ASK-0002
-title: Resolve workflow context from the consumer project
-status: Done
-rfc: RFC-ASK-0001
+schema: "implement-rfc.card.v1"
+id: "ASK-0002"
+title: "Resolve workflow context from the consumer project"
+status: "Done"
+rfcs: ["RFC-ASK-0001"]
 depends_on: ["ASK-0001"]
 ---
 

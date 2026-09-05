@@ -76,17 +76,19 @@ def scalar(value: str, path: Path, key: str) -> str:
     return value
 
 
-def decode(value: str, path: Path, key: str) -> str | list[str]:
-    if not value.startswith('['):
-        return scalar(value, path, key)
-    if not value.endswith(']'):
-        raise BoardError(path, key, 'unterminated inline list')
-    inside = value[1:-1].strip()
-    if not inside:
-        return []
-    # Tokens may be quoted, but embedded commas/complex YAML are deliberately
-    # unsupported. IDs cannot contain commas, so no card capability is lost.
-    return [scalar(part.strip(), path, key) for part in inside.split(',')]
+def decode(value: str, path: Path, key: str):
+    # JSON covers nested descriptive metadata without inventing a YAML dialect.
+    # Plain text scalars remain convenient for hand edits. Arrays/objects are JSON.
+    if value.startswith(('[', '{', '"')) or value in {'true', 'false', 'null'} or re.fullmatch(r'-?\d+(?:\.\d+)?', value):
+        try:
+            return json.loads(value)
+        except ValueError as exc:
+            raise BoardError(path, key, f'invalid JSON value: {exc}') from None
+    return scalar(value, path, key)
+
+
+def encode(value) -> str:
+    return json.dumps(value, ensure_ascii=False, separators=(',', ':'))
 
 
 @dataclass
@@ -106,8 +108,8 @@ class Matter:
                 if value is None:
                     lines[index] = ''
                 elif self.values[key] != value:
-                    lines[index] = f'{key}: {value}{newline}'
-        additions = [f'{key}: {value}{newline}' for key, value in updates.items()
+                    lines[index] = f'{key}: {encode(value)}{newline}'
+        additions = [f'{key}: {encode(value)}{newline}' for key, value in updates.items()
                      if key not in self.indices and value is not None]
         lines[self.end:self.end] = additions
         return ''.join(lines).encode('utf-8')
@@ -138,49 +140,44 @@ def parse_matter(data: bytes, path: Path) -> Matter:
 
 
 def schema_errors(values: dict, path: Path, config: dict) -> list[Diagnostic]:
-    """Evaluate the checked-in flat card schema; reject unsupported keywords.
-
-    This is intentionally not a general JSON Schema engine. Adding a schema
-    feature requires adding its evaluator and tests in the same change.
-    """
-    schema = json.loads(SCHEMA_PATH.read_text(encoding='utf-8'))
-    properties = schema['properties'].copy()
-    link = config['rfc_link_field']
-    properties[link] = properties.pop('rfc')
-    if 'front_matter' in config['closeout_card']:
-        marker = next(iter(config['closeout_card']['front_matter']))
-        properties.setdefault(marker, {'type': 'string', 'minLength': 1})
-    required = [link if key == 'rfc' else key for key in schema['required']]
+    """Evaluate our small schema vocabulary, including descriptive JSON metadata."""
     errors = []
-    for key in required:
-        if key not in values:
-            errors.append(Diagnostic(str(path), key, 'required field missing'))
-    for key, value in values.items():
-        if key not in properties:
-            errors.append(Diagnostic(str(path), key, 'unknown card field'))
-            continue
-        rule = properties[key]
-        allowed = {'type', 'minLength', 'pattern', 'items', 'uniqueItems', 'description'}
-        if set(rule) - allowed:
-            raise RuntimeError(f'unsupported card schema keywords: {set(rule) - allowed}')
-        valid_type = isinstance(value, str) if rule['type'] == 'string' else isinstance(value, list)
+    def check(value, rule, key):
+        types = {'string': str, 'array': list, 'object': dict}
+        if not isinstance(value, types[rule['type']]):
+            errors.append(Diagnostic(str(path), key, f"expected {rule['type']}"))
+            return
         reason = None
-        if not valid_type:
-            reason = f"expected {rule['type']}"
-        elif isinstance(value, str):
+        if 'enum' in rule and value not in rule['enum']:
+            reason = 'invalid value'
+        if isinstance(value, str):
             if len(value.strip()) < rule.get('minLength', 0):
                 reason = 'must be nonempty'
-            elif 'pattern' in rule and not re.fullmatch(rule['pattern'], value):
+            if 'pattern' in rule and not re.fullmatch(rule['pattern'], value):
                 reason = 'invalid value format'
+        elif isinstance(value, list):
+            if rule.get('uniqueItems') and len(value) != len({encode(v) for v in value}):
+                reason = 'duplicate array value'
+            for i, item in enumerate(value):
+                check(item, rule['items'], f'{key}[{i}]')
         else:
-            item_rule = rule['items']
-            if any(not isinstance(item, str) or not re.fullmatch(item_rule['pattern'], item) for item in value):
-                reason = 'invalid dependency id'
-            elif rule.get('uniqueItems') and len(value) != len(set(value)):
-                reason = 'duplicate dependency'
+            for required in rule.get('required', []):
+                if required not in value:
+                    errors.append(Diagnostic(str(path), f'{key}.{required}'.lstrip('.'), 'required field missing'))
+            for name, item in value.items():
+                if name in rule.get('properties', {}):
+                    check(item, rule['properties'][name], f'{key}.{name}'.lstrip('.'))
+                elif rule.get('additionalProperties') is False:
+                    errors.append(Diagnostic(str(path), name, 'unknown card field; descriptive data belongs in metadata'))
         if reason:
             errors.append(Diagnostic(str(path), key, reason))
+    check(values, CARD_SCHEMA, '')
+    if set(values.get('closeout_for', [])) - set(values.get('rfcs', [])):
+        errors.append(Diagnostic(str(path), 'closeout_for', 'must be a subset of rfcs'))
     return errors
+
+
+CARD_SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding='utf-8'))
 
 
 @dataclass
@@ -204,8 +201,7 @@ class Card:
 
     @property
     def rfcs(self) -> list[str]:
-        value = self.fields[self.config['rfc_link_field']]
-        return [] if value == 'none' else [value]
+        return self.fields['rfcs']
 
     @property
     def body(self) -> str:
@@ -215,7 +211,7 @@ class Card:
 def policy(config: dict) -> dict:
     lanes = config['lanes']
     return config.get('bookkeeping', {
-        'deferring_lanes': [lanes['backlog'], lanes['blocked'], *lanes['platform_ready'].values()],
+        'deferring_lanes': [lanes['inbox'], lanes['backlog'], lanes['blocked'], lanes['parked']],
         'parked_on': [], 'blocked_by_forbidden_prefixes': [],
         'link_roots': [], 'protected_globs': [], 'editable_globs': [],
     })
@@ -259,12 +255,14 @@ def read_cards(root: Path, config: dict, overrides: dict[Path, bytes | None] | N
     return cards, errors
 
 
-def validate_cards(cards: dict[str, Card], config: dict) -> list[Diagnostic]:
+def validate_cards(cards: dict[str, Card], config: dict, scope: set[str] | None = None) -> list[Diagnostic]:
     errors: list[Diagnostic] = []
     lanes = config['lanes']
     rules = policy(config)
     done = lanes['done']
     for card in cards.values():
+        if scope is not None and card.id not in scope:
+            continue
         def error(field: str, reason: str) -> None:
             errors.append(Diagnostic(str(card.path), field, reason))
         expected = config['lane_statuses'][card.lane]
@@ -291,7 +289,7 @@ def validate_cards(cards: dict[str, Card], config: dict) -> list[Diagnostic]:
     # Iterative DFS handles large boards without Python recursion limits.
     visited: set[str] = set()
     for start in cards:
-        if start in visited:
+        if (scope is not None and start not in scope) or start in visited:
             continue
         stack = [(start, iter(cards[start].deps))]
         active = {start}
@@ -310,10 +308,12 @@ def validate_cards(cards: dict[str, Card], config: dict) -> list[Diagnostic]:
     return errors
 
 
-def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None] | None = None
+def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None] | None = None, *, scope: set[str] | None = None
                    ) -> tuple[dict[str, Card], list[Diagnostic]]:
     cards, errors = read_cards(root, config, overrides)
-    errors.extend(validate_cards(cards, config))
+    if callable(scope):
+        scope = scope(cards)
+    errors.extend(validate_cards(cards, config, scope))
     rfcs: dict[str, Path] = {}
     rfc_root = safe_path(root, root / config['rfc_root'])
     for path in sorted(rfc_root.glob('RFC-*.md')):
@@ -333,18 +333,20 @@ def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None]
     for card in cards.values():
         for rfc in card.rfcs:
             if rfc not in rfcs:
-                errors.append(Diagnostic(str(card.path), config['rfc_link_field'], f'linked {rfc} has no RFC file'))
-    counter_path = safe_path(root, root / config['next_id']['path'])
-    if not counter_path.is_file():
-        errors.append(Diagnostic(str(counter_path), 'next_id', 'next-id file missing'))
-    else:
-        value = counter_path.read_text(encoding='utf-8').strip()
-        if not ID_RE.fullmatch(value):
-            errors.append(Diagnostic(str(counter_path), 'next_id', f"malformed value '{value}'"))
-        else:
-            prefix, number = value.rsplit('-', 1)
-            highest = max((int(c.id.rsplit('-', 1)[1]) for c in cards.values()
-                           if c.id.startswith(prefix + '-')), default=0)
-            if int(number) <= highest:
-                errors.append(Diagnostic(str(counter_path), 'next_id', f'next {value} <= highest used {prefix}-{highest:04d}'))
+                errors.append(Diagnostic(str(card.path), 'rfcs', f'linked {rfc} has no RFC file'))
+    import allocation
+    _, counter_errors, _ = allocation.inspect_counters(root, config, cards)
+    errors.extend(counter_errors)
     return cards, errors
+
+
+def dependency_scope(cards: dict[str, Card], selected: set[str]) -> set[str]:
+    pending = list(selected)
+    result = set(selected)
+    while pending:
+        card = cards.get(pending.pop())
+        for dep in card.deps if card else []:
+            if dep not in result:
+                result.add(dep)
+                pending.append(dep)
+    return result

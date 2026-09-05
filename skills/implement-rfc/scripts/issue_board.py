@@ -2,7 +2,7 @@
 """Validate issue cards, report RFC queues, and move one card with its live links.
 
 Uses the portable project config. Mutations require explicit bookkeeping policy.
-No staging, commits, dependency edits, or acceptance judgments are performed.
+Claim and finish commit explicit scope; agents retain acceptance judgment.
 """
 from __future__ import annotations
 
@@ -56,58 +56,70 @@ def mask_code(text: str) -> str:
     return re.sub(r'(?<!`)(`+)(?!`)([\s\S]*?)(?<!`)\1(?!`)', lambda m: blank(m[0]), masked)
 
 
-def require_valid(root: Path, config: dict, overrides: dict | None = None) -> dict:
-    cards, errors = board.validate_board(root, config, overrides)
+def require_valid(root: Path, config: dict, overrides: dict | None = None, scope=None) -> dict:
+    cards, errors = board.validate_board(root, config, overrides, scope=scope)
     if errors:
         raise board.ValidationError(root, errors)
     return cards
 
 
-def queue(root: Path, config: dict, rfc: str, platform: str, include: list[str], all_cards: bool) -> dict:
-    cards = require_valid(root, config)
-    if not board.RFC_RE.fullmatch(rfc) or len(list((root / config['rfc_root']).glob(rfc + '-*.md'))) != 1:
-        raise board.BoardError(root, 'rfc', f'unknown or ambiguous RFC {rfc}')
+def queue(root: Path, config: dict, rfcs: list[str], platform: str, include: list[str],
+          all_cards: bool, areas: list[str] | None = None, human_waiting=False, history=False) -> dict:
+    areas = areas or []
+    if not (rfcs or areas or include or all_cards or human_waiting):
+        raise board.BoardError(root, 'scope', 'select --rfc, --area, --include, --human-waiting or explicit --all')
+    def selected(card):
+        scope_match = all_cards or bool(set(rfcs) & set(card.rfcs)) or card.id in include or card.fields.get('area', card.id.split('-')[0]) in areas
+        human = card.fields.get('parked_on') in {'human-review', 'human-attendance', 'attended-review'}
+        return (scope_match or (human_waiting and not (rfcs or areas or include))) and (not human_waiting or human)
+    scope = lambda cards: board.dependency_scope(cards, {c.id for c in cards.values() if selected(c)})
+    cards = require_valid(root, config, scope=scope)
+    for rfc in rfcs:
+        if not board.RFC_RE.fullmatch(rfc) or len(list((root / config['rfc_root']).glob(rfc + '-*.md'))) != 1:
+            raise board.BoardError(root, 'rfc', f'unknown or ambiguous RFC {rfc}')
     for card_id in include:
         if card_id not in cards:
             raise board.BoardError(root, 'include', f'unknown card {card_id}')
-    selected = sorted((c for c in cards.values() if rfc in c.rfcs or c.id in include),
-                      key=lambda c: (int(c.id.rsplit('-', 1)[1]), c.id))
+    chosen = [c for c in cards.values() if selected(c)]
+    order = {}
+    if config.get('sequencing') == 'ordered-index':
+        index = root / config['rfc_root'] / 'README.md'
+        for rid in re.findall(r'RFC-[A-Z]{2,8}(?:-[A-Z]{2,8})?-\d{4}', index.read_text(encoding='utf-8')):
+            order.setdefault(rid, len(order))
+    chosen.sort(key=lambda c: (min((order.get(r, 999999) for r in c.rfcs), default=999999), c.fields.get('priority', 'P2'), c.id))
     lanes = config['lanes']
-    done = lanes['done']
-    startable = {lanes['ready'], lanes['platform_ready'].get(platform)}
     rows = []
-    for card in selected:
-        unmet = [dep for dep in card.deps if cards[dep].lane != done]
-        if card.lane == done:
+    for card in chosen:
+        unmet = [dep for dep in card.deps if dep not in cards or cards[dep].lane != lanes['done']]
+        platforms = card.fields.get('platforms', [])
+        if card.lane == lanes['done']:
             disposition = 'done'
+        elif platforms and platform not in platforms:
+            disposition = 'deferred_platform'
         elif card.lane == lanes['in_progress']:
             disposition = 'in_progress'
         elif card.lane == lanes['parked']:
             disposition = 'parked'
         elif card.lane == lanes['blocked']:
             disposition = 'blocked'
-        elif card.lane in lanes['platform_ready'].values() and card.lane not in startable:
-            disposition = 'deferred_platform'
         elif unmet:
             disposition = 'waiting_dependencies'
-        elif card.lane == lanes['backlog']:
+        elif card.lane in {lanes['inbox'], lanes['backlog']}:
             disposition = 'backlog_candidate'
         else:
             disposition = 'ready'
-        rows.append({'id': card.id, 'title': card.fields['title'],
-                     'path': card.path.relative_to(root).as_posix(), 'lane': card.lane,
-                     'status': card.fields['status'], 'unmet_dependencies': unmet,
+        rows.append({'id': card.id, 'title': card.fields['title'], 'path': card.path.relative_to(root).as_posix(),
+                     'rfcs': card.rfcs, 'status': card.fields['status'], 'unmet_dependencies': unmet,
                      'external_depends_on': card.fields.get('external_depends_on', []),
-                     'disposition': disposition,
-                     'reason': card.fields.get('parked_on', card.fields.get('blocked_by'))})
-    active = [row['id'] for row in rows if row['disposition'] == 'in_progress']
-    ready = [row['id'] for row in rows if row['disposition'] == 'ready']
-    matcher = project_config.closeout_card_matcher(config)
-    return {'schema': 'implement-rfc.queue.v1', 'rfc': rfc, 'platform': platform,
-            'next': None if len(active) > 1 else next(iter(active or ready), None),
+                     'disposition': disposition, 'reason': card.fields.get('parked_on', card.fields.get('blocked_by'))})
+    active = [r['id'] for r in rows if r['disposition'] == 'in_progress']
+    ready = [r['id'] for r in rows if r['disposition'] == 'ready']
+    return {'schema': 'implement-rfc.queue.v1', 'rfcs': rfcs, 'areas': areas, 'platform': platform,
+            'next': active[0] if len(active) == 1 else (ready[0] if not active and ready else None),
             'ambiguous_in_progress': active if len(active) > 1 else [],
-            'closeout_paths': [c.path.relative_to(root).as_posix() for c in selected if matcher(c.path, c.fields)],
-            'cards': [row for row in rows if all_cards or row['disposition'] != 'done']}
+            'closeout_paths': [c.path.relative_to(root).as_posix() for c in chosen if c.fields.get('closeout_for')],
+            'selected_count': len(rows), 'done_count': sum(r['disposition'] == 'done' for r in rows),
+            'cards': [r for r in rows if history or r['disposition'] != 'done']}
 
 
 def markdown_paths(root: Path, rules: dict) -> list[Path]:
@@ -169,7 +181,8 @@ def plan_move(root: Path, config: dict, card_id: str, lane: str,
               parked_on: str | None, blocked_by: str | None) -> tuple[dict, dict]:
     if 'bookkeeping' not in config:
         raise board.BoardError(root, 'bookkeeping', 'configure bookkeeping policy before moving cards')
-    cards = require_valid(root, config)
+    scope = lambda cards: board.dependency_scope(cards, {card_id})
+    cards = require_valid(root, config, scope=scope)
     if card_id not in cards:
         raise board.BoardError(root, 'id', f'unknown card {card_id}')
     if lane not in project_config.lane_names(config):
@@ -203,14 +216,14 @@ def plan_move(root: Path, config: dict, card_id: str, lane: str,
     if source != destination:
         changes[source] = None
         originals[destination] = None
-    require_valid(root, config, changes)
+    require_valid(root, config, changes, scope=scope)
     return changes, originals
 
 
 @contextmanager
 def board_lock(root: Path):
     result = subprocess.run(['git', '-C', str(root), 'rev-parse', '--absolute-git-dir'],
-                            capture_output=True, text=True, check=True)
+                            capture_output=True, text=True, check=True, env=project_config.git_environment())
     path = Path(result.stdout.strip()) / 'implement-rfc-board.lock'
     try:
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
@@ -301,77 +314,153 @@ def move(root: Path, config: dict, args) -> dict:
         return perform()
 
 
+def commit_transition(root: Path, config: dict, args) -> dict:
+    """Agent selects acceptance; this command owns only the explicit Git slice."""
+    from allocation import git
+    with board_lock(root):
+        if git(root, 'diff', '--cached', '--name-only').stdout.strip():
+            raise board.BoardError(root, 'git', 'index must be empty; preserve or commit existing staged work first')
+        revision = git(root, 'rev-parse', 'HEAD').stdout.strip()
+        if args.expect_revision and args.expect_revision != revision:
+            raise board.BoardError(root, 'revision', 'HEAD changed since supplied expectation')
+        explicit = set()
+        for relative in getattr(args, 'paths', []):
+            path = board.safe_path(root, root / relative)
+            if Path(relative).is_absolute() or path.is_dir() or any(c in relative for c in '*?[') or relative.startswith(':'):
+                raise board.BoardError(path, 'paths', 'supply individual repository-relative files')
+            explicit.add(path)
+        cards = require_valid(root, config, scope=lambda cs: board.dependency_scope(cs, {args.id}))
+        if args.id not in cards:
+            raise board.BoardError(root, 'id', f'unknown card {args.id}')
+        card = cards[args.id]
+        records = None
+        if args.command == 'claim':
+            if card.lane != config['lanes']['ready']:
+                raise board.BoardError(card.path, 'claim', 'claim requires an eligible Ready card')
+            if card.fields.get('platforms') and args.platform not in card.fields['platforms']:
+                raise board.BoardError(card.path, 'platforms', 'card is not eligible on selected platform')
+            lane, parked = config['lanes']['in_progress'], None
+        else:
+            decision = json.loads(args.acceptance.read_text(encoding='utf-8'))
+            if decision.get('approved') is not True or decision.get('decision') not in {'done', 'human-pending'}:
+                raise board.BoardError(args.acceptance, 'acceptance', 'agent-approved decision must be done or human-pending')
+            records = decision.get('records')
+            candidate = dict(card.fields, acceptance=records)
+            errors = board.schema_errors(candidate, card.path, config)
+            if errors or not records:
+                raise board.BoardError(args.acceptance, 'acceptance', 'supply nonempty criterion/outcome/revision/evidence records')
+            if decision['decision'] == 'done' and any(r['outcome'] != 'pass' for r in records):
+                raise board.BoardError(args.acceptance, 'acceptance', 'Done requires all supplied criteria passing')
+            lane = config['lanes']['done'] if decision['decision'] == 'done' else config['lanes']['parked']
+            parked = 'human-review' if decision['decision'] == 'human-pending' else None
+        changes, originals = plan_move(root, config, args.id, lane, parked, None)
+        destination = card.path.parent.parent / lane / card.path.name
+        if records is not None:
+            data = changes.get(destination, card.path.read_bytes())
+            changes[destination] = board.parse_matter(data, destination).updated({'acceptance': records})
+            originals.setdefault(destination, destination.read_bytes() if destination.exists() else None)
+        # Implicit bookkeeping files must be pristine. Explicitly supplied source
+        # files may be dirty: their inclusion is the agent's deliberate decision.
+        for path in changes:
+            if path in explicit:
+                continue
+            status = git(root, 'status', '--porcelain', '--', str(path.relative_to(root))).stdout
+            if status.strip():
+                raise board.BoardError(path, 'git', 'bookkeeping path has uncommitted edits; supply it explicitly with finish --paths or commit first')
+        commit_paths = sorted(p.relative_to(root).as_posix() for p in set(changes) | explicit)
+        if not commit_paths:
+            raise board.BoardError(root, 'git', 'no changes to commit')
+        if not args.dry_run:
+            apply_changes(changes, originals)
+            git(root, 'add', '--', *commit_paths)
+            # --only protects against an unrelated index addition by another process.
+            git(root, 'commit', '--only', '-m', args.message or f'{args.command.title()} {args.id}', '--', *commit_paths)
+        return {'schema': f'implement-rfc.{args.command}.v1', 'id': args.id, 'lane': lane,
+                'changed_paths': commit_paths, 'dry_run': args.dry_run,
+                'commit': None if args.dry_run else git(root, 'rev-parse', 'HEAD').stdout.strip()}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo-root', type=Path)
     parser.add_argument('--project-config', type=Path, help=argparse.SUPPRESS)
     commands = parser.add_subparsers(dest='command', required=True)
-    validate_parser = commands.add_parser('validate', help='Validate card schema and board relationships')
-    queue_parser = commands.add_parser('queue', help='Report explicit RFC-linked work; never promote cards')
-    queue_parser.add_argument('--rfc', required=True)
-    queue_parser.add_argument('--platform', choices=['mac', 'win', 'linux'],
-                              default={'darwin': 'mac', 'win32': 'win'}.get(sys.platform, 'linux'))
-    queue_parser.add_argument('--include', nargs='+', default=[])
-    queue_parser.add_argument('--all', action='store_true')
-    move_parser = commands.add_parser('move', help='Move one card and synchronize metadata and live links')
-    move_parser.add_argument('id')
-    move_parser.add_argument('--to', required=True)
-    move_parser.add_argument('--parked-on')
-    move_parser.add_argument('--blocked-by')
-    move_parser.add_argument('--dry-run', action='store_true')
-    for subparser in (validate_parser, queue_parser, move_parser):
-        subparser.add_argument('--json', action='store_true')
+    vp = commands.add_parser('validate', help='Check structure globally and workflow in selected dependency closure')
+    qp = commands.add_parser('queue', help='Compact scoped work and human waits; never promote cards')
+    for sub in (vp, qp):
+        sub.add_argument('--rfc', action='append', default=[])
+        sub.add_argument('--area', action='append', default=[])
+        sub.add_argument('--include', nargs='+', default=[])
+        sub.add_argument('--all', action='store_true')
+    qp.add_argument('--platform', choices=['mac', 'win', 'linux'], default={'darwin':'mac','win32':'win'}.get(sys.platform,'linux'))
+    qp.add_argument('--human-waiting', action='store_true')
+    qp.add_argument('--history', action='store_true', help='Include selected Done cards')
+    ip = commands.add_parser('inspect', help='Inspect one card and its dependencies; body is opt-in')
+    ip.add_argument('id'); ip.add_argument('--body', action='store_true')
+    mp = commands.add_parser('move', help='Move one card and repair live links without committing')
+    cp = commands.add_parser('claim', help='Claim and commit an eligible card')
+    fp = commands.add_parser('finish', help='Commit explicitly approved acceptance and named source paths')
+    for sub in (mp, cp, fp):
+        sub.add_argument('id'); sub.add_argument('--dry-run', action='store_true')
+    mp.add_argument('--to', required=True); mp.add_argument('--parked-on'); mp.add_argument('--blocked-by')
+    for sub in (cp, fp):
+        sub.add_argument('--expect-revision'); sub.add_argument('--message')
+    cp.add_argument('--platform', choices=['mac','win','linux'], default={'darwin':'mac','win32':'win'}.get(sys.platform,'linux'))
+    fp.add_argument('--acceptance', type=Path, required=True)
+    fp.add_argument('--paths', nargs='+', default=[])
+    ap = commands.add_parser('allocate', help='Reserve IDs using the same board/history model')
+    ap.add_argument('--area'); ap.add_argument('--count', type=int, default=1)
+    ap.add_argument('--reserve-for', required=True); ap.add_argument('--dry-run', action='store_true')
+    for sub in (vp, qp, ip, mp, cp, fp, ap):
+        sub.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
     try:
-        context = project_config.resolve_context(repo_root=args.repo_root,
-                                                 project_config_path=args.project_config)
-        root = context.repo_root
-        config = context.config
+        context = project_config.resolve_context(repo_root=args.repo_root, project_config_path=args.project_config)
+        root, config = context.repo_root, context.config
         if args.command == 'validate':
-            cards, errors = board.validate_board(root, config)
+            scope = None
+            if args.rfc or args.area or args.include:
+                scope = lambda cs: board.dependency_scope(cs, {c.id for c in cs.values() if set(args.rfc)&set(c.rfcs) or c.id in args.include or c.fields.get('area', c.id.split('-')[0]) in args.area})
+            cards, errors = board.validate_board(root, config, scope=scope)
             result = {'schema': 'implement-rfc.validation.v1', 'valid': not errors,
-                      'card_count': len(cards), 'errors': [asdict(e) for e in errors]}
-            code = 1 if errors else 0
+                      'card_count':len(cards), 'errors':[asdict(e) for e in errors]}
+            code = bool(errors)
         elif args.command == 'queue':
-            result = queue(root, config, args.rfc, args.platform, args.include, args.all)
+            result = queue(root, config, args.rfc, args.platform, args.include, args.all, args.area, args.human_waiting, args.history)
             code = 0
-        else:
-            result = move(root, config, args)
+        elif args.command == 'inspect':
+            cards = require_valid(root, config, scope=lambda cs: board.dependency_scope(cs, {args.id}))
+            if args.id not in cards:
+                raise board.BoardError(root, 'id', f'unknown card {args.id}')
+            card = cards[args.id]
+            result = {'schema':'implement-rfc.inspect.v1', 'path':card.path.relative_to(root).as_posix(),
+                      'fields':card.fields, 'dependencies':[{ 'id':d, 'path':cards[d].path.relative_to(root).as_posix(), 'status':cards[d].fields['status']} for d in card.deps]}
+            if args.body: result['body'] = card.body
             code = 0
-    except (board.BoardError, project_config.ProjectConfigError, OSError, subprocess.CalledProcessError, ValueError) as exc:
-        if isinstance(exc, board.ValidationError):
-            diagnostics = [asdict(error) for error in exc.diagnostics]
-        elif isinstance(exc, board.BoardError):
-            diagnostics = [asdict(exc.diagnostic)]
+        elif args.command == 'allocate':
+            import allocation
+            result = allocation.allocate(root, config, area=args.area, count=args.count, reserve_for=args.reserve_for, dry_run=args.dry_run)
+            code = 0
+        elif args.command in {'claim', 'finish'}:
+            result = commit_transition(root, config, args); code = 0
         else:
-            diagnostics = [{'path': '', 'field': 'command', 'reason': str(exc)}]
-        schema = 'validation' if args.command == 'validate' else args.command
-        result = {'schema': f'implement-rfc.{schema}.v1', 'errors': diagnostics}
-        if args.command == 'validate':
-            result['valid'] = False
+            result = move(root, config, args); code = 0
+    except (board.BoardError, project_config.ProjectConfigError, OSError, subprocess.SubprocessError, ValueError) as exc:
+        diagnostics = [asdict(e) for e in exc.diagnostics] if isinstance(exc, board.ValidationError) else [asdict(exc.diagnostic)] if isinstance(exc, board.BoardError) else [{'path':'','field':'command','reason':str(exc)}]
+        result = {'schema':f'implement-rfc.{args.command}.v1', 'errors':diagnostics}
         code = 1
     if args.json:
-        print(json.dumps(result, indent=2))
-    elif 'errors' in result and result['errors']:
-        for error in result['errors']:
-            print(f"{error['path']}: {error['field']}: {error['reason']}", file=sys.stderr)
-    elif args.command == 'validate':
-        print(f"BOARD_OK ({result['card_count']} cards)")
+        print(json.dumps(result, separators=(',', ':')))
+    elif result.get('errors'):
+        for e in result['errors']: print(f"{e['path']}: {e['field']}: {e['reason']}", file=sys.stderr)
     elif args.command == 'queue':
-        print(f"{result['rfc']} ({result['platform']}): next={result['next'] or 'none'}")
-        if result['ambiguous_in_progress']:
-            print('Ambiguous in-progress cards: ' + ', '.join(result['ambiguous_in_progress']))
-        for path in result['closeout_paths']:
-            print('Closeout: ' + path)
-        for row in result['cards']:
-            detail = ', '.join(row['unmet_dependencies']) or row['reason'] or ''
-            print(f"{row['id']} {row['disposition']} {row['path']} {detail}".rstrip())
-            if row['external_depends_on']:
-                print('  Verify external handoffs: ' + ', '.join(row['external_depends_on']))
+        print(f"Next: {result['next'] or 'none'}; selected {result['selected_count']}, done {result['done_count']}")
+        if result['ambiguous_in_progress']: print('Ambiguous claims: '+', '.join(result['ambiguous_in_progress']))
+        for path in result['closeout_paths']: print('Closeout: '+path)
+        for row in result['cards']: print(f"{row['id']} {row['disposition']} {row['path']} {row['reason'] or ', '.join(row['unmet_dependencies'])}")
     else:
-        print(('DRY RUN ' if result['dry_run'] else '') + f"{result['id']} -> {result['lane']}")
-        print('\n'.join(result['changed_paths']) or 'No changes')
-    return code
+        print(json.dumps(result, indent=2))
+    return int(code)
 
 
 if __name__ == '__main__':

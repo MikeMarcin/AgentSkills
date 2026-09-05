@@ -20,18 +20,18 @@ from typing import Any
 SKILL_DIR = Path(__file__).resolve().parents[1]
 CONTEXT_DIR = Path(".mask/skill-config/implement-rfc")
 PROJECT_ROOT_ENV = "IMPLEMENT_RFC_PROJECT_ROOT"
-SCHEMA = "implement-rfc.project.v1"
+SCHEMA = "implement-rfc.project.v2"
 TOKEN_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 PLATFORM_TOKENS = ("win", "linux", "mac")
 REQUIRED_KEYS = (
     "schema", "project", "display_name", "session_prefix", "origin_repo_name",
     "rfc_root", "issue_root", "next_id", "reservations_dir", "allocate_id_command",
-    "lanes", "lane_statuses", "rfc_link_field", "terminal_rfc_status", "closeout_card",
+    "lanes", "lane_statuses", "terminal_rfc_status",
     "structure_gate", "attended_review_skill", "station_registry_doc", "workstreams",
     "role_addenda",
 )
-OPTIONAL_KEYS = ("bookkeeping",)
-LANE_KEYS = ("backlog", "ready", "platform_ready", "in_progress", "parked", "blocked", "done")
+OPTIONAL_KEYS = ("bookkeeping", "sequencing", "allocation")
+LANE_KEYS = ("inbox", "backlog", "ready", "in_progress", "parked", "blocked", "done")
 
 
 class ProjectConfigError(ValueError):
@@ -76,32 +76,18 @@ def validate(config: Any) -> dict[str, Any]:
     for key in ("rfc_root", "issue_root", "reservations_dir", "station_registry_doc"):
         _require_relative_path(config, key)
     _require_text(config, "allocate_id_command")
-    _require_text(config, "rfc_link_field")
-    if (not re.fullmatch(r"[a-z][a-z0-9_]*", config["rfc_link_field"])
-            or config["rfc_link_field"] in {"id", "title", "status", "depends_on", "parked_on",
-                                           "blocked_by", "milestone", "completed", "closeout",
-                                           "external_depends_on", "platform"}):
-        raise ProjectConfigError("rfc_link_field must be a distinct front-matter key")
     _require_text(config, "terminal_rfc_status")
 
     next_id = config["next_id"]
-    if not isinstance(next_id, dict) or next_id.get("mode") != "single-file":
-        raise ProjectConfigError("next_id.mode must be 'single-file'")
+    if not isinstance(next_id, dict) or next_id.get("mode") not in {"single-file", "per-area"}:
+        raise ProjectConfigError("next_id.mode must be 'single-file' or 'per-area'")
     _require_relative_path(next_id, "path")
 
     lanes = config["lanes"]
     if not isinstance(lanes, dict) or set(lanes) != set(LANE_KEYS):
         raise ProjectConfigError(f"lanes must define exactly {', '.join(LANE_KEYS)}")
     for key in LANE_KEYS:
-        if key == "platform_ready":
-            platform_lanes = lanes[key]
-            if not isinstance(platform_lanes, dict):
-                raise ProjectConfigError("lanes.platform_ready must be an object")
-            for platform, lane in platform_lanes.items():
-                if platform not in PLATFORM_TOKENS or not isinstance(lane, str) or not TOKEN_RE.fullmatch(lane):
-                    raise ProjectConfigError(f"lanes.platform_ready has invalid entry {platform!r}: {lane!r}")
-        else:
-            _require_token(lanes, key)
+        _require_token(lanes, key)
     if len(set(lane_names(config))) != len(lane_names(config)):
         raise ProjectConfigError("lane directory names must be distinct")
 
@@ -112,23 +98,25 @@ def validate(config: Any) -> dict[str, Any]:
         if not isinstance(status, str) or not status.strip():
             raise ProjectConfigError(f"lane_statuses[{lane!r}] must be a non-empty string")
 
-    closeout = config["closeout_card"]
-    if not isinstance(closeout, dict) or len(closeout) != 1:
-        raise ProjectConfigError("closeout_card must hold exactly one detection rule")
-    rule, value = next(iter(closeout.items()))
-    if rule == "filename_pattern":
-        if not isinstance(value, str) or not value:
-            raise ProjectConfigError("closeout_card.filename_pattern must be a regex string")
-        re.compile(value)
-    elif rule == "front_matter":
-        if not isinstance(value, dict) or len(value) != 1 or not all(
-            isinstance(k, str) and isinstance(v, str) for k, v in value.items()
-        ):
-            raise ProjectConfigError("closeout_card.front_matter must map one key to one value")
-        if not re.fullmatch(r"[a-z][a-z0-9_]*", next(iter(value))):
-            raise ProjectConfigError("closeout_card.front_matter must name a valid field")
-    else:
-        raise ProjectConfigError(f"closeout_card has unknown rule {rule!r}")
+    if config.get("sequencing", "dependency") not in {"dependency", "ordered-index"}:
+        raise ProjectConfigError("sequencing must be dependency or ordered-index")
+    allocation = config.get("allocation", {})
+    if not isinstance(allocation, dict) or set(allocation) - {"history_limit", "rewind_overrides"}:
+        raise ProjectConfigError("allocation has unknown keys")
+    limit = allocation.get("history_limit", 2000)
+    if type(limit) is not int or not 1 <= limit <= 100000:
+        raise ProjectConfigError("allocation.history_limit must be 1..100000")
+    overrides = allocation.get("rewind_overrides", [])
+    if not isinstance(overrides, list):
+        raise ProjectConfigError("allocation.rewind_overrides must be a list")
+    for override in overrides:
+        if (not isinstance(override, dict) or set(override) != {"area", "floor", "waived_through", "date", "reason"}
+            or not re.fullmatch(r"[A-Z]{2,8}", str(override["area"]))
+            or type(override["floor"]) is not int or type(override["waived_through"]) is not int
+            or not 1 <= override["floor"] <= override["waived_through"] <= 9999
+            or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(override["date"]))
+            or not isinstance(override["reason"], str) or not override["reason"].strip()):
+            raise ProjectConfigError("invalid deliberate counter rewind override")
 
     gate = config["structure_gate"]
     if not isinstance(gate, list) or not all(isinstance(item, str) and item.strip() for item in gate):
@@ -199,16 +187,8 @@ def load(path: Path | None = None, *, repo_root: Path | str | None = None) -> di
 def lane_names(config: dict[str, Any]) -> list[str]:
     """Every board lane directory, in board order."""
     lanes = config["lanes"]
-    platform = [lanes["platform_ready"][key] for key in sorted(lanes["platform_ready"])]
-    return [
-        lanes["backlog"],
-        lanes["ready"],
-        *platform,
-        lanes["in_progress"],
-        lanes["parked"],
-        lanes["blocked"],
-        lanes["done"],
-    ]
+    return [lanes[key] for key in LANE_KEYS]
+
 
 
 def active_lanes(config: dict[str, Any]) -> list[str]:
@@ -273,14 +253,6 @@ def resolve_context(*, repo_root: Path | str | None = None,
         config_path = Path(project_config_path).expanduser()
         if not config_path.is_absolute():
             config_path = root / config_path
-    elif not context_dir.exists() and not context_dir.is_symlink():
-        local = root / ".agents/skills/implement-rfc"
-        # Every component must be real, not merely a symlink resolving in-tree.
-        unlinked = all(not path.is_symlink() for path in (local, local.parent, local.parent.parent))
-        if unlinked and assets == local and (local / "SKILL.md").is_file():
-            config_path = local / "config/project.json"
-            rules_path = local / "references/project.md"
-            legacy = True
     for path in (config_path, rules_path):
         if not path.resolve().is_relative_to(root):
             raise ProjectConfigError(f"project context escapes selected consumer {root}: {path}")
@@ -323,12 +295,8 @@ def lane_log_name(config: dict[str, Any]) -> str:
 
 def closeout_card_matcher(config: dict[str, Any]):
     """Return a predicate (path, front_matter) -> bool for closeout-card detection."""
-    rule, value = next(iter(config["closeout_card"].items()))
-    if rule == "filename_pattern":
-        pattern = re.compile(value)
-        return lambda path, _matter: bool(pattern.fullmatch(path.name))
-    key, expected = next(iter(value.items()))
-    return lambda _path, matter: matter.get(key, "").strip().strip("\"'").lower() == expected.lower()
+    return lambda _path, matter: bool(matter.get("closeout_for"))
+
 
 
 if __name__ == "__main__":
