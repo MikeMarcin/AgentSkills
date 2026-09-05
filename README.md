@@ -139,3 +139,5 @@ Do not edit MASK's internal registry or delete a real skill directory to bypass 
 AgentSkills, ManageAgentSkills, SampleReview, SampleLogs, SamplePlanner and sample_studio declare implement-rfc, attended-review and wizard through MASK, with distinct consumer context. AgentSkills and MASK also declare manage-agent-skills. Verified original copies remain outside discovery roots in `.mask/bootstrap-retired/`. Generated links, adapters and backups are ignored; skill payloads, declarations and project context are versioned.
 
 See [skill provenance](docs/development/skill-provenance.md), the [dogfood record](docs/development/mask-dogfood.md) and the [retained packet assets](docs/rfcs/assets/mask-v1-2026-09-05/). Repository visibility and inherited-source licensing remain unchanged. Filesystem links and bounded script invocation have been verified; they do not establish that an already-running agent has loaded a skill.
+
+The [selected skill migration record](docs/development/selected-skill-migration-2026-09-05.md) records personal/sample_studio/AST ownership, retained backups, consumer commits, and actual verification.
