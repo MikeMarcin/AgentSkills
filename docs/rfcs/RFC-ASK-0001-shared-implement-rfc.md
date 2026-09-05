@@ -1,7 +1,7 @@
 ---
 id: RFC-ASK-0001
 title: Import and adapt the portable implement-rfc workflow
-status: Implementing
+status: Auto-Verified
 owner: MikeMarcin
 created: 2026-09-05
 ---
