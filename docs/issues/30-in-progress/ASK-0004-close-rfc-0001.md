@@ -1,7 +1,7 @@
 ---
 id: ASK-0004
 title: Verify and close RFC-ASK-0001
-status: Backlog
+status: In Progress
 rfc: RFC-ASK-0001
 depends_on: ["ASK-0001", "ASK-0002", "ASK-0003"]
 closeout: true
