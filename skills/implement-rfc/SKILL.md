@@ -124,7 +124,9 @@ criterion keeps terminal status open even when automated work is complete.
 
 At integration, inspect the final scoped diff against `RFC_BASE_SHA`, check all
 required cards including relevant unlinked discoveries, reconcile RFC/index
-status and run the configured structure gate once. Keep actual check/result/
+status and run the configured structure gate once. Substitute a configured
+`{rfc}` token with the selected RFC ID; helpers accepting repeated `--rfc` can
+coalesce a pack into one scoped invocation. Keep actual check/result/
 revision records on the closeout; do not create a second mutable status ledger.
 The main integrator confirms terminal status after integrating worktree slices.
 

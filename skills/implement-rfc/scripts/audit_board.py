@@ -33,6 +33,7 @@ def audit(
     repo_root: Path,
     config: dict[str, Any],
     transcripts_dir: Path | None = None,
+    rfcs: list[str] | None = None,
 ) -> tuple[list[str], list[str], list[str]]:
     violations: list[str] = []
     warnings: list[str] = []
@@ -46,9 +47,10 @@ def audit(
         violations.append(f"issue root missing: {config['issue_root']}")
         return violations, warnings, infos
 
-    cards, structural_errors = board_model.validate_board(repo_root, config)
+    scope = (lambda cs: board_model.dependency_scope(cs, {c.id for c in cs.values() if set(rfcs) & set(c.rfcs)})) if rfcs else None
+    cards, structural_errors = board_model.validate_board(repo_root, config, scope=scope)
     violations.extend(map(str, structural_errors))
-    active_cards = [card for card in cards.values() if card.lane in active]
+    active_cards = [card for card in cards.values() if card.lane in active and (not rfcs or set(rfcs) & set(card.rfcs))]
 
     rfc_status: dict[str, str] = {}
     for card in active_cards:
@@ -100,6 +102,7 @@ def audit(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=None)
+    parser.add_argument("--rfc", action="append", default=[], help="Scope workflow findings to selected RFCs; repeat for a pack")
     parser.add_argument("--transcripts-dir", type=Path, default=None)
     parser.add_argument(
         "--project-config",
@@ -118,7 +121,7 @@ def main() -> int:
         candidate = Path.home() / ".claude/projects" / flattened
         transcripts = candidate if candidate.is_dir() else None
 
-    violations, warnings, infos = audit(args.repo_root.resolve(), config, transcripts)
+    violations, warnings, infos = audit(args.repo_root.resolve(), config, transcripts, args.rfc)
     for title, rows in (
         ("VIOLATIONS", violations),
         ("WARNINGS", warnings),
