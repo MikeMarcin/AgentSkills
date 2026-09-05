@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guided steps</title>
+<style>
+:root{color-scheme:light dark;font:17px/1.5 system-ui,sans-serif;background:#111820;color:#eaf0f6}
+body{margin:0 auto;max-width:760px;padding:32px 20px}h1{font-size:1.5rem}h2{font-size:1.3rem}
+main{padding:24px;border:1px solid #465366;border-radius:14px;background:#1b2633}
+p{white-space:pre-wrap}a{color:#97cdff}button,select,textarea{font:inherit;border-radius:7px;padding:10px}
+button{background:#badcff;color:#152536;border:0;cursor:pointer}button:disabled{opacity:.45;cursor:default}
+textarea{box-sizing:border-box;width:100%;min-height:110px}nav,footer{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.muted{color:#bbcad8;font-size:.9rem}#notice{min-height:1.5em;color:#ffd58b}#export-box{min-height:150px}
+[hidden]{display:none!important}progress{width:100%;accent-color:#badcff}#expected{border-left:3px solid #739fc4;padding-left:12px}
+</style>
+<h1 id="title">Guided steps</h1>
+<p id="progress" class="muted">Loading saved progress…</p>
+<progress id="meter" value="0" max="1"></progress>
+<p id="mode" class="muted"></p>
+<main aria-labelledby="step-title">
+  <h2 id="step-title"></h2><p id="instruction"></p><p id="expected" class="muted"></p>
+  <p><a id="destination" target="_blank" rel="noopener noreferrer" hidden>Open destination ↗</a></p>
+  <div id="response"></div>
+  <p id="notice" role="status" aria-live="polite"></p>
+  <nav><button id="save" hidden>Save and continue</button><button id="previous">Previous</button><button id="next">Next</button></nav>
+</main>
+<footer><button id="pause">Pause</button><button id="copy">Copy partial responses</button><button id="download">Download partial responses</button></footer>
+<textarea id="export-box" aria-label="Partial responses for copying" readonly hidden></textarea>
+<script>
+"use strict";
+let state = __WIZARD_STATE__;
+const live = state === null;
+const token = new URLSearchParams(location.hash.slice(1)).get("token") || "";
+let cursor = 0, busy = false, storageWorks = true;
+const $ = id => document.getElementById(id);
+const key = () => `wizard:${state.session_id}:${state.definition_digest}`;
+const firstPending = () => state.definition.steps.findIndex(s => !(s.id in state.answers));
+const message = text => { $("notice").textContent = text; };
+
+async function api(path, data) {
+  const response = await fetch(path, {method:data === undefined ? "GET" : "POST", headers:{Authorization:`Bearer ${token}`, "Content-Type":"application/json"}, ...(data === undefined ? {} : {body:JSON.stringify(data)})});
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "Unable to save");
+  return result;
+}
+function cache() {
+  try { localStorage.setItem(key(), JSON.stringify({answers:humanAnswers(),paused:state.paused,cursor})); }
+  catch (_) { storageWorks = false; }
+}
+function humanAnswers() {
+  return Object.fromEntries(Object.entries(state.answers).filter(([,a]) => a.actor === "human").map(([id,a]) => [id,a.value]));
+}
+function packet() {
+  return JSON.stringify({schema_version:1,session_id:state.session_id,definition_digest:state.definition_digest,answers:humanAnswers()}, null, 2);
+}
+function restore() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(key()) || "null");
+    if (!saved) return;
+    // Never let browser cache supply an agent observation or replace embedded answers.
+    for (const step of state.definition.steps) {
+      if (!(step.id in state.answers) && step.response !== "observation" && Object.hasOwn(saved.answers || {},step.id)) {
+        if (firstPending() !== state.definition.steps.indexOf(step)) break;
+        const value = saved.answers[step.id];
+        if (validValue(step,value)) state.answers[step.id] = {actor:"human",value};
+      }
+    }
+    state.paused = saved.paused === true;
+    if (Number.isInteger(saved.cursor) && saved.cursor >= 0 && saved.cursor < state.definition.steps.length) cursor = saved.cursor;
+  } catch (_) { storageWorks = false; }
+}
+function validValue(step,value) {
+  return step.response === "ack" ? value === true : step.response === "choice" ? step.options.includes(value) : step.response === "text" && typeof value === "string" && value.trim().length > 0 && value.length <= 8000;
+}
+function render() {
+  const steps = state.definition.steps, step = steps[cursor], answer = state.answers[step.id];
+  const done = steps.filter(s => s.id in state.answers).length;
+  $("title").textContent = state.definition.title;
+  document.title = state.definition.title;
+  $("progress").textContent = `${done} of ${steps.length} complete · ${done === steps.length ? "Complete" : state.paused ? "Paused — progress retained" : `Step ${cursor + 1} of ${steps.length}`}`;
+  $("meter").max = steps.length; $("meter").value = done;
+  $("mode").textContent = live ? "Responses save directly. The agent can read progress without a copy/paste round trip." : `Offline file. ${storageWorks ? "Progress is cached in this browser." : "Browser storage is unavailable."} Copy or download partial responses for durable import. Never enter secrets.`;
+  $("step-title").textContent = step.title; $("instruction").textContent = step.instruction;
+  $("expected").textContent = `Expected: ${step.expected}`;
+  $("destination").hidden = !step.url;
+  if(step.url) $("destination").href = step.url;
+  const response = $("response"); response.replaceChildren();
+  $("save").hidden = !!answer || step.response === "observation";
+  $("save").disabled = busy || state.paused || cursor !== firstPending();
+  if (answer) {
+    const p = document.createElement("p");
+    p.textContent = answer.actor === "agent" ? `Observed: ${answer.value.summary}\nEvidence: ${answer.value.evidence}` : `Saved: ${answer.value === true ? "Confirmed" : answer.value}`;
+    response.append(p);
+  } else if (step.response === "observation") {
+    const p = document.createElement("p");
+    p.textContent = live ? "The agent will capture the result. This page updates when it is recorded." : "The agent must capture this result. Import any completed responses, then reopen a fresh page after capture.";
+    response.append(p);
+  } else if (step.response === "choice") {
+    const input = document.createElement("select");input.id = "value";input.setAttribute("aria-label",step.title);
+    const empty = document.createElement("option");empty.value = "";empty.textContent = "Choose…";input.append(empty);
+    for (const option of step.options) {const node = document.createElement("option");node.value=option;node.textContent=option;input.append(node);}
+    response.append(input);
+  } else if (step.response === "text") {
+    const input = document.createElement("textarea");input.id="value";input.maxLength=8000;input.placeholder="Non-secret response";input.setAttribute("aria-label",step.title);response.append(input);
+  } else { $("save").textContent = "I completed this step"; }
+  if (step.response !== "ack") $("save").textContent = "Save and continue";
+  $("previous").disabled = cursor === 0 || busy;$("next").disabled = cursor === steps.length - 1 || busy;
+  $("pause").textContent = state.paused ? "Resume" : "Pause";$("pause").disabled = busy || done === steps.length;
+}
+async function refresh(moveToPending=false) {
+  const before = state && state.revision;
+  const fresh = await api("/state");
+  if (!state || fresh.revision !== before) {
+    state = fresh;
+    if(moveToPending || (state.answers[state.definition.steps[cursor].id] && firstPending() >= 0)) cursor = Math.max(0,firstPending());
+    render();
+  }
+}
+$("save").onclick = async () => {
+  const step=state.definition.steps[cursor];
+  const value=step.response === "ack" ? true : $("value").value;
+  if(!validValue(step,value)) return message("Provide a response before saving.");
+  busy=true;$("save").disabled=true;message("Saving…");
+  try {
+    if(live) {await api("/record",{step:step.id,value,revision:state.revision});await refresh(true);}
+    else {state.answers[step.id]={actor:"human",value};cursor=Math.max(0,firstPending());cache();}
+    message(live ? "Saved." : "Saved in this page. Export partial responses for import.");
+  } catch(error) {message(error.message);if(live) await refresh().catch(()=>{});}
+  finally {busy=false;render();}
+};
+$("pause").onclick = async () => {
+  busy=true;
+  try {if(live) {await api(state.paused ? "/resume" : "/pause",{revision:state.revision});await refresh();} else {state.paused=!state.paused;cache();}message(state.paused ? "Paused. Unanswered steps remain pending." : "Resumed.");}
+  catch(error){message(error.message);if(live) await refresh().catch(()=>{});}finally{busy=false;render();}
+};
+$("previous").onclick=()=>{cursor--;message("");if(!live)cache();render();};
+$("next").onclick=()=>{cursor++;message("");if(!live)cache();render();};
+$("copy").onclick=async()=>{const text=packet();try{await navigator.clipboard.writeText(text);message("Partial responses copied.");}catch(_){$("export-box").hidden=false;$("export-box").value=text;$("export-box").focus();$("export-box").select();message("Copy the selected responses.");}};
+$("download").onclick=()=>{const url=URL.createObjectURL(new Blob([packet()],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=`${state.definition.id}-responses.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+async function start(){try{if(live){await refresh(true);setInterval(()=>{if(!busy)refresh().catch(error=>message(`Host unavailable: ${error.message}. You can export current partial responses.`));},2000);}else{cursor=Math.max(0,firstPending());restore();render();}}catch(error){message(error.message);}}
+start();
+</script>
+</html>
