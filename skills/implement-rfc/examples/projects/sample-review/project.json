@@ -1,5 +1,5 @@
 {
-  "schema": "implement-rfc.project.v1",
+  "schema": "implement-rfc.project.v2",
   "project": "samplereview",
   "display_name": "SampleReview",
   "session_prefix": "srv",
@@ -13,44 +13,45 @@
   "reservations_dir": "docs/issues/_reservations",
   "allocate_id_command": "python3 scripts/allocate_issue_id.py",
   "lanes": {
+    "inbox": "00-inbox",
     "backlog": "10-backlog",
     "ready": "20-ready",
-    "platform_ready": {
-      "win": "21-ready-win",
-      "mac": "22-ready-mac",
-      "linux": "23-ready-lin"
-    },
     "in_progress": "30-in-progress",
     "parked": "40-parked",
     "blocked": "50-blocked",
     "done": "60-done"
   },
   "lane_statuses": {
+    "00-inbox": "Inbox",
     "10-backlog": "Backlog",
     "20-ready": "Ready",
-    "21-ready-win": "Ready",
-    "22-ready-mac": "Ready",
-    "23-ready-lin": "Ready",
     "30-in-progress": "In Progress",
     "40-parked": "Parked",
     "50-blocked": "Blocked",
     "60-done": "Done"
   },
-  "rfc_link_field": "rfc",
   "terminal_rfc_status": "Auto-Verified",
-  "closeout_card": {
-    "filename_pattern": "^SRV-\\d{4}-close-rfc-\\d{4}\\.md$"
-  },
   "structure_gate": [
     "python3 scripts/verify_documentation.py --root ."
   ],
-  "attended_review_skill": "srv-attended-review",
+  "attended_review_skill": "attended-review",
   "station_registry_doc": "docs/development/remote-stations.md",
   "workstreams": {
-    "main": {"branch": "main"},
-    "win": {"branch": "windows-lane", "platform": "win"},
-    "linux": {"branch": "linux-lane", "platform": "linux"},
-    "mac": {"branch": "mac-lane", "platform": "mac"}
+    "main": {
+      "branch": "main"
+    },
+    "win": {
+      "branch": "windows-lane",
+      "platform": "win"
+    },
+    "linux": {
+      "branch": "linux-lane",
+      "platform": "linux"
+    },
+    "mac": {
+      "branch": "mac-lane",
+      "platform": "mac"
+    }
   },
   "role_addenda": {
     "rfc-worker": [
@@ -66,16 +67,13 @@
   },
   "bookkeeping": {
     "deferring_lanes": [
+      "00-inbox",
       "10-backlog",
-      "50-blocked",
-      "21-ready-win",
-      "22-ready-mac",
-      "23-ready-lin"
+      "50-blocked"
     ],
     "parked_on": [
-      "awaiting-owner-verdict",
-      "awaiting-live-github",
-      "awaiting-product-decision"
+      "human-review",
+      "awaiting-live-github"
     ],
     "blocked_by_forbidden_prefixes": [
       "platform-"
@@ -98,5 +96,6 @@
     "editable_globs": [
       "docs/rfcs/assets/*.LIVE_IMPORT.md"
     ]
-  }
+  },
+  "sequencing": "ordered-index"
 }

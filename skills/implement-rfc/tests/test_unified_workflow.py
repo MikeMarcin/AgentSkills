@@ -44,6 +44,16 @@ class UnifiedTests(unittest.TestCase):
         self.assertEqual(self.public('queue','--rfc','RFC-XYZ-0002')['next'],'XYZ-0001')
         self.assertEqual(self.public('inspect','XYZ-0001')['fields']['metadata']['custom']['array'][3], 'comma,colon:')
 
+    def test_human_queue_reuses_done_prerequisites_without_replaying_history(self):
+        self.config['bookkeeping']['parked_on'] = []
+        write_context(self.root,config=self.config)
+        self.card(1,lane='parked',deps=('XYZ-0002',),extra='parked_on: human-review\n')
+        self.card(2,lane='done',deps=('XYZ-0003',))
+        self.card(3,lane='blocked',extra='blocked_by: historical-defect\n')
+        self.public('validate',expected=1)
+        result=self.public('queue','--human-waiting')
+        self.assertEqual([c['id'] for c in result['cards']],['XYZ-0001'])
+
     def test_explicit_scope_priority_and_human_waits(self):
         self.card(1,lane='ready',extra='priority: P3\n')
         self.card(2,lane='ready',extra='priority: P1\narea: descriptive-name\n')

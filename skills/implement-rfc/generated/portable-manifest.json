@@ -30,11 +30,11 @@
     },
     {
       "path": "examples/projects/samplereview/project.json",
-      "sha256": "7e972457d49c20895050f2d4b049156f10f400225b8ec16e13b72c5bbb12f519"
+      "sha256": "32827fbfa45c22925bdb72aca2c614eec0122699bcb1d9c34c1fe945efd17dfa"
     },
     {
       "path": "examples/projects/samplereview/project.md",
-      "sha256": "5d52ec77c33ab446823454f4f14a3dbefedaff4ed157ef7a39bb5387c32dc2e5"
+      "sha256": "7ca97f415063bac14438872eb36ac46301c3b2e0dfe8621f7d6147289e82c079"
     },
     {
       "path": "references/bookkeeping.md",
@@ -98,7 +98,7 @@
     },
     {
       "path": "scripts/board_model.py",
-      "sha256": "00a05164ad794a1c50d0ea10f5a8bcfc997b526955ec69d0ca8fe8150f43d8df"
+      "sha256": "b809e630545db62298303239e70a459bd8cd7379df96a95d067e3747d9394d0f"
     },
     {
       "path": "scripts/codex_lane.py",
@@ -182,9 +182,9 @@
     },
     {
       "path": "tests/test_unified_workflow.py",
-      "sha256": "6233b2addbd3c08b553e5edcf8fffd05f578e8cd90731ea626e30e1a2ea3afbb"
+      "sha256": "e5fc87cbc813b2e7923b143e572a9ac7b910fd922e7a28046a99ab25dd76df07"
     }
   ],
-  "portable_digest": "c5b2f52cdc52ba7f",
+  "portable_digest": "a56c29ff4507a3a8",
   "schema": "implement-rfc.portable-manifest.v1"
 }

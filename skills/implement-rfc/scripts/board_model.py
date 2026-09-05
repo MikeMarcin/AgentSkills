@@ -341,12 +341,14 @@ def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None]
 
 
 def dependency_scope(cards: dict[str, Card], selected: set[str]) -> set[str]:
+    # A completed prerequisite is evidence, not a request to replay its history.
+    # Explicitly selected Done cards (and full validation) still inspect history.
     pending = list(selected)
     result = set(selected)
     while pending:
         card = cards.get(pending.pop())
         for dep in card.deps if card else []:
-            if dep not in result:
+            if dep not in result and (dep not in cards or cards[dep].lane != cards[dep].config['lanes']['done']):
                 result.add(dep)
                 pending.append(dep)
     return result

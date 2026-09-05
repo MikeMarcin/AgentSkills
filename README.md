@@ -11,6 +11,8 @@ The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarci
 | Skill | Use it for |
 |---|---|
 | [implement-rfc](skills/implement-rfc/SKILL.md) | Carry RFCs or RFC packs through bounded implementation, acceptance verification, commits and issue-board closeout. Requires consumer workflow context. |
+| [attended-review](skills/attended-review/SKILL.md) | Prepare protected candidates and save partial human decisions through local HTML, with an offline fallback. |
+| [wizard](skills/wizard/SKILL.md) | Guide required manual steps one at a time with durable progress on native Windows and macOS. |
 | [manage-agent-skills](skills/manage-agent-skills/SKILL.md) | Inspect and manage project requirements, registration, deployment and authorized updates through MASK's JSON CLI. |
 
 `implement-rfc` was imported first with the supplied seed provenance preserved. `manage-agent-skills` was added after the CLI contracts were verified. Neither is installed globally by this repository.
@@ -62,7 +64,7 @@ python3 /absolute/path/to/project/.agents/skills/implement-rfc/scripts/project_c
 python3 /absolute/path/to/project/.agents/skills/implement-rfc/scripts/audit_board.py --repo-root /absolute/path/to/project
 ```
 
-The resolver selects an explicit `--repo-root` first, then `IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation working directory's Git worktree root. Missing or mismatched context refuses. It does not select a consumer from the resolved skill symlink. Native role adapters are optional and generated separately; see the [workflow instructions](skills/implement-rfc/SKILL.md).
+The resolver selects an explicit `--repo-root` first, then `IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation working directory's Git worktree root. Missing or mismatched context refuses. It does not select a consumer from the resolved skill symlink. Cards use the canonical multi-RFC schema; see the [board command contract](skills/implement-rfc/references/bookkeeping.md). Native role adapters are optional and generated separately; see the [workflow instructions](skills/implement-rfc/SKILL.md).
 
 ## Author a skill
 
@@ -108,6 +110,6 @@ Do not edit MASK's internal registry or delete a real skill directory to bypass 
 
 ## Provenance and current deployment
 
-ManageAgentSkills and AgentSkills both declare these two skills and retain distinct consumer context. Verified bootstrap copies remain outside discovery roots in `.mask/bootstrap-retired/implement-rfc-2026-09-05`. Generated links, adapters and backups are ignored; skill payloads, declarations and project context are versioned.
+ManageAgentSkills and AgentSkills both declare the shared skills and retain distinct consumer context. Verified bootstrap copies remain outside discovery roots in `.mask/bootstrap-retired/implement-rfc-2026-09-05`. Generated links, adapters and backups are ignored; skill payloads, declarations and project context are versioned.
 
 See [skill provenance](docs/development/skill-provenance.md), the [dogfood record](docs/development/mask-dogfood.md) and the [retained packet assets](docs/rfcs/assets/mask-v1-2026-09-05/). Repository visibility and inherited-source licensing remain unchanged. Filesystem links and bounded script invocation have been verified; they do not establish that an already-running agent has loaded a skill.
