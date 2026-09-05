@@ -1,11 +1,113 @@
-# AgentSkills
+![AgentSkills — Shared instructions. Local context.](docs/assets/readme-header.svg)
 
-Private canonical skills for the local MASK workflow. `implement-rfc` was imported first from the supplied packet with its provenance retained; `manage-agent-skills` was added second after the MASK CLI contracts passed verification. The program lives in the separate ManageAgentSkills checkout.
+**[Skill catalog](#available-skills) · [Use a skill](#use-the-skills-in-a-project) · [Workflow context](#configure-implement-rfc) · [Author a skill](#author-a-skill) · [Provenance](#provenance-and-current-deployment)**
 
-Author each package under `skills/<id>/SKILL.md`. Keep shared instructions portable and project facts in the consumer's `.mask/skill-config/implement-rfc/project.json` and `project.md`. The implement-rfc resolver uses explicit project selection, then its documented environment override, then the consumer Git working directory. Run source-only validation for shared authoring; generating native adapters is a separate explicit consumer operation.
+A private collection of canonical agent skills shared across projects. Each skill lives under `skills/<id>/`; projects keep their own requirements and configuration while using directory links to the shared instructions.
 
-Use a known Python 3.11+ interpreter with `/absolute/path/to/ManageAgentSkills/mask.py capabilities --json` if the MASK launcher is absent. Follow that checkout's README for machine initialization, registration, preview/apply, updates and recovery. Do not edit MASK state files or remove real skill directories to bypass collisions. The management skill is project scoped, not a global installation.
+The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarcin/ManageAgentSkills) contains the CLI that validates packages, manages project links and performs explicit source updates. This repository contains the skill payloads and their authoring workflow.
 
-Commit skill payloads, `.mask.json` and workflow context. Generated links, adapters and retained bootstrap backups are ignored individually. Local authoring may deploy a dirty source with a warning; source updates require a clean checkout and affect every registered consumer. Read `docs/rfcs/README.md` and `docs/issues/README.md` for the implementation workflow.
+## Available skills
 
-Repository visibility and inherited-source licensing remain unchanged. See `docs/development/skill-provenance.md` and the original packet assets for provenance. Filesystem links do not prove that an already-running agent has loaded the skill.
+| Skill | Use it for |
+|---|---|
+| [implement-rfc](skills/implement-rfc/SKILL.md) | Carry RFCs or RFC packs through bounded implementation, acceptance verification, commits and issue-board closeout. Requires consumer workflow context. |
+| [manage-agent-skills](skills/manage-agent-skills/SKILL.md) | Inspect and manage project requirements, registration, deployment and authorized updates through MASK's JSON CLI. |
+
+`implement-rfc` was imported first with the supplied seed provenance preserved. `manage-agent-skills` was added after the CLI contracts were verified. Neither is installed globally by this repository.
+
+## Use the skills in a project
+
+Clone this repository and install MASK using its [setup guide](https://github.com/MikeMarcin/ManageAgentSkills#install-and-select-a-source). MASK requires Python 3.11+, Git and native directory symlink support. If its launcher is unavailable, use a known supported interpreter with `/absolute/path/to/ManageAgentSkills/mask.py`.
+
+Select this checkout as the source, then initialize and register your project. Replace the example paths with your own:
+
+```sh
+mask init --source /absolute/path/to/AgentSkills --json
+mask skill list --json
+mask project init --project /absolute/path/to/project --json
+mask project register /absolute/path/to/project --json
+mask project require manage-agent-skills --project /absolute/path/to/project --apply --dry-run --json
+```
+
+Review the proposed actions and use the returned `data.plan_hash` for the matching apply:
+
+```sh
+mask project require manage-agent-skills --project /absolute/path/to/project --apply --expect-plan-hash RETURNED_HASH --json
+mask doctor --project /absolute/path/to/project --check --json
+```
+
+> [!TIP]
+> `require` and `unrequire` preserve unrelated requirements. Use `project set` only for a complete replacement.
+
+Commit `.mask.json` and consumer context; ignore generated entries under `.agents/skills/` and `.claude/skills/`. Preserve unrelated real skills.
+
+## Configure implement-rfc
+
+> [!IMPORTANT]
+> `implement-rfc` needs the consumer’s own repository facts and rules. A deployed link alone does not configure the workflow.
+
+The workflow reads exactly two consumer-specific files:
+
+```text
+<project>/.mask/skill-config/implement-rfc/project.json
+<project>/.mask/skill-config/implement-rfc/project.md
+```
+
+Use this repository's [project configuration](.mask/skill-config/implement-rfc/project.json) and [project rules](.mask/skill-config/implement-rfc/project.md) as structural examples. Adapt the complete repository identity, paths, issue lanes, verification commands and rules to the consumer. Do not copy another project's facts unchanged or embed them in the shared skill. The [inherited example](skills/implement-rfc/examples/projects/samplereview/) is historical reference, not an active default.
+
+After configuring the consumer, deploy `implement-rfc` with the same preview/guard sequence above. Verify selection and inspect the board through the linked workflow:
+
+```sh
+python3 /absolute/path/to/project/.agents/skills/implement-rfc/scripts/project_config.py --repo-root /absolute/path/to/project
+python3 /absolute/path/to/project/.agents/skills/implement-rfc/scripts/audit_board.py --repo-root /absolute/path/to/project
+```
+
+The resolver selects an explicit `--repo-root` first, then `IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation working directory's Git worktree root. Missing or mismatched context refuses. It does not select a consumer from the resolved skill symlink. Native role adapters are optional and generated separately; see the [workflow instructions](skills/implement-rfc/SKILL.md).
+
+## Author a skill
+
+Create `skills/<id>/SKILL.md` with matching frontmatter:
+
+```markdown
+---
+name: example-skill
+description: Describe the task this skill handles and when to use it.
+---
+
+# Example skill
+
+Write the instructions an agent needs to perform the task.
+```
+
+Use a portable lowercase ID such as `example-skill`. MASK's package convention accepts single-line plain or quoted `name` and `description` scalars. Keep supporting files inside the package; linked, special and case-colliding entries are rejected. Validation is passive and does not execute skill code.
+
+Edit canonical files here, leaving project-specific facts in consumer context. Validate the package with `mask skill validate example-skill --json` against a machine configured to use this checkout. To inspect every package, use `mask skill validate --all --json`.
+
+For changes to the shared workflow, run this check from the repository root:
+
+```sh
+python3 -B skills/implement-rfc/scripts/validate_portable_agents.py --source-only
+```
+
+Check the management procedure's public CLI examples against the selected MASK checkout with:
+
+```sh
+python3 -B scripts/verify_mask_examples.py --mask-program /absolute/path/to/ManageAgentSkills
+```
+
+The example scenario uses disposable projects and local bare remotes. Run `python3 -B scripts/verify_documentation.py` for the issue/RFC structure gate, and choose focused helper tests for the behavior being changed. Follow [CONTRIBUTING.md](CONTRIBUTING.md), the [RFC tracker](docs/rfcs/README.md) and the [issue board](docs/issues/README.md).
+
+## Updates and ownership
+
+> [!NOTE]
+> Shared links observe local edits immediately. Remote updates require a clean source and affect every registered consumer. Update between active tasks because hosts may cache skill content.
+
+Use `source fetch`, `update --dry-run` and guarded `update` to review and activate source changes. Program updates are separate: `self update` targets ManageAgentSkills. See MASK's [update and recovery guide](https://github.com/MikeMarcin/ManageAgentSkills#update-skills-or-the-program) for the complete sequence.
+
+Do not edit MASK's internal registry or delete a real skill directory to bypass a collision. `project unregister PATH` removes only unchanged owned links and leaves the declaration and source intact. For interrupted operations, inspect `recover --inspect` before choosing a recovery action.
+
+## Provenance and current deployment
+
+ManageAgentSkills and AgentSkills both declare these two skills and retain distinct consumer context. Verified bootstrap copies remain outside discovery roots in `.mask/bootstrap-retired/implement-rfc-2026-09-05`. Generated links, adapters and backups are ignored; skill payloads, declarations and project context are versioned.
+
+See [skill provenance](docs/development/skill-provenance.md), the [dogfood record](docs/development/mask-dogfood.md) and the [retained packet assets](docs/rfcs/assets/mask-v1-2026-09-05/). Repository visibility and inherited-source licensing remain unchanged. Filesystem links and bounded script invocation have been verified; they do not establish that an already-running agent has loaded a skill.

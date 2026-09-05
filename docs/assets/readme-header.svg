@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350" role="img" aria-labelledby="title desc">
+  <title id="title">AgentSkills — canonical instructions for your projects</title>
+  <desc id="desc">A shared skill library containing implement-rfc and manage-agent-skills, with project-specific context kept in each consumer.</desc>
+  <defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#102d32"/><stop offset="1" stop-color="#122a43"/></linearGradient></defs>
+  <rect width="1200" height="350" rx="24" fill="url(#bg)"/>
+  <circle cx="1160" cy="10" r="195" fill="#6be0c1" opacity=".05"/><circle cx="970" cy="390" r="170" fill="#8bbfff" opacity=".05"/>
+  <g font-family="Arial">
+    <text x="48" y="55" fill="#9fbdc5" font-size="14" font-weight="600" letter-spacing="3">THE CANONICAL SKILL LIBRARY</text>
+    <text x="45" y="127" fill="#fff" font-size="59" font-weight="700">AgentSkills</text>
+    <text x="48" y="173" fill="#d9e9e9" font-size="24">Shared instructions. Local context.</text>
+    <text x="48" y="207" fill="#a7c5ce" font-size="17">One source, linked into the projects that need it.</text>
+    <rect x="48" y="250" width="142" height="33" rx="16" fill="#204943"/><text x="66" y="272" fill="#a0edd7" font-size="14">Portable skills</text>
+    <rect x="202" y="250" width="172" height="33" rx="16" fill="#223e58"/><text x="220" y="272" fill="#bddcff" font-size="14">Managed with MASK</text>
+    <rect x="659" y="57" width="491" height="109" rx="16" fill="#132e36" stroke="#39636b"/>
+    <rect x="659" y="184" width="491" height="109" rx="16" fill="#172e44" stroke="#365770"/>
+    <rect x="681" y="82" width="6" height="56" rx="3" fill="#79dcc0"/>
+    <text x="708" y="104" fill="#b0f2df" font-family="Courier New" font-size="23" font-weight="600">implement-rfc</text>
+    <text x="708" y="137" fill="#abc9cc" font-size="16">RFC → implementation → verified closeout</text>
+    <rect x="681" y="208" width="6" height="56" rx="3" fill="#8abbff"/>
+    <text x="708" y="230" fill="#c8dfff" font-family="Courier New" font-size="23" font-weight="600">manage-agent-skills</text>
+    <text x="708" y="263" fill="#aabfd5" font-size="16">Requirements, deployment and explicit updates</text>
+  </g>
+</svg>
