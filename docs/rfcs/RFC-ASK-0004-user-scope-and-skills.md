@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0004"
 title: "Selected skill consolidation and consumer migration"
-status: "Implementing"
+status: "Auto-Verified"
 owner: "MikeMarcin"
 created: "2026-09-05"
 ---

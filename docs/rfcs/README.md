@@ -10,7 +10,7 @@ Only the main integrator imports, renumbers, edits tracker rules and confirms te
 | RFC-ASK-0002 | Auto-Verified | Agent-operated MASK management skill |
 | RFC-ASK-0003 | Auto-Verified | Unified RFC implementation and attended workflow |
 
-| RFC-ASK-0004 | Implementing | Selected skill consolidation and consumer migration |
+| RFC-ASK-0004 | Auto-Verified | Selected skill consolidation and consumer migration |
 
 ## Import and verification
 
