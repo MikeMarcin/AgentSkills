@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0003"
 title: "Unified RFC implementation and attended workflow"
-status: "Implementing"
+status: "Auto-Verified"
 ---
 
 # Unified RFC implementation and attended workflow

@@ -62,9 +62,7 @@
     ],
     "parked_on": [
       "human-review",
-      "awaiting-owner-verdict",
-      "awaiting-live-github",
-      "awaiting-product-decision"
+      "awaiting-live-github"
     ],
     "blocked_by_forbidden_prefixes": [],
     "link_roots": [
