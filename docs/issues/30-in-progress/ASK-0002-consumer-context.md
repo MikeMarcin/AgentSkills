@@ -1,7 +1,7 @@
 ---
 id: ASK-0002
 title: Resolve workflow context from the consumer project
-status: Backlog
+status: In Progress
 rfc: RFC-ASK-0001
 depends_on: ["ASK-0001"]
 ---
