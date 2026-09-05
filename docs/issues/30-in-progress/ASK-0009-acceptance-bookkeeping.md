@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0009"
 title: "Explicit claims, finish and efficient workflow"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0008"]
 ---
