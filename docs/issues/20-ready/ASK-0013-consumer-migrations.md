@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0013"
 title: "One-off named consumer migrations"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0012"]
 ---
