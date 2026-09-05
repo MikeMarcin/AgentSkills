@@ -1,7 +1,7 @@
 ---
 id: ASK-0003
 title: Keep shared source immutable during adapter rendering
-status: Backlog
+status: In Progress
 rfc: RFC-ASK-0001
 depends_on: ["ASK-0002"]
 ---
