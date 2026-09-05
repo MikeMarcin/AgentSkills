@@ -1,316 +1,156 @@
 ---
 name: implement-rfc
-description: Implement one or more RFCs end to end for the selected consumer repository and its external project context. Use when the user asks to implement or resume an RFC or RFC pack, break it into bounded issue slices, keep affected documentation current, run acceptance-focused verification, commit each completed slice, and reconcile RFC and issue-board status.
+description: Implement or resume RFCs and RFC packs through bounded cards, focused acceptance checks, explicit commits, attended handoffs and truthful closeout in the selected repository.
 ---
 
 # Implement RFC
 
-Carry requested RFCs from the live RFC and issue-board state to a truthful
-closeout. Verification proves the named acceptance boundary; it does not
-become a second deliverable.
+Carry the requested scope from its live board to a truthful closeout. Agents
+judge acceptance and evidence relevance; helpers handle deterministic mechanics.
 
-This directory is shared portable source. Select the consumer repository before
-editing: run `scripts/project_config.py --repo-root /absolute/consumer` from this
-skill's physical asset root, or use its `resolve_context(repo_root=...)` API.
-Report the selected repository and branch, then read that context's
-`project_rules_path`. Shared project facts and rules are exactly:
+## Select and resume
 
-- `<consumer>/.mask/skill-config/implement-rfc/project.json`
-- `<consumer>/.mask/skill-config/implement-rfc/project.md`
+Resolve the consumer once with `python <asset-root>/scripts/project_config.py
+--repo-root /absolute/consumer`. Assets may be shared links. Consumer facts are
+exactly `.mask/skill-config/implement-rfc/project.json` and `project.md` beneath
+that root. Explicit root wins over `IMPLEMENT_RFC_PROJECT_ROOT`, then invocation
+Git root. Missing or mismatched context refuses; examples are never defaults.
+Keep `--repo-root` explicit on subsequent helper calls.
 
-Selection is explicit `--repo-root` / API `repo_root=`, then
-`IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation CWD's Git worktree root.
-Invalid explicit values and missing or mismatched context refuse. Keep the
-selected root explicit in later helper calls, even after changing CWD to the
-skill directory. Never infer a consumer from a resolved skill symlink.
-All supporting references remain relative to the physical asset root; only the
-two project-context files are external. Below, `project.json` and `project.md`
-mean these selected files. Legacy embedded context is supported only for an
-unlinked `.agents/skills/implement-rfc` local copy whose identity agrees with
-its consumer. Inherited example facts are not active defaults.
+1. Report selected repository/branch, inspect Git status, and read project.md,
+   root/nearest instructions and the requested live RFC/card. Preserve unrelated
+   work. Load deeper ownership/hazard references only for the selected surface.
+2. Run `scripts/issue_board.py --repo-root ROOT queue --rfc RFC-ID --json`.
+   Repeat `--rfc` for a pack, or use `--area AREA` for an explicitly requested
+   monorepo area. `--include ID ...` adds named cards. Whole-board work requires
+   `--all`; never schedule unrelated projects or areas. The compact queue omits
+   Done history; `inspect ID --body` retrieves a selected card when needed.
+3. Recover the closeout's immutable `RFC_BASE_SHA`, planned cards and evidence.
+   Cross-check scoped live state with commits since that baseline after an
+   interruption. Do not re-read unrelated history or repeat unchanged checks.
+   Resolve ambiguous in-progress claims explicitly. Scripts do not promote
+   Backlog cards or treat external handoff references as integration evidence.
+4. Before source work, establish bounded acceptance, owned paths and a closeout
+   anchor. Reserve needed IDs on the main integrator with `allocate --area AREA
+   --count N --reserve-for TOKEN`; omit area only for an unambiguous counter.
+   Commit its returned counter/receipt paths before use. Record planning and
+   claim commits. Read [pack lifecycle](references/pack-lifecycle.md) only for
+   import, worktree lanes, integration, renumbering or handoff.
 
-## Finish Condition
+The live RFC and board are authoritative. A runtime goal may supplement them
+only if goal tracking is authorized; never infer authorization or invent a
+budget from an ordinary implementation request.
 
-Work is complete when:
+## Implement a slice
 
-1. every in-scope acceptance criterion has direct passing evidence;
-2. the changed public or selected path has been exercised when applicable;
-3. no known in-scope critical defect remains; and
-4. code, tests, documentation, RFC status, and issue-board status describe the
-   same bounded truth.
+- Select dependency-ready work and its narrowest direct check. Claim with
+  `issue_board.py --repo-root ROOT claim ID --json`; this moves and commits the
+  card and pristine repaired links. The index must be empty. Platform eligibility
+  is card metadata (`--platform win|mac|linux`), not separate Ready directories.
+- Implement within owned paths. Put rote repetition into a durable helper when
+  useful; avoid adding process scaffolding merely to document thinking. Update
+  code, tests and retained instructions only where changed behavior requires it.
+- Run focused changed-surface checks; exercise the public selected path if unit
+  checks can pass while the acceptance claim is false. Reuse evidence whose
+  relevant inputs are unchanged. Unrelated HEAD advancement does not invalidate
+  it. Review the changed code for straightforward simplifications.
+- Record criterion, outcome, revision and evidence. `record_evidence.py` captures
+  one command and exit result; the agent must still decide what it proves.
+  Observations, artifacts and freeform evidence are equally supported where
+  appropriate. No fake commands, compulsory bundles/hashes or proof-of-proof.
+- Finish using `issue_board.py --repo-root ROOT finish ID --acceptance FILE
+  --paths FILE ... --json`. The decision file explicitly approves Done or
+  automated-complete/human-pending; the command records evidence, repairs links
+  and commits only the card/bookkeeping and supplied individual paths. It never
+  infers acceptance, sweeps unrelated edits or pushes. Inspect its result.
+  See [bookkeeping](references/bookkeeping.md) for the small wire contract,
+  dry runs, stale-input refusals and recovery.
 
-Residual uncertainty, unrequested configuration coverage, and possible future
-improvements do not block completion. Record them as limitations or follow-up
-work.
+One canonical card model supports multiple RFCs and areas. Scope validation
+examines requested work and its dependency closure; identity and counter
+invariants remain global. Historical workflow contradictions outside that scope
+are follow-ups, not reasons to fabricate completion or block independent work.
+Descriptive data belongs in `metadata`, not custom scheduling fields.
 
-## Start And Reorientation
+## Choose verification at the right boundary
 
-Use one persistent runtime goal for the complete requested RFC set when an
-agent-callable goal facility is available and goal tracking is authorized.
-Inspect the existing goal first; reuse a matching unfinished goal rather than
-creating one per card or resume. Honor an earlier user request for goal tracking
-in the same session. Where the runtime requires an explicit user request, do
-not infer that permission from ordinary implementation work or skill selection.
-Never invent a token budget or replace an unrelated unfinished goal. If a goal
-is unavailable or unauthorized, continue repository work without it; a writable
-persistent session task list can provide the same progress view when permitted.
-The issue board and closeout cards remain authoritative, and a goal-tool failure
-must not block implementation.
+Ordinary slices use focused checks and reuse unchanged passing evidence. At
+pack or milestone completion, normally run one integration-focused verification
+pass. Full relevant suites and a critical review are appropriate when changed
+scope/risk justify them; a substantial single RFC may warrant the same treatment.
+State the claims the broader checks will resolve, then consume the result once.
 
-1. Confirm from live Git state that this checkout is the project
-   `project.json` names and note the current branch. Verify its configured
-   origin repository name from live Git before real implementation; fixture
-   checkouts may deliberately omit a remote. Read
-   [references/remote-routing.md](references/remote-routing.md) only when
-   `.remote-station.json` exists, a `remote-task` envelope arrived, or this
-   session will dispatch work to a station. Otherwise follow the local rules
-   in this skill and [references/pack-lifecycle.md](references/pack-lifecycle.md).
-2. Inspect `git status --short`; preserve unrelated work and stage explicit
-   paths only. Concurrent sessions may share a checkout: claim the current
-   card by committing its move to the in-progress lane before editing, leave
-   nothing staged between commits, and commit with explicit pathspecs.
-3. Recover or record the RFC's immutable `RFC_BASE_SHA` in its closeout card.
-   Conversation memory is not a durable home. For work that predates a
-   closeout card, use the first parent of the earliest in-scope commit.
-4. Read `project.md` and the repository instructions it names
-   (root and nested `AGENTS.md`, read-first documents) before editing source.
-   Open a deeper reference only when the change intersects a hazard it names.
-5. Read the requested live RFCs, the tracker READMEs under `rfc_root` and
-   `issue_root`, the relevant cards, their dependencies, and the next-ID
-   source. Live files outrank stale paths or remembered state.
-6. If the user supplied an RFC-pack folder, import it with the procedure in
-   [references/pack-lifecycle.md](references/pack-lifecycle.md) before
-   planning; a copied issue snapshot never overrides the live board.
-7. Build a short working plan from acceptance criteria and dependency-ready
-   issue slices. If the RFC has no closeout card, create one in the planning
-   slice — objective, `RFC_BASE_SHA`, the requested RFC set and this RFC's
-   position, planned card IDs — and commit the planning slice before
-   implementation. Create other cards only when implementation genuinely
-   needs them, allocating IDs with `allocate_id_command`.
+Application-wide builds, exhaustive matrices, hermetic replay, repeated reviews
+and manual approval checkpoints are not defaults. Broader work outside the
+warranted integration pass requires an explicit request or a concrete unresolved
+defect. A fix receives only the checks affected by that fix. Unavailable optional
+coverage is a limitation, not a new requirement. Required acceptance that cannot
+be exercised remains open and is reported honestly.
 
-Reorient from the live tree at the top of every task iteration and after
-interruption, compaction, conflict resolution, or a material external change:
+Correct contained in-scope failures. Track separable noncritical improvements
+as follow-ups. Ask about a material scope/architecture change; routine fixes
+within the accepted boundary do not require a new approval ceremony.
 
-- current RFC: the first requested RFC not at `terminal_rfc_status` in the
-  RFC index;
-- closeout card: find it in any lane and read back `RFC_BASE_SHA`, the
-  planned cards, and the verification record;
-- queue and next task: run `python3 <asset-root>/scripts/issue_board.py
-  --repo-root <consumer> queue --rfc RFC-ID --platform PLATFORM`. It validates the board and reports
-  linked cards, closeout paths, dependency readiness, platform deferrals,
-  blockers, and the next eligible card. Add `--include ISSUE-ID ...` for
-  planned cards not linked to this RFC; planned scope still comes from the
-  closeout record. Resolve multiple in-progress cards explicitly; do not
-  infer a winner or promote backlog automatically. Queue readiness checks local
-  dependencies; verify any external handoff evidence under the consumer's rules;
-- cross-check `git log --oneline "$RFC_BASE_SHA"..HEAD` against the queue:
-  commits without a done card mean an interrupted task, and a done card
-  without commits needs reconciliation;
-- list live delegated children from the runtime (native agents, plus
-  `scripts/codex_lane.py status` for Codex lanes); a compaction summary is
-  not live status.
+## Human attendance
 
-Do not restart completed verification whose inputs are unchanged. Context
-pressure is not a stop condition: hand the next slice to a bounded
-`rfc-worker`, or end the turn as an explicit resume handoff with the closeout
-card current and the next task named.
+An explicitly required human decision leaves its card/RFC open. Complete the
+unattended work, finish as `human-pending`, and continue independent work. Never
+invent a human gate merely because a surface has UI. Query waiting cards with
+`queue --human-waiting` (optionally scoped by RFC or area).
 
-## Pack Lifecycle
+When asked to **prepare for an attended session**, use the shared
+`attended-review` skill. Surface ready items immediately, prepare quick items
+first, and allow interruption of slow preparation. The user can review a partial
+queue and stop at any point; save each independent decision immediately. Prefer
+local HTML and practical agent-captured objective evidence. Use `wizard` when
+manual steps need guided presentation. Keep pure local HTML intake usable if a
+server is unavailable; both Claude and Codex can drive the same session.
 
-Pack import, lane setup and commit authority, mid-work ID discovery,
-milestone integration, renumbering, handoff, and worktree cleanup follow
-[references/pack-lifecycle.md](references/pack-lifecycle.md). Import,
-integration, renumbering, and every next-ID or reservation write belong to
-the project integrator on `main`.
+Protect selected candidates and relevant dependencies/resources. Unrelated work
+continues. Stepping away retains protection; **resume development** explicitly
+releases conflicting resources and marks only affected unanswered items needing
+preparation. Observe attended conflicts before changing protected inputs. These
+cooperative protections do not freeze arbitrary external tools or other agents.
+Completed verdicts stay attached to the actual candidate; relevant later changes
+may require another review. Do not invalidate evidence for unrelated HEAD changes.
 
-## Implement Bounded Slices
+## Integration and closeout
 
-For each dependency-ready card:
+The finish condition is direct passing evidence for all in-scope criteria, the
+selected public path exercised where applicable, no known critical in-scope
+failure, and agreement between implementation, docs, cards and RFC status.
+`Implemented` is distinct from `Auto-Verified`. An unresolved required human
+criterion keeps terminal status open even when automated work is complete.
 
-1. Confirm ownership, non-goals, applicable instructions, acceptance criteria,
-   and the narrowest direct verification command before editing.
-2. Move the card with `python3 <asset-root>/scripts/issue_board.py
-   --repo-root <consumer> move ISSUE-ID --to LANE`. The command synchronizes status and lane metadata,
-   checks dependencies, and updates live links. Use its changed paths for
-   explicit staging; commit the claim before implementation. The agent still
-   decides whether acceptance evidence warrants Done. Read
-   [references/bookkeeping.md](references/bookkeeping.md) for parked/blocked
-   moves, dry runs, schema diagnostics, or configuring another project.
-   Without a configured `bookkeeping` policy, use the consumer's existing
-   board lifecycle; do not infer write policy from another project's example.
-3. Implement the smallest coherent change, keeping each concern in the layer
-   `project.md` assigns it.
-4. Add focused tests for changed behavior. Update an instruction or reference
-   only when the change makes a purpose, ownership, hazard, or verification
-   rule it states untrue.
-5. Run the selected focused checks, record commands and outcomes concisely in
-   the card or closeout record, review the diff, and commit the slice with
-   explicit pathspecs.
-6. Move the card to done only when its own acceptance criteria are satisfied.
-   A separable noncritical improvement becomes follow-up work rather than an
-   expanded current card.
+At integration, inspect the final scoped diff against `RFC_BASE_SHA`, check all
+required cards including relevant unlinked discoveries, reconcile RFC/index
+status and run the configured structure gate once. Keep actual check/result/
+revision records on the closeout; do not create a second mutable status ledger.
+The main integrator confirms terminal status after integrating worktree slices.
 
-When a slice is delegated to `rfc-worker` or `rfc-worker-routine`, give it the card, the relevant
-acceptance criteria, the applicable instructions, an explicit exclusive list
-of allowed paths, explicit non-goals, and the focused verification. Do not
-edit while it runs. Afterwards inspect the complete diff, reject out-of-scope
-changes, reproduce the focused verification, and keep board moves, staging,
-and commits with the integrator.
+Isolation and independent review are optional tools for concrete persistence,
+migration, protocol, authority, concurrency or destructive-operation risks.
+[Delegated execution](references/delegated-execution.md) defines bounded worker
+and reviewer contracts. Keep exclusive write ownership, staging/commits and
+acceptance with the integrator; use one risk-focused reviewer where warranted,
+not a review loop. Models and roles follow the shared routing policy; only
+repository ownership facts/addenda are configurable.
 
-Run the repository's code-simplifier pass over recently changed code after the
-task set, then rerun only checks affected by simplification.
+Record exact task-created temporary roots and their consumers. Once consumed,
+confirm no user files/processes depend on them and remove them; never retain a
+checkout as evidence. Report completed scope, commits, actual verification,
+remaining decisions/limitations and cleanup. Context pressure does not complete
+a task: preserve the next actionable slice in the closeout and continue.
 
-## Select Verification By Acceptance
+## Optional runtime support
 
-Choose the narrowest commands that directly exercise the changed behavior and
-the RFC's stated acceptance criteria.
+Read [remote routing](references/remote-routing.md) only for a remote envelope,
+station marker or actual dispatch; read [Codex lanes](references/codex-lanes.md)
+only when launching one. Missing optional runtimes do not add acceptance gates.
 
-- Run focused changed-surface tests.
-- Add one public or selected-path lane when focused tests do not exercise it;
-  `project.md` names what counts as a direct surface.
-- Let one command prove several related claims.
-- Treat verification tables and preset catalogs as catalogs of available
-  lanes, not matrices. Select only lanes relevant to the changed surface.
-- Reuse a passing result when its source, configuration, fixture, and
-  dependency inputs did not change.
-- Report unavailable or omitted lanes honestly without promoting them into
-  requirements.
-
-Full project or repository validation, repeated clean builds, package
-matrices, broad soaks, clean-room replay, and hermetic evidence construction
-require an explicit user request. Do not infer them from ordinary
-implementation, closeout, release proximity, residual uncertainty, or the
-existence of a validator.
-
-Verification must not create new requirements. Do not build proof-of-proof
-artifacts, hash-bound result packages, evidence manifests, replay trees, or
-process audits unless the task explicitly names them as product acceptance.
-A source checkout is never retained as evidence.
-
-An attended human verdict is never a stop condition and never blocks a card's
-unattended work: finish the unattended evidence, park the card as
-`project.md` describes, and continue with work that does not
-depend on it. Present pending verdicts together at the run boundary.
-
-## Findings And Convergence
-
-Ask of every recorded check: could it pass while the claim is false? If yes,
-strengthen the check or narrow the claim. Then classify each finding by
-relevance and expected cost:
-
-- Correct it and narrowly rerun the affected check when it falsifies an
-  existing acceptance criterion, the repair is contained, and the check is
-  clear.
-- Record or create follow-up work when it is separable, noncritical, or an
-  improvement beyond the accepted boundary.
-- Ask the user when it changes scope or architecture, materially enlarges the
-  task, requires broad verification, or has an uncertain risk/benefit tradeoff.
-
-A correction never restarts whole-candidate review. Recheck only the changed
-surface; unchanged passing lanes remain valid.
-
-## Optional Isolation And Independent Review
-
-Isolation and independent review are tools, not universal phases. Consider
-them when they are likely to add discriminating evidence and the changed
-surface materially involves one of these trigger classes:
-
-- wire or protocol contracts;
-- persistence or migration behavior;
-- authority or security boundaries;
-- concurrency primitives;
-- destructive migrations.
-
-They are also appropriate when the user explicitly requests them. Use at most
-the isolation needed for the selected check, and remove task-created
-worktrees/build roots as soon as their result is consumed.
-
-When review is selected, use one reviewer and prefer the opposite model family
-from the implementation where the driver can launch it. Use the critical role
-instead of the ordinary role for a named material risk. A second review requires
-an unresolved material concern or an explicit request, including when the same
-role runs on another provider. If the other family is unavailable, use the native
-reviewer and record that limitation. Read
-[references/codex-lanes.md](references/codex-lanes.md) before launching any Codex
-lane, and record each review's runtime on the closeout card as
-`Closeout review runtime: <runtime> (<model>, <effort>)`.
-
-A reviewer may block closeout only with an evidence-backed failure of an
-existing acceptance criterion or a critical regression in the changed surface.
-Unsupported suspicions, broader hardening ideas, and new requirements are
-non-blocking. Read
-[references/delegated-execution.md](references/delegated-execution.md) when
-delegation, a test runner, or an independent reviewer will materially help.
-
-## Documentation
-
-Ordinary code work requires no documentation review or ledger. When a change
-makes a retained rule untrue in an instruction file or reference, apply the
-smallest source-backed update and move on. Before closeout run every
-`structure_gate` command; a failure blocks the status change until fixed.
-Documentation never invalidates otherwise unchanged product evidence.
-
-## Status And Closeout
-
-Use the RFC status vocabulary `project.md` lists; `Proposed` means
-design not yet approved, `terminal_rfc_status` means the finish condition
-above is satisfied, and any intermediate or rejection statuses mean what the
-project defines.
-
-Before the terminal status, confirm the final diff against `RFC_BASE_SHA`,
-direct acceptance evidence, issue-card state (every required card done, no
-required work left in an active lane, including unlinked cards created since
-`RFC_BASE_SHA` whose scope belongs to this RFC), RFC/index agreement, and a
-passing `structure_gate`. Do not create new verification work merely to make
-a record look more complete. Unrelated pre-existing findings remain separate
-work.
-
-The closeout card is the durable run anchor. Keep it in the project's
-closeout-card contract (`project.md`): `RFC_BASE_SHA`, the planned
-cards, and for each acceptance criterion the check run, its result, and the
-commit it was produced at; add the `Closeout review runtime:` line when an
-independent review ran. On a station branch the status flip is a proposal the
-project integrator confirms on `main`.
-
-Final reporting names completed cards/commits, exact verification run,
-omitted or unavailable lanes, documentation updated, temporary resources
-removed, and remaining follow-ups or decisions.
-
-Mark a runtime goal complete only when the finish condition holds for its whole
-requested RFC set. Completing a slice, reaching an attended checkpoint, or
-ending a turn is not goal completion. Preserve the goal across resumes and
-follow the runtime's rules for blocked status; the closeout card records the
-next actionable work.
-
-## Temporary Resources
-
-Ordinary RFC work creates no separate test-runner worktree. If this task creates a
-temporary worktree, build root, log root, or generated review root:
-
-1. record its exact path and consumer;
-2. keep it only while that consumer is active;
-3. remove it promptly after the result is consumed, after confirming no
-   untracked user files or live process depend on it; and
-4. compare the final worktree/resource state with the starting state.
-
-Never retain a temporary checkout as proof. Handoff- and closeout-time
-worktree cleanup follows
-[references/pack-lifecycle.md](references/pack-lifecycle.md).
-
-## Portable Runtime
-
-The canonical skill and role semantics are vendor-neutral. Generated Codex and
-Claude adapters come from `config/roles.json`, `config/routing.json`, and the
-per-role addenda in the selected external `project.json`. Read
-[references/runtime-compatibility.md](references/runtime-compatibility.md)
-only when using those adapters or remote runtime features. Regenerate consumer role adapters explicitly when their inputs change using
-`scripts/render_runtime_adapters.py --repo-root <consumer>`; `--check` only
-checks. The renderer writes native agent files and consumer metadata under
-`.mask/generated/implement-rfc/`, never either linked skill root. Existing
-adapters require this renderer's marker and prior consumer manifest. Bootstrap
-adapters need deliberate reconciliation before shared rendering.
-
-Author the canonical portable digest separately in the source checkout with
-`scripts/render_runtime_adapters.py --write-source-manifest`. Validate source
-with `scripts/validate_portable_agents.py --source-only`; validate a consumer
-with `--repo-root <consumer>`. Neither validation writes the shared source.
+Shared role source is `config/roles.json` and `config/routing.json`. Explicitly
+render consumer adapters with `scripts/render_runtime_adapters.py --repo-root
+ROOT`; `--check` is read-only. Writes stay in consumer agent directories and
+`.mask/generated/implement-rfc/`, never through linked skill roots. Existing
+outputs require matching ownership markers and prior manifest. Source authors
+use `--write-source-manifest` and `validate_portable_agents.py --source-only`.

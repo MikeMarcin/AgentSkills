@@ -16,8 +16,9 @@ Ordinary RFC work is acceptance-focused:
 - unchanged passing evidence is reused;
 - delegation, isolation, and independent review are optional, risk-triggered
   tools; the `Closeout review runtime:` line is recorded, not audited;
-- full-project validation, replay, hermetic evidence, and broad soaks require
-  an explicit user request;
+- one integration-focused pass normally completes a pack/milestone; full relevant
+  suites and critical review are selected when scope/risk warrant; exhaustive
+  matrices, hermetic replay and repeated reviews are not defaults;
 - temporary worktrees and build roots are removed when their result is
   consumed.
 
@@ -31,14 +32,13 @@ formats.
 Exactly two files under each consumer repository:
 
 - `.mask/skill-config/implement-rfc/project.json` — machine-read facts: project tokens, tracker paths,
-  lane names and their status words, the next-ID source, the closeout-card
-  detection rule, the structure-gate commands, the attended-review skill (or
+  lane names and their status words, single/per-area counters, sequencing, the structure-gate commands, the attended-review skill (or
   `null`), the station registry document, workstream branches, and per-role
   instruction addenda. `schemas/project.schema.json` documents the contract;
   `scripts/project_config.py` enforces it.
 - `.mask/skill-config/implement-rfc/project.md` — the project's own rules in prose: what to read
   first, the side-effect boundary, what counts as a direct surface, the
-  closeout-card contract, attended checkpoints, platform lanes.
+  closeout-card contract, attended integration and platform eligibility.
 
 The routine worker inherits the `rfc-worker` project addenda, followed by any
 `rfc-worker-routine` addenda. Its cheaper route does not relax project boundaries.
@@ -137,12 +137,9 @@ The inherited context is retained in
 `examples/projects/samplereview/project.json` and `project.md` as an
 example only. It is never a default for an arbitrary consumer.
 
-For isolated bootstrap, an unlinked real local copy at
-`.agents/skills/implement-rfc` can instead contain `config/project.json` and
-`references/project.md`. Its identity must match the selected checkout and
-both files must exist. External context takes priority; a broken external
-context never falls back to embedded facts. Retire a temporary bootstrap copy
-at managed cutover.
+All consumers require external v2 context and canonical cards. Historical
+conversion is one-off migration work outside this skill. See
+[bookkeeping](references/bookkeeping.md) for the CLI and card/evidence contracts.
 
 ## Bedrock
 

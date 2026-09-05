@@ -1,118 +1,115 @@
-# Issue-board commands
+# Board commands and contracts
 
-The portable entry point is
-`python3 .agents/skills/implement-rfc/scripts/issue_board.py`.
-It resolves the selected consumer's external
-`.mask/skill-config/implement-rfc/project.json` and `project.md` with the shared
-resolver. Global `--repo-root PATH` precedes the subcommand; keep the selected
-consumer explicit when invoking from another directory. Python 3.10+ and
-Git for applied moves are the only runtime requirements.
+Run `python <asset-root>/scripts/issue_board.py --repo-root ROOT COMMAND`.
+All commands accept `--json` and return a versioned compact object. Errors return
+nonzero; parse the object instead of re-reading the whole board.
 
-```sh
-python3 <asset-root>/scripts/issue_board.py --repo-root <consumer> validate --json
-python3 <asset-root>/scripts/issue_board.py --repo-root <consumer> queue --rfc RFC-ID --platform mac
-python3 <asset-root>/scripts/issue_board.py --repo-root <consumer> move ISSUE-ID --to LANE --dry-run
-python3 <asset-root>/scripts/issue_board.py --repo-root <consumer> move ISSUE-ID --to LANE --json
+| Command | Purpose |
+|---|---|
+| `queue --rfc RFC-ID [--rfc RFC-ID]` | Scoped active work and next eligible card |
+| `queue --area AREA` | Explicit monorepo area scope |
+| `queue --human-waiting` | Cards parked for human attendance |
+| `queue --all --history` | Intentional complete inventory |
+| `inspect ID [--body]` | Selected metadata, dependencies and optional Markdown |
+| `validate [--rfc RFC-ID / --include ID ...]` | Global identity/counters and scoped workflow; no scope checks all |
+| `allocate [--area AREA] --count N --reserve-for TOKEN` | Main-integrator reservation and counter advance |
+| `move ID --to LANE [--parked-on TOKEN / --blocked-by TOKEN]` | Guarded move/link repair without commit |
+| `claim ID [--platform PLATFORM]` | Commit eligible Ready card into In Progress |
+| `finish ID --acceptance FILE --paths FILE ...` | Commit approved acceptance and supplied paths |
+
+Mutations support `--dry-run`; claim/finish support `--expect-revision SHA` when
+prepared against a specific HEAD. Queue prefers a sole eligible in-progress
+claim, then priority (absent means P2) and stable ID. Ordered-index sequencing
+uses the consumer RFC index before priority. It reports ambiguity and external
+handoffs, never auto-promotes Backlog or guesses remote completion.
+
+## Canonical frontmatter
+
+Cards use one field per line between `---` fences. Values are JSON; plain text
+strings are also accepted for convenient editing. Arrays and nested objects use
+JSON syntax. No multiline YAML, implicit YAML dates or custom control fields.
+Unchanged bytes and Markdown bodies survive ordinary moves; edited values use
+JSON serialization. RFC frontmatter uses the same syntax with repository-defined
+fields; its status remains authoritative.
+
+```yaml
+---
+schema: implement-rfc.card.v1
+id: APP-0001
+title: Add selected behavior
+status: Ready
+rfcs: ["RFC-APP-0001", "RFC-LIB-0002"]
+depends_on: []
+priority: P1
+platforms: ["mac", "win"]
+metadata: {"estimate":3,"original_context":"retained descriptive data"}
+---
 ```
 
-Use actual IDs and configured lane directory names. All commands accept
-`--json`, returning a versioned result. Validation failures return nonzero and
-an `errors` list containing `path`, `field`, and `reason`; successful validation
-reports `valid` and `card_count`. Ordinary argument errors use argparse's exit
-status 2. Human output is compact and does not print card bodies.
+Required fields are schema, id, title, status, rfcs and depends_on. Empty arrays
+represent independent work. Optional `closeout_for` is a subset of rfcs.
+`external_depends_on` entries use `Repository:AREA-0001`; verify their real
+integrated handoff evidence. Optional area/priority/labels/owner/dates/milestone,
+platforms, parked_on, blocked_by and acceptance are documented in
+`schemas/issue-card.schema.json`. Additional descriptive data is unrestricted
+JSON under metadata. Historical conversion is one-off consumer work, never a
+shipped format adapter.
 
-## Queue and moves
+The lanes are Inbox, Backlog, Ready, In Progress, Parked, Blocked and Done.
+Ready means local dependencies are Done. Parked requires its reason token;
+`human-review` identifies attendance. Blocked requires a blocker token; keep
+concrete detail in the body or metadata. Done is terminal; make follow-up cards
+for new work. Never rewrite historical acceptance to satisfy a validator.
 
-`queue` includes explicit RFC links and optional `--include ISSUE-ID ...` IDs.
-It reports open cards by numeric ID; `--all` includes Done. The sole in-progress
-card wins, otherwise the lowest-ID dependency-ready card in generic ready or
-the selected platform lane wins. Multiple in-progress cards produce a null
-`next` plus `ambiguous_in_progress`; no eligible work also produces a null
-`next`. Platform defaults to the local Python host. Pass it explicitly for a
-station. Backlog candidates remain backlog, and other-platform work reports
-both its deferral and any unmet dependencies. Closeout paths can include older
-terminal records: the agent reconciles the current scope with those records.
+## Acceptance and explicit Git authority
 
-`move` validates the existing and proposed board before writing. Entering the
-parked lane requires `--parked-on TOKEN`; entering blocked requires
-`--blocked-by TOKEN`. A repeated move can reuse that card's existing reason.
-Leaving either lane removes its reason field. Done is terminal; repeating an
-already-satisfied command is a no-op. The tool never supplies acceptance
-evidence, changes RFC statuses, edits dependencies, allocates IDs, or commits.
-Use the returned `changed_paths` (including both ends of a move) for explicit
-staging. A successful move is not an ownership claim until its commit exists.
+A finish decision file has this shape:
 
-Live Markdown inline links and reference definitions are repaired by resolved
-destination, preserving fragments, query strings, and labels. Relative links
-within the moved card are rebased. Code examples, wiki IDs, external URLs, and
-plain historical path mentions are unchanged. A reference in configured
-protected content refuses the whole move; review that reference's authority
-before making any manual repair. The tool supports ordinary Markdown link
-destinations, including angle brackets and percent-encoded paths; HTML links
-and complex Markdown extensions are outside this command's link parser.
+```json
+{"approved":true,"decision":"done","records":[
+  {"criterion":"AC1","outcome":"pass","revision":"actual source revision",
+   "evidence":{"kind":"observation","detail":"What was exercised and observed"}}
+]}
+```
 
-Applied moves serialize through `implement-rfc-board.lock` in the checkout's
-Git directory. The tool rereads observed files before writing and refuses
-destination collisions. It restores its applied writes after ordinary I/O
-failure and reports any rollback it could not safely finish. This is not a
-crash-atomic multi-file transaction and cannot exclude editors or other tools
-that do not honor its lock. After a process interruption, confirm the recorded
-PID has ended before removing the lock and inspect Git state before retrying.
-`--dry-run` writes no files or lock. Commands do not stage or reset user edits.
+Decision is `done` or `human-pending`. Outcomes are pass/fail/pending; Done
+requires passing records. Evidence kinds are command, observation, artifact or
+freeform; extra evidence detail is allowed. The agent owns completeness and
+relevance of the criterion set. Human-pending stores partial evidence and parks
+for human-review; it does not close the RFC.
 
-## Card contract
+`record_evidence.py --repo-root ROOT --criterion AC1 [--output NEW_FILE] -- COMMAND
+ARG ...` captures revision, exit code, elapsed time and short output tails. It
+uses argument arrays, no shell. A zero exit code proves only command success;
+the agent still judges the acceptance claim. Reuse unchanged relevant evidence.
 
-[The card schema](../schemas/issue-card.schema.json) is evaluated by the shared
-`board_model.py` implementation, used by the CLI and portable audit. A consumer
-may also integrate it into its documentation gate. It validates decoded metadata rather than Markdown prose.
-The parser supports UTF-8, LF or CRLF, one key/value per line between `---`
-fences, text scalars, and inline text lists. It rejects duplicate keys, missing
-fences, comments and unsupported YAML constructs. Use JSON double-quoted text
-or YAML single-quoted text for values containing a colon followed by whitespace.
-Plain scalars, including dates and closeout markers, are text; only inline lists
-become arrays. This limited format avoids YAML's implicit type conversions.
+Claim/finish require an empty index, preserve unrelated working files, and never
+push. Supply individual repository-relative files, not folders/globs. Card moves
+and pristine repaired links are included automatically; an already-dirty
+bookkeeping file requires explicit inclusion in finish or a prior separate
+commit. Claim has no arbitrary source path option. The tool refuses symlinks,
+protected link edits, collisions, stale reads and unsafe destinations. File
+writes use atomic publication and roll back ordinary write failures without
+overwriting concurrent edits. Git failures leave reviewable changes; inspect
+status and the error before retrying. Never reset unrelated work to recover.
 
-Required fields are `id`, `title`, `status`, the configured `rfc_link_field`,
-and `depends_on`. Each card links one RFC, or the explicit text `none` for
-workflow maintenance. `depends_on` is an inline array of unique issue IDs.
-Supported optional fields are `parked_on`, `blocked_by`, `milestone`,
-`completed` (YYYY-MM-DD text), and `closeout` (`true` or `false` text). A
-configured closeout front-matter marker also declares that particular text
-field. Unknown fields are errors; extend the schema intentionally rather than
-silently ignoring metadata. The configured RFC key replaces `rfc` in the
-effective schema. Existing text and field order are retained during a move.
+`bookkeeping` config names live link roots and protected/explicitly editable
+patterns. Keep immutable imported packets outside editable roots. Repair actual
+Markdown links, including relative links on the moved card; do not rewrite code
+examples or historical prose.
 
-Shared consumers may also retain `external_depends_on`, an inline array of
-unique `Repository:ISSUE-NNNN` references. The command checks their syntax and
-preserves them during moves; it does not inspect other repositories or establish
-that their work is integrated. Queue readiness covers local dependencies only.
-Check the consumer's recorded external handoff evidence before claiming or
-moving a card whose external prerequisites are still outstanding.
-The optional `platform` text label is preserved for consumer-specific records;
-queue platform eligibility continues to use the configured lane, not this label.
+## Counters and history
 
-Board checks additionally require filename/ID agreement, unique IDs, existing
-RFC references, existing dependencies, no self-dependencies or cycles,
-lane/status agreement, valid reason metadata, satisfied dependencies in
-nondeferring lanes, and a next-ID counter ahead of used IDs in its sequence.
-The audit adds its existing historical counter and process observations;
-structural errors are failures even in Done. Product evidence remains an agent
-judgment, and the project structure gate still runs at closeout.
+`next_id.mode` is single-file or per-area; values are always AREA-NNNN. Per-area
+filenames are AREA. Validation and allocation share the same counter model:
+live IDs, reservations, and historical high water on branches, remotes, tags and
+HEAD. Transient tool checkpoint refs are excluded. The default 2,000 changed
+commit history bound is visible in allocation JSON; exceeding it refuses rather
+than silently ignoring history. Explicitly increase allocation.history_limit
+when justified. Shallow/missing Git history cannot establish unseen remote
+allocations; fetch the integrator's known refs before cross-machine allocation.
 
-## Project configuration
-
-The optional `bookkeeping` object becomes required to use `move`. Configure:
-
-- `deferring_lanes`: lane directory names allowed to retain unmet dependencies.
-- `parked_on`: accepted parked reasons; an empty list permits any valid token.
-- `blocked_by_forbidden_prefixes`: reason prefixes that belong elsewhere.
-- `link_roots`: repository-relative files or directories to scan for Markdown.
-- `protected_globs`: repository-relative patterns for immutable source/evidence.
-- `editable_globs`: exceptions for explicitly maintained records within those
-  protected trees, such as live-import notes.
-
-Older project configs can still validate and report queues: backlog, blocked,
-and platform-ready lanes defer dependencies by default, and reason tokens must
-have valid syntax. Add project-specific policy before enabling moves. The
-project schema and loader validate the object together. No policy is inferred
-from project names or Markdown prose.
+A deliberate historical override is configured under allocation.rewind_overrides
+as `{area,floor,waived_through,date,reason}`. It never waives live/reserved IDs or
+a later high-water value. Do not add overrides merely to silence a real collision.
+Reserve on main, commit returned counter/receipt files, then hand IDs to lanes.

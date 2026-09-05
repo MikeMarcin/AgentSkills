@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "4739d491435107a7ee623b1e225a637c345cd9d5f766c9212bc3762f6ca0d062"
+      "sha256": "2e0e3b7d8cacba4e827981ca7bcc76f7f1d31475d055344bd75d3f2b82113966"
     },
     {
       "path": "SKILL.md",
-      "sha256": "10f876e52d718c48d8888e332c17e67b5441d9d811a0a06640b65808c22b6e2c"
+      "sha256": "4df10d4233245640de4db913f1e5e7d763bacab7ae8fd6d78ca51338c8b2817b"
     },
     {
       "path": "agents/openai.yaml",
@@ -38,7 +38,7 @@
     },
     {
       "path": "references/bookkeeping.md",
-      "sha256": "7a0cb7dbb7353cba959aa3bfb54ad58a9a7133f7138bcf3af3c174d74234cfb3"
+      "sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a"
     },
     {
       "path": "references/codex-lanes.md",
@@ -66,11 +66,11 @@
     },
     {
       "path": "schemas/issue-card.schema.json",
-      "sha256": "c93330dd7533fb994acca2a4f37384be8d5752c4ed8872a27839507cfa4a8b85"
+      "sha256": "65f42d73b0ec9e030610a2bce99164e0aa9199e1a6dc022502679425a60cf76c"
     },
     {
       "path": "schemas/project.schema.json",
-      "sha256": "7459458057f47f55d9efd9e583b8a0fc513067da009d654967743b69da01ccf5"
+      "sha256": "552a42a4606ccb2e47c7d6f37c9e50e054ea704e6abac92e9a5998be5a3a8458"
     },
     {
       "path": "schemas/remote-station.schema.json",
@@ -89,12 +89,16 @@
       "sha256": "dfb5365cbdc9d39350f3fa7dc84f407acd53710c82b0376700f4c977f4e7d30e"
     },
     {
+      "path": "scripts/allocation.py",
+      "sha256": "90238c655906a1c4f514efcd1038421a41dd04cff723f2a490099e7558b472d6"
+    },
+    {
       "path": "scripts/audit_board.py",
-      "sha256": "8ed086eee9f570e9033ff60d432812b26f4554d058c12499100e23a5467bc66f"
+      "sha256": "5338e7e36d207c08f1bbb62297743372d32880d925d84e0360952f21927af599"
     },
     {
       "path": "scripts/board_model.py",
-      "sha256": "f3f2d58029313c8ab0415b1d4de2fd33a28a68ed24ecdce292db12878b23d487"
+      "sha256": "00a05164ad794a1c50d0ea10f5a8bcfc997b526955ec69d0ca8fe8150f43d8df"
     },
     {
       "path": "scripts/codex_lane.py",
@@ -106,7 +110,7 @@
     },
     {
       "path": "scripts/issue_board.py",
-      "sha256": "1752aa740573fcc904afdf9883b288c52eea02ce0841effe3bd37867aebad423"
+      "sha256": "455012e629a476cb93b8672e9c465953bfd9a77210fec3e1a2c4471951a07478"
     },
     {
       "path": "scripts/launch_remote_station.py",
@@ -114,7 +118,11 @@
     },
     {
       "path": "scripts/project_config.py",
-      "sha256": "2cc0d5876f31be99b82dd3c84d3e8847c5f7c9f7a56894ec402d6e48fb1c08f8"
+      "sha256": "2c5c534af6ca2abf601d7dc5932542a24c50021005141b83488cf75d4722d890"
+    },
+    {
+      "path": "scripts/record_evidence.py",
+      "sha256": "a88c189a46099793d74b4f7b7ad7c045e0ebe6863807b282ca174c16cb3280fa"
     },
     {
       "path": "scripts/remote_station_guard.py",
@@ -134,11 +142,11 @@
     },
     {
       "path": "tests/project_fixtures.py",
-      "sha256": "9e39c6823d6cc4b2ded5d09d403c32ca51a26b5aea2b3f22dad0a5bd0620d5cb"
+      "sha256": "ecb0d67da547e9cc8dc50f6a0b5c44e4ab285bb6b21f77d580d1ba96eddafea3"
     },
     {
       "path": "tests/test_audit_board.py",
-      "sha256": "69512d9ffc94f76df2c504de7969fc49a6114345175997887d12d36750f8c4ad"
+      "sha256": "a38d1fa0da627c682bf3df61a106af0875520b55e59ef10a3fd0a7b5ca833a90"
     },
     {
       "path": "tests/test_codex_lane.py",
@@ -150,7 +158,7 @@
     },
     {
       "path": "tests/test_issue_board.py",
-      "sha256": "0b3d8b9a4f90639cd7dde349c5f4a33ab0d8203e6ab66afbde36092aae1131b2"
+      "sha256": "45ea8711d7cda5a2ccfb0d71c51fd2180f2264db4a4faf09ce9f84487df8ac59"
     },
     {
       "path": "tests/test_launch_remote_station.py",
@@ -158,7 +166,7 @@
     },
     {
       "path": "tests/test_project_config.py",
-      "sha256": "25cd684442c87af1aec9f79d516951c94803f1072bda14ed5f884639dc33b15b"
+      "sha256": "8964f10f1771fb107dcb9301f1731fbc7fb9ae69a8d3b9336176692cd3afa6c7"
     },
     {
       "path": "tests/test_remote_station_guard.py",
@@ -166,13 +174,17 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "64779ed795be75304b69c3d013150b02d4ef8ebaebe2a36849c35527731d8468"
+      "sha256": "f0a5bfd32a67b31d5f0d2258fa0a740448617033a7ba04d6e49b4a9450710002"
     },
     {
       "path": "tests/test_station_lease.py",
       "sha256": "8eb8d7ee1222b1c652f5b8631841f508e9757b7eb4f861f15a26c8201ce3e5ca"
+    },
+    {
+      "path": "tests/test_unified_workflow.py",
+      "sha256": "edba5a5d6fc6f311ec1fa5757cc12a098fa69d3397571b42f0b020a6d67f38ea"
     }
   ],
-  "portable_digest": "6d1f725b474437a5",
+  "portable_digest": "c6186ee51830f779",
   "schema": "implement-rfc.portable-manifest.v1"
 }
