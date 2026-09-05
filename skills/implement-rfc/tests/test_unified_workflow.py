@@ -46,12 +46,14 @@ class UnifiedTests(unittest.TestCase):
 
     def test_explicit_scope_priority_and_human_waits(self):
         self.card(1,lane='ready',extra='priority: P3\n')
-        self.card(2,lane='ready',extra='priority: P1\n')
+        self.card(2,lane='ready',extra='priority: P1\narea: descriptive-name\n')
         self.config['bookkeeping']['parked_on'] = []
         write_context(self.root, config=self.config)
         self.card(3,lane='parked',extra='parked_on: human-review\n')
         self.public('queue',expected=1)
         self.assertEqual(self.public('queue','--all')['next'],'XYZ-0002')
+        self.assertEqual(self.public('queue','--area','XYZ')['next'],'XYZ-0002')
+        self.assertEqual(self.public('queue','--area','descriptive-name')['next'],'XYZ-0002')
         waiting = self.public('queue','--human-waiting')
         self.assertEqual([c['id'] for c in waiting['cards']],['XYZ-0003'])
         self.assertIsNone(waiting['next'])
@@ -120,6 +122,8 @@ class UnifiedTests(unittest.TestCase):
         self.commit_fixture()
         result=self.public('allocate','--area','AAA','--count','2','--reserve-for','area-worker')
         self.assertEqual(result['ids'],['AAA-0001','AAA-0002'])
+        fresh=self.public('allocate','--area','NEW','--reserve-for','new-area','--purpose','new component')
+        self.assertEqual(fresh['ids'],['NEW-0001'])
         self.commit_fixture()
         result=self.public('allocate','--area','AAA','--reserve-for','area-worker',expected=1)
         self.assertTrue(any('bound' in e['reason'] for e in result['errors']))

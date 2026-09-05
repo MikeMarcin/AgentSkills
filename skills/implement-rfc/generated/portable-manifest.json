@@ -90,7 +90,7 @@
     },
     {
       "path": "scripts/allocation.py",
-      "sha256": "90238c655906a1c4f514efcd1038421a41dd04cff723f2a490099e7558b472d6"
+      "sha256": "40f7133fc00292277047a8cf0d9622bbf705175026472253c5ec4c68c5d809d8"
     },
     {
       "path": "scripts/audit_board.py",
@@ -110,7 +110,7 @@
     },
     {
       "path": "scripts/issue_board.py",
-      "sha256": "455012e629a476cb93b8672e9c465953bfd9a77210fec3e1a2c4471951a07478"
+      "sha256": "b812b745431df751534be8572655a89860e715213afb2d84d72223030fc677cb"
     },
     {
       "path": "scripts/launch_remote_station.py",
@@ -182,9 +182,9 @@
     },
     {
       "path": "tests/test_unified_workflow.py",
-      "sha256": "edba5a5d6fc6f311ec1fa5757cc12a098fa69d3397571b42f0b020a6d67f38ea"
+      "sha256": "6233b2addbd3c08b553e5edcf8fffd05f578e8cd90731ea626e30e1a2ea3afbb"
     }
   ],
-  "portable_digest": "c6186ee51830f779",
+  "portable_digest": "c5b2f52cdc52ba7f",
   "schema": "implement-rfc.portable-manifest.v1"
 }

@@ -69,7 +69,7 @@ def queue(root: Path, config: dict, rfcs: list[str], platform: str, include: lis
     if not (rfcs or areas or include or all_cards or human_waiting):
         raise board.BoardError(root, 'scope', 'select --rfc, --area, --include, --human-waiting or explicit --all')
     def selected(card):
-        scope_match = all_cards or bool(set(rfcs) & set(card.rfcs)) or card.id in include or card.fields.get('area', card.id.split('-')[0]) in areas
+        scope_match = all_cards or bool(set(rfcs) & set(card.rfcs)) or card.id in include or (card.fields.get('area') in areas or card.id.split('-')[0] in areas)
         human = card.fields.get('parked_on') in {'human-review', 'human-attendance', 'attended-review'}
         return (scope_match or (human_waiting and not (rfcs or areas or include))) and (not human_waiting or human)
     scope = lambda cards: board.dependency_scope(cards, {c.id for c in cards.values() if selected(c)})
@@ -410,7 +410,7 @@ def main(argv: list[str] | None = None) -> int:
     fp.add_argument('--paths', nargs='+', default=[])
     ap = commands.add_parser('allocate', help='Reserve IDs using the same board/history model')
     ap.add_argument('--area'); ap.add_argument('--count', type=int, default=1)
-    ap.add_argument('--reserve-for', required=True); ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--reserve-for', required=True); ap.add_argument('--purpose', default=''); ap.add_argument('--dry-run', action='store_true')
     for sub in (vp, qp, ip, mp, cp, fp, ap):
         sub.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
@@ -420,7 +420,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == 'validate':
             scope = None
             if args.rfc or args.area or args.include:
-                scope = lambda cs: board.dependency_scope(cs, {c.id for c in cs.values() if set(args.rfc)&set(c.rfcs) or c.id in args.include or c.fields.get('area', c.id.split('-')[0]) in args.area})
+                scope = lambda cs: board.dependency_scope(cs, {c.id for c in cs.values() if set(args.rfc)&set(c.rfcs) or c.id in args.include or (c.fields.get('area') in args.area or c.id.split('-')[0] in args.area)})
             cards, errors = board.validate_board(root, config, scope=scope)
             result = {'schema': 'implement-rfc.validation.v1', 'valid': not errors,
                       'card_count':len(cards), 'errors':[asdict(e) for e in errors]}
@@ -439,7 +439,7 @@ def main(argv: list[str] | None = None) -> int:
             code = 0
         elif args.command == 'allocate':
             import allocation
-            result = allocation.allocate(root, config, area=args.area, count=args.count, reserve_for=args.reserve_for, dry_run=args.dry_run)
+            result = allocation.allocate(root, config, area=args.area, count=args.count, reserve_for=args.reserve_for, purpose=args.purpose, dry_run=args.dry_run)
             code = 0
         elif args.command in {'claim', 'finish'}:
             result = commit_transition(root, config, args); code = 0

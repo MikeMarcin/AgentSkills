@@ -90,7 +90,7 @@ def inspect_counters(root: Path, config: dict, cards: dict) -> tuple[dict, list,
     return counters, errors, info
 
 
-def allocate(root: Path, config: dict, *, area: str | None, count: int, reserve_for: str, dry_run=False) -> dict:
+def allocate(root: Path, config: dict, *, area: str | None, count: int, reserve_for: str, purpose: str = '', dry_run=False) -> dict:
     from issue_board import board_lock, apply_changes
     if not 1 <= count <= 64 or not board.TOKEN_RE.fullmatch(reserve_for):
         raise board.BoardError(root, 'allocation', 'count must be 1..64 and reserve-for a token')
@@ -104,17 +104,20 @@ def allocate(root: Path, config: dict, *, area: str | None, count: int, reserve_
         if area is None and len(counters) == 1:
             area = next(iter(counters))
         if area not in counters:
-            raise board.BoardError(root, 'area', 'select an existing counter area explicitly')
+            if area and re.fullmatch(r'[A-Z]{2,8}', area) and config['next_id']['mode'] == 'per-area':
+                counters[area] = (1, board.safe_path(root, root / config['next_id']['path'] / area))
+            else:
+                raise board.BoardError(root, 'area', 'select an area explicitly (new areas require per-area mode)')
         start, path = counters[area]
         if start + count > 9999:
             raise board.BoardError(path, 'counter', 'ID space exhausted')
         ids = [f'{area}-{n:04d}' for n in range(start, start + count)]
         receipt = board.safe_path(root, root / config['reservations_dir'] / f'{ids[0]}--{ids[-1]}--{uuid.uuid4().hex[:12]}.json')
-        record = {'schema': 'implement-rfc.reservation.v1', 'ids': ids, 'reserve_for': reserve_for,
+        record = {'schema': 'implement-rfc.reservation.v1', 'ids': ids, 'reserve_for': reserve_for, 'purpose': purpose,
                   'created': datetime.now(timezone.utc).isoformat(), 'base': git(root, 'rev-parse', 'HEAD').stdout.strip()}
         changes = {path: f'{area}-{start+count:04d}\n'.encode(), receipt: (json.dumps(record, indent=2)+'\n').encode()}
         if not dry_run:
             receipt.parent.mkdir(parents=True, exist_ok=True)
-            apply_changes(changes, {path: path.read_bytes(), receipt: None})
+            apply_changes(changes, {path: path.read_bytes() if path.exists() else None, receipt: None})
         return {'schema': 'implement-rfc.allocation.v1', 'ids': ids, 'next_id': f'{area}-{start+count:04d}',
                 'changed_paths': [p.relative_to(root).as_posix() for p in changes], 'history': history, 'dry_run': dry_run}
