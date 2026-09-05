@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0012"
 title: "Activate shared source and existing consumers"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0009","ASK-0010","ASK-0011"]
 ---
