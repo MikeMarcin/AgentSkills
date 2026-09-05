@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attended review</title>
+<style>
+:root{font:16px system-ui;color:#e9edf4;background:#111725;color-scheme:dark}body{max-width:960px;margin:auto;padding:24px}button,textarea,select{font:inherit}button{padding:10px 16px;margin:4px;border:1px solid #627391;border-radius:7px;background:#24324b;color:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:default}header,.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}header h1{margin-right:auto}#notice{white-space:pre-wrap;color:#ffdb8a}article{padding:22px;border:1px solid #44516b;border-radius:12px;margin:18px 0;background:#182235}small,.muted{color:#b6c1d5}#content{white-space:pre-wrap;line-height:1.6}textarea{display:block;box-sizing:border-box;width:100%;min-height:90px;margin:14px 0;padding:12px;background:#101725;border:1px solid #627391;border-radius:7px}#transfer{min-height:130px}img,video{max-width:100%;max-height:60vh}audio{width:100%}label{display:block;margin:12px 0}a{color:#9bc5ff}details{margin:20px 0}.positive{background:#205943}.negative{background:#693b43}#list button{font-size:14px}#identity{overflow-wrap:anywhere}
+</style>
+<header><h1>Attended review</h1><span id="mode"></span></header>
+<p id="progress" role="status"></p><p id="notice" role="alert"></p>
+<div class="controls"><button id="start">Start with what’s ready</button><button id="pause">Pause session</button><button id="skip">Skip for now</button></div>
+<div id="list" aria-label="Review queue"></div>
+<article id="card" hidden><small id="identity"></small><h2 id="title"></h2><div id="content"></div><h3>Review criteria</h3><ul id="criteria"></ul><div id="media"></div><div id="wizard"></div><div id="options"></div><textarea id="note" placeholder="Optional note or reason" aria-label="Decision note"></textarea><div id="verdict"></div><button id="accept" class="positive">Accept</button><button id="reject" class="negative">Reject</button></article>
+<details id="fallback"><summary>Offline fallback and partial export</summary><p>Every completed decision can be exported now. Pending and skipped items stay pending. Copy this JSON or download it, then give it to your driver for import.</p><button id="export">Export decisions</button><button id="copy">Copy JSON</button><button id="download">Download JSON</button><textarea id="transfer" aria-label="Decision JSON"></textarea><p id="storage"></p></details>
+<script>
+'use strict';
+const embedded=/*SESSION_DATA*/null;
+let state=embedded, current=null, local=[], saving=false;
+const token=new URLSearchParams(location.hash.slice(1)).get('token');
+const online=!embedded&&location.protocol==='http:';
+const el=id=>document.getElementById(id);
+const say=text=>el('notice').textContent=text;
+const cacheKey=()=>`attended-review:${state.session}`;
+function restore(){try{local=JSON.parse(localStorage.getItem(cacheKey())||'[]').filter(d=>state.candidates.some(c=>c.id===d.candidate&&c.fingerprint===d.fingerprint));}catch(e){local=[];el('storage').textContent='Browser storage is unavailable. Export decisions before closing this page.';}}
+function persist(){try{localStorage.setItem(cacheKey(),JSON.stringify(local));}catch(e){el('storage').textContent='Browser storage is unavailable. Export decisions before closing this page.';}}
+function decision(c){return c.decision||local.find(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint);}
+function packet(){const byId=new Map();for(const c of state.candidates){const d=decision(c);if(d){const clean={};for(const k of ['candidate','fingerprint','decision_id','outcome','selected','note'])if(k in d)clean[k]=d[k];byId.set(c.id,clean);}}return {schema_version:1,session:state.session,decisions:[...byId.values()]};}
+async function api(path,body){const r=await fetch(path,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const v=await r.json();if(!r.ok)throw Error(v.error||`HTTP ${r.status}`);return v;}
+function candidate(){return state.candidates.find(c=>c.id===current);}
+function chooseNext(){const available=state.candidates.filter(c=>c.phase==='ready'&&!decision(c));const index=available.findIndex(c=>c.id===current);current=available.length?available[(index+1)%available.length].id:null;el('note').value='';el('options').replaceChildren();draw();}
+function draw(){
+ if(!state)return;
+ const done=state.candidates.filter(decision).length,ready=state.candidates.filter(c=>c.phase==='ready'&&!decision(c)).length;
+ el('mode').textContent=online?'Live · decisions save immediately':'Local file · export to your driver';
+ el('progress').textContent=`${done} decided · ${ready} ready · ${state.candidates.length-done-ready} waiting${state.paused?' · paused':''}`;
+ el('list').replaceChildren();
+ for(const c of state.candidates){const b=document.createElement('button');b.textContent=`${decision(c)?'✓':c.phase==='ready'?'○':'…'} ${c.title}`;b.onclick=()=>{current=c.id;el('note').value='';el('options').replaceChildren();draw();};el('list').append(b);}
+ if(!current)current=state.candidates.find(c=>c.phase==='ready'&&!decision(c))?.id;
+ const c=candidate();el('card').hidden=!c;if(!c)return;
+ el('identity').textContent=`${c.id} · candidate ${c.revision}`;el('title').textContent=c.title;el('content').textContent=c.content||'';
+ el('criteria').replaceChildren();for(const text of c.criteria){const li=document.createElement('li');li.textContent=text;el('criteria').append(li);}
+ el('media').replaceChildren();for(const m of c.media||[]){const node=document.createElement(m.kind==='image'?'img':m.kind);node.src=m.url;node.alt=m.label||'';if(m.kind!=='image')node.controls=true;el('media').append(node);}
+ el('wizard').replaceChildren();if(c.wizard){const p=document.createElement('p');p.textContent=c.wizard.instructions||'Follow the companion wizard, then return here for your decision.';el('wizard').append(p);if(c.wizard.url){try{const url=new URL(c.wizard.url);if(['http:','https:','file:'].includes(url.protocol)){const a=document.createElement('a');a.href=url.href;a.textContent='Open manual steps';a.target='_blank';a.rel='noopener noreferrer';el('wizard').append(a);}}catch(e){}}}
+ const oldOptions=new Set([...el('options').querySelectorAll('input:checked')].map(v=>v.value));
+ el('options').replaceChildren();for(const option of c.options||[]){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.value=option;input.checked=oldOptions.has(option);label.append(input,document.createTextNode(` ${option}`));el('options').append(label);}
+ const d=decision(c),enabled=c.phase==='ready'&&c.protected&&!d&&!saving;
+ el('accept').textContent=c.options?'Save selection':'Accept';el('accept').disabled=el('reject').disabled=!enabled;
+ el('verdict').textContent=d?`Recorded: ${d.outcome}${d.selected?' — '+d.selected.join(', '):''}`:c.phase==='ready'?'':c.error||'Preparation is pending. Other ready items are available.';
+}
+async function record(outcome){
+ const c=candidate();if(!c)return;
+ const d={candidate:c.id,fingerprint:c.fingerprint,decision_id:globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`,outcome,note:el('note').value};
+ if(outcome==='select'){d.selected=[...el('options').querySelectorAll('input:checked')].map(v=>v.value);if(!d.selected.length){say('Select at least one option.');return;}}
+ saving=true;draw();
+ try{if(online){await api('/api/decisions',{schema_version:1,session:state.session,decisions:[d]});state=await api('/api/status');say('Decision saved.');}else{local.push(d);persist();say('Decision retained in this browser. Export whenever you are ready to stop.');}el('note').value='';chooseNext();}catch(e){say(`Decision was not confirmed saved: ${e.message}. Retry; a matching repeated import is safe.`);}finally{saving=false;draw();}
+}
+el('accept').onclick=()=>record(candidate()?.options?'select':'accept');el('reject').onclick=()=>record('reject');el('skip').onclick=chooseNext;
+el('start').onclick=async()=>{try{if(online){await api('/api/start',{interrupt:true});state=await api('/api/status');}say('Review ready items now. Skips remain pending.');chooseNext();}catch(e){say(e.message);}};
+el('pause').onclick=async()=>{try{if(online){await api('/api/pause',{});state=await api('/api/status');}say(online?'Session paused. Prepared candidates remain protected.':'You can stop now. Export partial decisions first; undecided items remain pending.');draw();}catch(e){say(e.message);}};
+el('export').onclick=()=>{el('transfer').value=JSON.stringify(packet(),null,2);};
+el('copy').onclick=async()=>{el('export').click();try{await navigator.clipboard.writeText(el('transfer').value);say('Decision JSON copied.');}catch(e){el('transfer').select();say('Copy the selected JSON using your keyboard.');}};
+el('download').onclick=()=>{el('export').click();const blob=new Blob([el('transfer').value],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='attended-decisions.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+async function boot(){try{if(online){state=await api('/api/status');history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');if(!online)restore();draw();if(online)setInterval(async()=>{if(saving)return;try{const next=await api('/api/status');if(next.sequence!==state.sequence){state=next;draw();}}catch(e){say('Live host is unavailable. Reopen it with your driver; saved decisions remain on disk.');}},1500);}catch(e){say(e.message);}}
+boot();
+</script></html>

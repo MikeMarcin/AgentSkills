@@ -1,0 +1,106 @@
+# Session contract, version 1
+
+All commands print JSON. Errors print JSON to stderr and return 1. Supply `--repo-root ABSOLUTE_CHECKOUT` before the subcommand. The root is resolved, so both drivers pointing at the same checkout share its `.mask/attended-review/session.json`; separate Git worktrees resolve to distinct roots. The tool does not infer roots from installed skill links.
+
+## Manifest
+
+```json
+{
+  "schema_version": 1,
+  "candidates": [
+    {
+      "id": "APP-0042-layout",
+      "title": "Review the revised layout",
+      "revision": "prepared-build-2026-09-05.2",
+      "criteria": ["Labels are readable at the default window size"],
+      "content": "Open the prepared build. Compare the default and narrow layouts.",
+      "paths": ["app/ui/**", "fixtures/layout"],
+      "resources": ["install:desktop-preview"],
+      "prepare": {
+        "speed": "quick",
+        "argv": ["python", "scripts/prepare_preview.py"],
+        "timeout_seconds": 300
+      }
+    }
+  ]
+}
+```
+
+Required: nonempty `id`, `title`, `revision`, and a nonempty string array `criteria`. Optional `content` is plain text, never evaluated Markdown or HTML. `paths` and `resources` default to empty arrays. `paths` are checkout-relative paths or glob patterns. Use forward slashes consistently in supplied paths. A directory path also protects its descendants. Glob matching uses Python `fnmatch` semantics: `*` can span separators, so choose narrow patterns. Protection is a coordination contract: agents query conflicts before mutations and judge which changes matter; it is not a filesystem watcher or mandatory rehash of the entire repository.
+
+`resources` names shared devices, mutable installations, fixtures or other resources. Use stable canonical names (for example the resolved absolute installation path prefixed by `install:`), consistently across all drivers/checkouts on the machine. Different aliases for the same device cannot be detected automatically. Claims are exclusive by default, including different candidates within the same session. Preparing a command never shares another candidate's claim because it may mutate the resource.
+
+An optional `resource_versions` map can share a **static** resource with the same explicit immutable version across candidates/checkouts:
+
+```json
+{"resources":["install:desktop-preview"],"resource_versions":{"install:desktop-preview":"build-abc123"}}
+```
+
+Both the existing and joining candidates must have no `prepare` command to share a claim. A preparation command owns an exclusive claim even if it declares the same resource version. The driver must truthfully identify the installed build and ensure it remains stable. Resources without matching versions conflict. Registrations are machine-local, at `~/.mask/attended-review-resources/`; all processes coordinating a resource must use that same directory. For fixtures or a configured shared location use `--registry PATH` or `ATTENDED_REVIEW_REGISTRY`. Remote device/farm ownership requires the repository's existing station adapter; this local registry does not coordinate disconnected machines.
+
+`prepare` is optional. Without it, `prepare` makes already assembled static review material ready. With it, `argv` is a nonempty string array executed directly in the checkout without a shell; `speed` is `quick` (default) or `slow`; `timeout_seconds` defaults to 300, at most 86400. Only explicit CLI preparation executes commands; HTTP never does. Review these arguments as code and prefer existing repository tools. Logs remain in the session directory. Failed/conflicting preparations remain waiting with a concise reason while other candidates proceed. Preparation exit 0 records only that objective result. Use an adapter's readiness check or driver `ready --evidence` when a successful installer alone is insufficient.
+
+Optional presentation:
+
+- `options`: nonempty array of unique strings for a coupled selection group. The human selects one or more together; that group is one bounded decision. An independent acceptance should be a separate candidate.
+- `media`: array of `{kind: "image"|"audio"|"video", url: "data:image/png;base64,...", label: "..."}`. Inline data URLs make the offline file self-contained; keep evidence reasonably sized. For live applications the driver launches/captures directly instead of embedding a giant recording.
+- `wizard`: textual `state`, `instructions` and optionally `url` for the standalone wizard companion. The driver prepares/opens its manual steps, observes its durable progress, then resumes review. This is a handoff, not a Python import dependency or automatic approval from wizard completion.
+- `metadata`: descriptive information ignored for candidate identity and control flow.
+
+`init --manifest FILE` adds/updates only listed candidates, preserving others and existing decisions. A SHA-256 fingerprint binds ID, revision, title, criteria, presentation and declared immutable resource versions; wizard host URLs, preparation metadata and unrelated repository HEAD do not invalidate it. Updating protected candidate material or protection definitions refuses until explicitly released. After release, changed material creates a new pending candidate and retains the old version/verdict in local history. Reusing unchanged material retains the decision; choose a new meaningful revision for an intentional new review. Unknown top-level candidate fields refuse rather than overwriting runtime state.
+
+## Commands and driver contract
+
+| Command | Behavior |
+|---|---|
+| `init --manifest FILE` | Merge selected candidate definitions into the checkout's one session. |
+| `prepare [--candidate ID] [--max-items N] [--include-slow]` | Publish static candidates first, then quick preparation, optionally slow. Each result is immediately durable. |
+| `ready ID --evidence TEXT` | Driver records relevant preparation evidence and protects a candidate after its own adapter work. |
+| `observe ID --evidence TEXT` | Append an objective observation; never a human decision. |
+| `status [--after SEQUENCE] [--full]` | Compact candidate summaries and optional new events; full adds presentation and observations. Save the returned sequence as the driver cursor. |
+| `start [--keep-preparing]` | Resume review and request cancellation of active prep by default. The current invocation stops, including its remaining queued preparation commands. Previously ready items remain available. |
+| `pause` | Record a pause; preserve candidate protection and partial verdicts. |
+| `conflicts --paths PATH ... --resources KEY ...` | Return overlapping local path/shared resource protections before modifying them. |
+| `resume-development --paths PATH ... --resources KEY ... [--candidate ID]` | Release only selected affected candidates; unanswered ones become waiting. `--all` explicitly releases the whole checkout session. |
+| `serve` | Start a foreground loopback host on an OS-assigned port, or print attach information for this checkout's existing host. |
+| `stop` | Authenticate to and stop only the recorded host. Prepared candidates remain protected. |
+| `html --output FILE` | Create standalone self-contained HTML after preparation. |
+| `import --file FILE` | Validate and atomically intake partial decision JSON; `-` reads stdin. |
+
+Prepare runs outside state locks, so other drivers and the UI can use already ready work immediately. Start/interruption cancels the current preparation invocation and its remaining queue, including interruption between commands. It cancels the current command tree (native Windows `taskkill`, POSIX process group). The cancelling item remains protected until the process exits and cleanup releases it. A command intentionally launching a detached/background installation must supply its own bounded adapter and cleanup; do not use such commands as generic prepare steps. Independent completed candidates remain ready. Ctrl-C retains prior progress.
+
+`status` reports `waiting`, `preparing`, `cancelling` or `ready`, plus explicit decision/protection state. Preparation failures are waiting, not human rejection. New events are `candidate`, `preparing`, `ready`, `preparation-stopped`, `observation`, `decision`, `paused`, `review-start` and `resume-development`. Only `decision` is a user verdict. Complete acceptance in the authoritative board via the driver; never infer it from phase, pause or observation. If a host dies, decisions remain in the session file and `serve` replaces its stale host entry. Session hosts do not own protection lifetimes.
+
+## Decision intake and offline fallback
+
+Server UI POSTs each user decision immediately, even while no driver is running. Offline HTML retains local browser progress when storage is available and exports any partial set. Both feed this exact format:
+
+```json
+{
+  "schema_version": 1,
+  "session": "SESSION_ID_FROM_STATUS",
+  "decisions": [
+    {
+      "candidate": "APP-0042-layout",
+      "fingerprint": "FINGERPRINT_FROM_STATUS",
+      "decision_id": "unique-id-for-this-verdict",
+      "outcome": "accept",
+      "note": "Optional human explanation"
+    }
+  ]
+}
+```
+
+Outcome is `accept`, `reject` or `select`. `select` additionally requires a nonempty unique `selected` list from the candidate's options. Groups accept `select` or `reject`. Skip/pause produce no verdict. The user can review one candidate and leave all others pending. Repeating the identical import is idempotent; conflicting subsequent verdicts refuse. Use a new candidate revision for a deliberate re-review, preserving the original verdict.
+
+Intake validates session, candidate fingerprint and prepared/protected state, then atomically saves the supplied partial set. A malformed/stale set saves none of that set. It never requires all candidates to be decided. Offline exports include already completed decisions safely; a stopped or changed preparation may cause an old offline export to refuse, which requires checking what was actually reviewed rather than claiming new acceptance.
+
+The UI has direct Accept/Reject/Save selection controls, one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
+
+## Local host and recovery boundaries
+
+The printed URL carries a random token in its fragment. The page sends it as an Authorization header. The server binds `127.0.0.1` only, validates Host and browser Origin, limits intake to 1 MiB, denies arbitrary commands/files, disables remote content and framing with CSP, and never performs Git operations. Keep the URL local; do not publish host tokens. Separate worktrees/projects use separate session files and ephemeral ports. A second driver verifies the token before attaching to an existing host. Stopping one session cannot target another host.
+
+Mutations use exclusive directory locks and atomic replace on both Windows and POSIX. Acquisitions are persisted before session readiness, and session invalidation is persisted before resource release. A conservative union of old and new claims bridges these writes, so an interruption leaves protection instead of admitting a conflicting preparation. Commands report a busy lock rather than guessing that a concurrent writer is dead. After an abrupt process kill, verify no controller/prepare command is using the affected lock before removing only its empty `.lock` directory. To clear a conservatively retained claim, use the owning checkout's explicit `resume-development --candidate ID` after restoring access; do not delete the entire registry or force another session through it. These are crash recovery steps, not routine approval checkpoints.
+
+If a preparation controller is abruptly killed, its command tree may outlive it. Verify and stop that specific tree using the repository/native process adapter, then use `resume-development --candidate ID --preparation-stopped` to record that recovery attestation and release the stale preparation. This flag is not a normal cancellation shortcut; a live controller normally acknowledges `start`/`resume-development` itself. It does not kill an arbitrary stale PID.
