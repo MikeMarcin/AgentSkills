@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0018"
+  ],
+  "reserve_for": "role-routing-audit",
+  "purpose": "",
+  "created": "2026-09-06T06:44:55.103910+00:00",
+  "base": "cd51863fd37d146cc90191de043bfa3190183883"
+}
