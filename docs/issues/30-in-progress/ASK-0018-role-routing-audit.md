@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0018
 title: Explicit implementation routing and local Codex/Claude role audit
-status: Ready
+status: "In Progress"
 rfcs: ["RFC-ASK-0003"]
 depends_on: ["ASK-0014"]
 ---
