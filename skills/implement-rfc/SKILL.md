@@ -47,6 +47,12 @@ budget from an ordinary implementation request.
   `issue_board.py --repo-root ROOT claim ID --json`; this moves and commits the
   card and pristine repaired links. The index must be empty. Platform eligibility
   is card metadata (`--platform win|mac|linux`), not separate Ready directories.
+- For substantial delegated implementation, choose **routine** or **deep** and
+  give one concrete reason in the assignment. Prefer `rfc-worker-routine` when
+  the approach and repository pattern are established, ownership is exclusive,
+  and verification is direct. Use `rfc-worker` for unresolved design or changed
+  sensitive behavior; name that reason. Small direct changes can stay with the
+  primary. See [delegated execution](references/delegated-execution.md).
 - Implement within owned paths. Put rote repetition into a durable helper when
   useful; avoid adding process scaffolding merely to document thinking. Update
   code, tests and retained instructions only where changed behavior requires it.
@@ -156,3 +162,7 @@ ROOT`; `--check` is read-only. Writes stay in consumer agent directories and
 `.mask/generated/implement-rfc/`, never through linked skill roots. Existing
 outputs require matching ownership markers and prior manifest. Source authors
 use `--write-source-manifest` and `validate_portable_agents.py --source-only`.
+
+For local role usage or routing diagnosis, read [routing audit](references/routing-audit.md)
+and run `scripts/role_usage.py`. It reads Codex and Claude history on demand;
+it does not install hooks, send telemetry, or add a closeout gate.

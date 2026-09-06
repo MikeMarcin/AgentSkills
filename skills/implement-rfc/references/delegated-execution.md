@@ -109,6 +109,17 @@ narrow changed-surface recheck; it never starts a whole-candidate review loop.
 | Named high-risk trigger or explicit request | Consider one reviewer |
 | Missing safe runtime capability | Execute serially in the primary agent |
 
+For substantial implementation selected for delegation, make the routine/deep
+choice before dispatch. Prefer `rfc-worker-routine` when its prerequisites hold;
+otherwise use `rfc-worker` and name the unresolved design or sensitive behavior.
+Do not treat the generic worker as the default merely because it appears first.
+Put one short line in the assignment: `Routing: routine | Reason: <concrete reason>`
+or `Routing: deep | Reason: <concrete reason>`. Ask the worker to repeat this
+line after its startup identity and in its final Status so either driver retains
+the decision in normal session history. If reassignment is needed, record
+the new choice and reason rather than rewriting the earlier decision. This is
+an assignment decision, not a quota, mandatory agent pipeline or acceptance gate.
+
 Run trivial deterministic commands directly. Workers normally run their own
 focused checks; there is no mandatory scout/worker/test-runner/reviewer pipeline.
 
@@ -122,6 +133,7 @@ Name the role and purpose, then provide only what the role needs:
 
 ```text
 Role and purpose:
+Routing: routine or deep | Reason: concrete reason (implementation workers only)
 Current card or review target:
 Repository root and branch/candidate:
 Question or acceptance claims:
@@ -162,3 +174,7 @@ unavailable, perform the bounded work serially while preserving the same
 acceptance boundary. A fallback may reduce speed or independence; it does not
 create new verification requirements. Report the omitted optional lane without
 blocking closeout.
+
+Use the optional [local routing audit](routing-audit.md) to count observed role
+usage in either driver and inspect recorded decisions. Missing historical reasons
+remain unknown; a startup banner alone is not runtime model evidence.

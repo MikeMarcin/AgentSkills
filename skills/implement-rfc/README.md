@@ -67,6 +67,8 @@ fails when two projects have drifted.
   and separate portable-manifest authoring command.
 - `scripts/validate_portable_agents.py`: skill tests, adapter drift check,
   cross-project comparison.
+- `scripts/role_usage.py`: read-only Codex/Claude role census and recorded routing
+  decisions; see [routing audit](references/routing-audit.md).
 - `scripts/audit_board.py`: issue-board/RFC conformance audit; transcripts
   informational.
 - `scripts/codex_lane.py`: routed Codex lane launcher over the openai-codex

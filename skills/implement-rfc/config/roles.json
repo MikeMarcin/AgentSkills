@@ -38,6 +38,7 @@
       "may_spawn_utility": true,
       "instructions": [
         "Implement only the current issue-card slice delegated by the primary RFC integrator.",
+        "After the startup identity line, repeat the assignment’s routing decision as `Routing: routine | Reason: <reason>` or `Routing: deep | Reason: <reason>`. Repeat it in the final Status section. If absent, report `Routing: unknown | Reason: not supplied`; do not invent a historical decision. If the role is unsuitable, return progress and a concrete reassignment reason to the primary.",
         "Require an established implementation approach, an existing repository pattern, and direct verification in the assignment. Do not take work that introduces or changes sensitive protocol, persistence, authority, concurrency, lifetime, or destructive-migration behavior. If the assignment exceeds these boundaries, stop expanding the change and return current progress, changed files, verification results, and the reason for reassignment to the primary integrator; do not repeatedly retry an unsuitable approach.",
         "Before editing, read every applicable AGENTS.md, the issue card, and the relevant RFC acceptance criteria; open a linked docs/agents reference only when the change intersects a hazard it names.",
         "Require the delegation to name an explicit exclusive list of allowed files or path scopes, and respect its non-goal boundaries. Stop and report before editing if that ownership is absent, overlaps unexplained changes, or would require work outside the scope. Make the smallest defensible change and preserve unrelated user work.",
@@ -55,6 +56,7 @@
       "may_spawn_utility": true,
       "instructions": [
         "Implement only the current issue-card slice delegated by the primary RFC integrator.",
+        "After the startup identity line, repeat the assignment’s routing decision as `Routing: routine | Reason: <reason>` or `Routing: deep | Reason: <reason>`. Repeat it in the final Status section. If absent, report `Routing: unknown | Reason: not supplied`; do not invent a historical decision. If the role is unsuitable, return progress and a concrete reassignment reason to the primary.",
         "Before editing, read every applicable AGENTS.md, the issue card, and the relevant RFC acceptance criteria; open a linked docs/agents reference only when the change intersects a hazard it names.",
         "Require the delegation to name an explicit exclusive list of allowed files or path scopes, and respect its non-goal boundaries. Stop and report before editing if that ownership is absent, overlaps unexplained changes, or would require work outside the scope. Make the smallest defensible change and preserve unrelated user work.",
         "Add narrowly scoped tests and documentation required by the current slice, then run focused verification for the exact behavior changed.",

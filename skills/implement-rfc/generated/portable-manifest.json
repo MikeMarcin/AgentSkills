@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "2e0e3b7d8cacba4e827981ca7bcc76f7f1d31475d055344bd75d3f2b82113966"
+      "sha256": "e4a5f34d8713c4532d4124705b395e22778e2ccdbf551cdd57bfdc2ebe093116"
     },
     {
       "path": "SKILL.md",
-      "sha256": "07d0379294b3566cd5d906023d71bd9490fb7ff041bb1ec64541cf429f569d58"
+      "sha256": "8977053157a201c681009a24951a9cf5d90a56d9f9d7c50689c605f402500c32"
     },
     {
       "path": "agents/openai.yaml",
@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "b6ed4c80664710a91681987a9e10f1a9a654ca9e21f310e4cd1dfeb8555e666e"
+      "sha256": "5af84140a663ef4559ac5ee301d81c7fbe44472a000bc055067ca5518c99b859"
     },
     {
       "path": "config/routing.json",
@@ -46,7 +46,7 @@
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "7e3bb0d5a0478b001373655c344401f34305e793fa68f3243637be8eefab9ac9"
+      "sha256": "4281ad5d67bb382f1016112557d53292e1b089f20a04fa86ac8bb8458e915f5a"
     },
     {
       "path": "references/model-routing.md",
@@ -59,6 +59,10 @@
     {
       "path": "references/remote-routing.md",
       "sha256": "4c1ca75e586a7451efbc2cd450fcc1fbce37322daaffb02cc02dd139729a0441"
+    },
+    {
+      "path": "references/routing-audit.md",
+      "sha256": "2b398eaca62022315f45636a62bc96e5e3d0c3161e6e279cecff97710b425ef8"
     },
     {
       "path": "references/runtime-compatibility.md",
@@ -133,6 +137,10 @@
       "sha256": "e8fc9b9d09c14bffc555303ef26cc47d7bf48e45cfe3d91bcc3f8b67377f4009"
     },
     {
+      "path": "scripts/role_usage.py",
+      "sha256": "457a093d9fb53ffacc37c9ef3cde6adccceb754e7a09a660aad0bace5f328df0"
+    },
+    {
       "path": "scripts/station_lease.py",
       "sha256": "b5ffeb248648958d8dfcc4835987c5cd62fdc396ac7ecae38c7a3dd27611a8d3"
     },
@@ -177,6 +185,10 @@
       "sha256": "f0a5bfd32a67b31d5f0d2258fa0a740448617033a7ba04d6e49b4a9450710002"
     },
     {
+      "path": "tests/test_role_usage.py",
+      "sha256": "49a8721810cd5131ea817437996042a273a8b4e799d34d360197f25934b1020f"
+    },
+    {
       "path": "tests/test_station_lease.py",
       "sha256": "8eb8d7ee1222b1c652f5b8631841f508e9757b7eb4f861f15a26c8201ce3e5ca"
     },
@@ -185,6 +197,6 @@
       "sha256": "e5fc87cbc813b2e7923b143e572a9ac7b910fd922e7a28046a99ab25dd76df07"
     }
   ],
-  "portable_digest": "9e73f2f0eff3ade3",
+  "portable_digest": "3357c2a8592f56cc",
   "schema": "implement-rfc.portable-manifest.v1"
 }
