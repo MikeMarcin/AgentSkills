@@ -66,3 +66,5 @@ All disposable fixtures were cleaned up; no local transcripts were copied into
 the repository. No MASK/runtime state, consumer settings, credentials or remotes
 were changed. The initial structure gate detected this open follow-up attached
 to its completed RFC; rerun after terminal bookkeeping below.
+
+Final structure gate after finish `c7c55dae0ea98b5ad97343ed7c7614be724d4ff1`: `python3 -B scripts/verify_documentation.py --root .` passed (4 RFCs, 18 cards, zero violations). No remaining acceptance work.
