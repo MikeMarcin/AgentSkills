@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0020"
+  ],
+  "reserve_for": "hand-back-and-clear-buttons",
+  "purpose": "A reviewer cannot say they are done, and the buttons do not say what they do",
+  "created": "2026-09-07T21:10:15.584952+00:00",
+  "base": "df42f6168f7b0eaa69d1126d451f4a227b4c26ac"
+}
