@@ -3,6 +3,7 @@ import concurrent.futures
 from contextlib import contextmanager
 import importlib.util
 import json
+import re
 import os
 from pathlib import Path
 import subprocess
@@ -89,7 +90,44 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(len(current["events"]), 1)
         self.assertEqual(current["events"][0]["kind"], "decision")
         self.assertIsNone(next(c for c in current["candidates"] if c["id"] == "B")["decision"])
-        self.assertEqual(self.intake(self.decision(state, outcome="reject"), success=False).returncode, 1)
+        # A reviewer who pressed the wrong button says so; the verdict they land
+        # on is the record and the one they replaced is kept beside it.
+        self.assertEqual(self.intake(self.decision(state, outcome="reject", decision_id="verdict-A2"))["accepted"], ["A"])
+        after = self.cli("status", "--full")
+        decided = next(c for c in after["candidates"] if c["id"] == "A")
+        self.assertEqual(decided["decision"]["outcome"], "reject")
+        self.assertEqual([v["outcome"] for v in decided["superseded"]], ["accept"])
+
+    def test_a_verdict_carries_its_note_and_images_and_can_be_withdrawn(self):
+        self.init(self.candidate())
+        state = self.cli("prepare")
+        image = "data:image/png;base64,iVBORw0KGgo="
+        self.intake(self.decision(state, outcome="reject", note="the box is unreadable",
+                                  attachments=[{"name": "shot.png", "data": image}]))
+        recorded = next(c for c in self.cli("status", "--full")["candidates"] if c["id"] == "A")["decision"]
+        self.assertEqual(recorded["note"], "the box is unreadable")
+        self.assertEqual(recorded["attachments"], [{"name": "shot.png", "data": image}])
+        # Withdrawing leaves the candidate undecided and keeps what was said.
+        self.intake(self.decision(state, outcome="withdrawn", decision_id="withdraw-A"))
+        cleared = next(c for c in self.cli("status", "--full")["candidates"] if c["id"] == "A")
+        self.assertIsNone(cleared["decision"])
+        self.assertEqual(cleared["superseded"][-1]["note"], "the box is unreadable")
+        self.assertEqual(self.intake(self.decision(state, decision_id="verdict-A3"))["accepted"], ["A"])
+        self.assertEqual(next(c for c in self.cli("status")["candidates"] if c["id"] == "A")["decision"]["outcome"], "accept")
+        # An attachment that is not an inline image, or too many, is refused.
+        self.assertEqual(self.intake(self.decision(state, decision_id="bad-1", attachments=[{"name": "n", "data": "https://example.test/x.png"}]), success=False).returncode, 1)
+        self.assertEqual(self.intake(self.decision(state, decision_id="bad-2", attachments=[{"name": str(i), "data": image} for i in range(5)]), success=False).returncode, 1)
+
+    def test_the_offline_file_says_when_it_was_written_and_a_launch_command_reaches_it(self):
+        self.init({**self.candidate(), "launch": {"label": "Open the build", "command": "open /Applications/Thing.app"}})
+        self.cli("prepare")
+        page = self.base / "review.html"
+        self.cli("html", "--output", str(page))
+        text = page.read_text()
+        embedded = json.loads(re.search(r"const embedded=(\{.*?\});\n", text, re.S).group(1).replace("\\u003c", "<"))
+        self.assertRegex(embedded["generated_at"], r"^\d{4}-\d\d-\d\dT")
+        self.assertEqual(embedded["candidates"][0]["launch"], {"label": "Open the build", "command": "open /Applications/Thing.app"})
+        self.assertIn("This file was written at", text)
 
     def test_same_checkout_drivers_attach_and_hosts_stop_independently(self):
         self.init(self.candidate()); self.cli("prepare")

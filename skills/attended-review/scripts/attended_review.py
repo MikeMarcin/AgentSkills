@@ -29,6 +29,12 @@ class ReviewError(ValueError):
     pass
 
 
+MAXIMUM_ATTACHMENTS = 4
+MAXIMUM_ATTACHMENT_BYTES = 4 * 1024 * 1024
+# One verdict with its images, and headroom for the envelope around them.
+MAXIMUM_REQUEST_BYTES = 20 * 1024 * 1024
+
+
 def now():
     return datetime.now(timezone.utc).isoformat()
 
@@ -100,7 +106,7 @@ def require_text(value, label):
 
 def canonical(candidate):
     """Only review material binds a decision; HEAD and preparation metadata do not."""
-    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions")
+    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch")
     material = {k: candidate[k] for k in keys if k in candidate}
     if "wizard" in candidate:
         material["wizard_instructions"] = candidate["wizard"].get("instructions", "")
@@ -116,7 +122,7 @@ def manifest(value):
     for item in value["candidates"]:
         if not isinstance(item, dict):
             raise ReviewError("candidate must be an object")
-        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions"}
+        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch"}
         if set(item) - allowed:
             raise ReviewError(f"Unknown candidate fields: {sorted(set(item) - allowed)}")
         cid = require_text(item.get("id"), "candidate id")
@@ -154,6 +160,16 @@ def manifest(value):
             raise ReviewError("resource_versions maps declared resources to stable candidate versions")
         if "wizard" in item and (not isinstance(item["wizard"], dict) or any(not isinstance(v, str) for v in item["wizard"].values())):
             raise ReviewError("wizard must contain textual instructions/state/url")
+        # A reviewer asked to look at something must be able to open it. A
+        # packet that names a path in prose makes them navigate a file tree by
+        # hand; this is the command, shown for copying and never run.
+        if "launch" in item:
+            launch = item["launch"]
+            if not isinstance(launch, dict) or set(launch) - {"label", "command"}:
+                raise ReviewError("launch holds a label and a command")
+            require_text(launch.get("command"), f"{cid} launch command")
+            if "label" in launch and not isinstance(launch["label"], str):
+                raise ReviewError("launch label must be text")
         prep = item.get("prepare")
         if prep is not None:
             if not isinstance(prep, dict) or prep.get("speed", "quick") not in ("quick", "slow"):
@@ -271,6 +287,8 @@ class Session:
         result = {"session": state["id"], "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"], "candidates": []}
         for item in state["candidates"].values():
             record = {k: item.get(k) for k in ("id", "title", "revision", "fingerprint", "phase", "protected", "decision")}
+            if item.get("superseded"):
+                record["superseded"] = item["superseded"]
             if item.get("error"):
                 record["error"] = item["error"]
             if full:
@@ -399,24 +417,45 @@ class Session:
                 if decision.get("fingerprint") != item["fingerprint"]:
                     raise ReviewError(f"Stale decision for {item['id']}; prepare the current candidate")
                 require_text(decision.get("decision_id"), "decision_id")
-                if decision.get("outcome") not in ("accept", "reject", "select"):
-                    raise ReviewError("outcome must be accept, reject or select; skip/pause are not verdicts")
+                if decision.get("outcome") not in ("accept", "reject", "select", "withdrawn"):
+                    raise ReviewError("outcome must be accept, reject, select or withdrawn; skip/pause are not verdicts")
                 if not isinstance(decision.get("note", ""), str):
                     raise ReviewError("decision note must be text")
+                attachments = decision.get("attachments", [])
+                if not isinstance(attachments, list) or len(attachments) > MAXIMUM_ATTACHMENTS:
+                    raise ReviewError(f"a verdict carries at most {MAXIMUM_ATTACHMENTS} attachments")
+                for attachment in attachments:
+                    if not isinstance(attachment, dict) or set(attachment) - {"name", "data"}:
+                        raise ReviewError("an attachment is a name and an inline data URL")
+                    require_text(attachment.get("name"), "attachment name")
+                    data = attachment.get("data", "")
+                    if not isinstance(data, str) or not data.startswith("data:image/"):
+                        raise ReviewError("attachments are inline image data URLs")
+                    if len(data) > MAXIMUM_ATTACHMENT_BYTES:
+                        raise ReviewError("attachment exceeds the per-image bound")
                 if "options" in item and decision["outcome"] == "accept":
                     raise ReviewError("Selection group requires select or reject")
                 if decision["outcome"] == "select":
                     selected = decision.get("selected")
                     if "options" not in item or not isinstance(selected, list) or not selected or any(not isinstance(v, str) for v in selected) or len(selected) != len(set(selected)) or any(v not in item["options"] for v in selected):
                         raise ReviewError("selected must name nonempty unique group options")
-                clean = {k: decision[k] for k in ("candidate", "fingerprint", "decision_id", "outcome", "selected", "note") if k in decision}
+                clean = {k: decision[k] for k in ("candidate", "fingerprint", "decision_id", "outcome", "selected", "note", "attachments") if k in decision}
+                if item["phase"] != "ready" or not item.get("protected"):
+                    raise ReviewError(f"{item['id']} is not prepared/protected")
+                # A reviewer who pressed the wrong button, or thought better of
+                # a verdict, can say so. The verdict they land on is the record
+                # and every earlier one is kept beside it, so changing a mind
+                # costs nothing and hides nothing.
                 if item.get("decision"):
                     previous = {k: v for k, v in item["decision"].items() if k not in ("saved_at", "actor")}
                     if previous == clean:
                         continue
-                    raise ReviewError(f"{item['id']} already has a durable verdict; record a new candidate revision for a new review")
-                if item["phase"] != "ready" or not item.get("protected"):
-                    raise ReviewError(f"{item['id']} is not prepared/protected")
+                    item.setdefault("superseded", []).append(item["decision"])
+                if clean["outcome"] == "withdrawn":
+                    item["decision"] = None
+                    self.event(state, "decision", candidate=item["id"], decision=None, withdrawn=True)
+                    accepted.append(item["id"])
+                    continue
                 clean.update(saved_at=now(), actor="human")
                 item["decision"] = clean
                 self.event(state, "decision", candidate=item["id"], decision=clean)
@@ -472,6 +511,9 @@ class Session:
     def html(self, output):
         snapshot = self.status(full=True)
         snapshot.pop("host", None)
+        # A static file cannot know what was decided after it was written; it
+        # says when it was written so nobody mistakes its silence for a record.
+        snapshot["generated_at"] = now()
         text = (ASSETS / "review.html").read_text(encoding="utf-8")
         data = json.dumps(snapshot, ensure_ascii=False).replace("<", "\\u003c").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
         text = text.replace("/*SESSION_DATA*/null", data)
@@ -540,8 +582,8 @@ def serve(session):
                 return
             try:
                 length = int(self.headers.get("Content-Length", "0"))
-                if not 0 < length <= 1024 * 1024:
-                    raise ReviewError("Request must be between 1 byte and 1 MiB")
+                if not 0 < length <= MAXIMUM_REQUEST_BYTES:
+                    raise ReviewError("Request must be between 1 byte and the intake bound")
                 value = json.loads(self.rfile.read(length))
                 if not isinstance(value, dict):
                     raise ReviewError("Request must be a JSON object")

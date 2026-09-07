@@ -54,3 +54,44 @@ they had made was not in the export they were told to hand back.
   fix.
 - A session driven end to end in a browser records a verdict with its note
   and an image, changes it, clears it, and exports what it recorded.
+
+## Notes (2026-09-07)
+
+- **Changing a verdict.** `intake` refused any verdict that differed from
+  the one already recorded, and the page disabled both buttons the moment
+  one existed. A verdict is now replaceable: the one the reviewer lands on
+  is the record, the one it replaced is appended to the candidate's
+  `superseded` list, and an identical repeat is still idempotent. A verdict
+  can also be withdrawn (`outcome: "withdrawn"`), which clears the decision
+  and keeps what was said. The page offers "Accept instead", "Reject
+  instead" and "Clear decision".
+- **The note.** It was always saved and never shown. The verdict line now
+  reads it back in quotation marks, the box is refilled from the recorded
+  verdict when a candidate is selected, and the page stays on the candidate
+  that was just answered instead of jumping to the next one, so the
+  reviewer sees what was kept.
+- **Images.** A verdict carries up to four inline images, each bounded, and
+  the page attaches them from an ordinary file input, shows them as
+  thumbnails, and includes them in the export. The intake validates the
+  count, the shape and the data URL, and the request bound was raised to
+  hold one verdict with its pictures.
+- **The offline file.** It is a snapshot; it now records `generated_at` and
+  says so on the page, so a file written before a decision cannot be
+  mistaken for a record of it. Its export carries attachments as well as
+  notes.
+- **Opening what is under review.** A candidate may carry
+  `launch: {label, command}`, shown in a copyable field and never run. The
+  packet that started this asked its reviewer to navigate a file tree by
+  hand.
+- **Evidence.** The suite is 18 tests, including a verdict replaced with
+  its previous kept, a verdict with a note and an image withdrawn and given
+  again, refusals for a non-image attachment and for five of them, and the
+  offline file's stamp and launch command. `verify_documentation.py`
+  reports 4 RFCs, 19 cards and no structural violations. The page itself
+  was driven in a browser against a throwaway session: a note and an image
+  were recorded on a rejection, the verdict line read them back, the
+  decision was changed to accept and then cleared, and the export carried
+  the outcome, the note and the image.
+- **Negative mutations.** Refusing a changed verdict, dropping attachments
+  from the record, dropping the generation stamp and dropping the launch
+  field each fail a named test.
