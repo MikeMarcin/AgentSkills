@@ -43,6 +43,7 @@ Both the existing and joining candidates must have no `prepare` command to share
 Optional presentation:
 
 - `options`: nonempty array of unique strings for a coupled selection group. The human selects one or more together; that group is one bounded decision. An independent acceptance should be a separate candidate.
+- `launch`: `{label, command}`, and `copy`: labelled values the candidate asks to be pasted elsewhere. Both are shown for copying and never executed; both bind the candidate's fingerprint.
 - `media`: array of `{kind: "image"|"audio"|"video", url: "data:image/png;base64,...", label: "..."}`. Inline data URLs make the offline file self-contained; keep evidence reasonably sized. For live applications the driver launches/captures directly instead of embedding a giant recording.
 - `wizard`: textual `state`, `instructions` and optionally `url` for the standalone wizard companion. The driver prepares/opens its manual steps, observes its durable progress, then resumes review. This is a handoff, not a Python import dependency or automatic approval from wizard completion.
 - `metadata`: descriptive information ignored for candidate identity and control flow.
@@ -60,6 +61,7 @@ Optional presentation:
 | `status [--after SEQUENCE] [--full]` | Compact candidate summaries and optional new events; full adds presentation and observations. Save the returned sequence as the driver cursor. |
 | `start [--keep-preparing]` | Resume review and request cancellation of active prep by default. The current invocation stops, including its remaining queued preparation commands. Previously ready items remain available. |
 | `pause` | Record a pause; preserve candidate protection and partial verdicts. |
+| `hand-back` | The reviewer has finished. Records nothing; marks the session handed back and reports what was decided and what was left. |
 | `conflicts --paths PATH ... --resources KEY ...` | Return overlapping local path/shared resource protections before modifying them. |
 | `resume-development --paths PATH ... --resources KEY ... [--candidate ID]` | Release only selected affected candidates; unanswered ones become waiting. `--all` explicitly releases the whole checkout session. |
 | `serve` | Start a foreground loopback host on an OS-assigned port, or print attach information for this checkout's existing host. |

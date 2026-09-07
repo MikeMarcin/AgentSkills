@@ -118,6 +118,32 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(self.intake(self.decision(state, decision_id="bad-1", attachments=[{"name": "n", "data": "https://example.test/x.png"}]), success=False).returncode, 1)
         self.assertEqual(self.intake(self.decision(state, decision_id="bad-2", attachments=[{"name": str(i), "data": image} for i in range(5)]), success=False).returncode, 1)
 
+    def test_handing_back_tells_the_driver_what_was_decided_and_what_was_not(self):
+        self.init(self.candidate(), self.candidate("B"))
+        state = self.cli("prepare")
+        self.intake(self.decision(state, outcome="reject", note="not yet"))
+        result = self.cli("hand-back")
+        self.assertEqual(result["decided"], ["A"])
+        self.assertEqual(result["pending"], ["B"])
+        after = self.cli("status", "--after", str(state["sequence"]))
+        self.assertIsNotNone(after["handed_back"])
+        self.assertEqual(after["events"][-1]["kind"], "handed-back")
+        # Handing back decides nothing: B is still open and A keeps its answer.
+        self.assertIsNone(next(c for c in after["candidates"] if c["id"] == "B")["decision"])
+        self.assertEqual(next(c for c in after["candidates"] if c["id"] == "A")["decision"]["note"], "not yet")
+
+    def test_a_candidate_offers_the_values_it_asks_to_be_pasted(self):
+        self.init({**self.candidate(), "copy": [{"label": "Pull request", "value": "https://example.test/owner/name/pull/7"}]})
+        self.cli("prepare")
+        page = self.base / "copy.html"
+        self.cli("html", "--output", str(page))
+        embedded = json.loads(re.search(r"const embedded=(\{.*?\});\n", page.read_text(), re.S).group(1).replace("\\u003c", "<"))
+        self.assertEqual(embedded["candidates"][0]["copy"][0]["value"], "https://example.test/owner/name/pull/7")
+        # A value without a label, or an empty one, is refused.
+        path = self.base / "bad.json"
+        path.write_text(json.dumps({"schema_version": 1, "candidates": [{**self.candidate("C"), "copy": [{"value": "x"}]}]}))
+        self.assertEqual(self.cli("init", "--manifest", str(path), success=False).returncode, 1)
+
     def test_the_offline_file_says_when_it_was_written_and_a_launch_command_reaches_it(self):
         self.init({**self.candidate(), "launch": {"label": "Open the build", "command": "open /Applications/Thing.app"}})
         self.cli("prepare")

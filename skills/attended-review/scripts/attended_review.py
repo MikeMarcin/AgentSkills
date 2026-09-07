@@ -106,7 +106,7 @@ def require_text(value, label):
 
 def canonical(candidate):
     """Only review material binds a decision; HEAD and preparation metadata do not."""
-    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch")
+    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch", "copy")
     material = {k: candidate[k] for k in keys if k in candidate}
     if "wizard" in candidate:
         material["wizard_instructions"] = candidate["wizard"].get("instructions", "")
@@ -122,7 +122,7 @@ def manifest(value):
     for item in value["candidates"]:
         if not isinstance(item, dict):
             raise ReviewError("candidate must be an object")
-        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch"}
+        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch", "copy"}
         if set(item) - allowed:
             raise ReviewError(f"Unknown candidate fields: {sorted(set(item) - allowed)}")
         cid = require_text(item.get("id"), "candidate id")
@@ -170,6 +170,18 @@ def manifest(value):
             require_text(launch.get("command"), f"{cid} launch command")
             if "label" in launch and not isinstance(launch["label"], str):
                 raise ReviewError("launch label must be text")
+        # What the candidate asks the reviewer to paste somewhere else: a
+        # pull request link, an identifier. Offered for copying, next to the
+        # command that opens what they are looking at.
+        if "copy" in item:
+            values = item["copy"]
+            if not isinstance(values, list) or not values:
+                raise ReviewError("copy is a nonempty array of labelled values")
+            for entry in values:
+                if not isinstance(entry, dict) or set(entry) - {"label", "value"}:
+                    raise ReviewError("a copied value is a label and a value")
+                require_text(entry.get("label"), f"{cid} copy label")
+                require_text(entry.get("value"), f"{cid} copy value")
         prep = item.get("prepare")
         if prep is not None:
             if not isinstance(prep, dict) or prep.get("speed", "quick") not in ("quick", "slow"):
@@ -284,7 +296,7 @@ class Session:
 
     def status(self, after=None, full=False):
         state = self.load()
-        result = {"session": state["id"], "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"], "candidates": []}
+        result = {"session": state["id"], "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"], "handed_back": state.get("handed_back"), "candidates": []}
         for item in state["candidates"].values():
             record = {k: item.get(k) for k in ("id", "title", "revision", "fingerprint", "phase", "protected", "decision")}
             if item.get("superseded"):
@@ -462,6 +474,17 @@ class Session:
                 accepted.append(item["id"])
         return {"accepted": accepted, "sequence": self.load()["sequence"]}
 
+    def hand_back(self):
+        """The reviewer has finished. Nothing is decided here; the driver is told."""
+        with self.transaction() as (state, _):
+            if state is None:
+                raise ReviewError("No session")
+            decided = sorted(cid for cid, item in state["candidates"].items() if item.get("decision"))
+            pending = sorted(cid for cid, item in state["candidates"].items() if not item.get("decision"))
+            state["handed_back"] = now()
+            self.event(state, "handed-back", decided=decided, pending=pending)
+        return {"handed_back": self.load()["handed_back"], "decided": decided, "pending": pending}
+
     def pause(self, paused=True, interrupt=False):
         with self.transaction() as (state, _):
             if state is None:
@@ -591,6 +614,8 @@ def serve(session):
                     result = session.intake(value)
                 elif self.path == "/api/pause":
                     result = session.pause()
+                elif self.path == "/api/hand-back":
+                    result = session.hand_back()
                 elif self.path == "/api/start":
                     result = session.pause(False, interrupt=bool(value.get("interrupt", True)))
                 elif self.path == "/api/stop":
@@ -644,6 +669,7 @@ def main(argv=None):
     sub.add_parser("import").add_argument("--file", required=True, help="JSON path or - for stdin")
     sub.add_parser("html").add_argument("--output", required=True)
     sub.add_parser("pause")
+    sub.add_parser("hand-back")
     p = sub.add_parser("start"); p.add_argument("--keep-preparing", action="store_true")
     p = sub.add_parser("resume-development"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[]); p.add_argument("--candidate", action="append", default=[]); p.add_argument("--all", action="store_true"); p.add_argument("--preparation-stopped", action="store_true", help="Recovery attestation: driver has verified the interrupted preparation command tree is stopped")
     p = sub.add_parser("conflicts"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[])
@@ -660,6 +686,7 @@ def main(argv=None):
         elif command == "import": result = session.intake(json.load(sys.stdin) if args.file == "-" else read_json(Path(args.file)))
         elif command == "html": result = session.html(args.output)
         elif command == "pause": result = session.pause()
+        elif command == "hand-back": result = session.hand_back()
         elif command == "start": result = session.pause(False, not args.keep_preparing)
         elif command == "resume-development": result = session.resume_development(args.paths, args.resources, args.candidate, args.all, args.preparation_stopped)
         elif command == "conflicts": result = session.conflicts(args.paths, args.resources)
