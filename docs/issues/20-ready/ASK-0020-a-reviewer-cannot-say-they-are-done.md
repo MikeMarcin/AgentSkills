@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0020"
 title: "A reviewer cannot say they are done, and the buttons do not say what they do"
-status: "Backlog"
+status: "Ready"
 rfcs: []
 depends_on: []
 priority: "P1"
