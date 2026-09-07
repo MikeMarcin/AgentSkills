@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0019"
+  ],
+  "reserve_for": "attended-verdict-repair",
+  "purpose": "The attended packet loses notes and answers",
+  "created": "2026-09-07T19:56:38.176855+00:00",
+  "base": "1b27c9a58fae8a13e2c4d2569425f7e6d319cd36"
+}
