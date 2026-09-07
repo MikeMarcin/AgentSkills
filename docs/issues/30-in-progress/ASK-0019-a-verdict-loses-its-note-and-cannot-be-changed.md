@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0019"
 title: "A verdict loses its note and cannot be changed"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: "P1"
