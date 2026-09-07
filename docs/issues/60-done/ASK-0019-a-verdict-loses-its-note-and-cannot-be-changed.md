@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0019"
 title: "A verdict loses its note and cannot be changed"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P1"
+acceptance: [{"criterion":"Each of the four is fixed and covered by a test that fails before the fix","outcome":"pass","revision":"7ad3231","evidence":{"kind":"observation","detail":"The 18-test suite passes and covers all four: a verdict replaced with the previous one kept in superseded, a verdict with a note and an image withdrawn and given again, refusals for a non-image attachment and for five of them, and the offline file's generation stamp. Refusing a changed verdict, dropping attachments from the record, dropping the stamp and dropping the launch field each fail a named test. verify_documentation.py reports no structural violations."}},{"criterion":"A session driven end to end in a browser records a verdict with its note and an image, changes it, clears it, and exports what it recorded","outcome":"pass","revision":"7ad3231","evidence":{"kind":"observation","detail":"A throwaway session was served and driven in a browser: a note and a PNG were attached to a rejection, the verdict line read back 'Recorded: reject - \"...\" - 1 image(s)' with the note still in the box and the thumbnail shown, Accept became 'Accept instead' and changed the verdict, Clear removed it and said so, and the export carried the outcome, the note and the image. The generated offline file contained the live decision and its generated_at, and importing its export was accepted idempotently."}}]
 ---
 
 # A verdict loses its note and cannot be changed
