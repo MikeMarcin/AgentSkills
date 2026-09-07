@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0020"
 title: "A reviewer cannot say they are done, and the buttons do not say what they do"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P1"
+acceptance: [{"criterion":"A reviewer can answer one candidate, end the review, and be told what was recorded, without asking which button to press","outcome":"pass","revision":"24ad97a","evidence":{"kind":"observation","detail":"The controls are two labelled groups: 'This session:' with Finish and hand back, Pause and come back later and Start with what's ready, and 'This candidate:' inside the card under a 'Your answer' heading with Accept, Reject, Clear my answer and Answer later. Driven in a browser: Reject recorded the note and a pasted image, then Finish and hand back said '1 answered: A candidate to answer - reject. 1 left unanswered. Your answers are saved; you can close this tab.' and disabled the answer controls."}},{"criterion":"The driver can see that a session was handed back and what was decided","outcome":"pass","revision":"24ad97a","evidence":{"kind":"observation","detail":"hand_back stamps handed_back on the session and writes a handed-back event naming the decided and pending candidates; status carries the stamp and hand-back is a CLI command. Pinned by a test that also proves it decides nothing: the untouched candidate stays open and the answered one keeps its note. A hand-back that decides, and a status that omits the stamp, each fail it."}},{"criterion":"A pasted image and a copied value are covered by tests","outcome":"pass","revision":"24ad97a","evidence":{"kind":"observation","detail":"A candidate's copy values reach the offline file and a value without a label is refused, pinned by test_a_candidate_offers_the_values_it_asks_to_be_pasted; dropping copy from the manifest's allowed keys fails it. The paste path shares one attach routine with the file input, whose bounds are pinned by the existing attachment tests, and was exercised in the browser with a real ClipboardEvent. Twenty tests pass and the structure gate reports no violations."}}]
 ---
 
 # A reviewer cannot say they are done, and the buttons do not say what they do
