@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0027"
 title: "Implement conservative request and counter reconciliation"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "consumption-reconciliation"}
+acceptance: [{"criterion":"RFC-ASK-0007-AC01/AC02 accounting","outcome":"pass","revision":"9c9a400e6274b741ccde2ca1f3d54bfc8c842fa4","evidence":{"kind":"command","command":"python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_usage_accounting.py","exit_code":0,"detail":"8 hand-calculated fixtures pass: v1/v2, fragment/inclusive dedup, missing baseline/reset/child ownership, cache/reasoning subsets, incomplete output, all-zero/no-data, decimal dated tier estimates and conflicting IDs. Native scout recommendations consumed; no rate or subscription savings invented."}}]
 ---
 
 # ASK-0027: Implement conservative request and counter reconciliation
