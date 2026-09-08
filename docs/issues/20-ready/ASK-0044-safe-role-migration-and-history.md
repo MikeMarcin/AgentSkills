@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0044"
 title: "Migrate role adapters safely and preserve historical audit meaning"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0009"]
 depends_on: ["ASK-0043"]
 metadata: {"packet":"agent-skills-standard-worker-review", "provisional_id":true}
