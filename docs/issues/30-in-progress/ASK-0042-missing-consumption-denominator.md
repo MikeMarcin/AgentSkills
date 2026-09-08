@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0042"
 title: "Keep accepted-task consumption unknown when usage evidence is absent"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0029"]
 metadata: {"packet": "agent-skills-execution-usage", "discovery": "integration-missing-consumption"}
