@@ -58,6 +58,12 @@ budget from an ordinary implementation request.
   immediately blocking work local. If a substantial slice stays local, state the
   concrete coupling, lack of parallel work or runtime limitation briefly; reassess
   at the next boundary. No agent quota or mandatory sequence of roles is implied.
+- Reuse an agent for corrections or a closely related continuation when its
+  retained context is useful and its role still fits. Start fresh for an unrelated
+  assignment, a role change or a new independent review boundary; do not recycle
+  a permanent team across the pack merely because agents are idle. Give fresh
+  agents compact assignments, not the parent history. See
+  [agent context lifetime](references/delegated-execution.md#agent-context-lifetime).
 - For substantial delegated implementation, default to `rfc-worker` for bounded
   engineering, diagnosis, refactoring, local design and approved architecture.
   An existing pattern is helpful, not required. Select `rfc-worker-deep` for a

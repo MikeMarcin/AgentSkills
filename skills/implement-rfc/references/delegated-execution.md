@@ -138,6 +138,39 @@ Parallel read-only agents must own different questions. Do not request duplicate
 same-prompt scans merely to obtain a vote. Stop delegation after it has answered
 the bounded question.
 
+## Agent context lifetime
+
+Choose reuse or fresh context before each assignment. Reuse is appropriate for
+clarification, a correction or narrow recheck of the same slice, and a closely
+related next slice when the agent's discoveries remain relevant and its role and
+configured route still fit. A new card alone does not require a fresh agent.
+Refresh the candidate, acceptance and exclusive owned paths for each new slice;
+previous write ownership does not carry forward implicitly.
+
+Start a fresh agent for an unrelated subsystem or acceptance problem, a different
+role, or a new review boundary that calls for independent judgment. Do not turn
+an implementer into its own independent reviewer. Reuse a reviewer to check the
+specific correction to its finding; when a later slice independently warrants
+review, start fresh with that slice's criteria, diff and evidence. Fresh review
+is not an extra review after a passing review and does not create a review loop.
+
+Do not reuse agents merely because they are idle or already configured. Avoid a
+permanent worker/reviewer pool spanning the whole pack. Accumulated irrelevant
+history, repeated stale assumptions or difficulty separating old and current
+scope are reasons to start fresh. Context size and compaction are signals to
+reassess relevance, not fixed expiry thresholds. Neither cache hits nor fresh
+context alone establish lower cost or better results; no token, turn or card
+quota is required.
+
+When starting a fresh successor, consume the prior result and carry forward only current facts,
+relevant source/evidence locations, unresolved questions and applicable
+constraints. Spawn without inherited conversation history when supported
+(`fork_turns="none"` in the interactive Codex tool), using the assignment packet
+below. Do not copy an old transcript or its accumulated summaries into the new
+agent. For a writing handoff, finish or stop the prior assignment and inspect its
+changes before granting the successor exclusive ownership. Retire the replaced agent
+from further assignments; close it if the runtime supports that operation.
+
 ## Assignment Contract
 
 Name the role and purpose, then provide only what the role needs. The following
