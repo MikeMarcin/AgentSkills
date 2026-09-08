@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0043"
 title: "Make the standard worker the default and separate review routing"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0009"]
 depends_on: []
 metadata: {"packet":"agent-skills-standard-worker-review", "provisional_id":true}
