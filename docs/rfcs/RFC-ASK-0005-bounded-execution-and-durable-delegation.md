@@ -1,14 +1,14 @@
 ---
 id: "RFC-ASK-0005"
 title: "Bounded deterministic execution and durable delegation"
-status: "Accepted"
+status: "Auto-Verified"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
 
 # RFC-ASK-0005: Bounded deterministic execution and durable delegation
 
-Pack IDs are provisional until the AgentSkills integrator reserves the live block.
+Live IDs were reserved and imported; the retained pack is immutable provenance.
 This is a new RFC, not an amendment silently rewriting settled RFC-ASK-0001–0004.
 
 ## Decision and scope
@@ -223,3 +223,11 @@ making every ordinary issue carry a new administrative checklist.
 ## Implementation authorization
 
 Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.
+
+## Qualified runtime boundary
+
+ASK-0036 records actual native command/companion evidence and explicit unsupported
+capabilities. Windows Codex delivered a native command-tool failure report; this
+does not qualify successful Windows Codex local-tool execution. Direct execution
+remains available. Semantic acceptance, billing changes and recovery authorization
+remain outside deterministic runner decisions.
