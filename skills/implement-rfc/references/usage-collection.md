@@ -55,3 +55,20 @@ The owning live cards record exact commands and actual tested platforms. A
 linked script invocation proves filesystem execution, not first-prompt host
 loading. Portable fixtures do not qualify Windows. Keep unavailable native
 combinations explicit and retain direct execution.
+
+## Explicit quota snapshots
+
+`python3 .agents/skills/implement-rfc/scripts/usage_quota.py codex
+--account-label codex-main --machine mac-main --out-dir /local/quota` initializes
+the installed native app server and reads account rate limits. This command can
+contact the provider; it never starts a thread/turn or services authentication,
+permission, purchase or reset requests. Failed/unsupported reads stay unknown.
+Import saved snapshots with `usage.py --quota-dir /local/quota`.
+
+An existing Claude status-line integration may pipe its native JSON to
+`usage_quota.py claude-stdin --account-label claude-main --out-dir /local/quota`.
+This is offline input parsing; no hook is installed or overwritten. `manual` mode
+requires an explicit provider and observed used percentage or credit balance.
+Provider sample time remains unknown unless established; capture time is not a
+freshness guarantee. Opaque pools, account windows, actual credits and project
+consumption remain separate. No model-to-pool mapping or project debit is inferred.

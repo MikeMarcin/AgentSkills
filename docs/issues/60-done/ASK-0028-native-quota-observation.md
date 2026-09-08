@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0028"
 title: "Integrate bounded native and manual account-quota observation"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "native-quota-observation"}
+acceptance: [{"criterion":"RFC-ASK-0007-AC03 quota boundary","outcome":"pass","revision":"7f18fc4e7777fda5c4001d7a48ccd01919307e12","evidence":{"kind":"observation","detail":"Seven quota tests and one native macOS Codex read pass; exact protocol and private artifact recorded on card. Offline status-line/manual inputs preserve unknown freshness and opaque pools; no native Claude endpoint asserted."}}]
 ---
 
 # ASK-0028: Integrate bounded native and manual account-quota observation
@@ -32,3 +33,9 @@ Fake app-server protocol tests must assert the exact whitelist of sent methods a
 ## Run record
 
 Not started. No native result, implementation revision, quota saving or semantic acceptance is asserted. Claim this live card before editing; preserve unrelated changes and commit explicit paths.
+
+## Evidence
+
+Seven quota fixtures pass (`python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_usage_quota.py`), including exact three-method whitelist, interactive-auth refusal without a response, malformed protocol, sanitizer rebuilding, missing-versus-zero values and credit privacy.
+
+Native macOS command: `python3 -B skills/implement-rfc/scripts/usage_quota.py codex --account-label codex-main --machine mac-main --out-dir ~/Library/Application\ Support/implement-rfc/usage/quota` exited 0 and saved `codex-20260908T032715-d5f0028a05.json`. Private account values remain only in the user-local artifact. No model turn or auth/reset mutation. Claude stdin/manual are offline input modes; no native Claude quota endpoint is claimed or hook installed.
