@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "8977053157a201c681009a24951a9cf5d90a56d9f9d7c50689c605f402500c32"
+      "sha256": "c73df9f4d340519f235194c56eef7fc10e00390efb41cf8e49c2b2e4750f5674"
     },
     {
       "path": "agents/openai.yaml",
@@ -22,7 +22,11 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "5af84140a663ef4559ac5ee301d81c7fbe44472a000bc055067ca5518c99b859"
+      "sha256": "9e3f7ba5d559ad9529fbfc76812a9933e47b15baec8ab591ab17414e94737c00"
+    },
+    {
+      "path": "config/routing-profiles.json",
+      "sha256": "82a2e8108af921987290dcea8b6c7aeb450bdeeaf4e24e90307a521e4da913bc"
     },
     {
       "path": "config/routing.json",
@@ -41,12 +45,16 @@
       "sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a"
     },
     {
+      "path": "references/bounded-execution.md",
+      "sha256": "decd1479b8097e2a2c30980ccc92c7c7aa72cefa14bc05afb88c9e2ac059c73e"
+    },
+    {
       "path": "references/codex-lanes.md",
       "sha256": "244ec87c62476808f8f1a510bd2f3effa9cfad60f232637a31456b00851b9c19"
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "4281ad5d67bb382f1016112557d53292e1b089f20a04fa86ac8bb8458e915f5a"
+      "sha256": "0e9d503007e7fcd3e8950a468e841e34b5da173198ea4c1b74df5f5f64b3dc21"
     },
     {
       "path": "references/model-routing.md",
@@ -67,6 +75,10 @@
     {
       "path": "references/runtime-compatibility.md",
       "sha256": "6ab9eb52a05977dbe4ac8b4e7254598fb98b3f8439e408b4e968aa77a6e8c909"
+    },
+    {
+      "path": "references/usage-collection.md",
+      "sha256": "56359855dd414ae4750655489b298284ba26291525dd95d0c7cd9066c5cb61c5"
     },
     {
       "path": "schemas/issue-card.schema.json",
@@ -134,15 +146,67 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "e8fc9b9d09c14bffc555303ef26cc47d7bf48e45cfe3d91bcc3f8b67377f4009"
+      "sha256": "174efe2f22784dfa91bf0586f16104809ce08e41b755b03fa6bc91b865b627a8"
     },
     {
       "path": "scripts/role_usage.py",
       "sha256": "457a093d9fb53ffacc37c9ef3cde6adccceb754e7a09a660aad0bace5f328df0"
     },
     {
+      "path": "scripts/run_slice.py",
+      "sha256": "2bb046922ff6e4645f6cdf6fae41d68e371af6be1d56dab2605888ffffd87281"
+    },
+    {
+      "path": "scripts/slice_claude.py",
+      "sha256": "ffb5a816f68dc2bedd362d0e418fbc1204c05deef300637c0a0fbe46ce12cdb4"
+    },
+    {
+      "path": "scripts/slice_codex.py",
+      "sha256": "b11077b7e7253c9d70bfabd0ab1c7a50c01d4c5bee464366d0ba8243268a05a5"
+    },
+    {
+      "path": "scripts/slice_events.py",
+      "sha256": "5ee7920f094768cdd60ab9850039c28cecc962ea927bd1a521d7e3c9ce0976ee"
+    },
+    {
+      "path": "scripts/slice_model.py",
+      "sha256": "f5d8ca64249391f53ea8d8b428cc7ab8dc06679d9d4221c0e3ba80b4574f9c12"
+    },
+    {
+      "path": "scripts/slice_runtime.py",
+      "sha256": "1b4cd4248c2bf4549d8a9d42edd00b89fab482621d38905f0949bf2c1459c66d"
+    },
+    {
       "path": "scripts/station_lease.py",
       "sha256": "b5ffeb248648958d8dfcc4835987c5cd62fdc396ac7ecae38c7a3dd27611a8d3"
+    },
+    {
+      "path": "scripts/usage.py",
+      "sha256": "de02ea60f0d4daaf002733b51dd1c383da854b8fd2fdc7be0ef697f5627dffd3"
+    },
+    {
+      "path": "scripts/usage_accounting.py",
+      "sha256": "2cdda342c08d44562f93565dc2a2c85022032ecafd16c902a8ba6d114ddece32"
+    },
+    {
+      "path": "scripts/usage_capture.py",
+      "sha256": "9ee94048fe133dd84270568d4c9bb58efa0cb3097b493aabb005c4efb1cba07c"
+    },
+    {
+      "path": "scripts/usage_outcomes.py",
+      "sha256": "847b52982d4308a632194efc4bbb56583bff8489f321371593d2aca93d806645"
+    },
+    {
+      "path": "scripts/usage_quota.py",
+      "sha256": "27992e906827502dcec4c9b65341d3ba59bca9b9871417649d616c6dfcd7b1c6"
+    },
+    {
+      "path": "scripts/usage_report.py",
+      "sha256": "fc2d682ea77dd023bdba17e8a59816f7b926fb794a862913d07a40994f26bf79"
+    },
+    {
+      "path": "scripts/usage_scope.py",
+      "sha256": "6d4bf65be11294bcd9318874b1b6f5699e560742b8a060be981f246f451bb028"
     },
     {
       "path": "scripts/validate_portable_agents.py",
@@ -182,11 +246,31 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "f0a5bfd32a67b31d5f0d2258fa0a740448617033a7ba04d6e49b4a9450710002"
+      "sha256": "3c8fed42d7eae1f57cc3c288a5456fa53f65c5156bc85386acd58a3457f465cc"
     },
     {
       "path": "tests/test_role_usage.py",
       "sha256": "49a8721810cd5131ea817437996042a273a8b4e799d34d360197f25934b1020f"
+    },
+    {
+      "path": "tests/test_slice_claude.py",
+      "sha256": "9328db9eb2eee35c73882a0729c30698413a81c229259cc9af161b532547452f"
+    },
+    {
+      "path": "tests/test_slice_codex.py",
+      "sha256": "b83b327d5ca0649b3bed18188dc9dbc424c3fb8db101b6a440e8655ea53ab9e2"
+    },
+    {
+      "path": "tests/test_slice_commands.py",
+      "sha256": "19a4592121dca73bee2b277e5247df36d2c14545cc897ad86f6a819e81b53018"
+    },
+    {
+      "path": "tests/test_slice_integration.py",
+      "sha256": "dfd46de96e1fc120dfe5df22c488ccb8c90c585665a3b7d2618ba3c49d76d046"
+    },
+    {
+      "path": "tests/test_slice_recovery.py",
+      "sha256": "e55a47cf9e73d601278ab98c3130d1e81d05e54618f40955fc45cb59c5cda70c"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -194,9 +278,37 @@
     },
     {
       "path": "tests/test_unified_workflow.py",
-      "sha256": "e5fc87cbc813b2e7923b143e572a9ac7b910fd922e7a28046a99ab25dd76df07"
+      "sha256": "d0faf50c58cd690e436ddc870a7b7e54cdda9dbf1f10771ae4c879c852a56082"
+    },
+    {
+      "path": "tests/test_usage_accounting.py",
+      "sha256": "0c130df3315ff03bf9db8efd56e5bed249ee9ab0e5435c075c001e17e03311c6"
+    },
+    {
+      "path": "tests/test_usage_capture.py",
+      "sha256": "1e4f32dc9c19f19aae987f0a98b4b2745b96450fcbb4582c4ad18d43631680b4"
+    },
+    {
+      "path": "tests/test_usage_cli.py",
+      "sha256": "f5cee61615a349be62def16a9391bceedc9bd29bb7f5cf00c6529f58e2f1981d"
+    },
+    {
+      "path": "tests/test_usage_quota.py",
+      "sha256": "a1040935e2a9331bd367379fa1ae4ae793313ee0816e2e7055bcf251057ffe93"
+    },
+    {
+      "path": "tests/test_usage_report.py",
+      "sha256": "7a438abbca67e5f1434f1ea2425e2023761e04cd9f7956fcb4de1cae4945dcfd"
+    },
+    {
+      "path": "tests/test_usage_scope.py",
+      "sha256": "596ddaed79dc92ef2dea73241b6515b21c999ba19603c363ba375215e74755c3"
+    },
+    {
+      "path": "tests/test_usage_windows.py",
+      "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "3357c2a8592f56cc",
+  "portable_digest": "cd27feb7e4c03c53",
   "schema": "implement-rfc.portable-manifest.v1"
 }
