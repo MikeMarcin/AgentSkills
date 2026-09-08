@@ -4,6 +4,7 @@
 /.claude/skills/manage-agent-skills
 /.mask/generated/
 /.mask/bootstrap-retired/
+/artifacts/
 __pycache__/
 /.agents/skills/attended-review
 /.claude/skills/attended-review
