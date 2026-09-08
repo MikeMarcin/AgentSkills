@@ -32,3 +32,27 @@ Validate comparison records offline first. After bounded real work, run the bund
 ## Run record
 
 Not started. No native result, implementation revision, quota saving or semantic acceptance is asserted. Claim this live card before editing; preserve unrelated changes and commit explicit paths.
+
+## Budgeted real-backlog observation (not controlled treatment completion)
+
+Owner authorized at most two real backlog tasks, one bounded attempt each, no
+purchased credits or usage resets. Both were consumed through the native macOS
+Claude companion public runner using the previously qualified sonnet/high route:
+
+| Backlog work | Bound | Actual outcome | Integration use |
+|---|---|---|---|
+| ASK-0025 Windows fixture preparation | One attempt; five native turns; 120 seconds | Structured max-turn limit; no final report | Retained failure/identity; integrator prepared fixtures directly |
+| ASK-0035 bounded-execution documentation check | One attempt; eight native turns; 120 seconds | Report produced and collected at semantic gate | Integrator inspected it and clarified documentation |
+
+Exact orders, native limits/permissions and durable reports are recorded on
+[ASK-0035](../20-ready/ASK-0035-runner-native-qualification.md). No retries or
+report-only recovery, purchases, resets, deployment, global setting edits or
+additional pilot tasks occurred. Inclusive native usage observations are
+non-additive; complete all-in context/cache/quota comparisons are unavailable.
+
+This is heterogeneous observational orchestration evidence, not a matched routing
+or instruction experiment. It does not complete either issue's native criteria,
+show a quota saving, or authorize promotion. Baseline remains default and the
+candidate remains opt-in. Required cross-project qualification and separately
+controlled treatment readouts remain open; the final owner deployment decision
+has not been recorded. The model pilot budget is exhausted.
