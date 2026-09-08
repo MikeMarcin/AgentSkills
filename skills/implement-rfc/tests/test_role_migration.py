@@ -155,15 +155,17 @@ class RoleMigrationTests(unittest.TestCase):
         profiles = {'schema': 'implement-rfc.routing-profiles.v1', 'profiles': {'baseline': {}}}
         capabilities = {p: {'fixture': ['high', 'medium', 'low']} for p in ('codex', 'claude')}
         for provider in capabilities:
-            routes, receipt = renderer.select_routes(ROUTING, roles, profiles, capabilities=capabilities,
-                order_routes={provider: {'rfc-worker': {'model': 'fixture', 'effort': 'high'}}},
-                explicit_routes={provider: {'rfc-reviewer': {'model': 'fixture', 'effort': 'medium'}}})
-            self.assertEqual(routes[provider]['rfc-worker']['effort'], 'high')
-            self.assertEqual(routes[provider]['rfc-reviewer']['effort'], 'medium')
-            self.assertEqual(receipt['origins'][provider]['rfc-worker'], 'admitted_order')
-            self.assertEqual(receipt['origins'][provider]['rfc-reviewer'], 'explicit_user')
-            self.assertEqual(routes[provider]['rfc-worker-deep'], ROUTING['providers'][provider]['classes']['deep'])
-            self.assertIsNone(receipt['observed'])
+            for worker in ('rfc-worker', 'rfc-worker-deep'):
+                routes, receipt = renderer.select_routes(ROUTING, roles, profiles, capabilities=capabilities,
+                    order_routes={provider: {worker: {'model': 'fixture', 'effort': 'low'}}},
+                    explicit_routes={provider: {'rfc-reviewer': {'model': 'fixture', 'effort': 'medium'}}})
+                self.assertEqual(routes[provider][worker]['effort'], 'low')
+                self.assertEqual(routes[provider]['rfc-reviewer']['effort'], 'medium')
+                self.assertEqual(receipt['origins'][provider][worker], 'admitted_order')
+                self.assertEqual(receipt['origins'][provider]['rfc-reviewer'], 'explicit_user')
+                other = 'rfc-worker-deep' if worker == 'rfc-worker' else 'rfc-worker'
+                self.assertEqual(routes[provider][other], ROUTING['providers'][provider]['classes'][ROUTING['assignments'][other]])
+                self.assertIsNone(receipt['observed'])
 
     def test_clean_prior_snapshot_can_be_restored_with_hash_preflight(self):
         with tempfile.TemporaryDirectory() as tmp:
