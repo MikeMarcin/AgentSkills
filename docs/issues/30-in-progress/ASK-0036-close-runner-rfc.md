@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0036"
 title: "Verify and close bounded execution and durable delegation"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0035"]
 closeout_for: ["RFC-ASK-0005"]
