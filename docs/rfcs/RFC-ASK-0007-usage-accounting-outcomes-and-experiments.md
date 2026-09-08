@@ -1,14 +1,14 @@
 ---
 id: "RFC-ASK-0007"
 title: "Reconciled usage accounting, account limits and task outcomes"
-status: "Accepted"
+status: "Auto-Verified"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
 
 # RFC-ASK-0007: Reconciled usage accounting, account limits and task outcomes
 
-Pack IDs are provisional until the AgentSkills integrator reserves the live block.
+Live IDs were reserved and imported; the retained pack is immutable provenance.
 This is a new RFC, not an amendment silently rewriting settled RFC-ASK-0001–0004.
 
 ## Decision
@@ -192,3 +192,11 @@ rollback belong to RFC-ASK-0008, not a fitted threshold invented after results.
 ## Implementation authorization
 
 Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.
+
+## Tooling closeout boundary
+
+ASK-0030 verifies reconciliation, explicit quota observation, immutable offline
+reporting and the experiment/readout contract, including missing-evidence cases.
+Matched live optimization treatments and the final owner deployment decision are
+the later ASK-0040/RFC-ASK-0008 boundary. This status asserts no quota saving,
+subscription debit, promotion, or completed controlled live comparison.
