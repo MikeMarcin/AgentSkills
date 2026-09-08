@@ -1,0 +1,13 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0043",
+    "ASK-0044",
+    "ASK-0045",
+    "ASK-0046"
+  ],
+  "reserve_for": "standard-worker-review",
+  "purpose": "",
+  "created": "2026-09-08T05:46:23.280518+00:00",
+  "base": "52aa2bb016d92b3d3fc881a8e6b4c2d1390df900"
+}
