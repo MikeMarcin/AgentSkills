@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0042"
+  ],
+  "reserve_for": "execution-usage-missing-consumption",
+  "purpose": "",
+  "created": "2026-09-08T03:57:01.830212+00:00",
+  "base": "810e012e230c2429d325a77da817f18b3c3dd3df"
+}
