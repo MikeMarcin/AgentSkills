@@ -113,3 +113,14 @@ Selected usage captures include hashed runtime lifecycle observations in
 `runtime_events.jsonl`, with separate coverage. Orders and report text are excluded.
 Inclusive native usage aggregates are marked non-additive and never substitute
 for reconciled request usage or explicit semantic outcomes.
+
+
+## Observed Windows limitation
+
+Native Windows qualification with Codex CLI 0.153.4 exercised authentication and
+report delivery, but the companion reported command-tool startup timeouts for its
+file reads. Its report was collected; the requested inventory was not completed.
+Do not claim Windows Codex local-tool execution is qualified from transport
+success. Use direct command execution or an explicitly selected qualified runtime.
+Windows Claude read-only inventory and report collection were observed with
+Claude Code 2.1.263. These are recorded versions, not version-only capability gates.

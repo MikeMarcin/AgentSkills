@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0035"
 title: "Qualify bounded execution and failure delivery across native hosts"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0033", "ASK-0034"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "runner-native-qualification"}
+acceptance: [{"criterion":"RFC-ASK-0005-AC01","outcome":"pass","revision":"42cd60e6ebcb1e922c93ad1a7109dbf073afb5e5","evidence":{"kind":"observation","detail":"Native macOS/Windows command and supported companion matrix recorded on this card; Windows Codex failure delivery exercised, local tool execution explicitly unqualified with direct fallback. Forty Windows runner cases reconciled after fixture-only fix; no automatic retries/acceptance/billing. Exact native reports inspected."}},{"criterion":"RFC-ASK-0005-AC03","outcome":"pass","revision":"42cd60e6ebcb1e922c93ad1a7109dbf073afb5e5","evidence":{"kind":"observation","detail":"Native macOS/Windows command and supported companion matrix recorded on this card; Windows Codex failure delivery exercised, local tool execution explicitly unqualified with direct fallback. Forty Windows runner cases reconciled after fixture-only fix; no automatic retries/acceptance/billing. Exact native reports inspected."}},{"criterion":"RFC-ASK-0005-AC04","outcome":"pass","revision":"42cd60e6ebcb1e922c93ad1a7109dbf073afb5e5","evidence":{"kind":"observation","detail":"Native macOS/Windows command and supported companion matrix recorded on this card; Windows Codex failure delivery exercised, local tool execution explicitly unqualified with direct fallback. Forty Windows runner cases reconciled after fixture-only fix; no automatic retries/acceptance/billing. Exact native reports inspected."}},{"criterion":"RFC-ASK-0005-AC05","outcome":"pass","revision":"42cd60e6ebcb1e922c93ad1a7109dbf073afb5e5","evidence":{"kind":"observation","detail":"Native macOS/Windows command and supported companion matrix recorded on this card; Windows Codex failure delivery exercised, local tool execution explicitly unqualified with direct fallback. Forty Windows runner cases reconciled after fixture-only fix; no automatic retries/acceptance/billing. Exact native reports inspected."}},{"criterion":"RFC-ASK-0005-AC06","outcome":"pass","revision":"42cd60e6ebcb1e922c93ad1a7109dbf073afb5e5","evidence":{"kind":"observation","detail":"Native macOS/Windows command and supported companion matrix recorded on this card; Windows Codex failure delivery exercised, local tool execution explicitly unqualified with direct fallback. Forty Windows runner cases reconciled after fixture-only fix; no automatic retries/acceptance/billing. Exact native reports inspected."}}]
 ---
 
 # ASK-0035: Qualify bounded execution and failure delivery across native hosts
@@ -57,3 +58,45 @@ No consumer settings, remote station, or billing changes are included.
 The same integration slice also owns `usage.py` and `slice_events.py` to include privacy-safe selected-consumer lifecycle observations in captures. These observations never infer acceptance or add inclusive usage aggregates to token consumption.
 
 The integration scope includes `tests/test_usage_cli.py` to exercise the updated read-only package file set.
+
+
+## Native Windows qualification and supported boundary
+
+Owner approved two additional Windows qualification attempts on 2026-09-08,
+separate from the exhausted two-task pilot. Exactly one per provider ran through
+public `run_slice.py start` with frozen orders, no automatic redispatch/recovery,
+no purchased credits/resets, and existing native subscription authentication:
+
+- Codex CLI 0.153.4, gpt-5.6-sol/low, read-only/never, 120-second wall limit.
+  Run `native-windows-codex-20260908`, order digest
+  `4b3cb21b9cc839859e7554071b575bdc803937e63b2a0e0bd3b053f2a64d7b33`.
+  Native report delivery/collection succeeded. The inspected report says both
+  internal file-read tool calls hit local command-runner startup timeout; the
+  requested inventory was not completed. This is failure-delivery evidence,
+  not successful Windows Codex file-reading qualification or semantic acceptance.
+- Claude Code 2.1.263, sonnet/high, Read-only tool set, safe-mode/dontAsk,
+  eight native turns/120-second wall limit. Run `native-windows-claude-20260908`,
+  order digest `50d96d547e5c435e8236536202c058bec34b23d5caf4b8485fe62e947d95a473`.
+  The report correctly inventories Windows output paths and capture exit/strict
+  behavior. Integrator inspected the report; production, collection and semantic
+  decision remain distinct.
+
+Native Windows command suite: 40 cases, one fixture UTF-8 error corrected on
+ASK-0025; its focused rerun passed. Public command cancellation, deadlines,
+quoted Unicode argv and final gate execute natively. Driver lifecycle fixtures
+run on Windows but do not masquerade as additional live model attempts.
+
+Both native reports, exact orders and journals are retained under
+`C:\Users\example\AppData\Local\implement-rfc\qualification\execution-usage-20260908`.
+Both companion processes closed. Source candidate is `1a165ef`; the two later
+fixture-only corrections are committed at `ca81470d`. No station checkout changed.
+
+Supported qualification matrix: commands on macOS/Windows; macOS Codex/Claude
+companion execution/report delivery; Windows Claude read-only execution/report
+ delivery; Windows Codex authentication/protocol/failure delivery only. Windows
+Codex local tool execution remains explicitly unqualified and should use direct
+commands or an explicitly selected qualified runtime. The RFC permits explicit
+unsupported capabilities and direct execution; no broader native success is claimed.
+The card is accepted for this documented supported boundary, replacing the earlier
+incorrect host-unavailability blocker. Further native model attempts are not
+preapproved by either exhausted budget.
