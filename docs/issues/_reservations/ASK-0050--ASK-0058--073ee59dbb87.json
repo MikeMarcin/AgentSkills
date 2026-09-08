@@ -1,0 +1,18 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0050",
+    "ASK-0051",
+    "ASK-0052",
+    "ASK-0053",
+    "ASK-0054",
+    "ASK-0055",
+    "ASK-0056",
+    "ASK-0057",
+    "ASK-0058"
+  ],
+  "reserve_for": "coordinator-milestones",
+  "purpose": "",
+  "created": "2026-09-08T23:40:09.366633+00:00",
+  "base": "07aa2714b40704b9584ee31c106c55ddd31251c5"
+}
