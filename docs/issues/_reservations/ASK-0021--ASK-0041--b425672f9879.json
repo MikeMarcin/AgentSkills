@@ -1,0 +1,30 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0021",
+    "ASK-0022",
+    "ASK-0023",
+    "ASK-0024",
+    "ASK-0025",
+    "ASK-0026",
+    "ASK-0027",
+    "ASK-0028",
+    "ASK-0029",
+    "ASK-0030",
+    "ASK-0031",
+    "ASK-0032",
+    "ASK-0033",
+    "ASK-0034",
+    "ASK-0035",
+    "ASK-0036",
+    "ASK-0037",
+    "ASK-0038",
+    "ASK-0039",
+    "ASK-0040",
+    "ASK-0041"
+  ],
+  "reserve_for": "agent-skills-execution-usage",
+  "purpose": "",
+  "created": "2026-09-08T02:51:20.083038+00:00",
+  "base": "3fd05776115a7f3a224975e34edb30b0a65cf65a"
+}
