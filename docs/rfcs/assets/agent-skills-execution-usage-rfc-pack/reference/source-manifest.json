@@ -1,0 +1,126 @@
+{
+  "inputs": [
+    {
+      "filename": "AgentSkills(2).zip",
+      "sha256": "68a1779c178685186c06ebb23b8dff8727cae10e608a10cbf37ef550994244a0",
+      "bytes": 3001299,
+      "bundled": false
+    },
+    {
+      "filename": "implement-rfc-audit-kit.zip",
+      "sha256": "4996ac76b2230a6d0694d89f3f1371662b5fa36ea1290f2b94aa2b9511bdba24",
+      "bytes": 41775,
+      "bundled": false
+    },
+    {
+      "filename": "rfc-measurement-analysis.zip",
+      "sha256": "4be0b99b75bf7ee600aa8748eb4e99b289ce8753c8114a613a85e89411ef83fd",
+      "bytes": 22434,
+      "bundled": false
+    },
+    {
+      "filename": "rfc-usage-mac-main.zip",
+      "sha256": "7e32f796c27a2c76c18de76cdfae11f0c8db17e5219dfdcaff9f03a74ed2d5ec",
+      "bytes": 22249855,
+      "bundled": false
+    },
+    {
+      "filename": "writing-for-agents.zip",
+      "sha256": "ef1283de3ab7b11781b4ac8ef82ba6abe88114f9d16ca544e2cab2032478d786",
+      "bytes": 9300,
+      "bundled": false
+    }
+  ],
+  "agentskills_files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "308e8276fa5d0260d1a73b19eeea5036b9dda8c3fa1014b328645d5078cbc814",
+      "bytes": 1290
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "70f5281632a1ac2d855160e7a4e2e73f2af2ad04b641e421d403ad633134b399",
+      "bytes": 1289
+    },
+    {
+      "path": "docs/rfcs/README.md",
+      "sha256": "1638f8df7ff02f305650e02cbfce4bcb70e8292566418e52df8a47dd208b3f1a",
+      "bytes": 1448
+    },
+    {
+      "path": "docs/issues/README.md",
+      "sha256": "eabd645f5c501567ccdc392a93277743ee533f5bd5588de7d4593eabac2ce8e1",
+      "bytes": 1632
+    },
+    {
+      "path": "docs/issues/NEXT_ID",
+      "sha256": "002df574119aef8121ad247b1083372ba72c5ced67b432e7ae014e0b2c7a7a22",
+      "bytes": 9
+    },
+    {
+      "path": ".mask/skill-config/implement-rfc/project.json",
+      "sha256": "cbd2979ef5fcc560daca171c91aa07d6694a64c00a087431e22b1bca15558703",
+      "bytes": 2285
+    },
+    {
+      "path": "skills/implement-rfc/SKILL.md",
+      "sha256": "8977053157a201c681009a24951a9cf5d90a56d9f9d7c50689c605f402500c32",
+      "bytes": 10473
+    },
+    {
+      "path": "skills/implement-rfc/config/roles.json",
+      "sha256": "5af84140a663ef4559ac5ee301d81c7fbe44472a000bc055067ca5518c99b859",
+      "bytes": 16492
+    },
+    {
+      "path": "skills/implement-rfc/config/routing.json",
+      "sha256": "aacab2b0a9f26c64b18962843d564fb7d6377f0e44f25b0fa505b8d77391bfdf",
+      "bytes": 1445
+    },
+    {
+      "path": "skills/implement-rfc/scripts/project_config.py",
+      "sha256": "2c5c534af6ca2abf601d7dc5932542a24c50021005141b83488cf75d4722d890",
+      "bytes": 15283
+    },
+    {
+      "path": "skills/implement-rfc/scripts/issue_board.py",
+      "sha256": "b812b745431df751534be8572655a89860e715213afb2d84d72223030fc677cb",
+      "bytes": 25895
+    },
+    {
+      "path": "skills/implement-rfc/scripts/record_evidence.py",
+      "sha256": "a88c189a46099793d74b4f7b7ad7c045e0ebe6863807b282ca174c16cb3280fa",
+      "bytes": 1817
+    },
+    {
+      "path": "skills/implement-rfc/scripts/render_runtime_adapters.py",
+      "sha256": "e8fc9b9d09c14bffc555303ef26cc47d7bf48e45cfe3d91bcc3f8b67377f4009",
+      "bytes": 20100
+    },
+    {
+      "path": "skills/implement-rfc/scripts/role_usage.py",
+      "sha256": "457a093d9fb53ffacc37c9ef3cde6adccceb754e7a09a660aad0bace5f328df0",
+      "bytes": 19125
+    },
+    {
+      "path": "skills/implement-rfc/references/pack-lifecycle.md",
+      "sha256": "37de6531e0e9f2e783c6ca4b483ee85216b509eaaf7a6fd003e4889a08106738",
+      "bytes": 6393
+    },
+    {
+      "path": "skills/implement-rfc/references/bookkeeping.md",
+      "sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a",
+      "bytes": 6134
+    },
+    {
+      "path": "scripts/verify_documentation.py",
+      "sha256": "236f459ffa6fe45cf170eadc4bf496e73349377b3e1c3d4fd74c4c02f34174f4",
+      "bytes": 2872
+    }
+  ],
+  "mask_source": {
+    "filename": "manage_agent_skills_project_source.md",
+    "generated": "2026-09-07T18:48:22-07:00",
+    "retrieval": "attached file search; no whole-file byte hash asserted"
+  }
+}

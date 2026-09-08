@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "mode",
+    "profile",
+    "experiment_id"
+  ],
+  "properties": {
+    "schema": {
+      "const": "implement-rfc.execution-selection.v1"
+    },
+    "mode": {
+      "enum": [
+        "direct",
+        "runner"
+      ]
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "experiment_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Consumer-local explicit opt-in at .mask/generated/implement-rfc/execution-selection.json; absence means direct/baseline. Does not authorize commands or deployment."
+}

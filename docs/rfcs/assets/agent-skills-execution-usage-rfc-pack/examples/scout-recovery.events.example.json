@@ -1,0 +1,123 @@
+[
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-0",
+    "sequence": 0,
+    "event": "dispatch_intent",
+    "observed_at": "2026-09-07T12:00:00+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-1",
+    "sequence": 1,
+    "event": "dispatch_confirmed",
+    "observed_at": "2026-09-07T12:00:01+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "utility",
+    "attempt_id": "utility-attempt-1",
+    "event_id": "event-2",
+    "sequence": 2,
+    "event": "dispatch_intent",
+    "observed_at": "2026-09-07T12:00:02+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "utility",
+    "attempt_id": "utility-attempt-1",
+    "event_id": "event-3",
+    "sequence": 3,
+    "event": "dispatch_confirmed",
+    "observed_at": "2026-09-07T12:00:03+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "utility",
+    "attempt_id": "utility-attempt-1",
+    "event_id": "event-4",
+    "sequence": 4,
+    "event": "report_produced",
+    "observed_at": "2026-09-07T12:00:04+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "utility",
+    "attempt_id": "utility-attempt-1",
+    "event_id": "event-5",
+    "sequence": 5,
+    "event": "report_collected",
+    "observed_at": "2026-09-07T12:00:05+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-6",
+    "sequence": 6,
+    "event": "execution_failed",
+    "observed_at": "2026-09-07T12:00:06+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-7",
+    "sequence": 7,
+    "event": "recovery_requested",
+    "observed_at": "2026-09-07T12:00:07+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-8",
+    "sequence": 8,
+    "event": "report_produced",
+    "observed_at": "2026-09-07T12:00:08+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-9",
+    "sequence": 9,
+    "event": "report_collected",
+    "observed_at": "2026-09-07T12:00:09+00:00",
+    "simulated": true
+  },
+  {
+    "schema": "implement-rfc.slice-event.v1",
+    "run_id": "example-recovery",
+    "task_id": "scout",
+    "attempt_id": "scout-attempt-1",
+    "event_id": "event-10",
+    "sequence": 10,
+    "event": "integration_requested",
+    "observed_at": "2026-09-07T12:00:10+00:00",
+    "simulated": true
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "schema": "implement-rfc.execution-selection.v1",
+  "mode": "runner",
+  "profile": "baseline",
+  "experiment_id": "runner-comparison-01"
+}

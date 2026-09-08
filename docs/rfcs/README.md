@@ -15,3 +15,12 @@ Only the main integrator imports, renumbers, edits tracker rules and confirms te
 ## Import and verification
 
 Reconcile live IDs before adopting packet IDs. Keep original packet IDs in provenance and record a LIVE_IMPORT mapping including external handoffs. Never rewind counters or recycle reservations. Run `python scripts/verify_documentation.py --root .` after import/integration and before terminal status. When working a lane, status changes are proposals until the integrator revalidates them on main.
+
+# Add these rows to the existing live RFC index after remapping
+
+| ID | Status | Scope |
+|---|---|---|
+| RFC-ASK-0005 | Proposed | Bounded deterministic execution and durable delegation |
+| RFC-ASK-0006 | Proposed | Project-aware turnkey usage capture and MASK selection |
+| RFC-ASK-0007 | Proposed | Reconciled usage accounting, account limits and task outcomes |
+| RFC-ASK-0008 | Proposed | Routing profiles, compact instructions and portable rollout |

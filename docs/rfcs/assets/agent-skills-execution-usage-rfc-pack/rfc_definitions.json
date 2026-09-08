@@ -1,0 +1,54 @@
+{
+  "5": {
+    "id": "RFC-ASK-0005",
+    "filename": "RFC-ASK-0005-bounded-execution-and-durable-delegation.md",
+    "title": "Bounded deterministic execution and durable delegation",
+    "acceptance": [
+      "Prescribed command batches execute without model-mediated stage transitions, stop on failed/incomplete predicates, and always retain an integrator semantic gate.",
+      "Work orders, root/permission/route binding, dependency ownership, concurrency and budget limits are validated before execution; malformed or stale orders cause no dispatch.",
+      "Dispatch, report production, collection and acceptance are durably distinct; duplicate/reordered events and crash boundaries do not silently relaunch mutations or lose ownership.",
+      "Eligible truncation supports one bounded report-only recovery or an explicit unsupported/blocked result; intentional cancellation is never automatically resumed.",
+      "Codex and Claude adapters preserve native permissions and authentication, expose capability limits, and avoid LLM polling; each claimed native combination has direct evidence.",
+      "Existing board, evidence and test-runner contracts remain authoritative; direct execution is available, and no mandatory daemon, second tracker, automatic billing switch or fleet dependency appears."
+    ]
+  },
+  "6": {
+    "id": "RFC-ASK-0006",
+    "filename": "RFC-ASK-0006-project-aware-turnkey-usage-capture.md",
+    "title": "Project-aware turnkey usage capture and MASK selection",
+    "acceptance": [
+      "A zero-argument invocation selects cwd rather than the shared skill/source checkout, creates a new readable metadata ZIP, and works without mandatory board configuration or pip installation.",
+      "--mask-projects uses only public MASK project.list JSON, preserves unavailable registrations, validates root_identity, keeps worktrees distinct and never widens or mutates scope on errors.",
+      "Both primaries and subagents are captured with versioned tool/control identities, preceding counter baselines, structured final results and explicit unknown/unsupported evidence.",
+      "Large histories are streamed with bounded memory/indexing and visible truncation/coverage; a sample remains usable while concurrent writers append.",
+      "Default exports exclude raw task/source/credential/command/reasoning content, linked skill files stay unchanged, existing output is preserved, and no model/network/upload occurs.",
+      "Installed canonical and MASK-linked execution is verified on native macOS and Windows, including nested cwd, a Windows launcher and two registered worktrees; no cross-host completeness is implied."
+    ]
+  },
+  "7": {
+    "id": "RFC-ASK-0007",
+    "filename": "RFC-ASK-0007-usage-accounting-outcomes-and-experiments.md",
+    "title": "Reconciled usage accounting, account limits and task outcomes",
+    "acceptance": [
+      "Claude fragments/aggregates and Codex snapshots/counter epochs/forks reconcile without double counting; unknown/missing/conflicting consumption is explicitly excluded or bounded.",
+      "Optional rate-card estimates preserve category inclusion, effective dates and service tiers and are never labelled actual subscription percentages or credit debits.",
+      "Native/manual quota helpers capture only allowed account observations with identity and freshness; they never start model work, buy credits, redeem resets or silently repair authentication.",
+      "Task/attempt joins distinguish delivered, collected, accepted and reopened work; all-in comparisons include primary, child, retry, recovery, review and repair while retaining unassigned work.",
+      "Offline v1/v2 archive reports validate privacy/integrity/bounds and expose partial coverage, opaque pools, overlapping-account activity and uncertainty instead of false exact totals.",
+      "Controlled runner, routing and instruction experiments have separate treatment IDs, fixed comparison conditions, explicit spend ceilings, independent acceptance and an honest inconclusive outcome."
+    ]
+  },
+  "8": {
+    "id": "RFC-ASK-0008",
+    "filename": "RFC-ASK-0008-routing-profiles-and-portable-rollout.md",
+    "title": "Routing profiles, compact instructions and portable rollout",
+    "acceptance": [
+      "Baseline and low-first profiles preserve explicit user authority, select routine/deep work deliberately and decouple worker changes from reviewer settings without inventing new personas.",
+      "Fallback/escalation receipts distinguish task difficulty, quota, unavailability and actual serving routes; capability or billing changes require scoped approval and no reset/credit action is automated.",
+      "Delegated roles default to leaves with truthful enforcement claims; legacy roles/banners remain analysable and test-runner authority stays mechanical.",
+      "Compact progressive-disclosure instructions preserve original constraints, acceptance and uncertainty while avoiding mandatory duplicated provenance or broad context injection.",
+      "Canonical and MASK-managed adoption is scoped and reversible, respects pinned artifacts and unrelated settings, and never treats --mask-projects collection as deployment authority.",
+      "A bounded, separately attributed runner/routing/instruction evaluation records quality, all-in cost and actual limitations; promotion or retention/rollback is an explicit evidence-based owner decision."
+    ]
+  }
+}

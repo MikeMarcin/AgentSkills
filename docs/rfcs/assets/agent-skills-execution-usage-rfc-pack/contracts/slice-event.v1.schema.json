@@ -1,0 +1,108 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "task_id",
+    "attempt_id",
+    "event_id",
+    "sequence",
+    "event",
+    "observed_at",
+    "simulated"
+  ],
+  "properties": {
+    "schema": {
+      "const": "implement-rfc.slice-event.v1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "attempt_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "event": {
+      "enum": [
+        "dispatch_intent",
+        "dispatch_confirmed",
+        "execution_started",
+        "execution_completed",
+        "execution_failed",
+        "report_produced",
+        "report_collected",
+        "integration_requested",
+        "accepted",
+        "rejected",
+        "superseded",
+        "reopened",
+        "recovery_requested",
+        "recovery_completed",
+        "cancel_requested",
+        "cancel_acknowledged",
+        "completion_unknown",
+        "blocked"
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "driver": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "native_session_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "native_turn_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "report_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "acceptance_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reason_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "simulated": {
+      "type": "boolean"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:implement-rfc:slice-event:v1",
+  "$comment": "Local event metadata only, not an approval grant. Usage export hashes native identities; no arbitrary free-text result/command/source field. Runtime guards sequencing, actor/attempt ownership and legal transitions."
+}

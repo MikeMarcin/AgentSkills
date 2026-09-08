@@ -1,0 +1,272 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "example_only",
+    "run_id",
+    "slice_id",
+    "consumer_root",
+    "base_revision",
+    "approved_dirty_paths",
+    "profile",
+    "routing_digest",
+    "permissions_ref",
+    "max_parallel_mutations",
+    "max_agent_dispatches",
+    "tasks"
+  ],
+  "properties": {
+    "schema": {
+      "const": "implement-rfc.slice-order.v1"
+    },
+    "example_only": {
+      "type": "boolean"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "slice_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "consumer_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+    },
+    "approved_dirty_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "maxItems": 256
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+    },
+    "routing_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "permissions_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "max_parallel_mutations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8
+    },
+    "max_agent_dispatches": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 32
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "depends_on",
+          "cwd",
+          "timeout_seconds",
+          "owned_paths",
+          "retry"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+          },
+          "kind": {
+            "enum": [
+              "command",
+              "agent",
+              "collect",
+              "integration_gate"
+            ]
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+            },
+            "uniqueItems": true,
+            "maxItems": 32
+          },
+          "cwd": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 86400
+          },
+          "owned_paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "maxItems": 256
+          },
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 128,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "route": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provider",
+              "role",
+              "profile",
+              "model",
+              "effort",
+              "permission_policy"
+            ],
+            "properties": {
+              "provider": {
+                "enum": [
+                  "codex",
+                  "claude"
+                ]
+              },
+              "role": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+              },
+              "profile": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+              },
+              "model": {
+                "type": "string",
+                "minLength": 1
+              },
+              "effort": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "permission_policy": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "task_packet": {
+            "type": "string",
+            "minLength": 1
+          },
+          "report_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "predicate": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "exit_code",
+              "required_artifacts"
+            ],
+            "properties": {
+              "exit_code": {
+                "type": "integer"
+              },
+              "required_artifacts": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "maxItems": 256
+              }
+            }
+          },
+          "retry": {
+            "enum": [
+              "never",
+              "safe_command_once",
+              "report_only_once"
+            ]
+          },
+          "acceptance_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "command"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "argv",
+                "predicate"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "agent"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "route",
+                "task_packet",
+                "report_path"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "integration_gate"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "acceptance_ref"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:implement-rfc:slice-order:v1",
+  "$comment": "Runtime additionally verifies approval, actual Git/root identity, closed permissions, path containment, acyclic dependencies, safe command semantics and a final integrator gate. start rejects example_only=true. This is not a runnable arbitrary workflow language."
+}

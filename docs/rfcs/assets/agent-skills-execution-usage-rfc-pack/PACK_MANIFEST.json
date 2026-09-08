@@ -1,0 +1,261 @@
+{
+  "schema": "implement-rfc.pack-manifest.v1",
+  "packet": "agent-skills-execution-usage",
+  "target_repository": "AgentSkills",
+  "ids_provisional": true,
+  "live_reservation_performed": false,
+  "new_rfcs": [
+    "RFC-ASK-0005",
+    "RFC-ASK-0006",
+    "RFC-ASK-0007",
+    "RFC-ASK-0008"
+  ],
+  "issue_range": [
+    "ASK-0021",
+    "ASK-0041"
+  ],
+  "payload": "runnable collector integration seed; future runner not implemented",
+  "validation": {
+    "payload_fixture_tests": 39,
+    "payload_fixture_failures": 0,
+    "temporary_import_repo_gate": {
+      "rfcs": 8,
+      "cards": 41,
+      "violations": 0
+    },
+    "new_rfc_count": 4,
+    "new_card_count": 21,
+    "acceptance_criteria": 24,
+    "native_runtime_tested": false
+  },
+  "files": {
+    "IMPLEMENTATION_ORDER.md": {
+      "bytes": 2302,
+      "sha256": "9d70d1525f1e5cbbc6d17afe3d87f9f32573b7f2cdabd3489863b422ca1577cb"
+    },
+    "IMPLEMENTATION_PROMPT.md": {
+      "bytes": 3329,
+      "sha256": "276aaea60e3313ba850dabd55e7b75fc3828b8bffef1f0765673b130ec1e948f"
+    },
+    "IMPORT.md": {
+      "bytes": 3360,
+      "sha256": "0b5c6da70fff72fbb01e6f9a14a5a227c965509dbbe4c3849c2208c915738266"
+    },
+    "INDEX_ADDITIONS.md": {
+      "bytes": 455,
+      "sha256": "f474e469eaa6716260708def4880e4a936df06f89980322785fe93e83f937a85"
+    },
+    "README.md": {
+      "bytes": 3155,
+      "sha256": "b3af9e8c96da310b08078af501d58dd27734842dfbc695f5f65fd51b94a04b7f"
+    },
+    "SOURCE_GROUNDING.md": {
+      "bytes": 6494,
+      "sha256": "67d3d88a23bfe24d839b57d77e4ae4e1715b5a6a40a98054e696208db394cbab"
+    },
+    "TRACEABILITY.md": {
+      "bytes": 1401,
+      "sha256": "237067e26f2638ba802b4f6ebb868b22645ab736d8c802f6646e864234df0afe"
+    },
+    "USAGE_TOOL.md": {
+      "bytes": 4831,
+      "sha256": "c965ed9546d29c28425ad53e5186399972e666a699eae4ae30f0d87ab62175fa"
+    },
+    "VALIDATION.md": {
+      "bytes": 2517,
+      "sha256": "68388192d8be17651085f8310e289857c11ca91eb558cbf1f973b51ba3c5d9f4"
+    },
+    "VERIFICATION.md": {
+      "bytes": 3451,
+      "sha256": "f07bd342c1deded384f3d33a85271013e35a04209b206d5bbc41c9c694d0229e"
+    },
+    "contracts/README.md": {
+      "bytes": 806,
+      "sha256": "e9afc18ca5d5dd000af45d86a1bbdd409f514595a55824843a0a8672b03282ce"
+    },
+    "contracts/execution-selection.v1.schema.json": {
+      "bytes": 747,
+      "sha256": "f709246bc7ba638a81eb7263b8dd274afb9c96b752bddc5fa5ef9b4bbde45f15"
+    },
+    "contracts/slice-event.v1.schema.json": {
+      "bytes": 2290,
+      "sha256": "5ac8aa860874c40c0ac321c87c86085d479ba9f00fcfa3fa7f3173b6106c0e49"
+    },
+    "contracts/slice-order.v1.schema.json": {
+      "bytes": 6620,
+      "sha256": "ea2eb76ce64112fca23369f216f9921abb930d13741df4a60b39f966756b0b44"
+    },
+    "contracts/usage-capture.v2.schema.json": {
+      "bytes": 1779,
+      "sha256": "123ca4b319c5b2f645f5631cd56426884ecfaa22149eee1810a47222b47f606c"
+    },
+    "docs/issues/10-backlog/ASK-0022-project-scope-and-mask-adapter.md": {
+      "bytes": 1896,
+      "sha256": "f0842f59561ec581df29ed62cbb97f8bb54103695fa7cb38ada1e87307983db8"
+    },
+    "docs/issues/10-backlog/ASK-0023-capture-core-and-bounds.md": {
+      "bytes": 2129,
+      "sha256": "9a284b24e1b734455e2e6d4f284689b61809bf0cc3247eee89ba5e03201147f1"
+    },
+    "docs/issues/10-backlog/ASK-0024-package-and-macos-capture.md": {
+      "bytes": 2058,
+      "sha256": "adf91ecbca255317348c16dfcd2fe25522e0646f9c3ce77a6d4b2ab9f7ef505c"
+    },
+    "docs/issues/10-backlog/ASK-0025-windows-capture-qualification.md": {
+      "bytes": 1884,
+      "sha256": "40d842f2189baee266354aab5cfafca20fa326b17233305e35d4869a70765cde"
+    },
+    "docs/issues/10-backlog/ASK-0026-close-capture-rfc.md": {
+      "bytes": 2743,
+      "sha256": "b4486508a551a6c3960cecaf1ea6e8ae9f3a2822b53c83394a50ec2e1af53c6e"
+    },
+    "docs/issues/10-backlog/ASK-0027-consumption-reconciliation.md": {
+      "bytes": 1894,
+      "sha256": "0780f0950ef765eea3e8bd48f0826eed92d324687d1aec16c21657e7e6c93d92"
+    },
+    "docs/issues/10-backlog/ASK-0028-native-quota-observation.md": {
+      "bytes": 1945,
+      "sha256": "e39188b51b8d7dc42fb828135210e796d606252f36024ebebe4042f1af3ca314"
+    },
+    "docs/issues/10-backlog/ASK-0029-outcomes-and-offline-report.md": {
+      "bytes": 2105,
+      "sha256": "eb17e5e27805757062dc17610cafe54ed034c01a119306522d219c84bf090ddf"
+    },
+    "docs/issues/10-backlog/ASK-0030-close-accounting-rfc.md": {
+      "bytes": 2768,
+      "sha256": "13d0462e3016c49fac8b60c636cf9e3420b5c6f6115d4d5c06574f3bac1df552"
+    },
+    "docs/issues/10-backlog/ASK-0031-prescribed-command-runner.md": {
+      "bytes": 1963,
+      "sha256": "1e1e793df4d17f18786b1c352daa0a0dff8b292feabe38cb67a369b8cf6d2faa"
+    },
+    "docs/issues/10-backlog/ASK-0032-durable-results-and-recovery.md": {
+      "bytes": 1989,
+      "sha256": "3dd26ee44bcacfc37a2b75e97e5067ab341bbcf5acec557557c8c1648044ee0f"
+    },
+    "docs/issues/10-backlog/ASK-0033-codex-event-adapter.md": {
+      "bytes": 1929,
+      "sha256": "1da37d893b5776c063d6b0b3d3867eccde2629196e8d1c726e0d4b98c0156e86"
+    },
+    "docs/issues/10-backlog/ASK-0034-claude-stream-adapter.md": {
+      "bytes": 1948,
+      "sha256": "da8d24384a5e7134d6e965f6d365da03679261ed27b16257761861387741c183"
+    },
+    "docs/issues/10-backlog/ASK-0035-runner-native-qualification.md": {
+      "bytes": 1986,
+      "sha256": "fed9a3bf110f36c69c427e8ad8db54d80c30fcc168ff2a0010e0d864853dfc05"
+    },
+    "docs/issues/10-backlog/ASK-0036-close-runner-rfc.md": {
+      "bytes": 2784,
+      "sha256": "23d4cefdd278b2bb94b020030f60da29a030768a57b3edf6e488b0116052f992"
+    },
+    "docs/issues/10-backlog/ASK-0037-profiles-and-leaf-role-policy.md": {
+      "bytes": 2201,
+      "sha256": "973a6c5c25c61a58f9320abb7ba62b356eaf6555db0ef71bf680d64dd6b87562"
+    },
+    "docs/issues/10-backlog/ASK-0038-compact-instructions-and-handoffs.md": {
+      "bytes": 2125,
+      "sha256": "426fa70d9d1cd9ac7fdfd53366c8a588717ce1dbcd5d24b4ac5d8dd2b5755a21"
+    },
+    "docs/issues/10-backlog/ASK-0039-consumer-pilot-and-rollback.md": {
+      "bytes": 1987,
+      "sha256": "31b98ac4f477d26c43a5181795e60a17d2e50de89f8417db599516917262d8bf"
+    },
+    "docs/issues/10-backlog/ASK-0040-controlled-experiment-readout.md": {
+      "bytes": 2046,
+      "sha256": "03d3cba326d4c5f7791733b7a64a9d37765efb6e45e29629c6ae0e7eae36a018"
+    },
+    "docs/issues/10-backlog/ASK-0041-close-rollout-rfc.md": {
+      "bytes": 2773,
+      "sha256": "0338939fc7c4d40ee596252829adb2d0dbefe8d97d8ee92f421ed62a0c9210c6"
+    },
+    "docs/issues/20-ready/ASK-0021-import-and-freeze-baseline.md": {
+      "bytes": 2414,
+      "sha256": "5e5e3d25a3bc50b3695bcb9628bd01c6efc03cb5141a6f53f8d160d809db88f9"
+    },
+    "docs/rfcs/RFC-ASK-0005-bounded-execution-and-durable-delegation.md": {
+      "bytes": 13670,
+      "sha256": "645afe5a60255cfaf7a5b043df34486d0f89eb2bd9227bad9552ed5f64989a5a"
+    },
+    "docs/rfcs/RFC-ASK-0006-project-aware-turnkey-usage-capture.md": {
+      "bytes": 11930,
+      "sha256": "8aa9e58aa1dbd1f9cab4a0f8bb1b6e77debcc84b77deee7c05cca22441b7feac"
+    },
+    "docs/rfcs/RFC-ASK-0007-usage-accounting-outcomes-and-experiments.md": {
+      "bytes": 11976,
+      "sha256": "031565dc7df5681ac89a9ef5f6b7ca684d507d1e222614febada3cc7db00d76f"
+    },
+    "docs/rfcs/RFC-ASK-0008-routing-profiles-and-portable-rollout.md": {
+      "bytes": 12577,
+      "sha256": "643aa6a1135f0dfd8ec429758d87347e43d588449028accc7f9322955b5da5aa"
+    },
+    "examples/command-stage.example.json": {
+      "bytes": 1192,
+      "sha256": "22236cfcc3a1eb2cd68b98d9e6f87f8e5d0b7c56f06ac9aeb954ae7008359fec"
+    },
+    "examples/execution-selection.example.json": {
+      "bytes": 143,
+      "sha256": "dd393427ecbec5ecea50e85e1a28ad5196be834033f91d30b6211dbfe9012f99"
+    },
+    "examples/routing-profiles.example.json": {
+      "bytes": 564,
+      "sha256": "e43b1db9752fdf57b0c000880103c8939771dc0f7a91bc1a18bffcf4738ba3eb"
+    },
+    "examples/scout-recovery.events.example.json": {
+      "bytes": 3317,
+      "sha256": "0bf44b499b25270bbd31dcdd0e6cde93cf9d750eb02628f70f7abcb871d866e3"
+    },
+    "issue-plan.json": {
+      "bytes": 8766,
+      "sha256": "6a77ee7579a5f127554316b4255b1f34aea8be8930fba61496392df3471cc0a7"
+    },
+    "payload/README.md": {
+      "bytes": 1028,
+      "sha256": "dc9811bc90017eab167be49170d57956f1791e476a1d84fabce7790c60a4cfb0"
+    },
+    "payload/skills/implement-rfc/scripts/usage.py": {
+      "bytes": 12389,
+      "sha256": "782701568a7a476d90bd4bbc98049d285a49cf945443281c83108338090e7c8e"
+    },
+    "payload/skills/implement-rfc/scripts/usage_capture.py": {
+      "bytes": 38992,
+      "sha256": "75818085eb0bb28cbb3f8b2449279d7d36024cf8c2d22d324504130e34a5f9e5"
+    },
+    "payload/skills/implement-rfc/scripts/usage_quota.py": {
+      "bytes": 10693,
+      "sha256": "f1db0fabea708d687522c6d8700a94036f5a13b45ff4346c085e385b41cbcfa0"
+    },
+    "payload/skills/implement-rfc/scripts/usage_scope.py": {
+      "bytes": 12145,
+      "sha256": "2b93d9fe3bdfeb6e49c21184695380cd600aa12d10395c3112819697877de073"
+    },
+    "payload/skills/implement-rfc/tests/test_usage_parser_seed.py": {
+      "bytes": 12771,
+      "sha256": "2b896aaf10f619c537eda730340bcf1bfc8e9c7ac4f0d4cf65825ab5922b416d"
+    },
+    "payload/skills/implement-rfc/tests/test_usage_scope_seed.py": {
+      "bytes": 8428,
+      "sha256": "b377d998f1eb61c18af69d01d4974b04e70a6dd0a2db8bf843f2659d66d95060"
+    },
+    "reference/measurement-baseline.json": {
+      "bytes": 724,
+      "sha256": "426917f2bd16cd3c37afbf34e08410d9c943fa73878e84a6163f78c0ac6b1973"
+    },
+    "reference/source-manifest.json": {
+      "bytes": 4084,
+      "sha256": "4d767dfb5822d2434f28adbfdea3162a01da9907197a5961b7aa347933a32c53"
+    },
+    "rfc_definitions.json": {
+      "bytes": 5412,
+      "sha256": "c57ecdca550e000e008d378c0aba33f42b9e06b4cf8273c45cffccf705bda65a"
+    },
+    "tools/run_payload_tests.py": {
+      "bytes": 526,
+      "sha256": "c37dde86b0d6690cf964b1fb1c2734cd1ea4fd6068ee48d35b4467cd4be96003"
+    },
+    "tools/validate_pack.py": {
+      "bytes": 5158,
+      "sha256": "1971bfc0cf4ded9cb35418d6bc47fa464300fbc0fc0fd9a184f9f45af06ddbdd"
+    }
+  }
+}

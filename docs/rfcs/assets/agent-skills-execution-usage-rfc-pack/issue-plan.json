@@ -1,0 +1,380 @@
+[
+  {
+    "id": "ASK-0021",
+    "title": "Import the pack and freeze the actual implementation baseline",
+    "path": "docs/issues/20-ready/ASK-0021-import-and-freeze-baseline.md",
+    "rfcs": [
+      "RFC-ASK-0005",
+      "RFC-ASK-0006",
+      "RFC-ASK-0007",
+      "RFC-ASK-0008"
+    ],
+    "depends_on": [],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0005-AC06",
+      "RFC-ASK-0006-AC01",
+      "RFC-ASK-0007-AC06",
+      "RFC-ASK-0008-AC05"
+    ]
+  },
+  {
+    "id": "ASK-0022",
+    "title": "Implement invocation-scoped project discovery and MASK selection",
+    "path": "docs/issues/10-backlog/ASK-0022-project-scope-and-mask-adapter.md",
+    "rfcs": [
+      "RFC-ASK-0006"
+    ],
+    "depends_on": [
+      "ASK-0021"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0006-AC01",
+      "RFC-ASK-0006-AC02"
+    ]
+  },
+  {
+    "id": "ASK-0023",
+    "title": "Harden streaming provider capture, provenance and archive bounds",
+    "path": "docs/issues/10-backlog/ASK-0023-capture-core-and-bounds.md",
+    "rfcs": [
+      "RFC-ASK-0006"
+    ],
+    "depends_on": [
+      "ASK-0022"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0006-AC03",
+      "RFC-ASK-0006-AC04",
+      "RFC-ASK-0006-AC05"
+    ]
+  },
+  {
+    "id": "ASK-0024",
+    "title": "Package the one-command collector and qualify a linked macOS consumer",
+    "path": "docs/issues/10-backlog/ASK-0024-package-and-macos-capture.md",
+    "rfcs": [
+      "RFC-ASK-0006"
+    ],
+    "depends_on": [
+      "ASK-0023"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0006-AC01",
+      "RFC-ASK-0006-AC05",
+      "RFC-ASK-0006-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0025",
+    "title": "Qualify collector invocation and MASK launcher handling on Windows",
+    "path": "docs/issues/10-backlog/ASK-0025-windows-capture-qualification.md",
+    "rfcs": [
+      "RFC-ASK-0006"
+    ],
+    "depends_on": [
+      "ASK-0023"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0006-AC02",
+      "RFC-ASK-0006-AC05",
+      "RFC-ASK-0006-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0026",
+    "title": "Verify and close the turnkey capture RFC",
+    "path": "docs/issues/10-backlog/ASK-0026-close-capture-rfc.md",
+    "rfcs": [
+      "RFC-ASK-0006"
+    ],
+    "depends_on": [
+      "ASK-0024",
+      "ASK-0025"
+    ],
+    "closeout_for": [
+      "RFC-ASK-0006"
+    ],
+    "coverage": [
+      "RFC-ASK-0006-AC01",
+      "RFC-ASK-0006-AC02",
+      "RFC-ASK-0006-AC03",
+      "RFC-ASK-0006-AC04",
+      "RFC-ASK-0006-AC05",
+      "RFC-ASK-0006-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0027",
+    "title": "Implement conservative request and counter reconciliation",
+    "path": "docs/issues/10-backlog/ASK-0027-consumption-reconciliation.md",
+    "rfcs": [
+      "RFC-ASK-0007"
+    ],
+    "depends_on": [
+      "ASK-0023"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0007-AC01",
+      "RFC-ASK-0007-AC02"
+    ]
+  },
+  {
+    "id": "ASK-0028",
+    "title": "Integrate bounded native and manual account-quota observation",
+    "path": "docs/issues/10-backlog/ASK-0028-native-quota-observation.md",
+    "rfcs": [
+      "RFC-ASK-0007"
+    ],
+    "depends_on": [
+      "ASK-0023"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0007-AC03"
+    ]
+  },
+  {
+    "id": "ASK-0029",
+    "title": "Join task outcomes and produce offline comparison reports",
+    "path": "docs/issues/10-backlog/ASK-0029-outcomes-and-offline-report.md",
+    "rfcs": [
+      "RFC-ASK-0007"
+    ],
+    "depends_on": [
+      "ASK-0027",
+      "ASK-0028"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0007-AC04",
+      "RFC-ASK-0007-AC05",
+      "RFC-ASK-0007-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0030",
+    "title": "Verify and close accounting and experiment readout",
+    "path": "docs/issues/10-backlog/ASK-0030-close-accounting-rfc.md",
+    "rfcs": [
+      "RFC-ASK-0007"
+    ],
+    "depends_on": [
+      "ASK-0026",
+      "ASK-0029"
+    ],
+    "closeout_for": [
+      "RFC-ASK-0007"
+    ],
+    "coverage": [
+      "RFC-ASK-0007-AC01",
+      "RFC-ASK-0007-AC02",
+      "RFC-ASK-0007-AC03",
+      "RFC-ASK-0007-AC04",
+      "RFC-ASK-0007-AC05",
+      "RFC-ASK-0007-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0031",
+    "title": "Add bounded deterministic command stages and integrator gates",
+    "path": "docs/issues/10-backlog/ASK-0031-prescribed-command-runner.md",
+    "rfcs": [
+      "RFC-ASK-0005"
+    ],
+    "depends_on": [
+      "ASK-0021"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0005-AC01",
+      "RFC-ASK-0005-AC02",
+      "RFC-ASK-0005-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0032",
+    "title": "Add durable dispatch, report collection and bounded recovery",
+    "path": "docs/issues/10-backlog/ASK-0032-durable-results-and-recovery.md",
+    "rfcs": [
+      "RFC-ASK-0005"
+    ],
+    "depends_on": [
+      "ASK-0031",
+      "ASK-0023"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0005-AC03",
+      "RFC-ASK-0005-AC04"
+    ]
+  },
+  {
+    "id": "ASK-0033",
+    "title": "Implement the capability-checked Codex event-driven adapter",
+    "path": "docs/issues/10-backlog/ASK-0033-codex-event-adapter.md",
+    "rfcs": [
+      "RFC-ASK-0005"
+    ],
+    "depends_on": [
+      "ASK-0032"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0005-AC05"
+    ]
+  },
+  {
+    "id": "ASK-0034",
+    "title": "Implement the capability-checked Claude companion adapter",
+    "path": "docs/issues/10-backlog/ASK-0034-claude-stream-adapter.md",
+    "rfcs": [
+      "RFC-ASK-0005"
+    ],
+    "depends_on": [
+      "ASK-0032"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0005-AC04",
+      "RFC-ASK-0005-AC05"
+    ]
+  },
+  {
+    "id": "ASK-0035",
+    "title": "Qualify bounded execution and failure delivery across native hosts",
+    "path": "docs/issues/10-backlog/ASK-0035-runner-native-qualification.md",
+    "rfcs": [
+      "RFC-ASK-0005"
+    ],
+    "depends_on": [
+      "ASK-0033",
+      "ASK-0034"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0005-AC01",
+      "RFC-ASK-0005-AC03",
+      "RFC-ASK-0005-AC04",
+      "RFC-ASK-0005-AC05",
+      "RFC-ASK-0005-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0036",
+    "title": "Verify and close bounded execution and durable delegation",
+    "path": "docs/issues/10-backlog/ASK-0036-close-runner-rfc.md",
+    "rfcs": [
+      "RFC-ASK-0005"
+    ],
+    "depends_on": [
+      "ASK-0035"
+    ],
+    "closeout_for": [
+      "RFC-ASK-0005"
+    ],
+    "coverage": [
+      "RFC-ASK-0005-AC01",
+      "RFC-ASK-0005-AC02",
+      "RFC-ASK-0005-AC03",
+      "RFC-ASK-0005-AC04",
+      "RFC-ASK-0005-AC05",
+      "RFC-ASK-0005-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0037",
+    "title": "Add independent routing profiles, leaf defaults and explicit fallback policy",
+    "path": "docs/issues/10-backlog/ASK-0037-profiles-and-leaf-role-policy.md",
+    "rfcs": [
+      "RFC-ASK-0008"
+    ],
+    "depends_on": [
+      "ASK-0023",
+      "ASK-0032"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0008-AC01",
+      "RFC-ASK-0008-AC02",
+      "RFC-ASK-0008-AC03"
+    ]
+  },
+  {
+    "id": "ASK-0038",
+    "title": "Refactor task context and reporting without removing engineering requirements",
+    "path": "docs/issues/10-backlog/ASK-0038-compact-instructions-and-handoffs.md",
+    "rfcs": [
+      "RFC-ASK-0008"
+    ],
+    "depends_on": [
+      "ASK-0037",
+      "ASK-0029"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0008-AC03",
+      "RFC-ASK-0008-AC04"
+    ]
+  },
+  {
+    "id": "ASK-0039",
+    "title": "Deploy a scoped cross-project pilot with reversible bindings",
+    "path": "docs/issues/10-backlog/ASK-0039-consumer-pilot-and-rollback.md",
+    "rfcs": [
+      "RFC-ASK-0008"
+    ],
+    "depends_on": [
+      "ASK-0026",
+      "ASK-0036",
+      "ASK-0038"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0008-AC05"
+    ]
+  },
+  {
+    "id": "ASK-0040",
+    "title": "Run bounded separate orchestration, routing and instruction comparisons",
+    "path": "docs/issues/10-backlog/ASK-0040-controlled-experiment-readout.md",
+    "rfcs": [
+      "RFC-ASK-0008"
+    ],
+    "depends_on": [
+      "ASK-0030",
+      "ASK-0039"
+    ],
+    "closeout_for": [],
+    "coverage": [
+      "RFC-ASK-0008-AC06"
+    ]
+  },
+  {
+    "id": "ASK-0041",
+    "title": "Verify and close routing, instructions and portable rollout",
+    "path": "docs/issues/10-backlog/ASK-0041-close-rollout-rfc.md",
+    "rfcs": [
+      "RFC-ASK-0008"
+    ],
+    "depends_on": [
+      "ASK-0040"
+    ],
+    "closeout_for": [
+      "RFC-ASK-0008"
+    ],
+    "coverage": [
+      "RFC-ASK-0008-AC01",
+      "RFC-ASK-0008-AC02",
+      "RFC-ASK-0008-AC03",
+      "RFC-ASK-0008-AC04",
+      "RFC-ASK-0008-AC05",
+      "RFC-ASK-0008-AC06"
+    ]
+  }
+]

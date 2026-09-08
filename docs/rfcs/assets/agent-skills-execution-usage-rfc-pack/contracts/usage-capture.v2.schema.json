@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:implement-rfc:usage-capture:v2",
+  "type": "object",
+  "required": [
+    "schema",
+    "collector_version",
+    "machine",
+    "since_inclusive",
+    "until_exclusive",
+    "project_labels",
+    "session_count",
+    "text_previews_included",
+    "billing_or_quota_estimates",
+    "files"
+  ],
+  "properties": {
+    "schema": {
+      "const": "rfc-usage-evidence.v2"
+    },
+    "collector_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "machine": {
+      "type": "string",
+      "minLength": 1
+    },
+    "since_inclusive": {
+      "type": "string",
+      "minLength": 1
+    },
+    "until_exclusive": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_labels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "maxItems": 256
+    },
+    "session_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "text_previews_included": {
+      "type": "boolean"
+    },
+    "billing_or_quota_estimates": {
+      "const": false
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$comment": "Transport manifest allows additive fields. Reader verifies all member hashes/size/path bounds and date semantics. No usage totals or quota debits are inferred by capture."
+}

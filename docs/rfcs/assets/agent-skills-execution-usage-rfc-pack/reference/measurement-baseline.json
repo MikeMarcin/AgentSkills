@@ -1,0 +1,21 @@
+{
+  "provenance": "retained prior conversation analysis; not recomputed by this pack",
+  "capture_scope": "SRV and SamplePlanner, mac-main only, 7-day sample",
+  "sessions": 303,
+  "events": 254290,
+  "skipped_large_files": 13,
+  "codex_top_level_coordination": {
+    "SampleReview": {
+      "calls": 282,
+      "all_tool_calls": 3320
+    },
+    "SamplePlanner": {
+      "calls": 2378,
+      "all_tool_calls": 9608
+    }
+  },
+  "no_astra_low_or_medium_observations": true,
+  "accepted_work_outcomes_available": false,
+  "saving_or_quality_claim": null,
+  "chronology_correction": "Utility children launched early; some produced results before scout termination. Failure is delivery/ownership, not merely late delegation."
+}
