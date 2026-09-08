@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0021"
 title: "Import the pack and freeze the actual implementation baseline"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0005", "RFC-ASK-0006", "RFC-ASK-0007", "RFC-ASK-0008"]
 depends_on: []
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "import-and-freeze-baseline"}
