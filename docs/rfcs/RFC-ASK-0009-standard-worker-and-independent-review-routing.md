@@ -2,7 +2,7 @@
 schema: "implement-rfc.rfc.v1"
 id: "RFC-ASK-0009"
 title: "Standard implementation worker and independent review routing"
-status: "Implementing"
+status: "Auto-Verified"
 ---
 
 # Standard implementation worker and independent review routing
@@ -242,3 +242,14 @@ ASK-0046 is the sole closeout; capture the actual immutable RFC_BASE_SHA before 
 work. Retain direct criterion/evidence/outcome/revision rows there. No terminal status
 until required configuration/migration evidence exists. Optional native serving and
 quality/cost measurements must remain clearly unclaimed, not fabricated pass results.
+
+## Owner adjustment and verified closeout
+
+The owner explicitly renamed `rfc-critical-reviewer` to `rfc-reviewer-critical`.
+The live target uses that spelling. Migration preserves legacy critical-reviewer
+addenda and raw historical identity, retires only clean owned old adapters and
+rejects retired new selectors. The retained original pack is unchanged.
+
+Auto-Verified at the configuration/migration acceptance boundary; all six criteria
+are recorded on ASK-0046. Native serving/reload, quality equivalence and subscription
+savings were not tested or claimed. Consumer adapter rollout remains separately scoped.
