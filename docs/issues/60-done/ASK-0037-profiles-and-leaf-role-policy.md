@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0037"
 title: "Add independent routing profiles, leaf defaults and explicit fallback policy"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0023", "ASK-0032"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "profiles-and-leaf-role-policy"}
+acceptance: [{"criterion":"RFC-ASK-0008-AC01","outcome":"pass","revision":"3df7bd4ddc9e92181badcf25209259b2574f52f4","evidence":{"kind":"command","detail":"14 focused test_render_runtime_adapters.py tests pass against changes included in this finish; configuration behavior only, no live fallback/deployment claim."}},{"criterion":"RFC-ASK-0008-AC02","outcome":"pass","revision":"3df7bd4ddc9e92181badcf25209259b2574f52f4","evidence":{"kind":"command","detail":"14 focused test_render_runtime_adapters.py tests pass against changes included in this finish; configuration behavior only, no live fallback/deployment claim."}},{"criterion":"RFC-ASK-0008-AC03","outcome":"pass","revision":"3df7bd4ddc9e92181badcf25209259b2574f52f4","evidence":{"kind":"command","detail":"14 focused test_render_runtime_adapters.py tests pass against changes included in this finish; configuration behavior only, no live fallback/deployment claim."}}]
 ---
 
 # ASK-0037: Add independent routing profiles, leaf defaults and explicit fallback policy
@@ -31,4 +32,6 @@ Focused renderer/config tests assert role matrices, generated native fields, def
 
 ## Run record
 
-Not started. No native result, implementation revision, quota saving or semantic acceptance is asserted. Claim this live card before editing; preserve unrelated changes and commit explicit paths.
+Implemented baseline/opt-in per-role profiles, capability-gated overrides, explicit-request precedence, requested/observed provenance, and bounded fallback receipt validation. All roles are leaves in generated Codex/Claude adapters. Primary native settings are untouched. Fallback receipts do not execute substitutions or infer available quota.
+
+Verification: 14 renderer tests passed on native macOS, including public CLI candidate/refusal/local-selection/explicit-baseline behavior, unchanged review routes, native-settings preservation and bounded approval validation. No live model comparison or consumer deployment is claimed.

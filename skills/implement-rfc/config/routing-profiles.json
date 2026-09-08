@@ -1,0 +1,25 @@
+{
+  "schema": "implement-rfc.routing-profiles.v1",
+  "profiles": {
+    "baseline": {
+      "experiment": null,
+      "overrides": {}
+    },
+    "astra-low-first": {
+      "experiment": "routine-worker-astra-low",
+      "integrator_recommendation": {
+        "model": "gpt-6-astra",
+        "effort": "low",
+        "requires_explicit_session_selection": true
+      },
+      "overrides": {
+        "codex": {
+          "rfc-worker-routine": {
+            "model": "gpt-6-astra",
+            "effort": "low"
+          }
+        }
+      }
+    }
+  }
+}

@@ -136,6 +136,68 @@ def validate_routing(
     return assignments, codex_classes, claude_classes
 
 
+def select_routes(routing, roles, profiles, profile="baseline", capabilities=None,
+                  order_routes=None, explicit_routes=None):
+    """Resolve per-role requests; rendering never selects the primary session."""
+    assignments, codex, claude = validate_routing(routing, roles)
+    if profiles.get("schema") != "implement-rfc.routing-profiles.v1":
+        raise ValueError("unsupported routing profiles schema")
+    selected = profiles.get("profiles", {}).get(profile)
+    if not isinstance(selected, dict):
+        raise ValueError("unknown routing profile")
+    routes = {p: {name: dict(classes[assignments[name]]) for name in roles}
+              for p, classes in (("codex", codex), ("claude", claude))}
+    origins = {p: {name: "baseline" for name in roles} for p in routes}
+    for origin, overlay in (("profile", selected.get("overrides", {})),
+                            ("admitted_order", order_routes or {}),
+                            ("explicit_user", explicit_routes or {})):
+        if not isinstance(overlay, dict) or set(overlay) - set(routes):
+            raise ValueError("invalid route override providers")
+        for provider, changes in overlay.items():
+            if not isinstance(changes, dict) or set(changes) - set(roles):
+                raise ValueError("invalid route override roles")
+            for name, route in changes.items():
+                if (not isinstance(route, dict) or set(route) != {"model", "effort"}
+                        or not isinstance(route["model"], str) or not route["model"].strip()
+                        or PLACEHOLDER_RE.search(route["model"])
+                        or (route["effort"] is not None and not isinstance(route["effort"], str))):
+                    raise ValueError("override requires exact model and effort")
+                supported = (capabilities or {}).get(provider, {}).get(route["model"], [])
+                if route["effort"] not in supported:
+                    raise ValueError(f"unsupported or unverified runtime capability: {provider}/{route['model']}/{route['effort']}")
+                routes[provider][name] = dict(route)
+                origins[provider][name] = origin
+    encoded = json.dumps(selected, sort_keys=True, separators=(",", ":")).encode()
+    return routes, {"profile": profile, "profile_digest": hashlib.sha256(encoded).hexdigest(),
+                    "experiment": selected.get("experiment"), "requested": routes,
+                    "origins": origins, "observed": None,
+                    "enforcement": {"codex": "agents-disabled", "claude": "Agent-tool-omitted"}}
+
+
+FALLBACK_REASONS = {"synthetic_error", "unknown_effort", "unsupported_effort",
+                    "server_unavailability", "model_quota", "shared_quota",
+                    "authentication_permissions", "request_size", "task_difficulty"}
+
+
+def fallback_receipt(requested, reason, *, observed=None, alternative=None,
+                     approval=None, attempt=0):
+    """Record an explicit decision; never launch, purchase, or redeem capacity."""
+    if reason not in FALLBACK_REASONS:
+        raise ValueError("unknown fallback reason")
+    if alternative is not None:
+        if (not isinstance(approval, dict) or approval.get("alternative") != alternative
+                or not approval.get("scope") or not approval.get("risk_floor")
+                or not approval.get("permission_billing_boundary")
+                or type(approval.get("max_attempts")) is not int
+                or not 1 <= approval["max_attempts"] <= 3
+                or type(attempt) is not int or not 1 <= attempt <= approval["max_attempts"]):
+            raise ValueError("fallback needs exact bounded approval")
+    return {"schema": "implement-rfc.route-receipt.v1", "requested": requested,
+            "reason": reason, "observed": observed, "alternative": alternative,
+            "approval": approval, "attempt": attempt,
+            "synthetic": reason == "synthetic_error"}
+
+
 def q(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
@@ -366,11 +428,13 @@ def main() -> int:
         type=Path,
         help="Optional candidate routing overlay; use with a temporary --repo-root for evaluation.",
     )
+    parser.add_argument("--profile", help="Explicit consumer adapter profile; absent uses local selection or baseline.")
+    parser.add_argument("--capabilities", type=Path, help="Verified provider/model to supported efforts JSON for overrides.")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
     if args.write_source_manifest:
-        if args.repo_root or args.routing_override:
+        if args.repo_root or args.routing_override or args.profile or args.capabilities:
             parser.error("source manifest authoring does not accept consumer/routing options")
         owner = project_config._git(skill_dir, "rev-parse", "--show-toplevel")
         if owner is None or skill_dir != Path(owner).resolve() / "skills" / SKILL_NAME:
@@ -396,16 +460,32 @@ def main() -> int:
     roles = validate_roles(roles_data)
     assignments, codex_classes, claude_classes = validate_routing(routing_data, roles)
 
-    digest = source_digest(*digest_paths)
+    profiles_path = skill_dir / "config/routing-profiles.json"
+    digest_paths.append(profiles_path)
+    selection_path = context.repo_root / ".mask/generated/implement-rfc/execution-selection.json"
+    profile = args.profile
+    if profile is None and selection_path.exists():
+        safe_destination(context.repo_root, selection_path)
+        selection = load_json(selection_path)
+        if selection.get("schema") != "implement-rfc.execution-selection.v1":
+            raise ValueError("unsupported execution selection schema")
+        profile = selection.get("profile", "baseline")
+        digest_paths.append(selection_path)
+    capabilities = load_json(args.capabilities) if args.capabilities else None
+    if args.capabilities:
+        digest_paths.append(args.capabilities)
+    routes, provenance = select_routes(routing_data, roles, load_json(profiles_path),
+                                       profile or "baseline", capabilities)
+    digest = hashlib.sha256((source_digest(*digest_paths) + json.dumps(provenance, sort_keys=True)).encode()).hexdigest()
     repo_root = context.repo_root
     generated: dict[Path, str] = {}
     for name, role in sorted(roles.items()):
         model_class = assignments[name]
         generated[repo_root / ".codex" / "agents" / f"{name}.toml"] = render_codex_agent(
-            name, role, codex_classes[model_class], project, digest
+            name, role, routes["codex"][name], project, digest
         )
         generated[repo_root / ".claude" / "agents" / f"{name}.md"] = render_claude_agent(
-            name, role, claude_classes[model_class], project, digest
+            name, role, routes["claude"][name], project, digest
         )
 
     manifest_entries: list[dict[str, str]] = []
@@ -422,6 +502,7 @@ def main() -> int:
         "project": project["project"],
         "source_digest": digest,
         "assignments": assignments,
+        "routing_provenance": provenance,
         "verified_as_of": routing_data.get("verified_as_of"),
         "files": manifest_entries,
     }

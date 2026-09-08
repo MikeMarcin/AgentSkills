@@ -59,11 +59,11 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         expected = {
             "rfc-utility": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "read-only", False),
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
-            "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", True),
-            "rfc-worker-routine": ("gpt-5.6-sol", "high", "claude-opus-5", "high", "workspace-write", True),
-            "rfc-worker": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", True),
-            "rfc-reviewer": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "read-only", True),
-            "rfc-critical-reviewer": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "xhigh", "read-only", True),
+            "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),
+            "rfc-worker-routine": ("gpt-5.6-sol", "high", "claude-opus-5", "high", "workspace-write", False),
+            "rfc-worker": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", False),
+            "rfc-reviewer": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "read-only", False),
+            "rfc-critical-reviewer": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "xhigh", "read-only", False),
         }
         self.assertEqual(set(ROUTING["assignments"]), set(expected))
         with tempfile.TemporaryDirectory() as temp:
@@ -291,3 +291,67 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class ProfileTests(unittest.TestCase):
+    def test_candidate_is_opt_in_and_capability_checked(self):
+        import render_runtime_adapters as renderer
+        roles = renderer.load_json(SKILL_DIR / 'config/roles.json')['roles']
+        profiles = renderer.load_json(SKILL_DIR / 'config/routing-profiles.json')
+        baseline, _ = renderer.select_routes(ROUTING, roles, profiles)
+        with self.assertRaisesRegex(ValueError, 'unverified'):
+            renderer.select_routes(ROUTING, roles, profiles, 'astra-low-first')
+        caps = {'codex': {'gpt-6-astra': ['low', 'high']}}
+        candidate, receipt = renderer.select_routes(ROUTING, roles, profiles, 'astra-low-first', caps)
+        self.assertEqual(candidate['codex']['rfc-worker-routine'], {'model':'gpt-6-astra','effort':'low'})
+        for name in roles:
+            if name != 'rfc-worker-routine':
+                self.assertEqual(candidate['codex'][name], baseline['codex'][name])
+        self.assertEqual(candidate['claude'], baseline['claude'])
+        self.assertIsNone(receipt['observed'])
+        explicit = {'codex': {'rfc-worker-routine': {'model':'gpt-6-astra','effort':'high'}}}
+        resolved, receipt = renderer.select_routes(ROUTING, roles, profiles, 'astra-low-first', caps,
+                                                  explicit_routes=explicit)
+        self.assertEqual(resolved['codex']['rfc-worker-routine']['effort'], 'high')
+        self.assertEqual(receipt['origins']['codex']['rfc-worker-routine'], 'explicit_user')
+
+    def test_public_profile_and_selection_preserve_native_settings(self):
+        runner = RenderRuntimeAdaptersTests()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.assertEqual(runner.run_renderer(root).returncode, 0)
+            config = root / '.codex/config.toml'
+            config.write_text('model = "user-choice"\n')
+            caps = root / 'caps.json'
+            caps.write_text(json.dumps({'codex': {'gpt-6-astra':['low']}}))
+            before = (root / '.codex/agents/rfc-reviewer.toml').read_text()
+            refused = runner.run_renderer(root, '--profile', 'astra-low-first')
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertEqual((root / '.codex/agents/rfc-reviewer.toml').read_text(), before)
+            result = runner.run_renderer(root, '--profile', 'astra-low-first', '--capabilities', str(caps))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(config.read_text(), 'model = "user-choice"\n')
+            data = tomllib.loads((root / '.codex/agents/rfc-worker-routine.toml').read_text())
+            self.assertEqual(data['model_reasoning_effort'], 'low')
+            selection = root / '.mask/generated/implement-rfc/execution-selection.json'
+            selection.write_text(json.dumps({'schema':'implement-rfc.execution-selection.v1','profile':'astra-low-first'}))
+            self.assertEqual(runner.run_renderer(root, '--capabilities', str(caps)).returncode, 0)
+            self.assertEqual(runner.run_renderer(root, '--profile', 'baseline').returncode, 0)
+            data = tomllib.loads((root / '.codex/agents/rfc-worker-routine.toml').read_text())
+            self.assertEqual(data['model'], 'gpt-5.6-sol')
+
+    def test_fallback_never_assumes_capacity_or_effort(self):
+        import render_runtime_adapters as renderer
+        for reason in renderer.FALLBACK_REASONS:
+            receipt = renderer.fallback_receipt({'model':'requested','effort':None}, reason)
+            self.assertEqual(receipt['reason'], reason)
+            self.assertIsNone(receipt['observed'])
+        alt = {'provider':'codex','model':'explicit','effort':'none'}
+        with self.assertRaises(ValueError):
+            renderer.fallback_receipt({}, 'shared_quota', alternative=alt)
+        approval = {'alternative':alt,'scope':'one-run','risk_floor':'review-high',
+                    'permission_billing_boundary':'subscription/read-only','max_attempts':1}
+        self.assertEqual(renderer.fallback_receipt({}, 'server_unavailability', alternative=alt,
+                         approval=approval, attempt=1)['alternative'], alt)
+        with self.assertRaises(ValueError):
+            renderer.fallback_receipt({}, 'server_unavailability', alternative=alt,
+                                      approval=approval, attempt=2)
