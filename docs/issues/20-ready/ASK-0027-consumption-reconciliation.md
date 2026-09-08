@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0027"
 title: "Implement conservative request and counter reconciliation"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "consumption-reconciliation"}
