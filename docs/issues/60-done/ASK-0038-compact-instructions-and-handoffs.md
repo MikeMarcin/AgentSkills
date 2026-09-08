@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0038"
 title: "Refactor task context and reporting without removing engineering requirements"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0037", "ASK-0029"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "compact-instructions-and-handoffs"}
+acceptance: [{"criterion":"RFC-ASK-0008-AC03","outcome":"pass","revision":"b2a641f9fbb97aae8531468b8fdf8bba6168aa3a","evidence":{"kind":"command","detail":"11 unified workflow tests pass against included changes; selected rendered context preserves role authority and uncertainty. Existing banner compatibility retained; no measured instruction improvement asserted."}},{"criterion":"RFC-ASK-0008-AC04","outcome":"pass","revision":"b2a641f9fbb97aae8531468b8fdf8bba6168aa3a","evidence":{"kind":"command","detail":"11 unified workflow tests pass against included changes; selected rendered context preserves role authority and uncertainty. Existing banner compatibility retained; no measured instruction improvement asserted."}}]
 ---
 
 # ASK-0038: Refactor task context and reporting without removing engineering requirements
@@ -31,4 +32,8 @@ Test branch-specific context assembly and compare fixture packets; check actual 
 
 ## Run record
 
-Not started. No native result, implementation revision, quota saving or semantic acceptance is asserted. Claim this live card before editing; preserve unrelated changes and commit explicit paths.
+Pre-refactor instruction baseline: 8326de11807875653805aadc13bf3c96e9c60907. Added triggered direct/runner and collection entry points; scoped assignment packets retain exact authority, ownership, evidence and uncertainty. Leaf instructions select only role-specific content and applicable addenda. Existing interactive duplicate-banner compatibility is intentionally retained until receipt-aware native parser/report qualification; no prompt-saving or instruction treatment result is asserted.
+
+Verification: 11 test_unified_workflow.py tests pass, including actual rendered utility/test-runner/worker context and unchanged public claim/finish/human-pending authority. Public usage_report.py --help verified documented interface.
+
+Owner pilot budget on 2026-09-08: up to two real backlog tasks, one bounded attempt each, no purchased credits or usage resets. Heterogeneous tasks are observational; profile remains opt-in.

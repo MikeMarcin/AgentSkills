@@ -72,3 +72,20 @@ requires an explicit provider and observed used percentage or credit balance.
 Provider sample time remains unknown unless established; capture time is not a
 freshness guarantee. Opaque pools, account windows, actual credits and project
 consumption remain separate. No model-to-pool mapping or project debit is inferred.
+
+## Offline accounting and outcomes
+
+Run `python3 <asset-root>/scripts/usage_report.py CAPTURE.zip --out NEW_DIRECTORY`
+for immutable archive validation, reconciled ledger, grouped CSV and Markdown
+report. Use `--help` for explicit outcome and optional rate-card inputs; quota snapshots are imported
+through capture.
+Duplicate captures are compared separately rather than summed. Missing baselines,
+ownership or serving settings remain unknown; synthetic errors are separate.
+
+Acceptance comes from explicit outcome records, not completion text or a moved
+card inferred from time. Reopened tasks leave the accepted denominator; review,
+failed attempts and recovery still count toward attributable all-in consumption.
+Unassigned/unknown usage prevents a precise per-accepted-task claim. Price
+equivalents from dated rates are estimates, not subscription charges. Compare
+routing, orchestration and instruction changes separately; heterogeneous real
+backlog work is observational and cannot automatically promote a profile.

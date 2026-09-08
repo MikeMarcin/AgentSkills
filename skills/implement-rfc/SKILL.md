@@ -150,6 +150,20 @@ checkout as evidence. Report completed scope, commits, actual verification,
 remaining decisions/limitations and cleanup. Context pressure does not complete
 a task: preserve the next actionable slice in the closeout and continue.
 
+## Select execution and collect usage
+
+Keep small or coupled work in the integrator. For already selected command
+stages, read [bounded execution](references/bounded-execution.md); review the
+order before starting it. Native companion capabilities and limitations are
+listed there. A delivered report or successful command never approves acceptance.
+
+For local usage, run `python3 <asset-root>/scripts/usage.py` from the desired
+project, or add `--mask-projects` for public registry scope. Read
+[usage collection](references/usage-collection.md) only for options, quota or
+offline analysis. Capture does not deploy skills or launch models. Historical
+role activity remains available through `role_usage.py`; it is not accepted-work
+or subscription billing evidence.
+
 ## Optional runtime support
 
 Read [remote routing](references/remote-routing.md) only for a remote envelope,
@@ -158,7 +172,9 @@ only when launching one. Missing optional runtimes do not add acceptance gates.
 
 Shared role source is `config/roles.json` and `config/routing.json`. Explicitly
 render consumer adapters with `scripts/render_runtime_adapters.py --repo-root
-ROOT`; `--check` is read-only. Writes stay in consumer agent directories and
+ROOT`; `--check` is read-only. Baseline routing is the default. An explicit
+`--profile` requires verified capabilities for each overridden model/effort and
+changes delegated adapters only; it never selects the primary session. Writes stay in consumer agent directories and
 `.mask/generated/implement-rfc/`, never through linked skill roots. Existing
 outputs require matching ownership markers and prior manifest. Source authors
 use `--write-source-manifest` and `validate_portable_agents.py --source-only`.

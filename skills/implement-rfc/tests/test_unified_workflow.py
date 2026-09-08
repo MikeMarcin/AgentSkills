@@ -145,3 +145,32 @@ class UnifiedTests(unittest.TestCase):
 
 
 if __name__=='__main__': unittest.main()
+
+class SelectedInstructionTests(unittest.TestCase):
+    def test_leaf_packets_preserve_selected_authority_and_uncertainty(self):
+        import render_runtime_adapters as renderer
+        from project_fixtures import CONFIG
+        import copy
+        root = Path(__file__).resolve().parents[1]
+        roles = renderer.load_json(root / 'config/roles.json')['roles']
+        project = copy.deepcopy(CONFIG)
+        project['role_addenda'] = {'rfc-worker':['Preserve fixture-owner constraint exactly.']}
+        route = {'model':'fixture-model','effort':'high'}
+        utility = renderer.role_prompt('rfc-utility', roles['rfc-utility'], route, project)
+        runner = renderer.role_prompt('rfc-test-runner', roles['rfc-test-runner'], route, project)
+        worker = renderer.role_prompt('rfc-worker-routine', roles['rfc-worker-routine'], route, project)
+        self.assertIn('do not broaden the question or infer architecture', utility)
+        self.assertIn('Distinguish not-found from not-searched', utility)
+        self.assertNotIn('Preserve fixture-owner constraint exactly.', utility)
+        self.assertNotIn('Preserve fixture-owner constraint exactly.', runner)
+        self.assertIn('Preserve fixture-owner constraint exactly.', worker)
+        self.assertIn('Do not diagnose root cause, choose additional tests', runner)
+        self.assertIn('exclusive list of allowed files or path scopes', worker)
+        self.assertIn('Uncertainties', worker)
+        for packet in (utility, runner, worker):
+            self.assertIn('do not spawn agents', packet)
+            self.assertNotIn('assets/', packet)
+            self.assertNotIn('bounded-execution.md', packet)
+        core = (root / 'SKILL.md').read_text()
+        self.assertIn('A delivered report or successful command never approves acceptance', core)
+        self.assertNotIn('slice-order.v1', core)

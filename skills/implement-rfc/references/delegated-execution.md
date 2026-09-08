@@ -120,6 +120,10 @@ the decision in normal session history. If reassignment is needed, record
 the new choice and reason rather than rewriting the earlier decision. This is
 an assignment decision, not a quota, mandatory agent pipeline or acceptance gate.
 
+Delegated roles are leaves by default. Commission independent siblings from the
+primary when needed; do not add unrestricted Agent tooling to a leaf. Inspect
+the driver capability before claiming enforcement rather than policy alone.
+
 Run trivial deterministic commands directly. Workers normally run their own
 focused checks; there is no mandatory scout/worker/test-runner/reviewer pipeline.
 
@@ -129,7 +133,22 @@ the bounded question.
 
 ## Assignment Contract
 
-Name the role and purpose, then provide only what the role needs:
+Name the role and purpose, then provide only what the role needs. The following
+packet is the actual context boundary: link relevant source and original evidence,
+include applicable constraints verbatim, and leave unsearched facts explicit.
+Do not attach the parent transcript, every RFC, retained import assets, or a full
+board dump. Read a linked procedure only when the selected action needs it.
+Mechanical inventory cannot resolve architecture or authorization questions.
+
+For example, a utility packet names exact paths/search terms and asks for matches;
+a test-runner packet names exact argv, candidate and disposable output roots;
+a semantic investigation uses a scout with a bounded question and acceptance
+references. Do not silently promote a utility because its output is convenient.
+
+Name each root once; internal evidence may use repo-relative paths plus revision,
+symbol and line. Use absolute paths when crossing roots or when requested.
+
+Assignment fields:
 
 ```text
 Role and purpose:
@@ -145,7 +164,7 @@ Requested result:
 ```
 
 Use a role-prefixed runtime name such as `rfc_scout_backend_selection` or
-`rfc_utility_cache_inventory`. Require the startup banner
+`rfc_utility_cache_inventory`. For adapters without an authoritative compatible dispatch receipt, retain the startup banner
 `Role: <role> | Model: <model> | Effort: <effort>` before analysis so routing
 mistakes are visible. Role-to-model assignment and its rationale live in
 [model-routing.md](model-routing.md) and `config/routing.json`.
@@ -178,3 +197,24 @@ blocking closeout.
 Use the optional [local routing audit](routing-audit.md) to count observed role
 usage in either driver and inspect recorded decisions. Missing historical reasons
 remain unknown; a startup banner alone is not runtime model evidence.
+
+## Receipt and profile compatibility
+
+Baseline `config/routing.json` remains the shared default. Explicit task/session
+selection wins over an admitted order route, selected profile and baseline.
+`--profile astra-low-first --capabilities FILE` changes only the routine Codex
+worker. The capability file maps provider to exact model to supported effort
+values; it is an operator-supplied observation, not provider discovery. A missing
+capability refuses the override. No profile changes the primary session.
+
+The runtime-adapters manifest records requested settings, profile digest and
+experiment label. Driver dispatch receipts establish owned attempts; observed
+serving data is stronger than requests. Legacy role banners remain self-report
+metadata. Keep startup/final banners for the current interactive adapters until
+their receipt-aware parser and report path are qualified; do not silently replace
+that compatibility contract merely to reduce prose.
+
+`fallback_receipt` validates an explicit alternative and bounded approval scope;
+it never executes a fallback. Unknown effort, unsupported effort, actual `none`,
+synthetic errors, availability and model/shared quota are distinct. Capacity
+errors do not justify stronger reasoning. No automatic credit purchase or reset.
