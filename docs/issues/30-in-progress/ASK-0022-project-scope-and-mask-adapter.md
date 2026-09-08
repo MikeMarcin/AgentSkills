@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0022"
 title: "Implement invocation-scoped project discovery and MASK selection"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0021"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "project-scope-and-mask-adapter"}
