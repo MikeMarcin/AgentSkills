@@ -56,3 +56,28 @@ Protocol reference: [OpenAI app-server documentation](https://learn.chatgpt.com/
 Installed schemas, rather than the online example's spelling or a version number,
 determine supported native fields. Native macOS/Windows acceptance is recorded on
 the owning cards; fake-driver tests do not qualify another platform.
+
+## Claude companion
+
+`slice_claude.ClaudeDriver` capability-checks installed print/stream flags and
+requires existing first-party claude.ai authentication. Its explicit packets use
+read-only leaf tools (`Read`, `Grep`, `Glob`), a model/effort, native max-turns
+request and wall deadline. This first companion supports investigation, not
+source-writing workers. Safe mode disables customizations while preserving native
+authentication and permissions; MCP tools are denied and permission mode is
+`dontAsk`. It never uses bare mode, API keys or permission bypass. Managed host
+policy still applies. These companion restrictions are explicit and do not
+rewrite interactive settings.
+
+The assigned session UUID is native; turn identifiers are labelled logical
+assignment IDs because this stream does not expose a qualified native turn ID.
+Only structured result subtypes establish completion/limit/failure. Text quoting
+a turn limit is a partial report, never proof of termination. Report-only resume
+uses the exact owned session with all built-in tools disabled and MCP denied,
+one turn and the preapproved deadline. Cancellation disables resumption. Native
+embedded Agent sessions are not adopted.
+
+Reference: [Claude print-mode documentation](https://code.claude.com/docs/en/headless)
+and [CLI flags](https://code.claude.com/docs/en/cli-reference). Installed native
+smoke evidence lives on ASK-0034; fixture recovery is distinguished from live
+recovery qualification.
