@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0026"
 title: "Verify and close the turnkey capture RFC"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0024", "ASK-0025"]
 closeout_for: ["RFC-ASK-0006"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "close-capture-rfc"}
+acceptance: [{"criterion":"RFC-ASK-0006-AC01","outcome":"pass","revision":"cf7621916cfa4ba308cbcc41b9b6eaa44073d394","evidence":{"kind":"observation","detail":"Closeout matrix records direct parser/privacy/bounds/public MASK and actual macOS/Windows invocation evidence. Native Windows fixture corrections and zero-argument archive are recorded at ca81470d. Unknown/partial consumption remains explicit."}},{"criterion":"RFC-ASK-0006-AC02","outcome":"pass","revision":"cf7621916cfa4ba308cbcc41b9b6eaa44073d394","evidence":{"kind":"observation","detail":"Closeout matrix records direct parser/privacy/bounds/public MASK and actual macOS/Windows invocation evidence. Native Windows fixture corrections and zero-argument archive are recorded at ca81470d. Unknown/partial consumption remains explicit."}},{"criterion":"RFC-ASK-0006-AC03","outcome":"pass","revision":"cf7621916cfa4ba308cbcc41b9b6eaa44073d394","evidence":{"kind":"observation","detail":"Closeout matrix records direct parser/privacy/bounds/public MASK and actual macOS/Windows invocation evidence. Native Windows fixture corrections and zero-argument archive are recorded at ca81470d. Unknown/partial consumption remains explicit."}},{"criterion":"RFC-ASK-0006-AC04","outcome":"pass","revision":"cf7621916cfa4ba308cbcc41b9b6eaa44073d394","evidence":{"kind":"observation","detail":"Closeout matrix records direct parser/privacy/bounds/public MASK and actual macOS/Windows invocation evidence. Native Windows fixture corrections and zero-argument archive are recorded at ca81470d. Unknown/partial consumption remains explicit."}},{"criterion":"RFC-ASK-0006-AC05","outcome":"pass","revision":"cf7621916cfa4ba308cbcc41b9b6eaa44073d394","evidence":{"kind":"observation","detail":"Closeout matrix records direct parser/privacy/bounds/public MASK and actual macOS/Windows invocation evidence. Native Windows fixture corrections and zero-argument archive are recorded at ca81470d. Unknown/partial consumption remains explicit."}},{"criterion":"RFC-ASK-0006-AC06","outcome":"pass","revision":"cf7621916cfa4ba308cbcc41b9b6eaa44073d394","evidence":{"kind":"observation","detail":"Closeout matrix records direct parser/privacy/bounds/public MASK and actual macOS/Windows invocation evidence. Native Windows fixture corrections and zero-argument archive are recorded at ca81470d. Unknown/partial consumption remains explicit."}}]
 ---
 
 # ASK-0026: Verify and close the turnkey capture RFC
@@ -32,7 +33,7 @@ Run the existing documentation/board gate plus only missing focused acceptance c
 
 ## Run record
 
-Integration evidence reconciled on 2026-09-08. This closeout remains open behind its recorded prerequisites; these observations do not mark pending cards Done or the RFC Auto-Verified.
+Integration evidence reconciled on 2026-09-08. All planned capture cards are Done after native ExampleWinHost qualification. Capture criteria are approved at their stated boundaries; other RFCs and deployment/experiment cards remain independent.
 
 ## Durable closeout anchor
 
@@ -80,3 +81,5 @@ removed after consumption; the native fixture is temporarily retained while
 Windows qualification remains active. Private user-local captures/reports and ignored native
 run journals are intentionally retained; no temporary checkout is retained and
 no publication/push or consumer migration was performed.
+
+Capture finish decision: all six capture criteria pass at their recorded macOS/Windows boundaries. Source-only portability validation and structure gate passed; final pack bookkeeping is reconciled by the integrator. No completeness or billing estimate is asserted.

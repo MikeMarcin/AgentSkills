@@ -1,14 +1,14 @@
 ---
 id: "RFC-ASK-0006"
 title: "Project-aware turnkey usage capture and MASK selection"
-status: "Accepted"
+status: "Auto-Verified"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
 
 # RFC-ASK-0006: Project-aware turnkey usage capture and MASK selection
 
-Pack IDs are provisional until the AgentSkills integrator reserves the live block.
+Live IDs were reserved and imported; the retained pack is immutable provenance.
 This is a new RFC, not an amendment silently rewriting settled RFC-ASK-0001–0004.
 
 ## Decision
@@ -198,3 +198,10 @@ with explicit scope or adapt it to this common parser without breaking its calle
 ## Implementation authorization
 
 Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.
+
+## Native closeout
+
+Capture acceptance is verified on macOS and native ExampleWinHost Windows. See ASK-0026
+for the exact source revisions, partial-coverage observations and focused native
+checks. This status does not qualify other RFCs, infer complete account usage,
+or deploy a consumer profile.
