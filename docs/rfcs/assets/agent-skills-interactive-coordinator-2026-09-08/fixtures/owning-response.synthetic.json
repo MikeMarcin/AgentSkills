@@ -1,0 +1,135 @@
+{
+  "schema": "agent-skills.native-usage-fixture.v1",
+  "synthetic": true,
+  "lineage": [
+    {
+      "thread": "coordinator",
+      "parent": null
+    },
+    {
+      "thread": "integrator-1",
+      "parent": "coordinator"
+    },
+    {
+      "thread": "worker-1",
+      "parent": "integrator-1"
+    },
+    {
+      "thread": "integrator-2",
+      "parent": "coordinator"
+    }
+  ],
+  "records": [
+    {
+      "file_thread": "coordinator",
+      "type": "token_usage_record",
+      "payload": {
+        "thread_id": "coordinator",
+        "response_id": "r1",
+        "turn_id": "synthetic-turn-r1",
+        "usage": {
+          "input_tokens": 100,
+          "cached_input_tokens": 80,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 10,
+          "reasoning_output_tokens": 2,
+          "total_tokens": 110
+        }
+      }
+    },
+    {
+      "file_thread": "integrator-1",
+      "type": "token_usage_record",
+      "payload": {
+        "thread_id": "integrator-1",
+        "response_id": "r2",
+        "turn_id": "synthetic-turn-r2",
+        "usage": {
+          "input_tokens": 200,
+          "cached_input_tokens": 150,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 20,
+          "reasoning_output_tokens": 5,
+          "total_tokens": 220
+        }
+      }
+    },
+    {
+      "file_thread": "worker-1",
+      "type": "token_usage_record",
+      "payload": {
+        "thread_id": "worker-1",
+        "response_id": "r3",
+        "turn_id": "synthetic-turn-r3",
+        "usage": {
+          "input_tokens": 300,
+          "cached_input_tokens": 250,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 30,
+          "reasoning_output_tokens": 10,
+          "total_tokens": 330
+        }
+      }
+    },
+    {
+      "file_thread": "integrator-2",
+      "type": "token_usage_record",
+      "payload": {
+        "thread_id": "integrator-2",
+        "response_id": "r4",
+        "turn_id": "synthetic-turn-r4",
+        "usage": {
+          "input_tokens": 150,
+          "cached_input_tokens": 100,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 15,
+          "reasoning_output_tokens": 3,
+          "total_tokens": 165
+        }
+      }
+    },
+    {
+      "file_thread": "worker-1",
+      "type": "token_usage_record",
+      "payload": {
+        "thread_id": "worker-1",
+        "response_id": "r3",
+        "turn_id": "synthetic-turn-r3",
+        "usage": {
+          "input_tokens": 300,
+          "cached_input_tokens": 250,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 30,
+          "reasoning_output_tokens": 10,
+          "total_tokens": 330
+        }
+      }
+    }
+  ],
+  "aggregate_observations": [
+    {
+      "kind": "family_summary_not_additive",
+      "input_tokens": 750,
+      "output_tokens": 75
+    },
+    {
+      "kind": "legacy_counter_disagreement",
+      "input_tokens": 700,
+      "output_tokens": 75
+    }
+  ],
+  "expected": {
+    "unique_owning_responses": 4,
+    "input_tokens": 750,
+    "cached_input_tokens": 580,
+    "uncached_input_tokens": 170,
+    "output_tokens": 75,
+    "reasoning_output_tokens": 20,
+    "total_tokens": 825
+  },
+  "notes": [
+    "These values, identities and work are synthetic, not private native usage.",
+    "The audit supplement wraps retained native records with file_thread/type/payload; preserve actual raw/export provenance in implementation.",
+    "Legacy disagreement is reported, not silently added or rewritten."
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "schema": "agent-skills.coordinator-source-basis.v1",
+  "date": "2026-09-08",
+  "raw_uploads": [
+    {
+      "filename": "agent_skills_project_source.md",
+      "bytes": 2072667,
+      "sha256": "12136a98bc585e9f8dbd7f1065c92a7fc2eeaa0ea63d6d359a3b2fe1e740bbb9"
+    },
+    {
+      "filename": "manage_agent_skills_project_source(1).md",
+      "bytes": 1881499,
+      "sha256": "fcf6e5abdcba1a8905e21f85968b11a8c2ce13c458dde424ec74b37eb2a4a612"
+    },
+    {
+      "filename": "SKILL.md",
+      "bytes": 10886,
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    },
+    {
+      "filename": "SKILL-MECHANICS.md",
+      "bytes": 2629,
+      "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059"
+    },
+    {
+      "filename": "AgentSkills-0b6f786-Clarify RFC subagent reuse and fresh context boundaries.patch",
+      "bytes": 5542,
+      "sha256": "027a5e262898dd51b2873d0dc6ea1ca6133fc53d6e766edae6997c1580324dba"
+    }
+  ],
+  "selected_extracted_files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 1290,
+      "normalized_text_sha256": "308e8276fa5d0260d1a73b19eeea5036b9dda8c3fa1014b328645d5078cbc814"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 1289,
+      "normalized_text_sha256": "70f5281632a1ac2d855160e7a4e2e73f2af2ad04b641e421d403ad633134b399"
+    },
+    {
+      "path": "docs/rfcs/README.md",
+      "bytes": 1986,
+      "normalized_text_sha256": "0ae7d73ab8dbe0f714554d9de0a6fff8f49c1a9a59bcb2d2868e3678f6ece3d1"
+    },
+    {
+      "path": "docs/issues/README.md",
+      "bytes": 1632,
+      "normalized_text_sha256": "eabd645f5c501567ccdc392a93277743ee533f5bd5588de7d4593eabac2ce8e1"
+    },
+    {
+      "path": "docs/issues/NEXT_ID",
+      "bytes": 9,
+      "normalized_text_sha256": "d26caf93c569b13c69331a809b3f48a1b415a5041be6eb47310df9f320f43a67"
+    },
+    {
+      "path": ".mask/skill-config/implement-rfc/project.json",
+      "bytes": 2285,
+      "normalized_text_sha256": "cbd2979ef5fcc560daca171c91aa07d6694a64c00a087431e22b1bca15558703"
+    },
+    {
+      "path": ".mask/skill-config/implement-rfc/project.md",
+      "bytes": 3501,
+      "normalized_text_sha256": "c3524b3b436cfe97e0fe7ad00eb305d180b28601364b7feae7c22d81141f68df"
+    },
+    {
+      "path": "skills/implement-rfc/SKILL.md",
+      "bytes": 12926,
+      "normalized_text_sha256": "88bf00ea5a237f19161f0a794d87aa9e249c03c8d0c57ae87ee8f8a4cd9e2028"
+    },
+    {
+      "path": "skills/implement-rfc/config/roles.json",
+      "bytes": 15835,
+      "normalized_text_sha256": "95dc4ddd9004b3c40d70cd48da25287ae1ff32f31ccff4ba1d4de69f03d27d3e"
+    },
+    {
+      "path": "skills/implement-rfc/config/routing.json",
+      "bytes": 1636,
+      "normalized_text_sha256": "d3b53090b636acf411ffc40f7e46e20053707721b465361c739fe31136c8dca6"
+    },
+    {
+      "path": "skills/implement-rfc/config/routing-profiles.json",
+      "bytes": 145,
+      "normalized_text_sha256": "0488576f1d4fdaf81d26838d0b181218711a5fb3ee44d5ce66bfabefca05c9a3"
+    },
+    {
+      "path": "skills/implement-rfc/scripts/render_runtime_adapters.py",
+      "bytes": 30514,
+      "normalized_text_sha256": "56b6fc3829864194500a57586c30d8dfce0c140966383e6c4ef1de15c34714be"
+    },
+    {
+      "path": "skills/implement-rfc/references/delegated-execution.md",
+      "bytes": 13563,
+      "normalized_text_sha256": "f9b69ae0079fc6dba8fa1aa15cccedf64bfa046187d609d6d6b77064e983c8b9"
+    },
+    {
+      "path": "skills/implement-rfc/references/bookkeeping.md",
+      "bytes": 6134,
+      "normalized_text_sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a"
+    },
+    {
+      "path": "skills/implement-rfc/references/pack-lifecycle.md",
+      "bytes": 6393,
+      "normalized_text_sha256": "37de6531e0e9f2e783c6ca4b483ee85216b509eaaf7a6fd003e4889a08106738"
+    },
+    {
+      "path": "skills/implement-rfc/references/runtime-compatibility.md",
+      "bytes": 15868,
+      "normalized_text_sha256": "bd5aaad736660072e292988b9f9e3103017ab21d5886557b0f03aa16869d36dd"
+    },
+    {
+      "path": "skills/implement-rfc/scripts/usage_capture.py",
+      "bytes": 39433,
+      "normalized_text_sha256": "f41a5cd6d332cdf60462623c80384d9c6264b7d36eae7cbdadd4df3a851f8704"
+    },
+    {
+      "path": "skills/implement-rfc/scripts/usage_accounting.py",
+      "bytes": 10573,
+      "normalized_text_sha256": "2cdda342c08d44562f93565dc2a2c85022032ecafd16c902a8ba6d114ddece32"
+    },
+    {
+      "path": "skills/implement-rfc/scripts/usage_outcomes.py",
+      "bytes": 6016,
+      "normalized_text_sha256": "847b52982d4308a632194efc4bbb56583bff8489f321371593d2aca93d806645"
+    },
+    {
+      "path": "skills/implement-rfc/tests/test_standard_worker_target.py",
+      "bytes": 1079,
+      "normalized_text_sha256": "b14dcb1fcfa7d337183b4b86b1514238185ef75f566ddb0eb4af41fe924a737b"
+    }
+  ],
+  "normalization": "Dump fenced bodies were reconstructed with one trailing newline. Original extra terminal blank lines are not recoverable from the dump; these hashes identify reconstructed text, not an asserted Git revision. Raw upload digests above are exact.",
+  "source_snapshot_next_issue": "ASK-0050",
+  "source_snapshot_latest_rfc": "RFC-ASK-0009",
+  "live_repository_inspected": false,
+  "implementation_revision": null,
+  "native_qualification_performed": false
+}

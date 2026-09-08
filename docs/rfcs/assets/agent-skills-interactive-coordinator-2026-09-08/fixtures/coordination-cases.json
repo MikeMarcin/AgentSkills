@@ -1,0 +1,247 @@
+{
+  "schema": "agent-skills.coordinator-cases.v1",
+  "status": "specification, not observed agent results",
+  "cases": [
+    {
+      "id": "C01-first-dispatch",
+      "trigger": "Authorized new pack; no current integrator.",
+      "expected": "Bind consumer/mandate/engineering route; fresh first integrator selects usable milestone.",
+      "forbidden": "Coordinator reads the whole source tree and implements first.",
+      "criteria": [
+        "AC01",
+        "AC02",
+        "AC03"
+      ]
+    },
+    {
+      "id": "C02-next-milestone",
+      "trigger": "Matching milestone-complete return; evidence refs and native quiescence accounted for.",
+      "expected": "Consume once and dispatch a distinct fresh integrator with current continuation.",
+      "forbidden": "Resume the retired integrator for unrelated next work.",
+      "criteria": [
+        "AC01",
+        "AC05"
+      ]
+    },
+    {
+      "id": "C03-correction",
+      "trigger": "Current milestone has a reproduced review finding.",
+      "expected": "Resume the same current integrator with finding and current authority.",
+      "forbidden": "Fresh agent per review comment or coordinator edits the fix.",
+      "criteria": [
+        "AC05",
+        "AC07"
+      ]
+    },
+    {
+      "id": "C04-wait-timeout",
+      "trigger": "Wait expires while the same child remains active.",
+      "expected": "Continue supported native waiting; act only on a real interruption.",
+      "forbidden": "Spawn replacement, poll transcript, or invent useful coordinator work.",
+      "criteria": [
+        "AC01",
+        "AC06"
+      ]
+    },
+    {
+      "id": "C05-partial-invocation",
+      "trigger": "Native turn limit returns continue-milestone with accounted partial changes.",
+      "expected": "Continue same integrator without declaring milestone or pack complete.",
+      "forbidden": "Treat max turns as acceptance or blindly replay all prior commands.",
+      "criteria": [
+        "AC05",
+        "AC06"
+      ]
+    },
+    {
+      "id": "C06-duplicate-result",
+      "trigger": "Already consumed terminal result is delivered again.",
+      "expected": "Ignore duplicate disposition for that exact dispatch.",
+      "forbidden": "Start another successor.",
+      "criteria": [
+        "AC06"
+      ]
+    },
+    {
+      "id": "C07-user-amendment",
+      "trigger": "A result consumed mandate 1; user mandate 2 narrows scope.",
+      "expected": "Forward current amendment; require relevant reconciliation before continuing.",
+      "forbidden": "Dispatch now-prohibited work from stale recommendation.",
+      "criteria": [
+        "AC06"
+      ]
+    },
+    {
+      "id": "C08-cancelled",
+      "trigger": "User cancels while a writer is active.",
+      "expected": "Stop task-owned work where supported; preserve and report partial/unknown effects.",
+      "forbidden": "Automatic resume, replacement writer, or cancellation interpreted as retry.",
+      "criteria": [
+        "AC06"
+      ]
+    },
+    {
+      "id": "C09-result-before-quiescence",
+      "trigger": "Success result arrives while a child command still writes.",
+      "expected": "Retain current ownership until effects and descendants are accounted for.",
+      "forbidden": "Successor begins overlapping edits.",
+      "criteria": [
+        "AC03",
+        "AC06"
+      ]
+    },
+    {
+      "id": "C10-unknown-exit",
+      "trigger": "Integrator terminates without a usable result; effects unknown.",
+      "expected": "Establish inactive old writers and inspect effects before a bounded recovery assignment.",
+      "forbidden": "Replay mutation or assume an absent result means nothing changed.",
+      "criteria": [
+        "AC06"
+      ]
+    },
+    {
+      "id": "C11-human-independent",
+      "trigger": "Required visual approval pending; independent persistence milestone eligible.",
+      "expected": "Keep candidate protected and required acceptance open; continue independent work.",
+      "forbidden": "Stop entire pack early or fabricate approval.",
+      "criteria": [
+        "AC07",
+        "AC08"
+      ]
+    },
+    {
+      "id": "C12-human-boundary",
+      "trigger": "No eligible independent work remains; required human decision pending.",
+      "expected": "Return exact candidate/ask with unresolved criteria; unattended boundary is reached.",
+      "forbidden": "Mark pack Auto-Verified or keep reasoning in a waiting loop.",
+      "criteria": [
+        "AC07",
+        "AC08"
+      ]
+    },
+    {
+      "id": "C13-status-only",
+      "trigger": "User asks for status, not implementation.",
+      "expected": "Read scoped live state and report; no agent spawn or mutation.",
+      "forbidden": "Full pack workflow or model family starts.",
+      "criteria": [
+        "AC08",
+        "AC09"
+      ]
+    },
+    {
+      "id": "C14-small-fix",
+      "trigger": "One small coupled fix is authorized.",
+      "expected": "One milestone integrator implements/checks directly; one compact closeout.",
+      "forbidden": "Mandatory workers, scouts, repeated review, or milestone fragmentation.",
+      "criteria": [
+        "AC04",
+        "AC08",
+        "AC09"
+      ]
+    },
+    {
+      "id": "C15-native-nesting-unavailable",
+      "trigger": "Fresh child supported but integrator cannot spawn leaves.",
+      "expected": "Qualified integrator-direct path; preserve required independent review via supported narrow relay or leave unmet.",
+      "forbidden": "External headless/API replacement or silently skip required review.",
+      "criteria": [
+        "AC03",
+        "AC07",
+        "AC08"
+      ]
+    },
+    {
+      "id": "C16-effort-override",
+      "trigger": "Native child effective effort is low because a global/main setting overrides intended engineering effort.",
+      "expected": "Report mismatch, reconcile supported selection before claiming intended route.",
+      "forbidden": "Treat generated request/banner as observed runtime proof.",
+      "criteria": [
+        "AC02",
+        "AC10",
+        "AC11"
+      ]
+    },
+    {
+      "id": "C17-runtime-leaf",
+      "trigger": "Ordinary implementation worker receives its complete slice.",
+      "expected": "Use retained standard route and exclusive ownership, perform local checks, return result.",
+      "forbidden": "Nested integrator creation, board acceptance or unassigned staging/commits.",
+      "criteria": [
+        "AC02",
+        "AC03",
+        "AC04"
+      ]
+    },
+    {
+      "id": "C18-host-resume",
+      "trigger": "Interactive host ended; later authorized invocation resumes.",
+      "expected": "Recover original mandate/baseline and live board; reconcile prior ownership before writing.",
+      "forbidden": "Promise external restart or reset RFC_BASE_SHA.",
+      "criteria": [
+        "AC06",
+        "AC08"
+      ]
+    },
+    {
+      "id": "C19-review-only",
+      "trigger": "User asks to review a candidate without implementation.",
+      "expected": "Read-only review assignment scoped to candidate and requested criteria.",
+      "forbidden": "Implementation, card finish or commit inferred from review request.",
+      "criteria": [
+        "AC07",
+        "AC08"
+      ]
+    },
+    {
+      "id": "C20-attended-intake",
+      "trigger": "Human submits one rejection, then hands back with other candidates unanswered.",
+      "expected": "Consume actual decision once, preserve other candidates and required undecided work; correct relevant scope.",
+      "forbidden": "Treat hand-back as approval, discard note/image, or unlock unrelated protected candidates.",
+      "criteria": [
+        "AC07",
+        "AC08"
+      ]
+    },
+    {
+      "id": "C21-observation-not-experiment",
+      "trigger": "Rollout changed coordinator model, topology and instructions together.",
+      "expected": "Report combined rollout observation and all-in family usage; preserve existing strict experiment rules.",
+      "forbidden": "Label as matched one-factor experiment or causal quota saving.",
+      "criteria": [
+        "AC12",
+        "AC13"
+      ]
+    },
+    {
+      "id": "C22-transitive-accounting",
+      "trigger": "Coordinator, two integrator generations and their leaves have owning response records plus duplicate counters.",
+      "expected": "Count each unique owned response once across transitive family; report conflicts/gaps.",
+      "forbidden": "Count only immediate children, add cumulative totals or treat missing outcomes as zero.",
+      "criteria": [
+        "AC12"
+      ]
+    },
+    {
+      "id": "C23-closeout",
+      "trigger": "All required selected criteria have actual relevant evidence; writers quiescent.",
+      "expected": "Integrator performs existing truthful closeout; coordinator relays outcome.",
+      "forbidden": "Fresh mandatory re-review, broader unrequested matrix, or context pressure as completion.",
+      "criteria": [
+        "AC07",
+        "AC14"
+      ]
+    },
+    {
+      "id": "C24-scope-and-history",
+      "trigger": "Old settled RFC assets contain prior primary-only policy and exact role fixtures.",
+      "expected": "Reconcile active workflow and live tests; preserve immutable historical evidence/assets.",
+      "forbidden": "Rewrite historical acceptance, weaken leaf safety, or migrate unnamed consumers.",
+      "criteria": [
+        "AC03",
+        "AC13",
+        "AC14"
+      ]
+    }
+  ]
+}

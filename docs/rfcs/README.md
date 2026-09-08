@@ -26,3 +26,5 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0008 | Auto-Verified | Routing profiles, compact instructions and portable rollout |
 
 | RFC-ASK-0009 | Auto-Verified | Standard implementation worker and independent review routing |
+
+| RFC-ASK-0010 | Proposed | Interactive coordinator and milestone integrators |

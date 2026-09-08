@@ -1,0 +1,72 @@
+{
+  "schema": "implement-rfc.routing.v1",
+  "verified_as_of": "2026-09-08",
+  "assignments": {
+    "rfc-utility": "mechanical",
+    "rfc-scout": "balanced",
+    "rfc-worker": "standard",
+    "rfc-test-runner": "mechanical",
+    "rfc-reviewer": "review",
+    "rfc-worker-deep": "deep",
+    "rfc-reviewer-critical": "critical"
+  },
+  "providers": {
+    "codex": {
+      "classes": {
+        "mechanical": {
+          "model": "gpt-5.6-luna",
+          "effort": "xhigh"
+        },
+        "balanced": {
+          "model": "gpt-5.6-sol",
+          "effort": "low"
+        },
+        "standard": {
+          "model": "gpt-6-astra",
+          "effort": "low"
+        },
+        "deep": {
+          "model": "gpt-6-astra",
+          "effort": "high"
+        },
+        "critical": {
+          "model": "gpt-6-astra",
+          "effort": "xhigh"
+        },
+        "review": {
+          "model": "gpt-6-astra",
+          "effort": "medium"
+        }
+      }
+    },
+    "claude": {
+      "minimum_cli_version": "2.1.255",
+      "classes": {
+        "mechanical": {
+          "model": "claude-haiku-4-5",
+          "effort": null
+        },
+        "balanced": {
+          "model": "claude-opus-5",
+          "effort": "low"
+        },
+        "standard": {
+          "model": "claude-opus-5",
+          "effort": "xhigh"
+        },
+        "deep": {
+          "model": "claude-fable-5-1",
+          "effort": "high"
+        },
+        "critical": {
+          "model": "claude-fable-5-1",
+          "effort": "high"
+        },
+        "review": {
+          "model": "claude-fable-5-1",
+          "effort": "medium"
+        }
+      }
+    }
+  }
+}

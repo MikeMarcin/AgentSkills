@@ -1,0 +1,233 @@
+{
+  "schema": "agent-skills.rfc-pack-manifest.v1",
+  "pack_id": "agent-skills-interactive-coordinator-2026-09-08",
+  "created": "2026-09-08",
+  "status": "proposed implementation packet; no live source or native acceptance",
+  "rfc_count": 1,
+  "card_count": 9,
+  "acceptance_criteria": 14,
+  "workflow_cases": 24,
+  "files": [
+    {
+      "path": "CHANGE_MAP.md",
+      "bytes": 4976,
+      "sha256": "6f1a5314f6e41da19f28b066efd9c34eda1bdb3bc7ff9e2677b717d2496aa1cb"
+    },
+    {
+      "path": "IMPLEMENTATION_ORDER.md",
+      "bytes": 1643,
+      "sha256": "51a621318415ef36885a480797771ada8dccc832e4ab9be3a5a84e0956a75056"
+    },
+    {
+      "path": "IMPLEMENTATION_PROMPT.md",
+      "bytes": 4273,
+      "sha256": "57fdc9b26a04d930540b6e447aebb4704a007b96718aca347daf31e525c267f4"
+    },
+    {
+      "path": "IMPORT.md",
+      "bytes": 3817,
+      "sha256": "6aa249c327ff6a67671bba986a30c81a6fafb2978a3de37acb4017bebeb8649b"
+    },
+    {
+      "path": "NATIVE_QUALIFICATION.md",
+      "bytes": 6612,
+      "sha256": "92e6c68cb9c466acffca8a9c3014b2d3076c33f28727754c6a4bfcc53d3dcc6e"
+    },
+    {
+      "path": "PACK_CHECKS.md",
+      "bytes": 3508,
+      "sha256": "49f773e8c855c3ac6438e2e864063d0f4753fc60720963fe55a95d46f1cc0f98"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4531,
+      "sha256": "5659aca195de0f041778f7159ee60f8be4eccd6b2fea8c0745b14b60ee0e9f30"
+    },
+    {
+      "path": "ROUTING.md",
+      "bytes": 5601,
+      "sha256": "b9d6ccc78036de334f8501b0359ebb31e3d3c2029dd9585d92efc7296ff92d47"
+    },
+    {
+      "path": "SOURCE_BASIS.md",
+      "bytes": 7440,
+      "sha256": "1239854f7739b514131b7290cb9e94669a236390606d9bdd47d821154714127d"
+    },
+    {
+      "path": "TRACEABILITY.md",
+      "bytes": 1341,
+      "sha256": "28540b032ce5dfdc58ec7f2bb79f7b463719e00a3531a4010e1032ea77092622"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 5172,
+      "sha256": "f1d232dd6e0b849472f743a88949d645cb7a29d45e5bc4f5cee9ba474de51ec8"
+    },
+    {
+      "path": "WORKFLOW_CASES.md",
+      "bytes": 2461,
+      "sha256": "e330cc2b383c3bc478b860ebed9b0272a090ae0b0c7d95cebae978ae42fe98a3"
+    },
+    {
+      "path": "WRITING_REVIEW.md",
+      "bytes": 4621,
+      "sha256": "257cc86fe3f9b6b42927f8d9518094a3c39ad7210a34c85f58b757c73aaf8ef0"
+    },
+    {
+      "path": "contracts/README.md",
+      "bytes": 4666,
+      "sha256": "d688bfaa21d57278323588e4e10ac2e0cb4b5d0296dab4e0d9e927228f418246"
+    },
+    {
+      "path": "contracts/milestone-return.schema.json",
+      "bytes": 3934,
+      "sha256": "55d57097c3c1f58c52bd32a6cedd7b1e6f4ef6f2f25904cc3affe4e2e1bd14e7"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0051-native-integrator-role-and-routing.md",
+      "bytes": 3072,
+      "sha256": "1a71096c541b0f6497e7670c9ca930363be582d526430a7ac696f8fd169a5424"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0052-milestone-focused-instructions.md",
+      "bytes": 3148,
+      "sha256": "44ef566f03c1ca15f2174ea3af79cb9d3d90ccef3f3a5d0f816e613e26f5833a"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0053-handoff-wait-and-recovery.md",
+      "bytes": 3093,
+      "sha256": "3b54cd591a4302370ba65ae27f00557d25e2dda20534e00ff984c9175a4e9af7"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0054-codex-native-two-milestones.md",
+      "bytes": 2613,
+      "sha256": "6f62be8192de9e6fbfc3e14a793e61bc20d12a7a88efbc3a4dfc6e151f74bc87"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0055-claude-native-two-milestones.md",
+      "bytes": 2498,
+      "sha256": "d1a546661f9c5b280c757a7fd7a6a894a0afd4cd4ccd85426b675fc0157ecabd"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0056-whole-family-usage-accounting.md",
+      "bytes": 2887,
+      "sha256": "775dd6b85482c2e5d624ab91aa8c3ff423251a52c747b1c52195cb695d09f262"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0057-readout-adoption-and-rollback.md",
+      "bytes": 2808,
+      "sha256": "b598aea27f82afd06ada157d009541736d72da6174dcc9a5001952db04b8cf7e"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0058-close-coordinator-rfc.md",
+      "bytes": 3799,
+      "sha256": "f1b7e396747abee6a8aa0384c36eab1699b164da77718c358fbf0c9dd5b17146"
+    },
+    {
+      "path": "docs/issues/20-ready/ASK-0050-import-and-freeze-baseline.md",
+      "bytes": 1861,
+      "sha256": "4be54d170d237a26a82778493d83ce6832bf383cc74ce05f1c77a0b78a4e5481"
+    },
+    {
+      "path": "docs/rfcs/RFC-ASK-0010-interactive-coordinator-and-milestone-integrators.md",
+      "bytes": 25572,
+      "sha256": "1434be2a32aa988a1302509372221fcef1f65dbdc351e712513e7ada3ce61a11"
+    },
+    {
+      "path": "draft/skills/implement-rfc/README.md",
+      "bytes": 959,
+      "sha256": "c330c24d41e3c7e883fa463661df4265263d6f1b0d10ee7f2729e93f89d13edb"
+    },
+    {
+      "path": "draft/skills/implement-rfc/SKILL.md",
+      "bytes": 5197,
+      "sha256": "73cdabb695ab84674fb0b6011c38f89c5db33493805e482be281bf149b03ed21"
+    },
+    {
+      "path": "draft/skills/implement-rfc/references/attendance.md",
+      "bytes": 2502,
+      "sha256": "d78bef6d28ee1b9ee1fe6f7f9072ccb3e056985c61cd7ccbba78c652ef6fa724"
+    },
+    {
+      "path": "draft/skills/implement-rfc/references/coordination-handoff.md",
+      "bytes": 4730,
+      "sha256": "35e89a740f7720aaa7548be0dd3f26b5841e5f3f7bdd13616e65142a63a2219f"
+    },
+    {
+      "path": "draft/skills/implement-rfc/references/delegated-execution.md",
+      "bytes": 5032,
+      "sha256": "771c703683db09ecff9367bc516758409f79bc213b64cda15f98f0a5d8efc301"
+    },
+    {
+      "path": "draft/skills/implement-rfc/references/milestone-integration.md",
+      "bytes": 7284,
+      "sha256": "50892307e33916771355b9f8a8c7cfc72a83d872aad0610e5053dfd625b0cf11"
+    },
+    {
+      "path": "draft/skills/implement-rfc/references/verification-and-closeout.md",
+      "bytes": 3826,
+      "sha256": "fd18a8a706eb0e596b64cbfdd9e97ff189d1695d7b5c1b9828f4afbd3b9e3b2c"
+    },
+    {
+      "path": "fixtures/coordination-cases.json",
+      "bytes": 9299,
+      "sha256": "36bac6b2f01a12ff469e7fc4b22f2e54c3c9603fd4ff59cfa8797c31bb161357"
+    },
+    {
+      "path": "fixtures/owning-response.synthetic.json",
+      "bytes": 3483,
+      "sha256": "016872460b75c9692ce8464c3af3483dc57d8c44aeeb7b25e971350d2eaa8701"
+    },
+    {
+      "path": "fixtures/return.example.json",
+      "bytes": 706,
+      "sha256": "66dcb20bc0aa5f246a0b536dfc1fcf826abeb0765f7502b156c08bcaf8c86d02"
+    },
+    {
+      "path": "fixtures/target-routing.json",
+      "bytes": 2813,
+      "sha256": "28122ca4714fb7c68d23ee7e3595bcaf6d9e6b5bb45b8fb1c0f495733e62971b"
+    },
+    {
+      "path": "issue-plan.json",
+      "bytes": 2791,
+      "sha256": "0f87ac74b0473f7c6724f272ead207b33900a4ae04d34a8e510412ea89f1df5d"
+    },
+    {
+      "path": "reference/baseline/roles.json",
+      "bytes": 15835,
+      "sha256": "95dc4ddd9004b3c40d70cd48da25287ae1ff32f31ccff4ba1d4de69f03d27d3e"
+    },
+    {
+      "path": "reference/baseline/routing.json",
+      "bytes": 1636,
+      "sha256": "d3b53090b636acf411ffc40f7e46e20053707721b465361c739fe31136c8dca6"
+    },
+    {
+      "path": "reference/writing-for-agents/SKILL-MECHANICS.md",
+      "bytes": 2629,
+      "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059"
+    },
+    {
+      "path": "reference/writing-for-agents/SKILL.md",
+      "bytes": 10886,
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    },
+    {
+      "path": "source-basis.json",
+      "bytes": 5301,
+      "sha256": "fc9ef8c1f59011d8aa0b86460c59ce47355525bb932f0f77ad0fcf002a4d0bc7"
+    },
+    {
+      "path": "tools/test_pack.py",
+      "bytes": 6013,
+      "sha256": "5a902a50eca9668bcb6a102a8bcb1ff06b617915c5b4d80ce7379b335f378685"
+    },
+    {
+      "path": "tools/validate_pack.py",
+      "bytes": 16062,
+      "sha256": "6c4bb3df155bac962aca698b65ff754fa1988daec6e126938486f97019c083b4"
+    }
+  ],
+  "manifest_excluded_from_own_hash_list": true
+}

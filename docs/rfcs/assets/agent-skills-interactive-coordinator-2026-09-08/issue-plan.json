@@ -1,0 +1,146 @@
+{
+  "schema": "agent-skills.issue-plan.v1",
+  "ids_are_provisional": true,
+  "rfc": "RFC-ASK-0010",
+  "cards": [
+    {
+      "id": "ASK-0050",
+      "path": "docs/issues/20-ready/ASK-0050-import-and-freeze-baseline.md",
+      "depends": [],
+      "acs": [
+        "AC14"
+      ],
+      "stage": "intake"
+    },
+    {
+      "id": "ASK-0051",
+      "path": "docs/issues/10-backlog/ASK-0051-native-integrator-role-and-routing.md",
+      "depends": [
+        "ASK-0050"
+      ],
+      "acs": [
+        "AC01",
+        "AC02",
+        "AC03",
+        "AC05"
+      ],
+      "stage": "M1"
+    },
+    {
+      "id": "ASK-0052",
+      "path": "docs/issues/10-backlog/ASK-0052-milestone-focused-instructions.md",
+      "depends": [
+        "ASK-0051"
+      ],
+      "acs": [
+        "AC04",
+        "AC07",
+        "AC08",
+        "AC09"
+      ],
+      "stage": "M1"
+    },
+    {
+      "id": "ASK-0053",
+      "path": "docs/issues/10-backlog/ASK-0053-handoff-wait-and-recovery.md",
+      "depends": [
+        "ASK-0051",
+        "ASK-0052"
+      ],
+      "acs": [
+        "AC01",
+        "AC03",
+        "AC05",
+        "AC06",
+        "AC08"
+      ],
+      "stage": "M1"
+    },
+    {
+      "id": "ASK-0054",
+      "path": "docs/issues/10-backlog/ASK-0054-codex-native-two-milestones.md",
+      "depends": [
+        "ASK-0053"
+      ],
+      "acs": [
+        "AC01",
+        "AC02",
+        "AC03",
+        "AC05",
+        "AC06",
+        "AC07",
+        "AC08",
+        "AC10"
+      ],
+      "stage": "M2"
+    },
+    {
+      "id": "ASK-0055",
+      "path": "docs/issues/10-backlog/ASK-0055-claude-native-two-milestones.md",
+      "depends": [
+        "ASK-0053"
+      ],
+      "acs": [
+        "AC01",
+        "AC02",
+        "AC03",
+        "AC05",
+        "AC06",
+        "AC07",
+        "AC08",
+        "AC11"
+      ],
+      "stage": "M2"
+    },
+    {
+      "id": "ASK-0056",
+      "path": "docs/issues/10-backlog/ASK-0056-whole-family-usage-accounting.md",
+      "depends": [
+        "ASK-0051"
+      ],
+      "acs": [
+        "AC12"
+      ],
+      "stage": "M2"
+    },
+    {
+      "id": "ASK-0057",
+      "path": "docs/issues/10-backlog/ASK-0057-readout-adoption-and-rollback.md",
+      "depends": [
+        "ASK-0054",
+        "ASK-0055",
+        "ASK-0056"
+      ],
+      "acs": [
+        "AC09",
+        "AC12",
+        "AC13"
+      ],
+      "stage": "M3"
+    },
+    {
+      "id": "ASK-0058",
+      "path": "docs/issues/10-backlog/ASK-0058-close-coordinator-rfc.md",
+      "depends": [
+        "ASK-0057"
+      ],
+      "acs": [
+        "AC01",
+        "AC02",
+        "AC03",
+        "AC04",
+        "AC05",
+        "AC06",
+        "AC07",
+        "AC08",
+        "AC09",
+        "AC10",
+        "AC11",
+        "AC12",
+        "AC13",
+        "AC14"
+      ],
+      "stage": "M3"
+    }
+  ]
+}

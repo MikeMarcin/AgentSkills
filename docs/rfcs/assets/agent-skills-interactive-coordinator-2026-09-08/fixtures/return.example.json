@@ -1,0 +1,18 @@
+{
+  "schema": "implement-rfc.milestone-return.v1",
+  "run_id": "synthetic-run",
+  "dispatch_id": "synthetic-dispatch-1",
+  "producer_id": "synthetic-native-agent-1",
+  "mandate_revision": "synthetic-user-mandate-1",
+  "milestone": "Fixture-only example: preserve entry order when adding an entry",
+  "disposition": "continue-milestone",
+  "summary": "Synthetic partial invocation; no real source result or test is asserted.",
+  "candidate_revision": null,
+  "handoff_ref": null,
+  "ownership": "unknown",
+  "next_objective": "Reconcile the actual effects before resuming this same milestone.",
+  "required_pending": [
+    "Actual implementation and verification have not run."
+  ],
+  "evidence_refs": []
+}
