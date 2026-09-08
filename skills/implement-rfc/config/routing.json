@@ -4,11 +4,11 @@
   "assignments": {
     "rfc-utility": "mechanical",
     "rfc-scout": "balanced",
-    "rfc-worker-routine": "standard",
-    "rfc-worker": "deep",
+    "rfc-worker": "standard",
     "rfc-test-runner": "mechanical",
-    "rfc-reviewer": "deep",
-    "rfc-critical-reviewer": "critical"
+    "rfc-reviewer": "review",
+    "rfc-worker-deep": "deep",
+    "rfc-reviewer-critical": "critical"
   },
   "providers": {
     "codex": {
@@ -32,11 +32,15 @@
         "critical": {
           "model": "gpt-6-astra",
           "effort": "xhigh"
+        },
+        "review": {
+          "model": "gpt-6-astra",
+          "effort": "medium"
         }
       }
     },
     "claude": {
-      "minimum_cli_version": "2.1.219",
+      "minimum_cli_version": "2.1.255",
       "classes": {
         "mechanical": {
           "model": "claude-haiku-4-5",
@@ -48,7 +52,7 @@
         },
         "standard": {
           "model": "claude-opus-5",
-          "effort": "high"
+          "effort": "xhigh"
         },
         "deep": {
           "model": "claude-fable-5-1",
@@ -56,7 +60,11 @@
         },
         "critical": {
           "model": "claude-fable-5-1",
-          "effort": "xhigh"
+          "effort": "high"
+        },
+        "review": {
+          "model": "claude-fable-5-1",
+          "effort": "medium"
         }
       }
     }

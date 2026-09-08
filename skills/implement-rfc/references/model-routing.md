@@ -1,73 +1,27 @@
 # Model Routing And Updates
 
-`config/routing.json` is the single checked-in source for role-to-model assignment. The canonical `SKILL.md` and shared role definitions name semantic roles and capability classes, never vendor models.
-
-## Capability Classes And Assignments
+`config/routing.json` owns delegated routes; primary session settings stay unchanged.
 
 | Role | Class | Codex | Claude |
 |---|---|---|---|
-| `rfc-utility` | `mechanical` | GPT-5.6 Luna, xhigh | Claude Haiku 4.5, effort unsupported |
-| `rfc-test-runner` | `mechanical` | GPT-5.6 Luna, xhigh | Claude Haiku 4.5, effort unsupported |
-| `rfc-scout` | `balanced` | GPT-5.6 Sol, low | Claude Opus 5, low |
-| `rfc-worker-routine` | `standard` | GPT-6 Astra, low | Claude Opus 5, high |
-| `rfc-worker` | `deep` | GPT-6 Astra, high | Claude Fable 5.1, high |
-| `rfc-reviewer` | `deep` | GPT-6 Astra, high | Claude Fable 5.1, high |
-| `rfc-critical-reviewer` | `critical` | GPT-6 Astra, xhigh | Claude Fable 5.1, xhigh |
+| `rfc-utility`, `rfc-test-runner` | mechanical | Luna xhigh | Haiku 4.5 unsupported/null |
+| `rfc-scout` | balanced | Sol low | Opus 5 low |
+| `rfc-worker` | standard | Astra low | Opus 5 xhigh |
+| `rfc-worker-deep` | deep | Astra high | Fable 5.1 high |
+| `rfc-reviewer` | review | Astra medium | Fable 5.1 medium |
+| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.1 high |
 
-- `mechanical`: exact locating, inventories, prescribed command execution,
-  schema/drift checks, and log condensation with directly checkable outputs.
-- `balanced`: bounded semantic repository analysis, ownership and execution-path
-  tracing, verification-surface discovery, and failure investigation.
-- `standard`: implementation using an established approach, an existing pattern,
-  exclusive ownership, and direct verification. Sensitive protocol, persistence,
-  authority, concurrency, lifetime, and destructive-migration changes use `deep`.
-- `deep`: implementation and independent review requiring substantial code and
-  contract judgment.
-- `critical`: deeper counterexample analysis focused on a named material risk.
+Standard is broad engineering; deep addresses named unresolved difficulty.
+Review is independently configurable from deep implementation. Critical review
+addresses a named material risk and replaces normal review when selected; no
+medium-then-critical pipeline. Effort does not change acceptance or authority.
+See [delegated execution](delegated-execution.md) for selection and contracts.
 
-The primary integrator is not a generated child role. Recommend the `deep`
-route (Astra high or Fable 5.1 high) when choosing a primary model, but preserve
-user-selected active session settings. These are defaults, not permanent
-architectural decisions. No default uses `max`. Haiku's omitted effort field
-means effort is unsupported; it does not establish that thinking is disabled.
-
-## Routing Decision And Evidence
-
-Research and owner approval: **2026-09-04**. `verified_as_of` records this routing
-review date, not a successful local model-quality evaluation. This update is an
-owner-approved promotion informed by public measurements and experience; no
-project task bakeoff was performed.
-
-- **Flagships and effort:** use Astra/Fable high for difficult implementation and
-  review, and xhigh for critical review. Public measurements support examining
-  cost per completed task rather than always selecting maximum effort; they do
-  not establish the best effort on every project slice. See
-  [Astra evaluation](https://artificialanalysis.ai/articles/benchmarking-gpt-6-astra),
-  [Fable 5.1 evaluation](https://artificialanalysis.ai/articles/claude-fable-5-1), and
-  [Anthropic's cost/intelligence guidance](https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence).
-- **Scouts:** the researched Artificial Analysis Codex-agent results gave Sol low
-  and Terra high the same coding index (55), with Sol low taking 3.5 versus 6.0
-  minutes at $1.29 versus $1.14 per task. CursorBench 3.2 gave Opus 5 low 62.8%
-  versus Sonnet 5 high 56.9%, at $2.55 versus $2.13 per task and 37 versus 57
-  steps. These support our speed/capability tradeoff; steps are not elapsed time
-  and the two harnesses must not be combined into one ranking. Sources:
-  [Artificial Analysis coding agents](https://artificialanalysis.ai/agents/coding-agents/comparisons/claude-code-vs-codex),
-  [CursorBench](https://cursor.com/evals).
-- **Routine workers:** Astra low and Opus high are the default implementation
-  routes for known approaches. The owner reports Fable often completes difficult
-  work in one attempt where Opus needs repeated turns; this is user experience,
-  not a controlled benchmark or a claim that Opus loses on every task.
-- **Mechanical roles:** Luna xhigh reflects the owner's preference to spend its
-  inexpensive reasoning budget on diligence. Haiku remains appropriate only for
-  prescribed, checkable work. Its $1/$5 input/output price per million tokens is
-  half Sonnet 5's $2/$10; that is API pricing, not subscription allowance or
-  guaranteed cost per completed task. See
-  [Anthropic pricing](https://platform.claude.com/docs/en/about-claude/pricing) and
-  [Haiku capabilities](https://platform.claude.com/docs/en/models/haiku-4-5/overview).
-
-Public results are dated, harness-dependent evidence. The role boundaries and
-selected defaults are engineering judgments. Watch actual rework, accepted
-findings, false positives, elapsed time, and usage when revisiting them.
+This is the owner's 2026-09-08 allocation decision, not measured quality equivalence
+or subscription savings. No live bakeoff is required for this promotion. Exact
+model IDs and requested effort live in configuration; requests do not prove serving.
+Claude's declared floor is 2.1.255; no automatic client upgrade, effort clamp,
+model fallback, reset or credit purchase is authorized. Preserve processing speed.
 
 ## Lane Runtime Selection
 
@@ -107,7 +61,7 @@ selects sufficient verification and adjudicates all acceptance decisions.
 
 ## Critical Review Selection
 
-Consider `rfc-critical-reviewer` when the user requests independent critical
+Consider `rfc-reviewer-critical` when the user requests independent critical
 review or the final diff materially affects one or more of:
 
 - wire or protocol contracts;
@@ -175,10 +129,3 @@ When a new model or effort level appears:
 
 Absent an explicit owner-directed promotion, establish a newly released model on representative utility, scout, or shadow-review work before assigning implementation or closeout-critical responsibility. An owner-directed promotion can proceed on documented public evidence and judgment; state which local evaluations were not performed.
 
-## Owner-directed default update — 2026-09-08
-
-The owner promoted Astra low for routine Codex workers and removed the former
-Sol-high default and separate astra-low-first experimental profile. The baseline
-now contains the promoted route. Other role/provider routes are unchanged. This
-is an explicit owner preference after an inconclusive evaluation, not measured
-quality or usage superiority. Existing primary-session selections remain authoritative.

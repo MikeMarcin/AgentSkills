@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0043"
 title: "Make the standard worker the default and separate review routing"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0009"]
 depends_on: []
 metadata: {"packet":"agent-skills-standard-worker-review", "provisional_id":true}
+acceptance: [{"criterion":"RFC-ASK-0009-AC01/AC02 policy and configuration slice","outcome":"pass","revision":"78696978a9acb9c054c18402eac0fcc8835d823d plus supplied working paths","evidence":{"kind":"command","detail":"14 test_render_runtime_adapters tests passed; semantic policy inspected against RFC. Migration and full source qualification remain ASK-0044/0045."}}]
 ---
 
 # ASK-0043: Make the standard worker the default and separate review routing

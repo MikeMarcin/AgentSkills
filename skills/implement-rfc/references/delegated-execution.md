@@ -32,21 +32,21 @@ verification-surface, documentation-impact, or first-cause analysis. A scout
 should replace the corresponding broad primary scan; the primary confirms only
 material conclusions.
 
-### `rfc-worker`
+### `rfc-worker` and `rfc-worker-deep`
 
-Use for one current issue-card slice after ownership, non-goals, acceptance
-criteria, and focused verification are clear. Give an exclusive file/path
-scope. Only one agent writes a shared checkout at a time. The worker does not
-commit or mutate tracker/RFC state.
+Standard `rfc-worker` handles normal features, diagnosis, multi-file changes,
+refactoring, local design and approved architecture. Require exclusive ownership,
+constraints, acceptance and a credible verification strategy; the worker may
+create that strategy. No copyable precedent is required. Workers never commit
+or mutate tracker/RFC state and preserve unrelated changes.
 
-### `rfc-worker-routine`
-
-Use the worker contract above when the assignment supplies an established
-approach, an existing repository pattern, exclusive ownership, and direct
-verification. Exclude new or changed sensitive protocol, persistence, authority,
-concurrency, lifetime, and destructive-migration behavior. If the assignment
-exceeds these boundaries, return current progress and the reason for reassignment
-to the primary; do not stretch the routine role or repeatedly retry it.
+Use `rfc-worker-deep` for a named unresolved reasoning problem: conflicting
+invariants, difficult causal diagnosis or materially ambiguous technical solutions.
+Known-hard work may start deep directly. Ordinary debugging stays standard while
+making progress. Difficulty selects effort; consequence selects safeguards and
+review. Sensitive domains alone do not mandate deep. Approval questions return
+to the integrator. Carry useful work forward, with no forced failure, quota,
+blind retry sequence or unnecessary handoff.
 
 ### `rfc-test-runner`
 
@@ -72,7 +72,7 @@ failures; reviewers examine whether recorded evidence can miss a broken claim.
 The primary consumes the result and reruns only a check affected by a later
 correction. It does not repeat unchanged passing commands.
 
-### `rfc-reviewer` And `rfc-critical-reviewer`
+### `rfc-reviewer` And `rfc-reviewer-critical`
 
 Use an independent reviewer when explicitly requested or when it is likely to
 add discriminating evidence for a changed wire/protocol contract,
@@ -103,22 +103,18 @@ narrow changed-surface recheck; it never starts a whole-candidate review loop.
 | Small, directly verifiable change | Primary agent |
 | Substantial mechanical read-only inventory or commands | Optional `rfc-utility` |
 | Bounded semantic repository investigation | Optional `rfc-scout` |
-| Established approach and pattern with direct verification | Optional `rfc-worker-routine` |
-| Other bounded implementation slice | Optional `rfc-worker` |
+| Normal bounded engineering | Optional `rfc-worker` |
+| Named unresolved difficult problem | Optional `rfc-worker-deep` |
 | Exact separate test/build command set | Optional `rfc-test-runner` |
 | Named high-risk trigger or explicit request | Consider one reviewer |
 | Missing safe runtime capability | Execute serially in the primary agent |
 
-For substantial implementation selected for delegation, make the routine/deep
-choice before dispatch. Prefer `rfc-worker-routine` when its prerequisites hold;
-otherwise use `rfc-worker` and name the unresolved design or sensitive behavior.
-Do not treat the generic worker as the default merely because it appears first.
-Put one short line in the assignment: `Routing: routine | Reason: <concrete reason>`
-or `Routing: deep | Reason: <concrete reason>`. Ask the worker to repeat this
-line after its startup identity and in its final Status so either driver retains
-the decision in normal session history. If reassignment is needed, record
-the new choice and reason rather than rewriting the earlier decision. This is
-an assignment decision, not a quota, mandatory agent pipeline or acceptance gate.
+For delegated implementation, default to standard and record
+`Routing: standard | Reason: default implementation` (or the actual reason).
+For deep work record `Routing: deep | Reason: <specific unresolved problem>`.
+Repeat the decision after startup identity and in final Status. Missing supplied
+assignment information stays unknown. Preserve earlier assignment evidence on
+reissue. Capacity follows explicit fallback policy, not automatic escalation.
 
 Delegated roles are leaves by default. Commission independent siblings from the
 primary when needed; do not add unrestricted Agent tooling to a leaf. Inspect
@@ -152,7 +148,7 @@ Assignment fields:
 
 ```text
 Role and purpose:
-Routing: routine or deep | Reason: concrete reason (implementation workers only)
+Routing: standard or deep | Reason: concrete reason (implementation workers only)
 Current card or review target:
 Repository root and branch/candidate:
 Question or acceptance claims:

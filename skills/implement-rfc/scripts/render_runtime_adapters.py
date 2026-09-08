@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import project_config  # noqa: E402
 
 ROLE_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-MODEL_CLASSES = {"mechanical", "balanced", "standard", "deep", "critical"}
+MODEL_CLASSES = {"mechanical", "balanced", "standard", "deep", "review", "critical"}
 MUTATIONS = {"read-only", "build-write", "workspace-write"}
 PLACEHOLDER_RE = re.compile(r"^<[^>]+>$|\$\{")
 ROLES_SCHEMA = "implement-rfc.roles.v1"

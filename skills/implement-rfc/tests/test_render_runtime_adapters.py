@@ -60,10 +60,10 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             "rfc-utility": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "read-only", False),
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
             "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),
-            "rfc-worker-routine": ("gpt-6-astra", "low", "claude-opus-5", "high", "workspace-write", False),
-            "rfc-worker": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", False),
-            "rfc-reviewer": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "read-only", False),
-            "rfc-critical-reviewer": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "xhigh", "read-only", False),
+            "rfc-worker": ("gpt-6-astra", "low", "claude-opus-5", "xhigh", "workspace-write", False),
+            "rfc-worker-deep": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", False),
+            "rfc-reviewer": ("gpt-6-astra", "medium", "claude-fable-5-1", "medium", "read-only", False),
+            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "high", "read-only", False),
         }
         self.assertEqual(set(ROUTING["assignments"]), set(expected))
         with tempfile.TemporaryDirectory() as temp:
@@ -116,7 +116,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertEqual(len(manifest["files"]), 14)
             self.assertEqual(manifest["project"], PROJECT["project"])
 
-            for worker in ("rfc-worker", "rfc-worker-routine"):
+            for worker in ("rfc-worker", "rfc-worker-deep"):
                 claude_worker = (root / f".claude/agents/{worker}.md").read_text()
                 codex_worker = tomllib.loads((root / f".codex/agents/{worker}.toml").read_text())
                 for content in (claude_worker, codex_worker["developer_instructions"]):
@@ -298,22 +298,22 @@ class ProfileTests(unittest.TestCase):
         roles = renderer.load_json(SKILL_DIR / 'config/roles.json')['roles']
         profiles = renderer.load_json(SKILL_DIR / 'config/routing-profiles.json')
         baseline, _ = renderer.select_routes(ROUTING, roles, profiles)
-        profiles['profiles']['test-candidate'] = {'overrides': {'codex': {'rfc-worker-routine': {'model': 'gpt-6-astra', 'effort': 'low'}}}}
+        profiles['profiles']['test-candidate'] = {'overrides': {'codex': {'rfc-worker': {'model': 'gpt-6-astra', 'effort': 'low'}}}}
         with self.assertRaisesRegex(ValueError, 'unverified'):
             renderer.select_routes(ROUTING, roles, profiles, 'test-candidate')
         caps = {'codex': {'gpt-6-astra': ['low', 'high']}}
         candidate, receipt = renderer.select_routes(ROUTING, roles, profiles, 'test-candidate', caps)
-        self.assertEqual(candidate['codex']['rfc-worker-routine'], {'model':'gpt-6-astra','effort':'low'})
+        self.assertEqual(candidate['codex']['rfc-worker'], {'model':'gpt-6-astra','effort':'low'})
         for name in roles:
-            if name != 'rfc-worker-routine':
+            if name != 'rfc-worker':
                 self.assertEqual(candidate['codex'][name], baseline['codex'][name])
         self.assertEqual(candidate['claude'], baseline['claude'])
         self.assertIsNone(receipt['observed'])
-        explicit = {'codex': {'rfc-worker-routine': {'model':'gpt-6-astra','effort':'high'}}}
+        explicit = {'codex': {'rfc-worker': {'model':'gpt-6-astra','effort':'high'}}}
         resolved, receipt = renderer.select_routes(ROUTING, roles, profiles, 'test-candidate', caps,
                                                   explicit_routes=explicit)
-        self.assertEqual(resolved['codex']['rfc-worker-routine']['effort'], 'high')
-        self.assertEqual(receipt['origins']['codex']['rfc-worker-routine'], 'explicit_user')
+        self.assertEqual(resolved['codex']['rfc-worker']['effort'], 'high')
+        self.assertEqual(receipt['origins']['codex']['rfc-worker'], 'explicit_user')
 
     def test_public_profile_and_selection_preserve_native_settings(self):
         runner = RenderRuntimeAdaptersTests()
@@ -331,7 +331,7 @@ class ProfileTests(unittest.TestCase):
             result = runner.run_renderer(root, '--profile', 'baseline')
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(config.read_text(), 'model = "user-choice"\n')
-            data = tomllib.loads((root / '.codex/agents/rfc-worker-routine.toml').read_text())
+            data = tomllib.loads((root / '.codex/agents/rfc-worker.toml').read_text())
             self.assertEqual(data['model'], 'gpt-6-astra')
             self.assertEqual(data['model_reasoning_effort'], 'low')
             profiles = json.loads((SKILL_DIR / 'config/routing-profiles.json').read_text())
