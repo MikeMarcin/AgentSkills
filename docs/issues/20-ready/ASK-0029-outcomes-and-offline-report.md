@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0029"
 title: "Join task outcomes and produce offline comparison reports"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0027", "ASK-0028"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "outcomes-and-offline-report"}
