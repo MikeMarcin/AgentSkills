@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0022"
 title: "Implement invocation-scoped project discovery and MASK selection"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0021"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "project-scope-and-mask-adapter"}
+acceptance: [{"criterion":"RFC-ASK-0006-AC01/AC02 scope boundary","outcome":"pass","revision":"489f8c98587f5946b8d5ce4f804cbd6b146d47ad","evidence":{"kind":"command","command":"python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_usage_scope.py","exit_code":0,"detail":"19 tests pass: real disposable Git/worktrees, physical cwd and non-Git declaration, exact fake MASK argv and home, private extras ignored, replacement identity excludes attribution and metadata reads. Source changes included in this finish commit."}}]
 ---
 
 # ASK-0022: Implement invocation-scoped project discovery and MASK selection
