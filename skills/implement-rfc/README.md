@@ -150,3 +150,12 @@ Keep generated Claude agent files unchanged. If Claude Code's
 map the stable model IDs to inference-profile ARNs outside the portable skill
 using `config/claude-bedrock-model-overrides.example.json`. Confirm each
 agent's startup banner before relying on the mapping.
+
+## Optional remote station controls
+
+The station launcher starts or resumes both runtimes. Use `--fresh codex`,
+`--fresh claude`, or `--fresh` for both contexts while retaining station identity.
+`--no-claude` and `--no-codex` select one service. Claude uses the compact Remote
+Control server; a fresh session becomes visible after a controller connects.
+See [launch and reset controls](references/remote-routing.md#launch-and-reset-controls)
+for exact-ID resumption, writer ownership and legacy flags.

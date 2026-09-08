@@ -3,7 +3,7 @@ schema: implement-rfc.card.v1
 id: ASK-0047
 title: Shared station fresh-context controls and compact Claude server
 status: "In Progress"
-rfcs: ["RFC-ASK-0003"]
+rfcs: []
 depends_on: []
 ---
 
@@ -31,3 +31,8 @@ their tests, active station references/README, source manifest if required.
 
 No push, live session reset, credentials, deployment registry or consumer migration.
 Existing links observe the authorized canonical edit. No live launch is required.
+
+## Scope clarification
+
+Independent owner-requested enhancement after the completed RFC-ASK-0003 adoption.
+It does not reopen that terminal RFC or amend its historical acceptance.

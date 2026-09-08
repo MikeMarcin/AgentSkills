@@ -17,42 +17,12 @@ PACK = Path(__file__).resolve().parent.parent
 GUARD = PACK / "scripts" / "remote_station_guard.py"
 LEASE = PACK / "scripts" / "station_lease.py"
 PROJECT_CONFIG_MODULE = PACK / "scripts" / "project_config.py"
+from project_fixtures import CONFIG
+
 FIXTURE_PROJECT = {
-    "schema": "implement-rfc.project.v1",
-    "project": "fixture",
-    "display_name": "Fixture",
-    "session_prefix": "fx",
+    **CONFIG,
     "origin_repo_name": "fixture",
-    "rfc_root": "docs/rfcs",
-    "issue_root": "docs/issues",
-    "next_id": {"mode": "single-file", "path": "docs/issues/NEXT_ID"},
-    "reservations_dir": "docs/issues/_reservations",
-    "allocate_id_command": "python3 scripts/allocate_issue_id.py",
-    "lanes": {
-        "backlog": "10-backlog",
-        "ready": "20-ready",
-        "platform_ready": {},
-        "in_progress": "30-in-progress",
-        "parked": "40-parked",
-        "blocked": "50-blocked",
-        "done": "60-done",
-    },
-    "lane_statuses": {
-        "10-backlog": "Backlog",
-        "20-ready": "Ready",
-        "30-in-progress": "In Progress",
-        "40-parked": "Parked",
-        "50-blocked": "Blocked",
-        "60-done": "Done",
-    },
-    "rfc_link_field": "rfc",
-    "terminal_rfc_status": "Auto-Verified",
-    "closeout_card": {"front_matter": {"closeout": "true"}},
-    "structure_gate": [],
-    "attended_review_skill": None,
-    "station_registry_doc": "docs/development/remote-stations.md",
     "workstreams": {"main": {"branch": "main"}, "acta": {"branch": "codex/acta"}},
-    "role_addenda": {},
 }
 SCHEMA = PACK / "schemas" / "remote-station.schema.json"
 
@@ -134,7 +104,11 @@ class RemoteStationGuardTests(unittest.TestCase):
             text=True,
         )
         assert self.holder.stdout is not None
-        self.assertEqual(self.holder.stdout.readline().strip(), "held")
+        readiness = self.holder.stdout.readline().strip()
+        if readiness != "held":
+            _, error = self.holder.communicate(timeout=5)
+            self._temporary.cleanup()
+            self.fail(f"lease fixture failed to start: {error}")
 
     def tearDown(self) -> None:
         if self.holder.poll() is None:

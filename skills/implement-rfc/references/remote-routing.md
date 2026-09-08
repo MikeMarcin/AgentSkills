@@ -92,7 +92,8 @@ The launcher writes `.remote-station.json`, untracked, at the checkout root:
   An explicit `--machine` that contradicts the record is a refusal.
 - `codex.thread_id` is the immutable persistent-task identity and is also
   reused on relaunch. `thread_name` equals `station`; a mismatch is a hard
-  stop. `codex` may be `null` only in the deprecated `--no-server` path.
+  stop. `codex` may be `null` before Codex provisioning, including `--no-codex`
+  and the deprecated `--no-server` path.
 - `claude.session_id` is the exact Remote Control identity recorded after a
   fresh named session starts. Relaunch uses `--session-id`; it never selects a
   conversation by recency across linked Git worktrees. The field may be absent
@@ -110,19 +111,45 @@ machine-local configuration, not dispatch input: a message cannot rewrite it,
 and the skill must treat a hand-edited file that disagrees with the live
 checkout (wrong branch, wrong repo) as a hard stop, not as truth.
 
-### Starting a station over
+### Launch and reset controls
 
-Every identity above is durable on purpose, which leaves no ordinary way out
-of a station whose recorded bindings have become wrong. `--fresh-station` is
-that way out, and it is the only one: it archives the recorded Codex task and
-anything else already answering to the station name in this checkout, then
-discards `station_id`, `codex`, and `claude` and provisions the workstream's
-canonical name again — the recorded machine suffix included, so it is also how
-a station is deliberately renamed. Archiving, not deletion, is what Codex
-offers, so the abandoned history stays readable; it simply stops being the
-station. `--fresh-station` refuses alongside `--continue`, which requires the
-session it discards, and alongside `--no-server`, which reaches no App Server
-and so could only pretend the old task was released.
+Run the shared `scripts/launch_remote_station.py` from the consumer checkout,
+through its skill link or with an explicit `--repo-root`. Normal launch starts
+or resumes both runtimes under the writer lease. Use `python3` on macOS, Linux
+and WSL2; use `py -3` in native Windows PowerShell or cmd.
+
+| Option | Behavior |
+|---|---|
+| `--fresh` or `--fresh both` | New context for both enabled runtimes |
+| `--fresh codex` | Archive the validated idle Codex task and create a replacement |
+| `--fresh claude` | Clear the saved Claude binding and start a new named session |
+| `--no-claude` | Run Codex only; keep the terminal open to hold the lease |
+| `--no-codex` | Run Claude only, retaining any saved Codex binding |
+| `--help-all` | Show setup and troubleshooting flags |
+
+Fresh context keeps station identity, name and machine suffix. With one service
+skipped, `--fresh` affects only the enabled runtime. Skipping does not stop an
+already-running endpoint. Active or unrelated Codex tasks are refused; history
+is archived, never deleted. If Desktop holds an idle task's writer, archive that
+exact task in Desktop and retry. An archived catalog entry is recognized even
+when `thread/read` omits the archived flag. Bootstrap failures include the
+server's error message.
+
+Claude uses the compact `claude remote-control --name NAME --spawn session`
+server interface, showing status and connection controls rather than a terminal
+conversation. A fresh session may not appear in peer lists until a controller
+connects. The launcher watches for the exact bridge session ID throughout the
+server lifetime. Restarts use that ID, never a directory-wide recency guess.
+`--require-claude-resume` (legacy `--continue`/`-c`) refuses without that ID;
+normal launch attempts resumption and can start fresh after a startup refusal.
+An explicit fresh Claude launch clears the old binding before starting, so an
+interruption before connection cannot silently resume the discarded context.
+
+The legacy `--fresh-station` additionally discards station identity and the
+inferred machine suffix. It archives validated station tasks before provisioning
+under the canonical name. It refuses with strict Claude resume, `--no-server`,
+or either skipped service; use `--fresh` for ordinary context resets instead.
+Legacy `--new-codex-session` and `--new-claude-session` remain accepted.
 
 ## Writer lease
 

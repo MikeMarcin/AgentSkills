@@ -151,32 +151,25 @@ directory, reachable from other machines' sessions and from claude.ai/code and
 the mobile app. Multiple servers on one machine in different directories are
 supported — that is how several stations share a host.
 
-- Launch stations with the interactive form, `claude --remote-control
-  <station> --permission-mode <mode>`: the running process is the served
-  session, so the name exists and binds in peer lists the moment it starts,
-  and the supervisor already runs Claude in the foreground for its whole
-  life. The operator therefore sees Claude open in the launch terminal; that
-  session is the station and stays running, driven by messages, the web or
-  mobile app, or the keyboard. The launcher infers the workstream from the
-  station file or the checkout's branch, so the documented command takes no
-  argument. The `claude remote-control` *server* is the wrong shape for a
-  station whatever its `--spawn` mode: `session`, the default `same-dir`,
-  and `worktree` all create sessions only when a controller connects, so a
-  station launched that way has no session and no peer-list entry until
-  someone opens its environment (measured 2026-09-01: four server-form
-  probes, `--create-session-in-dir` and `--capacity 1` included, created
-  none in 40 seconds; the interactive form was listed under its name within
-  seconds). `--spawn worktree` is additionally wrong for every workstream
-  branch because it branches from the repository's default branch, and
-  `same-dir` lets several sessions mix context in one checkout. The spawn
-  mode is persisted per project in `~/.claude.json`
-  (`remoteControlSpawnMode`); the launcher no longer depends on it.
-- Resuming a station: a recorded server-created session comes back through
-  `claude remote-control --session-id <id>`; a session created by the
-  interactive form comes back through `claude --continue --remote-control
-  <station>` in the station directory, which reconnects through that
-  conversation's reconnection record. The launcher chooses by what the
-  station file and the directory's conversation records hold.
+- The launcher defaults to the compact server form, `claude remote-control
+  --name <station> --spawn session --permission-mode <mode>`. It keeps the
+  foreground supervisor and writer lease alive while showing connection/status
+  controls. The workstream is inferred from the station file or checkout branch.
+  A fresh session is created when a controller connects; verify the exact name
+  in peer lists after that connection. The September 1 historical probes found
+  immediate visibility only with the interactive form. The owner explicitly
+  selected the compact interface for the shared launcher on September 8, accepting
+  the connection step. This change has mocked command/session-watcher evidence,
+  not a new live platform observation.
+- `--spawn session` is explicit so persisted `remoteControlSpawnMode` does not
+  choose the launch mode. `worktree` would select another branch and `same-dir`
+  could mix multiple sessions in one checkout; neither is selected here.
+- Resumption uses only the station's recorded exact session ID through
+  `claude remote-control --session-id <id>`. The launcher watches for that ID
+  throughout a fresh server's lifetime. It never resumes by worktree recency.
+  `--fresh claude`, `--fresh codex`, and `--fresh` select new contexts;
+  [remote routing](remote-routing.md#launch-and-reset-controls) defines identity,
+  service-selection and legacy reset behavior.
 - A session cannot create a session on another machine. Cross-machine work is
   `SendMessage` to existing sessions, addressed purely by session name;
   duplicate names silently resolve to auto-variants, so names must be unique

@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "e4a5f34d8713c4532d4124705b395e22778e2ccdbf551cdd57bfdc2ebe093116"
+      "sha256": "7799de169718dfce1de2c0ba2425ff7a98cb989ebdfed2882d538651e18eeea0"
     },
     {
       "path": "SKILL.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "references/remote-routing.md",
-      "sha256": "4c1ca75e586a7451efbc2cd450fcc1fbce37322daaffb02cc02dd139729a0441"
+      "sha256": "15da6fafc84ba5ec2173052c9cbf15e3ebcece509e6a49b1b4b8eb1f3122e263"
     },
     {
       "path": "references/role-adoption.md",
@@ -78,7 +78,7 @@
     },
     {
       "path": "references/runtime-compatibility.md",
-      "sha256": "21a2ad3661a33fbb20a256502d6138fad4f9e4498de268fd0b939d65f1dbb48c"
+      "sha256": "bd5aaad736660072e292988b9f9e3103017ab21d5886557b0f03aa16869d36dd"
     },
     {
       "path": "references/usage-collection.md",
@@ -126,7 +126,7 @@
     },
     {
       "path": "scripts/codex_station.py",
-      "sha256": "883d34c6751e837a8c38c3c972c4783d598c67ec32a30483636a2aa95e6f70f1"
+      "sha256": "f773b527ebe66fea3c3a3dd71c0d9c801e5a0ad545c75cffcb554ffe245a2dfd"
     },
     {
       "path": "scripts/issue_board.py",
@@ -134,7 +134,7 @@
     },
     {
       "path": "scripts/launch_remote_station.py",
-      "sha256": "9f187d6c044ee13c69ee2412d245c91da83f362d02bb0277180d6b25cc079474"
+      "sha256": "f1f785f09dee72e93773c03f499a69ef7a60e5a349d447b658a628a2d00278db"
     },
     {
       "path": "scripts/project_config.py",
@@ -230,7 +230,7 @@
     },
     {
       "path": "tests/test_codex_station.py",
-      "sha256": "f8e6f3711680772fd1a52d3cfccb17284e572871372789e2470f4ad48f4115d5"
+      "sha256": "26a69e0641f49e29ff22d42e2de14c6353873b470f167c745432f6620c418c4f"
     },
     {
       "path": "tests/test_issue_board.py",
@@ -238,7 +238,7 @@
     },
     {
       "path": "tests/test_launch_remote_station.py",
-      "sha256": "47a621eda1342ae8d6725573105890e7757b9aa373388612f92910417c2eb656"
+      "sha256": "337222976ce04d9bab34fe0dc63401c17ab9e85e25be76ea956b02e1e399f378"
     },
     {
       "path": "tests/test_project_config.py",
@@ -246,7 +246,7 @@
     },
     {
       "path": "tests/test_remote_station_guard.py",
-      "sha256": "120fa4978427426e609f8cd1e72797df9ef4ffaacddec0658cd92d1d571c200d"
+      "sha256": "fa9e08ea6dc135684abf8c32269aececd714ea0d043b0fc10928f18ec390b480"
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
@@ -321,6 +321,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "6ed546ab546b6495",
+  "portable_digest": "ca3ab7d77d843261",
   "schema": "implement-rfc.portable-manifest.v1"
 }
