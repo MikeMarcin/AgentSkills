@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0025"
 title: "Qualify collector invocation and MASK launcher handling on Windows"
-status: "In Progress"
+status: "Blocked"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "windows-capture-qualification"}
+blocked_by: "native-windows-unavailable"
 ---
 
 # ASK-0025: Qualify collector invocation and MASK launcher handling on Windows
