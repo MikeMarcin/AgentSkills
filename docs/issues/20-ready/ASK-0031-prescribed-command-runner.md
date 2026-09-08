@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0031"
 title: "Add bounded deterministic command stages and integrator gates"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0021"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "prescribed-command-runner"}
