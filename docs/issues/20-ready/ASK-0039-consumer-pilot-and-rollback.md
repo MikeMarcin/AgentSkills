@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0039"
 title: "Deploy a scoped cross-project pilot with reversible bindings"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0026", "ASK-0036", "ASK-0038"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "consumer-pilot-and-rollback"}
