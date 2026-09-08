@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0048"
 title: "Activate bounded delegation in implement-rfc"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0009"]
 depends_on: []
 ---
