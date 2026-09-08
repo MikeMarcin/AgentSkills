@@ -57,6 +57,14 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(data['tasks']['gate']['event'],'awaiting_integration')
         self.assertEqual(data['semantic_acceptance'],'not_decided_by_runner')
 
+    def test_pending_adapter_publication_refuses_new_run(self):
+        pending = self.root / '.mask/generated/implement-rfc/runtime-adapters.pending.json'
+        pending.parent.mkdir(parents=True)
+        pending.write_text('{}')
+        with self.assertRaisesRegex(ValueError, 'Interrupted adapter publication'):
+            self.execute()
+        self.assertFalse((pending.parent / 'runs').exists())
+
     def test_stale_or_unapproved_causes_no_dispatch(self):
         with self.assertRaises(ValueError):runner.start(self.order,'wrong')
         self.script.write_text('raise RuntimeError()')

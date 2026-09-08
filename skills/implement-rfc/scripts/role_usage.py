@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 SCHEMA = 'implement-rfc.role-usage.v1'
 BANNER = re.compile(r'\ARole: (rfc-[a-z-]+) \| Model: ([^|\n]+) \| Effort: ([^\n]+)(?:\n|$)')
-DECISION = re.compile(r'^Routing: (routine|deep|unknown) \| Reason: ([^\n]+)$', re.M)
+DECISION = re.compile(r'^Routing: (standard|routine|deep|unknown) \| Reason: ([^\n]+)$', re.M)
 UNKNOWN = '<unknown>'
 
 
@@ -76,7 +76,7 @@ class Audit:
         return bool(parsed and parsed.astimezone(self.tz).date() == self.day)
 
     def markers(self, record, text, path, line):
-        if record['role'] not in ('rfc-worker', 'rfc-worker-routine'):
+        if record['role'] not in ('rfc-worker', 'rfc-worker-routine', 'rfc-worker-deep'):
             return
         # Decisions belong beside the startup identity or final Status, not in
         # quoted examples later in an assistant's prose.
@@ -301,7 +301,7 @@ class Audit:
             group['agents_created'] += int(record['created_on_date'])
             group['agents_active'] += bool(record['activity'])
             group['activity_count'] += len(record['activity'])
-            if record['role'] in ('rfc-worker', 'rfc-worker-routine'):
+            if record['role'] in ('rfc-worker', 'rfc-worker-routine', 'rfc-worker-deep'):
                 group['agents_without_routing_reason'] += not any(d['choice'] != 'unknown' for d in record['routing_decisions'])
             for activity in record['activity']:
                 for observation in activity['observations']:

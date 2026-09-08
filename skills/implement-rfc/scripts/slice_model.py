@@ -164,7 +164,7 @@ def validate(order):
             route = task['route']
             if (not isinstance(route,dict) or set(route) != {'provider','role','profile','model','effort','permission_policy'}
                     or route['provider'] not in ('codex','claude')
-                    or route['role'] not in ('rfc-utility','rfc-scout','rfc-reviewer','rfc-critical-reviewer')
+                    or route['role'] not in ('rfc-utility','rfc-scout','rfc-reviewer','rfc-critical-reviewer','rfc-reviewer-critical')
                     or route['profile'] != order['profile'] or route['permission_policy'] != 'read-only-leaf'
                     or route not in permissions.get('allowed_agents', [])):
                 raise ValueError('Exact approved read-only agent route required')

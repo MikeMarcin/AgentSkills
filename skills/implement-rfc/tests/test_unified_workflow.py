@@ -158,7 +158,7 @@ class SelectedInstructionTests(unittest.TestCase):
         route = {'model':'fixture-model','effort':'high'}
         utility = renderer.role_prompt('rfc-utility', roles['rfc-utility'], route, project)
         runner = renderer.role_prompt('rfc-test-runner', roles['rfc-test-runner'], route, project)
-        worker = renderer.role_prompt('rfc-worker-routine', roles['rfc-worker-routine'], route, project)
+        worker = renderer.role_prompt('rfc-worker', roles['rfc-worker'], route, project)
         self.assertIn('do not broaden the question or infer architecture', utility)
         self.assertIn('Distinguish not-found from not-searched', utility)
         self.assertNotIn('Preserve fixture-owner constraint exactly.', utility)

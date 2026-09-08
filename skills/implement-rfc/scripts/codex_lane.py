@@ -74,6 +74,8 @@ def load_role_route(role_name: str) -> tuple[dict, dict]:
     roles = renderer.validate_roles(renderer.load_json(SKILL_DIR / "config" / "roles.json"))
     routing = renderer.load_json(SKILL_DIR / "config" / "routing.json")
     assignments, codex_classes, _ = renderer.validate_routing(routing, roles)
+    if role_name in renderer.RETIRED_ROLES:
+        raise LaunchError("retired role selector; explicitly reissue using rfc-worker or rfc-reviewer-critical; preserve original route evidence")
     if role_name not in roles:
         raise LaunchError(f"unknown role {role_name!r}; known roles: {', '.join(sorted(roles))}")
     return roles[role_name], codex_classes[assignments[role_name]]
@@ -144,6 +146,9 @@ def compose_prompt(role_name: str, role: dict, route: dict, lane_name: str, task
 
 def cmd_launch(args: argparse.Namespace) -> int:
     context = getattr(args, "context", None) or project_config.resolve_context(repo_root=args.repo_root)
+    pending = context.repo_root / ".mask/generated/implement-rfc/runtime-adapters.pending.json"
+    if pending.exists() or pending.is_symlink():
+        raise LaunchError("interrupted adapter publication; finish regeneration before launch")
     role, route = load_role_route(args.role)
     if args.task_file:
         task_text = Path(args.task_file).read_text(encoding="utf-8")

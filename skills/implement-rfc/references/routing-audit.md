@@ -1,7 +1,7 @@
 # Local role usage and routing audit
 
 Use `scripts/role_usage.py` when asked which roles ran, how often a driver uses
-routine/deep workers, or whether recorded model selection matches an assignment.
+standard/deep workers, or whether recorded model selection matches an assignment.
 Run it from either driver; `--driver` selects the history being read, not the
 agent invoking the script. Python 3.11+ is sufficient; no host CLI is launched.
 
@@ -47,7 +47,7 @@ Redirect stdout to a chosen local artifact if a snapshot is useful.
   as self-reported. Prompts, model names and task titles never establish a role.
   Unattributed and non-RFC native subagents remain visible; filter by exact role
   when desired. A missing role is not evidence that no subagent ran.
-- **Routing decisions**: the worker's exact assistant `Routing: routine|deep |
+- **Routing decisions**: the worker's exact assistant `Routing: standard|routine|deep |
   Reason: ...` line, with source location. Repeated startup/final copies are
   deduplicated. Reasons are limited to 500 characters; do not put sensitive
   information in these short assignment reasons. Missing historical reasons
@@ -71,7 +71,7 @@ its tail was incomplete. Missing optional audit coverage never blocks RFC work.
 
 Compare observed model/effort with the routing policy that applied at the time.
 Today's `config/routing.json` cannot prove yesterday's assignment was incorrect.
-Likewise, a low routine/deep ratio is a reason to inspect assignments, not proof
+Likewise, a low standard/deep ratio is a reason to inspect assignments, not proof
 of misrouting: the actual work may require sensitive contract changes.
 
 ## Claude-driven Codex companion lanes
@@ -93,7 +93,7 @@ histories and primary-agent work are outside the native census.
 
 ## Record new decisions
 
-For substantial delegated implementation, select routine/deep as described in
+For substantial delegated implementation, select standard/deep as described in
 [delegated execution](delegated-execution.md), and supply one concrete reason.
 Workers repeat the assignment's decision after their identity line and in their
 final Status. This keeps the reason in normal local runtime history for either
@@ -101,3 +101,5 @@ driver; no extra command is required for every delegation. Missing reasons in
 older or cached role adapters are expected and remain unknown. Shared skill
 links update policy immediately on disk; generated role adapters need an
 explicit render in the selected consumer, and active hosts may cache both.
+
+Historical `rfc-worker-routine`, `rfc-critical-reviewer` and routine decisions remain raw history. New selectors use `rfc-worker`, `rfc-worker-deep` and `rfc-reviewer-critical`. A generic historical worker without contemporaneous routing evidence remains unclassified; current models and dates cannot relabel it. Collect admitted assignments before regenerating; explicitly reissue when necessary, preserving original route evidence. No live session is hot-migrated.

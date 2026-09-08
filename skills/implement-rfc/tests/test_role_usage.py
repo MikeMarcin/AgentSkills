@@ -125,6 +125,23 @@ class RoleUsageTests(unittest.TestCase):
         self.assertEqual(record['activity'][0]['observations'][0]['model'], 'claude-opus-5')
         self.assertEqual(self.audit.report()['summary'][0]['agents_without_routing_reason'], 0)
 
+    def test_new_standard_deep_and_ambiguous_generic_history(self):
+        for index, (role, choice) in enumerate((('rfc-worker', 'standard'),
+                ('rfc-worker-deep', 'deep'), ('rfc-worker', None))):
+            identity = f'worker-{index}'
+            banner = '' if choice is None else f'Routing: {choice} | Reason: supplied problem'
+            path = write(self.root / f'{identity}.jsonl', [meta(identity=identity, role=role),
+                context(model='same-model', effort=None), owned(identity=identity, text=banner),
+                owned(identity=identity, text=banner)])
+            self.audit.codex_file(path)
+        records = self.audit.records
+        self.assertEqual([r['role'] for r in records], ['rfc-worker', 'rfc-worker-deep', 'rfc-worker'])
+        self.assertEqual(records[0]['routing_decisions'][0]['choice'], 'standard')
+        self.assertEqual(records[1]['routing_decisions'][0]['choice'], 'deep')
+        self.assertEqual(len(records[0]['routing_decisions']), 1)
+        self.assertEqual(records[2]['routing_decisions'], [])
+        self.assertIsNone(records[2]['activity'][0]['observations'][0]['effort'])
+
     def test_codex_routing_from_owned_assistant_only_and_no_transcript_dump(self):
         secret = 'PRIVATE PROMPT MUST NOT APPEAR'
         path = write(self.root / 'rollout.jsonl', [meta(), context(),

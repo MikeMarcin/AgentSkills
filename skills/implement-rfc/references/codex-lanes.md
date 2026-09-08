@@ -14,7 +14,7 @@ gap is known and deliberately left open.
 
 - **Cross-family independent review.** When review is useful, prefer the Codex
   route for a Claude-authored implementation. Select either `rfc-reviewer` or
-  `rfc-critical-reviewer` according to the named risk. Run a second review only
+  `rfc-reviewer-critical` according to the named risk. Run a second review only
   for an unresolved material concern or an explicit request; see
   [model-routing.md](model-routing.md).
 - **Mechanical bulk.** Offloading bulk `rfc-utility` and `rfc-test-runner`
@@ -43,7 +43,7 @@ appends a launch record to the checkout's Codex lane log
 (`<git-common-dir>/<project>-codex-lanes.jsonl`, named from the selected consumer's `project.json`).
 
 Native adapters and plugin launches use the same routing source for all seven
-roles, including `rfc-test-runner` and `rfc-worker-routine`. Model and effort are
+roles, including `rfc-test-runner` and `rfc-worker-deep`. Model and effort are
 passed explicitly, so plugin defaults do not select a different route. The test
 runner remains limited to assigned disposable outputs even when `--write` is
 used; that flag grants a workspace sandbox, not permission to change source.
@@ -134,3 +134,5 @@ stays optional and risk-triggered per `SKILL.md`.
 - When no Codex runtime is installed or the companion invocation fails, fall
   back per the standard rule: run the same role on the native runtime or
   serially in the primary, and record the fallback and its trigger.
+
+Historical `rfc-worker-routine`, `rfc-critical-reviewer` and routine decisions remain raw history. New selectors use `rfc-worker`, `rfc-worker-deep` and `rfc-reviewer-critical`. A generic historical worker without contemporaneous routing evidence remains unclassified; current models and dates cannot relabel it. Collect admitted assignments before regenerating; explicitly reissue when necessary, preserving original route evidence. No live session is hot-migrated.

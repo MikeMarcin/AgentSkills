@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0044"
 title: "Migrate role adapters safely and preserve historical audit meaning"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0009"]
 depends_on: ["ASK-0043"]
 metadata: {"packet":"agent-skills-standard-worker-review", "provisional_id":true}
+acceptance: [{"criterion":"RFC-ASK-0009-AC03/AC04","outcome":"pass","revision":"ac4e7f903fd65558fef91d2cf1151f8c60328188 plus supplied working paths","evidence":{"kind":"command","detail":"8 migration regressions, 22 history tests, 11 fake-driver companion tests, 11 unified workflow tests passed. Public renderer fixtures establish hash/ownership collision refusal, obsolete retirement, interrupted retry and active frozen assignment protection. Command-runner checks passed including pending-publication admission refusal. Raw historical generic workers stay unknown without decisions."}}]
 ---
 
 # ASK-0044: Migrate role adapters safely and preserve historical audit meaning

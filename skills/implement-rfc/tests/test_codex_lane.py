@@ -91,16 +91,23 @@ class CodexLaneTest(unittest.TestCase):
             return []
         return [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
 
+    def test_retired_selectors_refuse_without_launch(self):
+        for role in ('rfc-worker-routine', 'rfc-critical-reviewer'):
+            result = self._launch('--role', role, '--task', 'Do not launch.')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('retired role selector', result.stderr)
+        self.assertEqual(self._lane_log(), [])
+
     def test_all_routes_are_forwarded_with_role_instructions_and_identity(self) -> None:
         module = _load_codex_lane()
         expected = {
             "rfc-utility": ("gpt-5.6-luna", "xhigh"),
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh"),
             "rfc-scout": ("gpt-5.6-sol", "low"),
-            "rfc-worker-routine": ("gpt-5.6-sol", "high"),
-            "rfc-worker": ("gpt-6-astra", "high"),
-            "rfc-reviewer": ("gpt-6-astra", "high"),
-            "rfc-critical-reviewer": ("gpt-6-astra", "xhigh"),
+            "rfc-worker": ("gpt-6-astra", "low"),
+            "rfc-worker-deep": ("gpt-6-astra", "high"),
+            "rfc-reviewer": ("gpt-6-astra", "medium"),
+            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh"),
         }
         for name, (model, effort) in expected.items():
             with self.subTest(role=name):
@@ -121,7 +128,7 @@ class CodexLaneTest(unittest.TestCase):
                 self.assertIn(module.renderer.startup_banner(name, route), payload["prompt"])
                 for instruction in module.renderer.project_instructions(role, PROJECT):
                     self.assertIn(instruction, payload["prompt"])
-                addenda_roles = ("rfc-worker", name) if name == "rfc-worker-routine" else (name,)
+                addenda_roles = ("rfc-worker", name) if name == "rfc-worker-deep" else (name,)
                 for addenda_role in addenda_roles:
                     for addendum in PROJECT["role_addenda"].get(addenda_role, []):
                         self.assertIn(addendum, payload["prompt"])
@@ -176,7 +183,7 @@ class CodexLaneTest(unittest.TestCase):
         self.assertEqual(self._lane_log(), [])
 
     def test_write_refused_in_shared_checkout(self) -> None:
-        for role in ("rfc-worker", "rfc-worker-routine", "rfc-test-runner"):
+        for role in ("rfc-worker", "rfc-worker-deep", "rfc-test-runner"):
             with self.subTest(role=role):
                 result = self._launch("--role", role, "--task", "Execute assignment.", "--write")
                 self.assertEqual(result.returncode, 2)
@@ -186,7 +193,7 @@ class CodexLaneTest(unittest.TestCase):
     def test_write_allowed_in_lane_worktree(self) -> None:
         worktree = self.root / "wt-a"
         _git(self.repo, "worktree", "add", "-b", "lane/a", str(worktree), "HEAD")
-        for role in ("rfc-worker", "rfc-worker-routine", "rfc-test-runner"):
+        for role in ("rfc-worker", "rfc-worker-deep", "rfc-test-runner"):
             with self.subTest(role=role):
                 result = self._launch(
                     "--role", role, "--task", "Execute the bounded assignment.",

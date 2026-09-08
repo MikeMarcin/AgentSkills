@@ -191,6 +191,12 @@ def agent(path, task, root, order):
 
 def start(order, approval):
     root = validate(order)
+    if any(task.get('route', {}).get('role') in ('rfc-worker-routine', 'rfc-critical-reviewer')
+           for task in order['tasks']):
+        raise ValueError('Retired role selector: explicitly reissue new work using current roles; retained admitted orders remain unchanged')
+    pending = root / '.mask/generated/implement-rfc/runtime-adapters.pending.json'
+    if pending.exists() or pending.is_symlink():
+        raise ValueError('Interrupted adapter publication; finish regeneration before launch')
     if approval != digest(order):
         raise ValueError('Explicit current --approve-order digest required')
     path = run_path(root,order['run_id'])
