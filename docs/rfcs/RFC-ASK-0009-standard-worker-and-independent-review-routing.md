@@ -2,7 +2,7 @@
 schema: "implement-rfc.rfc.v1"
 id: "RFC-ASK-0009"
 title: "Standard implementation worker and independent review routing"
-status: "Proposed"
+status: "Implementing"
 ---
 
 # Standard implementation worker and independent review routing
