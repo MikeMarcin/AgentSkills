@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0035"
 title: "Qualify bounded execution and failure delivery across native hosts"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0033", "ASK-0034"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "runner-native-qualification"}
