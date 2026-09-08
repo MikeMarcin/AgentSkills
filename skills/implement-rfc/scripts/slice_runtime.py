@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import tempfile
 from slice_events import EventStore
 
 TOKEN=re.compile(r'[A-Za-z0-9][A-Za-z0-9._-]{0,79}\Z')
@@ -40,6 +41,9 @@ class Runtime:
             self.driver.validate(packet)
             self.append('dispatch_intent',task,attempt,recovery_budget=recovery_budget)
             try:
+                # Native drivers checkpoint allocated identity before model work.
+                self.driver.identity_checkpoint = lambda **identity: self.append(
+                    'native_identity',task,attempt,**identity)
                 receipt=self.driver.launch(packet,attempt_id=attempt)
                 if not isinstance(receipt,dict) or not receipt.get('driver_session_id') or not receipt.get('driver_turn_id'):
                     raise ValueError('Driver receipt lacks exact owned identity')
@@ -50,36 +54,57 @@ class Runtime:
 
     def receipt(self,attempt):
         records=self.records(attempt)
-        return next((r for r in reversed(records) if r['event']=='dispatched'),None)
+        return next((r for r in reversed(records) if r['event'] in ('dispatched','native_identity')),None)
+
+    def publish(self, name, text):
+        if not isinstance(text, str) or len(text.encode()) > MAX_REPORT:
+            raise ValueError('Missing or oversized report')
+        path = self.store.root / name
+        raw = text.encode()
+        if path.is_symlink():
+            raise ValueError('Report collision')
+        if path.exists():
+            if path.read_bytes() != raw:
+                raise ValueError('Report collision')
+            return raw
+        # Publish complete bytes without replacing an existing artifact. A crash
+        # before publication leaves only a disposable temporary, not a torn report.
+        fd, temporary = tempfile.mkstemp(prefix='.report-', dir=self.store.root)
+        try:
+            with os.fdopen(fd, 'wb') as stream:
+                stream.write(raw); stream.flush(); os.fsync(stream.fileno())
+            try:
+                os.link(temporary, path)
+            except FileExistsError:
+                if path.is_symlink() or path.read_bytes() != raw:
+                    raise ValueError('Report collision')
+            if os.name == 'posix':
+                directory = os.open(self.store.root, os.O_RDONLY)
+                try: os.fsync(directory)
+                finally: os.close(directory)
+        finally:
+            os.unlink(temporary)
+        return raw
 
     def save_report(self,task,attempt,text,recovery=False):
-        if not isinstance(text,str) or len(text.encode())>MAX_REPORT:
-            raise ValueError('Missing or oversized report')
         name=attempt+('.recovery-report.txt' if recovery else '.report.txt')
-        path=self.store.root/name
-        # Retry collection can reuse precisely identical bytes, never replace a different report.
-        raw=text.encode()
-        if path.exists() or path.is_symlink():
-            if path.is_symlink() or path.read_bytes()!=raw:
-                raise ValueError('Report collision')
-        else:
-            with path.open('xb') as stream:
-                stream.write(raw);stream.flush();os.fsync(stream.fileno())
+        raw=self.publish(name,text)
         self.append('recovery_report_ready' if recovery else 'report_ready',task,attempt,
                     report_path=name,sha256=hashlib.sha256(raw).hexdigest())
         self.append('collected',task,attempt,report_path=name)
         return self.records(attempt)[-1]
 
     def consume(self,attempt,events):
-        # This consumes driver events; it never calls a model to check status.
-        with self.store.writer():
-            receipt=self.receipt(attempt)
-            if not receipt:raise ValueError('No owned native receipt; inspect uncertain dispatch')
-            task=receipt['task_id']
-            records=self.records(attempt)
-            seen={r.get('native_event_id') for r in records if r.get('native_event_id')}
-            terminal=any(r['event'] in ('cancelled','cancel_requested','awaiting_integration') for r in records)
-            for index,event in enumerate(events):
+        # Wait outside the writer lock so cancellation can acquire ownership.
+        for index,event in enumerate(events):
+            with self.store.writer():
+                receipt=self.receipt(attempt)
+                if not receipt:raise ValueError('No owned native receipt; inspect uncertain dispatch')
+                task=receipt['task_id']
+                records=self.records(attempt)
+                # Only a final handled marker deduplicates the entire transaction.
+                seen={r.get('native_event_id') for r in records if r['event']=='native_event_handled'}
+                terminal=any(r['event'] in ('cancelled','cancel_requested','awaiting_integration') for r in records)
                 if index>=10000:raise ValueError('Driver event budget exceeded')
                 if event.get('kind')=='idle':continue
                 if any(event.get(k)!=receipt[k] for k in ('driver_session_id','driver_turn_id')):
@@ -87,9 +112,13 @@ class Runtime:
                 eid=event.get('event_id')
                 if not isinstance(eid,str) or len(eid)>256:raise ValueError('Native event identity required')
                 if eid in seen:continue
-                seen.add(eid)
                 if terminal:continue
                 kind=event.get('kind')
+                if isinstance(event.get('usage_aggregate_do_not_add'),dict):
+                    from usage_capture import tokens
+                    self.append('usage_aggregate_observed',task,attempt,
+                                tokens=tokens(event['usage_aggregate_do_not_add']),
+                                additive=False,native_event_id=eid)
                 if kind=='report':
                     if not any(r['event']=='collected' for r in self.records(attempt)):
                         self.save_report(task,attempt,event.get('text'))
@@ -97,7 +126,7 @@ class Runtime:
                         self.append('awaiting_integration',task,attempt)
                         terminal=True
                 elif kind in ('completed','failed','max_turns','quota'):
-                    if kind == 'completed':
+                    if kind == 'completed' and not any(r['event']=='execution_completed' for r in self.records(attempt)):
                         self.append('execution_completed',task,attempt,native_event_id=eid)
                     if kind == 'completed' and any(r['event']=='collected' for r in self.records(attempt)):
                         self.append('awaiting_integration',task,attempt);terminal=True
@@ -112,13 +141,12 @@ class Runtime:
                     if isinstance(text,str) and len(text.encode())<=MAX_REPORT:
                         # Keep each bounded phase report; arrival order cannot erase earlier evidence.
                         name=attempt+'.partial-'+hashlib.sha256(eid.encode()).hexdigest()[:16]+'.txt'
-                        with (self.store.root/name).open('xb') as stream:
-                            stream.write(text.encode());stream.flush();os.fsync(stream.fileno())
+                        self.publish(name,text)
                         self.append('partial_report_ready',task,attempt,report_path=name,native_event_id=eid)
                 else:
                     raise ValueError('Unsupported native lifecycle event')
                 self.append('native_event_handled',task,attempt,native_event_id=eid)
-            return self.records(attempt)
+        return self.records(attempt)
 
     def cancel(self,attempt):
         with self.store.writer():
@@ -152,11 +180,16 @@ class Runtime:
             if not eligible or not budget or not caps.get('read_only_report_resume'):
                 return self.append('blocked',task,attempt,reason='report_only_recovery_unsupported_or_not_preapproved')
             self.append('recovery_intent',task,attempt,budget_seconds=budget)
-            try:
-                result=self.driver.recover_report(receipt,budget_seconds=budget)
+        # Recovery is reserved durably, but native waiting must not own the journal.
+        try:
+            result=self.driver.recover_report(receipt,budget_seconds=budget)
+            with self.store.writer():
+                if any(r['event'] in ('cancel_requested','cancelled') for r in self.records(attempt)):
+                    return self.records(attempt)[-1]
                 if result.get('driver_session_id')!=receipt['driver_session_id']:
                     raise ValueError('Recovery session changed')
                 self.save_report(task,attempt,result.get('report'),recovery=True)
                 return self.append('awaiting_integration',task,attempt,recovered_report_only=True)
-            except Exception as error:
+        except Exception as error:
+            with self.store.writer():
                 return self.append('blocked',task,attempt,reason='recovery_failed_'+type(error).__name__)

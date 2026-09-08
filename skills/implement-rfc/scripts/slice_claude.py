@@ -78,7 +78,10 @@ class ClaudeDriver:
         return process
     def launch(self,packet,attempt_id):
         self.validate(packet);self.auth()
-        sid=str(uuid.uuid4());process=self.spawn(packet,sid)
+        sid=str(uuid.uuid4())
+        if checkpoint := getattr(self,'identity_checkpoint',None):
+            checkpoint(driver_session_id=sid,driver_turn_id='assignment:'+attempt_id,phase='session_allocated')
+        process=self.spawn(packet,sid)
         self.owned[sid]={'process':process,'packet':dict(packet),'attempt':attempt_id,'cancelled':False,'recovered':False}
         return {'driver_session_id':sid,'driver_turn_id':'assignment:'+attempt_id}
     def require_owned(self,receipt):
@@ -101,8 +104,11 @@ class ClaudeDriver:
         deadline=time.monotonic()+seconds
         try:
             for _ in range(10000):
-                try:value=messages.get(timeout=max(.001,deadline-time.monotonic()))
-                except queue.Empty:raise TimeoutError('Companion deadline reached') from None
+                try:value=messages.get(timeout=min(.25,max(.001,deadline-time.monotonic())))
+                except queue.Empty:
+                    if time.monotonic()>=deadline:raise TimeoutError('Companion deadline reached') from None
+                    yield {'type':'__idle__'}
+                    continue
                 if value is None:return
                 if isinstance(value,Exception):raise value
                 yield value
@@ -113,6 +119,9 @@ class ClaudeDriver:
         owned=self.require_owned(receipt);final=False
         try:
             for index,value in enumerate(self.stream(owned['process'],owned['packet']['timeout_seconds'])):
+                if value.get('type')=='__idle__':
+                    yield {'kind':'idle'}
+                    continue
                 event=normalize(value,receipt,index)
                 if event:
                     yield event
@@ -138,6 +147,8 @@ class ClaudeDriver:
         self.auth();process=self.spawn(packet,receipt['driver_session_id'],resume=True);owned['process']=process
         report=None
         try:
+            if owned['cancelled']:
+                raise ValueError('Recovery cancelled before stream collection')
             for index,value in enumerate(self.stream(process,budget_seconds)):
                 event=normalize(value,receipt,index)
                 if event and event['kind']=='completed':report=event.get('report');break

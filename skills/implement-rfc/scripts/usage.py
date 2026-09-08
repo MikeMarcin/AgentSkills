@@ -155,6 +155,9 @@ def main(argv=None) -> int:
         rejected = {r['label'] for r in projects.records if r['identity_check'] == 'mismatch'}
         good = type('InventoryScopes', (), {'primary': [(n,p) for n,p in projects.primary if n not in rejected], 'match': staticmethod(projects.match)})()
         write_json(root, 'configuration.json', inventory(good, args.claude_home.expanduser(), args.codex_home.expanduser()))
+        from slice_events import capture_runtime_events
+        runtime_coverage = capture_runtime_events(good, root/'runtime_events.jsonl', start, end)
+        write_json(root, 'runtime_coverage.json', runtime_coverage)
         quota_warnings = []
         if args.quota_dir:
             from usage_quota import sanitize_snapshot
@@ -176,7 +179,7 @@ def main(argv=None) -> int:
                     quota_warnings.append('invalid_snapshot')
             write_json(root, 'quota_snapshots.json', snapshots)
             write_json(root, 'quota_import_coverage.json', {'warnings': quota_warnings, 'accepted': len(snapshots)})
-        gaps = bool(audit.stats['coverage_warnings'] or scope_gaps or quota_warnings or any(v for k,v in audit.stats.items() if k.endswith('_missing_roots')))
+        gaps = bool(runtime_coverage['warnings'] or audit.stats['coverage_warnings'] or scope_gaps or quota_warnings or any(v for k,v in audit.stats.items() if k.endswith('_missing_roots')))
         if not session_count:
             gaps = True
         summary = {'schema': 'implement-rfc.usage-summary.v1', 'archive': str(target),

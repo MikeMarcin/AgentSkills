@@ -78,7 +78,8 @@ def usage_projection(records):
     """No reports, paths, prompts, credentials or acceptance inference."""
     identities=('run_id','task_id','attempt_id','driver_session_id','driver_turn_id')
     allowed={'dispatch_intent','dispatched','execution_failed','completion_unknown','report_ready','collected',
-             'cancel_requested','cancelled','recovery_intent','recovery_report_ready','blocked','awaiting_integration'}
+             'cancel_requested','cancelled','recovery_intent','recovery_report_ready','blocked','awaiting_integration',
+             'native_identity','execution_completed','usage_aggregate_observed'}
     for record in records:
         if record.get('event') not in allowed:
             continue
@@ -86,4 +87,59 @@ def usage_projection(records):
         for key in identities:
             if record.get(key) is not None:
                 out[key]=hashlib.sha256(str(record[key]).encode()).hexdigest()[:24]
+        if record.get('event') == 'usage_aggregate_observed':
+            from usage_capture import tokens
+            out.update(tokens=tokens(record.get('tokens')),additive=False)
         yield out
+
+
+def capture_runtime_events(projects, output, since, until):
+    """Read only selected consumer journals; no reports, orders, prompts or launches."""
+    stats = {'files':0, 'events':0, 'warnings':0}
+    seen = set()
+    with Path(output).open('x', encoding='utf-8') as target:
+        for label, root in projects.primary:
+            folder = Path(root) / '.mask/generated/implement-rfc/runs'
+            if any(p.is_symlink() for p in (folder, *list(folder.parents)[:3])):
+                stats['warnings'] += 1
+                continue
+            if not folder.is_dir():
+                continue
+            for index, run in enumerate(folder.iterdir()):
+                if index >= 1000:
+                    stats['warnings'] += 1
+                    break
+                if run.is_symlink() or not run.is_dir():
+                    continue
+                for name in ('events.jsonl','lifecycle.jsonl'):
+                    path = run / name
+                    if path.is_symlink():
+                        stats['warnings'] += 1; continue
+                    try:
+                        if not path.is_file():continue
+                        st = path.stat(); identity = (st.st_dev, st.st_ino)
+                        if identity in seen:continue
+                        seen.add(identity);stats['files'] += 1
+                        with path.open('rb') as source:
+                            remaining = st.st_size
+                            for _ in range(10000):
+                                if remaining <= 0:break
+                                raw = source.readline(min(MAX_EVENT+1,remaining))
+                                remaining -= len(raw)
+                                if not raw or len(raw)>MAX_EVENT or not raw.endswith(b'\n'):
+                                    stats['warnings'] += 1;break
+                                record = json.loads(raw)
+                                stamp = record.get('timestamp')
+                                if type(stamp) not in (float,int) or not since.timestamp() <= stamp < until.timestamp():continue
+                                record.setdefault('sequence',_)
+                                record.setdefault('run_id',run.name)
+                                for value in usage_projection([record]):
+                                    value.update(schema='implement-rfc.runtime-observation.v1', project=label,
+                                                 source_id=hashlib.sha256(str(path).encode()).hexdigest()[:24])
+                                    target.write(json.dumps(value,sort_keys=True)+'\n')
+                                    stats['events'] += 1
+                            if remaining>0:stats['warnings'] += 1
+                        if path.stat().st_size != st.st_size:stats['warnings'] += 1
+                    except (OSError,ValueError,TypeError,AttributeError):
+                        stats['warnings'] += 1
+    return stats

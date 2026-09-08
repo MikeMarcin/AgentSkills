@@ -56,7 +56,7 @@ class UsageCliTests(unittest.TestCase):
     def test_read_only_package_does_not_create_bytecode(self):
         package = self.root / 'readonly-package'
         (package/'scripts').mkdir(parents=True)
-        for name in ('usage.py', 'usage_capture.py', 'usage_scope.py'):
+        for name in ('usage.py', 'usage_capture.py', 'usage_scope.py', 'slice_events.py'):
             shutil.copyfile(SCRIPT.parent/name, package/'scripts'/name)
         files = list((package/'scripts').iterdir())
         before = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in files}

@@ -73,7 +73,10 @@ class Rpc:
         for _ in range(10000):
             remaining=deadline-time.monotonic()
             if remaining<=0:raise TimeoutError('Native attempt deadline reached')
-            yield self.pending.popleft() if self.pending else self.receive(remaining)
+            try:
+                yield self.pending.popleft() if self.pending else self.receive(min(.25,remaining))
+            except TimeoutError:
+                yield {'method':'__idle__'}
         raise ValueError('Native event budget exceeded')
 
     def close(self):
@@ -134,9 +137,13 @@ class CodexDriver:
         tid=thread['thread']['id']
         # Own the thread before requesting a model turn, including a failed turn-start receipt.
         self.owned[tid]={'packet':dict(packet),'attempt_id':attempt_id,'turn':None}
+        if checkpoint := getattr(self,'identity_checkpoint',None):
+            checkpoint(driver_session_id=tid,driver_turn_id=None,phase='thread_allocated')
         turn=self.rpc.request('turn/start',{'threadId':tid,'input':[{'type':'text','text':packet['prompt']}],
                     'model':packet['model'],'effort':packet['effort']})
         turn_id=turn['turn']['id'];self.owned[tid]['turn']=turn_id
+        if checkpoint:
+            checkpoint(driver_session_id=tid,driver_turn_id=turn_id,phase='turn_started')
         return {'driver_session_id':tid,'driver_turn_id':turn_id}
 
     def require_owned(self,receipt):
@@ -150,6 +157,9 @@ class CodexDriver:
         try:
             for index,raw in enumerate(self.rpc.notifications(owned['packet']['timeout_seconds'])):
                 method=raw.get('method');p=raw.get('params',{})
+                if method=='__idle__':
+                    yield {'kind':'idle'}
+                    continue
                 tid=p.get('threadId');turn_id=p.get('turnId',p.get('turn',{}).get('id'))
                 if method not in ('item/completed','turn/completed'):continue
                 if tid!=receipt['driver_session_id'] or turn_id!=receipt['driver_turn_id']:
@@ -180,7 +190,7 @@ class CodexDriver:
 
     def inspect_attempt(self,receipt):
         tid=receipt.get('driver_session_id')
-        if tid not in self.owned:return {'status':'completion_unknown','reason':'new_driver_cannot_adopt_unverified_session','automatic_relaunch':False}
+        if tid not in self.owned:return {'status':'completion_unknown','reason':'new_driver_cannot_adopt_unverified_session','inspection_target':receipt,'automatic_relaunch':False}
         return {'status':'owned','thread_id':tid,'turn_id':self.owned[tid]['turn'],'automatic_relaunch':False}
 
     def close(self):

@@ -135,6 +135,7 @@ def command(path, task, root):
     passed = reason is None and process.returncode == predicate['exit_code'] and not missing and (count is None or count > 0)
     # Same command evidence shape as record_evidence.py; bounded streaming adds deadline/output handling.
     evidence = {'criterion':task_id, 'outcome':'pass' if passed else 'fail',
+                'revision':subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip(),
                 'evidence':{'kind':'command','detail':json.dumps(task['argv']), 'exit_code':process.returncode,
                             'elapsed_seconds':round(time.monotonic()-started,3),
                             'stdout_tail':output.get('stdout','')[-4000:], 'stderr_tail':output.get('stderr','')[-4000:]},
@@ -144,6 +145,48 @@ def command(path, task, root):
     event(path,task_id,'report_ready',attempt_id=attempt,report_path=attempt+'.report.json')
     return event(path, task_id, 'collected' if passed else 'cancelled' if reason == 'cancelled' else 'execution_failed',
                  attempt_id=attempt, report_path=attempt+'.report.json')
+
+
+def native_driver(provider):
+    if provider == 'codex':
+        from slice_codex import CodexDriver
+        return CodexDriver()
+    from slice_claude import ClaudeDriver
+    return ClaudeDriver()
+
+
+def agent(path, task, root, order):
+    from slice_runtime import Runtime
+    driver = native_driver(task['route']['provider'])
+    runtime = Runtime(path, driver, order['run_id'])
+    attempt = task['id'] + '-1'
+    try:
+        event(path,task['id'],'dispatch_intent',attempt_id=attempt,
+              requested_route=task['route'],routing_digest=order['routing_digest'])
+        packet = load(inside(root,task['task_packet']))
+        receipt = runtime.dispatch(task['id'],packet)
+        if receipt['event'] != 'dispatched':
+            return event(path,task['id'],'completion_unknown',attempt_id=attempt)
+        event(path,task['id'],'running',attempt_id=attempt,
+              driver_session_id=receipt['driver_session_id'],driver_turn_id=receipt['driver_turn_id'])
+        def stream():
+            for value in driver.events(receipt):
+                if (path/'cancel.request').exists():
+                    runtime.cancel(attempt)
+                    return
+                yield value
+        records = runtime.consume(attempt,stream())
+        cancelled = any(r['event'] in ('cancel_requested','cancelled') for r in records)
+        delivered = any(r['event']=='awaiting_integration' for r in records)
+        failure = next((r for r in reversed(records) if r['event'] in ('execution_failed','blocked')), None)
+        state = 'cancelled' if cancelled else 'collected' if delivered else failure['event'] if failure else 'completion_unknown'
+        return event(path,task['id'],state,reason=failure.get('reason') if failure else None,
+                     attempt_id=attempt,report_path=attempt+'.report.txt' if delivered else None,
+                     semantic_acceptance='not_decided_by_runner')
+    except Exception as error:
+        return event(path,task['id'],'completion_unknown',attempt_id=attempt,detail=type(error).__name__)
+    finally:
+        driver.close()
 
 
 def start(order, approval):
@@ -163,7 +206,7 @@ def start(order, approval):
             validate(order)  # Relevant inputs, root, permission and route checked before every dispatch.
             if task['kind'] == 'integration_gate':
                 event(path,task['id'],'awaiting_integration',acceptance_ref=task['acceptance_ref']);break
-            result = command(path,task,root)
+            result = agent(path,task,root,order) if task['kind']=='agent' else command(path,task,root)
             if result['event'] != 'collected':
                 break
         except (OSError,ValueError,subprocess.SubprocessError) as error:
@@ -206,7 +249,7 @@ def main():
             deadline = time.monotonic()+max(0,min(args.timeout,3600))
             while True:
                 result = status(path)
-                if any(r['event'] in ('awaiting_integration','execution_failed','cancelled','completion_unknown') for r in result['tasks'].values()) or time.monotonic() >= deadline:
+                if any(r['event'] in ('awaiting_integration','execution_failed','blocked','cancelled','completion_unknown') for r in result['tasks'].values()) or time.monotonic() >= deadline:
                     break
                 time.sleep(.1)
         else:

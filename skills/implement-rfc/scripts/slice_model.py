@@ -78,8 +78,8 @@ def validate(order):
     invocation = Path(order['invocation_root'])
     if not invocation.is_absolute() or not invocation.resolve().is_relative_to(root):
         raise ValueError('Invocation root must be inside consumer')
-    if type(order['max_parallel_mutations']) is not int or order['max_parallel_mutations'] != 1 or order['max_agent_dispatches'] != 0:
-        raise ValueError('Command driver supports serial execution and zero agent dispatches')
+    if type(order['max_parallel_mutations']) is not int or order['max_parallel_mutations'] != 1 or type(order['max_agent_dispatches']) is not int or not 0 <= order['max_agent_dispatches'] <= 2:
+        raise ValueError('Runner supports serial execution and at most two explicit agent dispatches')
     if not isinstance(order['base_revision'], str) or not re.fullmatch('[0-9a-f]{40}([0-9a-f]{24})?', order['base_revision']):
         raise ValueError('Invalid baseline revision')
     subprocess.run(['git', '-C', str(root), 'cat-file', '-e', order['base_revision']+'^{commit}'], env=git_environment(), check=True, capture_output=True)
@@ -96,7 +96,7 @@ def validate(order):
     if order['routing_digest'] != hashes[order['routing_ref']]:
         raise ValueError('Routing digest mismatch')
     permissions = load(inside(root, order['permissions_ref']))
-    if set(permissions) != {'schema','execution','allowed_argv'} or permissions['schema'] != 'implement-rfc.command-permissions.v1' or permissions['execution'] != 'local_unsandboxed':
+    if set(permissions) not in ({'schema','execution','allowed_argv'}, {'schema','execution','allowed_argv','allowed_agents'}) or permissions['schema'] != 'implement-rfc.command-permissions.v1' or permissions['execution'] != 'local_unsandboxed':
         raise ValueError('Explicit local execution policy required; path declarations are not a sandbox')
     dirty = order['approved_dirty_paths']
     if not isinstance(dirty, list) or len(dirty) > 256:
@@ -109,11 +109,12 @@ def validate(order):
     if not isinstance(tasks, list) or not 1 <= len(tasks) <= 32:
         raise ValueError('Order requires 1–32 tasks')
     seen = set()
+    agents = 0
     for task in tasks:
         common = {'id','kind','depends_on','cwd','timeout_seconds','owned_paths','retry'}
         kind = task.get('kind') if isinstance(task, dict) else None
-        extra = {'argv','predicate'} if kind == 'command' else {'acceptance_ref'} if kind == 'integration_gate' else set()
-        if kind not in ('command','integration_gate') or set(task) != common | extra:
+        extra = {'argv','predicate'} if kind == 'command' else {'acceptance_ref'} if kind == 'integration_gate' else {'route','task_packet'} if kind == 'agent' else set()
+        if kind not in ('command','integration_gate','agent') or set(task) != common | extra:
             raise ValueError('Unsupported task kind or fields')
         if not isinstance(task['id'], str) or not TOKEN.fullmatch(task['id']) or task['id'] in seen:
             raise ValueError('Invalid or duplicate task ID')
@@ -145,7 +146,7 @@ def validate(order):
                 if candidate.is_file() and candidate.resolve().is_relative_to(root):
                     relative = str(candidate.relative_to(root))
                     inside(root, relative)
-                    if relative not in hashes and relative not in task['owned_paths']:
+                    if relative not in hashes:
                         raise ValueError('Command file input lacks a frozen hash: '+relative)
             predicate = task['predicate']
             if not isinstance(predicate,dict) or set(predicate) != {'exit_code','required_artifacts','tests'} or type(predicate['exit_code']) is not int:
@@ -156,12 +157,42 @@ def validate(order):
                 raise ValueError('Invalid artifacts')
             for path in predicate['required_artifacts']:
                 inside(root,path)
+        elif kind == 'agent':
+            agents += 1
+            if task['retry'] != 'never' or task['owned_paths']:
+                raise ValueError('Public companion stages are read-only with no automatic retry')
+            route = task['route']
+            if (not isinstance(route,dict) or set(route) != {'provider','role','profile','model','effort','permission_policy'}
+                    or route['provider'] not in ('codex','claude')
+                    or route['role'] not in ('rfc-utility','rfc-scout','rfc-reviewer','rfc-critical-reviewer')
+                    or route['profile'] != order['profile'] or route['permission_policy'] != 'read-only-leaf'
+                    or route not in permissions.get('allowed_agents', [])):
+                raise ValueError('Exact approved read-only agent route required')
+            if task['task_packet'] not in hashes:
+                raise ValueError('Task packet must be a frozen input')
+            packet = load(inside(root,task['task_packet']))
+            if (packet.get('cwd') != str(inside(root,task['cwd']))
+                    or packet.get('model') != route['model'] or packet.get('effort') != route['effort']
+                    or packet.get('timeout_seconds') != task['timeout_seconds']):
+                raise ValueError('Packet contradicts admitted root, route or deadline')
+            if route['provider'] == 'codex':
+                from slice_codex import CodexDriver
+                driver = object.__new__(CodexDriver)
+                if packet.get('sandbox') != 'read-only' or packet.get('approval_policy') != 'never':
+                    raise ValueError('Public Codex companion requires read-only never-approve policy')
+            else:
+                from slice_claude import ClaudeDriver
+                driver = object.__new__(ClaudeDriver)
+            driver._capabilities = {'launch':True}
+            driver.validate(packet)  # Structural only; installed capability/auth checked at launch.
         else:
             if not isinstance(task['acceptance_ref'],str) or not task['acceptance_ref']:
                 raise ValueError('Integrator acceptance reference required')
             if task is not tasks[-1] or set(deps) != seen:
                 raise ValueError('Final gate must depend on every preceding task')
         seen.add(task['id'])
+    if agents > order['max_agent_dispatches']:
+        raise ValueError('Agent dispatch budget exceeded')
     if tasks[-1]['kind'] != 'integration_gate':
         raise ValueError('Final integrator gate required')
     return root
