@@ -9,7 +9,7 @@
 | `rfc-utility` | `mechanical` | GPT-5.6 Luna, xhigh | Claude Haiku 4.5, effort unsupported |
 | `rfc-test-runner` | `mechanical` | GPT-5.6 Luna, xhigh | Claude Haiku 4.5, effort unsupported |
 | `rfc-scout` | `balanced` | GPT-5.6 Sol, low | Claude Opus 5, low |
-| `rfc-worker-routine` | `standard` | GPT-5.6 Sol, high | Claude Opus 5, high |
+| `rfc-worker-routine` | `standard` | GPT-6 Astra, low | Claude Opus 5, high |
 | `rfc-worker` | `deep` | GPT-6 Astra, high | Claude Fable 5.1, high |
 | `rfc-reviewer` | `deep` | GPT-6 Astra, high | Claude Fable 5.1, high |
 | `rfc-critical-reviewer` | `critical` | GPT-6 Astra, xhigh | Claude Fable 5.1, xhigh |
@@ -53,7 +53,7 @@ project task bakeoff was performed.
   and the two harnesses must not be combined into one ranking. Sources:
   [Artificial Analysis coding agents](https://artificialanalysis.ai/agents/coding-agents/comparisons/claude-code-vs-codex),
   [CursorBench](https://cursor.com/evals).
-- **Routine workers:** Sol high and Opus high retain capable implementation
+- **Routine workers:** Astra low and Opus high are the default implementation
   routes for known approaches. The owner reports Fable often completes difficult
   work in one attempt where Opus needs repeated turns; this is user experience,
   not a controlled benchmark or a claim that Opus loses on every task.
@@ -174,3 +174,11 @@ When a new model or effort level appears:
 7. Retain the previous routing revision in version control for immediate rollback.
 
 Absent an explicit owner-directed promotion, establish a newly released model on representative utility, scout, or shadow-review work before assigning implementation or closeout-critical responsibility. An owner-directed promotion can proceed on documented public evidence and judgment; state which local evaluations were not performed.
+
+## Owner-directed default update — 2026-09-08
+
+The owner promoted Astra low for routine Codex workers and removed the former
+Sol-high default and separate astra-low-first experimental profile. The baseline
+now contains the promoted route. Other role/provider routes are unchanged. This
+is an explicit owner preference after an inconclusive evaluation, not measured
+quality or usage superiority. Existing primary-session selections remain authoritative.

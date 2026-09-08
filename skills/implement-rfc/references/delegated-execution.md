@@ -202,8 +202,9 @@ remain unknown; a startup banner alone is not runtime model evidence.
 
 Baseline `config/routing.json` remains the shared default. Explicit task/session
 selection wins over an admitted order route, selected profile and baseline.
-`--profile astra-low-first --capabilities FILE` changes only the routine Codex
-worker. The capability file maps provider to exact model to supported effort
+The former `astra-low-first` candidate is now the shared baseline; its separate
+profile has been removed. Future explicit profile overrides require verified
+capabilities. The capability file maps provider to exact model to supported effort
 values; it is an operator-supplied observation, not provider discovery. A missing
 capability refuses the override. No profile changes the primary session.
 

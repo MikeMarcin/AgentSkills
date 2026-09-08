@@ -1,6 +1,6 @@
 {
   "schema": "implement-rfc.routing.v1",
-  "verified_as_of": "2026-09-04",
+  "verified_as_of": "2026-09-08",
   "assignments": {
     "rfc-utility": "mechanical",
     "rfc-scout": "balanced",
@@ -22,8 +22,8 @@
           "effort": "low"
         },
         "standard": {
-          "model": "gpt-5.6-sol",
-          "effort": "high"
+          "model": "gpt-6-astra",
+          "effort": "low"
         },
         "deep": {
           "model": "gpt-6-astra",

@@ -213,3 +213,11 @@ implied. ASK-0040 records the decision and full readout.
 At the owner's request, SamplePlanner's local Claude routing substitution was
 removed and its generated adapters checked against shared baseline. Account
 model unavailability must be reported rather than silently restoring exceptions.
+
+## Subsequent owner promotion — 2026-09-08
+
+After accepting the inconclusive closeout, the owner explicitly requested the
+routing change become default and the old choice be removed. Shared Codex
+routine workers now use Astra low; the separate candidate profile and Sol-high
+routine default are removed. This supersedes the earlier retain-baseline decision
+without rewriting the observational evidence or claiming measured savings.

@@ -26,11 +26,11 @@
     },
     {
       "path": "config/routing-profiles.json",
-      "sha256": "82a2e8108af921987290dcea8b6c7aeb450bdeeaf4e24e90307a521e4da913bc"
+      "sha256": "0488576f1d4fdaf81d26838d0b181218711a5fb3ee44d5ce66bfabefca05c9a3"
     },
     {
       "path": "config/routing.json",
-      "sha256": "aacab2b0a9f26c64b18962843d564fb7d6377f0e44f25b0fa505b8d77391bfdf"
+      "sha256": "eac1054f1a692ab2ad062da6b890fb1ffc6e7d3c069d5a06a87890074b3960e0"
     },
     {
       "path": "examples/projects/samplereview/project.json",
@@ -54,11 +54,11 @@
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "0e9d503007e7fcd3e8950a468e841e34b5da173198ea4c1b74df5f5f64b3dc21"
+      "sha256": "18d6345adf666103b567ce7b0a271275ea8bf941458b09a286dfbea256c04830"
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "eaf313d585d00d7bd953d7008d5c3de3a798ec037151225730bae632fa9cba85"
+      "sha256": "022af7c4dd8a597f45481254645b30524b81f420888692bfd904c44c8d269fdb"
     },
     {
       "path": "references/pack-lifecycle.md",
@@ -246,7 +246,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "3c8fed42d7eae1f57cc3c288a5456fa53f65c5156bc85386acd58a3457f465cc"
+      "sha256": "12a7ba0b74aab7785217545875c258da8b1f38b41fc8eb2bef381dce7df70202"
     },
     {
       "path": "tests/test_role_usage.py",
@@ -309,6 +309,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "450ddff54b8447db",
+  "portable_digest": "94772ab837d810f6",
   "schema": "implement-rfc.portable-manifest.v1"
 }

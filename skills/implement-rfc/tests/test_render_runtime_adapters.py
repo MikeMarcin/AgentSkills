@@ -60,7 +60,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             "rfc-utility": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "read-only", False),
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
             "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),
-            "rfc-worker-routine": ("gpt-5.6-sol", "high", "claude-opus-5", "high", "workspace-write", False),
+            "rfc-worker-routine": ("gpt-6-astra", "low", "claude-opus-5", "high", "workspace-write", False),
             "rfc-worker": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", False),
             "rfc-reviewer": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "read-only", False),
             "rfc-critical-reviewer": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "xhigh", "read-only", False),
@@ -293,15 +293,16 @@ if __name__ == '__main__':
     unittest.main()
 
 class ProfileTests(unittest.TestCase):
-    def test_candidate_is_opt_in_and_capability_checked(self):
+    def test_explicit_override_is_capability_checked(self):
         import render_runtime_adapters as renderer
         roles = renderer.load_json(SKILL_DIR / 'config/roles.json')['roles']
         profiles = renderer.load_json(SKILL_DIR / 'config/routing-profiles.json')
         baseline, _ = renderer.select_routes(ROUTING, roles, profiles)
+        profiles['profiles']['test-candidate'] = {'overrides': {'codex': {'rfc-worker-routine': {'model': 'gpt-6-astra', 'effort': 'low'}}}}
         with self.assertRaisesRegex(ValueError, 'unverified'):
-            renderer.select_routes(ROUTING, roles, profiles, 'astra-low-first')
+            renderer.select_routes(ROUTING, roles, profiles, 'test-candidate')
         caps = {'codex': {'gpt-6-astra': ['low', 'high']}}
-        candidate, receipt = renderer.select_routes(ROUTING, roles, profiles, 'astra-low-first', caps)
+        candidate, receipt = renderer.select_routes(ROUTING, roles, profiles, 'test-candidate', caps)
         self.assertEqual(candidate['codex']['rfc-worker-routine'], {'model':'gpt-6-astra','effort':'low'})
         for name in roles:
             if name != 'rfc-worker-routine':
@@ -309,7 +310,7 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(candidate['claude'], baseline['claude'])
         self.assertIsNone(receipt['observed'])
         explicit = {'codex': {'rfc-worker-routine': {'model':'gpt-6-astra','effort':'high'}}}
-        resolved, receipt = renderer.select_routes(ROUTING, roles, profiles, 'astra-low-first', caps,
+        resolved, receipt = renderer.select_routes(ROUTING, roles, profiles, 'test-candidate', caps,
                                                   explicit_routes=explicit)
         self.assertEqual(resolved['codex']['rfc-worker-routine']['effort'], 'high')
         self.assertEqual(receipt['origins']['codex']['rfc-worker-routine'], 'explicit_user')
@@ -327,17 +328,14 @@ class ProfileTests(unittest.TestCase):
             refused = runner.run_renderer(root, '--profile', 'astra-low-first')
             self.assertNotEqual(refused.returncode, 0)
             self.assertEqual((root / '.codex/agents/rfc-reviewer.toml').read_text(), before)
-            result = runner.run_renderer(root, '--profile', 'astra-low-first', '--capabilities', str(caps))
+            result = runner.run_renderer(root, '--profile', 'baseline')
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(config.read_text(), 'model = "user-choice"\n')
             data = tomllib.loads((root / '.codex/agents/rfc-worker-routine.toml').read_text())
+            self.assertEqual(data['model'], 'gpt-6-astra')
             self.assertEqual(data['model_reasoning_effort'], 'low')
-            selection = root / '.mask/generated/implement-rfc/execution-selection.json'
-            selection.write_text(json.dumps({'schema':'implement-rfc.execution-selection.v1','profile':'astra-low-first'}))
-            self.assertEqual(runner.run_renderer(root, '--capabilities', str(caps)).returncode, 0)
-            self.assertEqual(runner.run_renderer(root, '--profile', 'baseline').returncode, 0)
-            data = tomllib.loads((root / '.codex/agents/rfc-worker-routine.toml').read_text())
-            self.assertEqual(data['model'], 'gpt-5.6-sol')
+            profiles = json.loads((SKILL_DIR / 'config/routing-profiles.json').read_text())
+            self.assertEqual(set(profiles['profiles']), {'baseline'})
 
     def test_fallback_never_assumes_capacity_or_effort(self):
         import render_runtime_adapters as renderer
