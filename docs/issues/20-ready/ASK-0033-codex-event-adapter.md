@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0033"
 title: "Implement the capability-checked Codex event-driven adapter"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0032"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "codex-event-adapter"}
