@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0049"
 title: "Bound agent context reuse"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0009"]
 depends_on: []
 ---
