@@ -38,3 +38,6 @@ retirement/handoff language explicitly to fresh replacements.
 11 unified-workflow tests and 14 runtime-adapter tests passed. Skill validator,
 portable source validator and diff check passed. This is tabletop policy evidence;
 no live runtime efficiency improvement or consumer reload is claimed.
+
+Integrated validation passed: 9 RFCs, 49 cards, zero documentation violations;
+portable source valid. Temporary authoring worktree removed after integration.
