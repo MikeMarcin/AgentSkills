@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0041"
 title: "Verify and close routing, instructions and portable rollout"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0040"]
 closeout_for: ["RFC-ASK-0008"]
