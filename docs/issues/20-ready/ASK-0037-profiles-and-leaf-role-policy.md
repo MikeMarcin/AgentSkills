@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0037"
 title: "Add independent routing profiles, leaf defaults and explicit fallback policy"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0023", "ASK-0032"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "profiles-and-leaf-role-policy"}
