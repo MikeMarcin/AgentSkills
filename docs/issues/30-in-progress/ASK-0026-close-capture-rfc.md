@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0026"
 title: "Verify and close the turnkey capture RFC"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0024", "ASK-0025"]
 closeout_for: ["RFC-ASK-0006"]
