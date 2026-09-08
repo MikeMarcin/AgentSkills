@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0051"
 title: "Build the thin coordinator-to-integrator path with explicit engineering authority"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0050"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "native-integrator-role-and-routing", "milestone": "M1"}
