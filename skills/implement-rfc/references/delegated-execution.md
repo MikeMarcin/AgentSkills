@@ -1,9 +1,18 @@
 # Portable Delegated Execution
 
-Use this reference only when bounded delegation will reduce primary-context
-load, improve elapsed throughput, isolate writable test output, or add a
-meaningfully independent check. Delegation is optional; agent count is not a
-quality metric.
+The skill explicitly requests sub-agent delegation when a bounded assignment
+can run independently alongside useful primary work and the runtime permits it.
+Assess that opportunity at scope intake, each new slice and integration. Useful
+assignments reduce primary-context load, improve elapsed throughput, isolate
+writable test output, or add a meaningfully independent check. Dispatch the
+selected assignment instead of doing the same work in the primary as well.
+
+This request satisfies a host policy that permits delegation when an applicable
+skill explicitly asks for it. It does not override a user prohibition, an
+unconditional host restriction, unavailable capabilities or ownership conflicts.
+Keep small, coupled or immediately blocking work local. Briefly state why a
+substantial slice stays local and reassess at the next boundary; do not infer a
+session-wide ban from one coupled slice. Agent count is not a quality metric.
 
 ## Authority
 
@@ -98,15 +107,17 @@ narrow changed-surface recheck; it never starts a whole-candidate review loop.
 
 ## Choosing Delegation
 
+Apply these routes when the independent-work condition above holds.
+
 | Work shape | Default |
 |---|---|
 | Small, directly verifiable change | Primary agent |
-| Substantial mechanical read-only inventory or commands | Optional `rfc-utility` |
-| Bounded semantic repository investigation | Optional `rfc-scout` |
-| Normal bounded engineering | Optional `rfc-worker` |
-| Named unresolved difficult problem | Optional `rfc-worker-deep` |
-| Exact separate test/build command set | Optional `rfc-test-runner` |
-| Named high-risk trigger or explicit request | Consider one reviewer |
+| Substantial mechanical read-only inventory or commands | `rfc-utility` |
+| Bounded semantic repository investigation | `rfc-scout` |
+| Normal bounded engineering | `rfc-worker` |
+| Named unresolved difficult problem | `rfc-worker-deep` |
+| Exact separate test/build command set | `rfc-test-runner` |
+| Named high-risk trigger or explicit request | One reviewer when it adds discriminating evidence |
 | Missing safe runtime capability | Execute serially in the primary agent |
 
 For delegated implementation, default to standard and record

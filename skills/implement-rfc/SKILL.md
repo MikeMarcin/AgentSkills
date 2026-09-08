@@ -47,6 +47,17 @@ budget from an ordinary implementation request.
   `issue_board.py --repo-root ROOT claim ID --json`; this moves and commits the
   card and pristine repaired links. The index must be empty. Platform eligibility
   is card metadata (`--platform win|mac|linux`), not separate Ready directories.
+- At scope intake and each new slice or integration boundary, identify a bounded
+  subtask that can run independently alongside useful primary work. When one
+  exists and the runtime permits it, **use a sub-agent**: this skill explicitly
+  requests delegation for that work. Read
+  [delegated execution](references/delegated-execution.md) for the assignment
+  contract. Use a scout for a distinct investigation, a worker for exclusively
+  owned implementation, or a test runner for selected commands; choose independent
+  review when the changed risk warrants it. Keep small, tightly coupled or
+  immediately blocking work local. If a substantial slice stays local, state the
+  concrete coupling, lack of parallel work or runtime limitation briefly; reassess
+  at the next boundary. No agent quota or mandatory sequence of roles is implied.
 - For substantial delegated implementation, default to `rfc-worker` for bounded
   engineering, diagnosis, refactoring, local design and approved architecture.
   An existing pattern is helpful, not required. Select `rfc-worker-deep` for a

@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "82cdc576b8d09df5b0cc7b7da4cfd5531f3998cfe928eb092c161611dc7b20e0"
+      "sha256": "1a62bad2a12f519268fbc27ba75327c28b9f1f07d63792986537b043b0359cbf"
     },
     {
       "path": "agents/openai.yaml",
@@ -54,7 +54,7 @@
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "0f7e1abf4ac1fd38b881e5483d5c94848d9b6a084450836ecabad03766dc2d15"
+      "sha256": "eab259ce0fcf37178fc141d178833bae26b28d536f30b7bd2a0115de4142e77f"
     },
     {
       "path": "references/model-routing.md",
@@ -321,6 +321,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "ca3ab7d77d843261",
+  "portable_digest": "4b2ad3c2c5c8ab75",
   "schema": "implement-rfc.portable-manifest.v1"
 }
