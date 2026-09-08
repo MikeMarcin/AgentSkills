@@ -31,4 +31,8 @@ Run the Windows-specific subprocess and actual two-registration capture checks. 
 
 ## Run record
 
-Not started. No native result, implementation revision, quota saving or semantic acceptance is asserted. Claim this live card before editing; preserve unrelated changes and commit explicit paths.
+Prepared `test_usage_windows.py` with two native-only qualification tests: real disposable MASK registry/worktrees/unavailable registration, public self-install plan/apply of an owned mask.cmd, percent/non-ASCII paths, Windows case aliases, unsupported wrapper refusal, linked invocation, immutable read-only file attributes and archive platform/hash checks. No MASK internal state edits or source copies as deployment fallback.
+
+Command: `python3 -m unittest discover -s skills/implement-rfc/tests -p test_usage_windows.py -v` on macOS. Result: two skipped because native Windows is required. This is test preparation, not a Windows pass. Native command: set MASK_TEST_PROGRAM to the Windows checkout's absolute mask.py and run that same unittest command; link privilege must already be available. No permission grants are authorized or performed.
+
+The repository has no configured remote station and specifies local implementation only. Required Windows evidence remains blocked, including native read-only/pinned attributes; no POSIX mock substitutes. One budgeted Claude preparation attempt hit the structured native turn limit with no final report; no retry/recovery was made. The integrator prepared these fixtures directly.
