@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0023"
 title: "Harden streaming provider capture, provenance and archive bounds"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0022"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "capture-core-and-bounds"}
+acceptance: [{"criterion":"RFC-ASK-0006-AC03/AC04/AC05 capture core","outcome":"pass","revision":"da9724ebf12b4cb7e8ece991178c51f74312f264","evidence":{"kind":"observation","detail":"51 scope/capture tests pass (python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_usage_*.py). Generated stress: 29,557,929 bytes fully scanned, 30,000 events, 3.799 seconds, 244,499-byte tracemalloc peak, 16,357,788 output bytes. SQLite indexes and streamed session arrays; torn/oversized records, concurrent append, newest baseline, private sentinels, exclusive output and interrupted publish exercised. Native qualification remains ASK-0024/0025. Temporary fixtures cleaned."}}]
 ---
 
 # ASK-0023: Harden streaming provider capture, provenance and archive bounds
