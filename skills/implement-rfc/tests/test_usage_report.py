@@ -81,3 +81,15 @@ class ReportTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
+
+class MissingConsumptionTests(unittest.TestCase):
+    def test_acceptance_without_usage_is_unknown_not_zero(self):
+        from usage_outcomes import Outcomes
+        outcomes=Outcomes({'schema':'implement-rfc.outcomes.v1','assignments':[],
+            'events':[{'event_id':'accepted','state':'accepted','task_id':'task',
+                       'timestamp':'2026-09-08T00:00:00Z','evidence_ref':'real-verdict'}]})
+        self.assertIsNone(outcomes.summary()['observed_tokens_per_accepted_task'])
+        outcomes.observe({'task_id':'task','attempt_id':'one','classification':'request_reconciled',
+                          'tokens':{'input_tokens':0,'output_tokens':0}})
+        self.assertEqual(outcomes.summary()['observed_tokens_per_accepted_task'],0)

@@ -79,5 +79,5 @@ class Outcomes:
         all_tokens=sum(self.token_totals.values())
         return {'tasks':self.tasks,'events':dict(self.counts),'accepted_task_count':len(accepted),
                 'all_assigned_attempt_tokens':all_tokens,'unknown_rows_by_task':dict(self.unknown),
-                'observed_tokens_per_accepted_task':all_tokens/len(accepted) if accepted and not self.unknown and not self.counts['unassigned_ledger_rows'] else None,
+                'observed_tokens_per_accepted_task':all_tokens/len(accepted) if accepted and all(task in self.token_totals for task in accepted) and not self.unknown and not self.counts['unassigned_ledger_rows'] else None,
                 'limitation':'Includes joined failures, recovery, review and repair; unassigned/unknown rows prevent an exact all-in ratio. No acceptance inferred from collection.'}
