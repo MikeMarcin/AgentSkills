@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0045"
 title: "Qualify routing and prepare scoped consumer adoption"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0009"]
 depends_on: ["ASK-0044"]
 metadata: {"packet":"agent-skills-standard-worker-review", "provisional_id":true}
