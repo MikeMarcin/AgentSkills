@@ -45,7 +45,7 @@ Claude companion public runner using the previously qualified sonnet/high route:
 | ASK-0035 bounded-execution documentation check | One attempt; eight native turns; 120 seconds | Report produced and collected at semantic gate | Integrator inspected it and clarified documentation |
 
 Exact orders, native limits/permissions and durable reports are recorded on
-[ASK-0035](../20-ready/ASK-0035-runner-native-qualification.md). No retries or
+[ASK-0035](../30-in-progress/ASK-0035-runner-native-qualification.md). No retries or
 report-only recovery, purchases, resets, deployment, global setting edits or
 additional pilot tasks occurred. Inclusive native usage observations are
 non-additive; complete all-in context/cache/quota comparisons are unavailable.
