@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0030"
 title: "Verify and close accounting and experiment readout"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0026", "ASK-0029"]
 closeout_for: ["RFC-ASK-0007"]
