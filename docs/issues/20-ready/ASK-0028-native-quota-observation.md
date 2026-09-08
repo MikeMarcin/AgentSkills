@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0028"
 title: "Integrate bounded native and manual account-quota observation"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0007"]
 depends_on: ["ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "native-quota-observation"}
