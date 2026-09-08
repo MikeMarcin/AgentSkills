@@ -199,3 +199,17 @@ close native macOS/Windows/host-runtime acceptance.
 ## Implementation authorization
 
 Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.
+
+## Accepted evaluation boundary — 2026-09-08
+
+The owner accepted the inconclusive closeout and elected to try the delivered
+workflow during ordinary work. AC06 is accepted with an explicit scope amendment:
+the four authorized observational attempts establish the reported operational
+results only; controlled routing and instruction comparisons are deferred, and
+all-in savings remain unknown. Baseline is retained and the candidate stays
+opt-in. No new benchmark, model-profile promotion, credit purchase or reset is
+implied. ASK-0040 records the decision and full readout.
+
+At the owner's request, SamplePlanner's local Claude routing substitution was
+removed and its generated adapters checked against shared baseline. Account
+model unavailability must be reported rather than silently restoring exceptions.
