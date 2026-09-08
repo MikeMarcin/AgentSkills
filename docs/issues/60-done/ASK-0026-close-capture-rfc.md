@@ -83,3 +83,13 @@ run journals are intentionally retained; no temporary checkout is retained and
 no publication/push or consumer migration was performed.
 
 Capture finish decision: all six capture criteria pass at their recorded macOS/Windows boundaries. Source-only portability validation and structure gate passed; final pack bookkeeping is reconciled by the integrator. No completeness or billing estimate is asserted.
+
+## Subsequent pack reconciliation
+
+ASK-0039 completed both consumer checks and baseline rollback at
+226ec7ebc1ed32e6411cc8433e6e1b87f8e6a3aa. The separately approved two
+Windows attempts were consumed: Claude inventory succeeded; Codex delivered a
+failure report with local tool execution explicitly unsupported. Native fixture
+cleanup is complete. Earlier pending statements above describe their recorded
+checkpoint, not current host availability. Final evaluation disposition is owned
+by ASK-0040 and the rollout closeout ASK-0041.

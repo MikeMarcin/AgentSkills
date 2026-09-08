@@ -1,14 +1,14 @@
 ---
 id: "RFC-ASK-0008"
 title: "Routing profiles, compact instructions and portable rollout"
-status: "Accepted"
+status: "Implementing"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
 
 # RFC-ASK-0008: Routing profiles, compact instructions and portable rollout
 
-Pack IDs are provisional until the AgentSkills integrator reserves the live block.
+Live IDs were reserved and imported; the retained pack is immutable provenance.
 This is a new RFC, not an amendment silently rewriting settled RFC-ASK-0001–0004.
 
 ## Decision

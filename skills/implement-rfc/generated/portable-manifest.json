@@ -46,7 +46,7 @@
     },
     {
       "path": "references/bounded-execution.md",
-      "sha256": "decd1479b8097e2a2c30980ccc92c7c7aa72cefa14bc05afb88c9e2ac059c73e"
+      "sha256": "59ab2f26ca8073db31b67b9a823e680b29deb7e7f4943fdec632502a73e73443"
     },
     {
       "path": "references/codex-lanes.md",
@@ -262,7 +262,7 @@
     },
     {
       "path": "tests/test_slice_commands.py",
-      "sha256": "19a4592121dca73bee2b277e5247df36d2c14545cc897ad86f6a819e81b53018"
+      "sha256": "617d7b7f6f983aa4224691289e6a07749bb9352bef19ab9fcf744ef0097e4df4"
     },
     {
       "path": "tests/test_slice_integration.py",
@@ -286,7 +286,7 @@
     },
     {
       "path": "tests/test_usage_capture.py",
-      "sha256": "1e4f32dc9c19f19aae987f0a98b4b2745b96450fcbb4582c4ad18d43631680b4"
+      "sha256": "588c62c32561cb8f75bdbeb4569f740a5e4c5d26689120eb760558c7bca41a07"
     },
     {
       "path": "tests/test_usage_cli.py",
@@ -309,6 +309,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "cd27feb7e4c03c53",
+  "portable_digest": "450ddff54b8447db",
   "schema": "implement-rfc.portable-manifest.v1"
 }

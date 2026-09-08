@@ -92,3 +92,13 @@ observational promotion refused. It does not assert that a matched live routing
 or instruction treatment occurred. The later live readout and final owner
 retention/promotion decision remain explicitly open on ASK-0040/RFC-ASK-0008.
 No native quota saving, all-in ratio or winner is claimed from the backlog pilot.
+
+## Subsequent pack reconciliation
+
+ASK-0039 completed both consumer checks and baseline rollback at
+226ec7ebc1ed32e6411cc8433e6e1b87f8e6a3aa. The separately approved two
+Windows attempts were consumed: Claude inventory succeeded; Codex delivered a
+failure report with local tool execution explicitly unsupported. Native fixture
+cleanup is complete. Earlier pending statements above describe their recorded
+checkpoint, not current host availability. Final evaluation disposition is owned
+by ASK-0040 and the rollout closeout ASK-0041.

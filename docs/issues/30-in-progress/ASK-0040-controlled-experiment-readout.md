@@ -31,7 +31,7 @@ Validate comparison records offline first. After bounded real work, run the bund
 
 ## Run record
 
-Not started. No native result, implementation revision, quota saving or semantic acceptance is asserted. Claim this live card before editing; preserve unrelated changes and commit explicit paths.
+Claimed at d7a9599461eb246cfa9ed11c6fea2408950076e2. Final readout follows; owner disposition is pending.
 
 ## Budgeted real-backlog observation (not controlled treatment completion)
 
@@ -50,9 +50,40 @@ report-only recovery, purchases, resets, deployment, global setting edits or
 additional pilot tasks occurred. Inclusive native usage observations are
 non-additive; complete all-in context/cache/quota comparisons are unavailable.
 
-This is heterogeneous observational orchestration evidence, not a matched routing
-or instruction experiment. It does not complete either issue's native criteria,
-show a quota saving, or authorize promotion. Baseline remains default and the
-candidate remains opt-in. Required cross-project qualification and separately
-controlled treatment readouts remain open; the final owner deployment decision
-has not been recorded. The model pilot budget is exhausted.
+## Final bounded readout
+
+The owner separately approved two Windows qualification attempts. Both were
+consumed once, with no runner redispatch or report-only recovery:
+
+| Dimension / task | Actual observation | Supported conclusion |
+|---|---|---|
+| Orchestration: macOS ASK-0025 | Five-turn limit, no final report | Negative delivery result retained |
+| Orchestration: macOS ASK-0035 | Useful documentation report collected | Delivery and integrator inspection exercised |
+| Native Windows Codex: ASK-0035 | Failure report collected after local command tool startup timeouts | Report transport qualified; local file-tool execution not qualified |
+| Native Windows Claude: ASK-0026 | Useful inventory collected | Read-only native inventory qualified |
+| Routing treatment | No matched Sol-high/Astra-low tasks run | Inconclusive; no quality/cost winner |
+| Instruction treatment | No separate controlled live treatment run | Inconclusive; no token saving claimed |
+
+The four specifically budgeted attempts yielded three final reports: two useful
+inventories/checks and one explicit failure. One attempt produced no final report.
+This count excludes earlier adapter qualification and integrator/reviewer usage;
+it is not total task consumption. Both authorized budgets are exhausted. No
+purchased credits or usage resets occurred. Codex's two internal tool attempts
+were within its single authorized task attempt, not a runner redispatch.
+
+These heterogeneous observations are not matched treatment completion. All-in
+consumption, cache/service-tier comparability and uncontaminated quota attribution
+are unavailable; no cost ratio or saving is asserted. The offline real-registry
+capture/report and missing-consumption protection are recorded on ASK-0030/0042.
+Native orders, report paths and limits are recorded on ASK-0035/0026.
+
+ASK-0039 (226ec7ebc1ed32e6411cc8433e6e1b87f8e6a3aa) qualified both named
+consumers and rollback, preserving SamplePlanner's override and protected settings.
+Both consumers now use baseline. Candidate rendering was checked, not measured as
+a serving-model treatment. The candidate remains opt-in. Pinned helper invocation
+was exercised through the public MASK artifact path; first-prompt host loading is
+still not verified.
+
+Owner decision requested: accept an explicitly amended inconclusive closeout,
+retain baseline and candidate opt-in, and defer the unrun controlled routing and
+instruction comparisons. Until answered, AC06 and this card remain open.
