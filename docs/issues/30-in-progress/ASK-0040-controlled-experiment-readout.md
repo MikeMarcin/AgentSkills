@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0040"
 title: "Run bounded separate orchestration, routing and instruction comparisons"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0030", "ASK-0039"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "controlled-experiment-readout"}
