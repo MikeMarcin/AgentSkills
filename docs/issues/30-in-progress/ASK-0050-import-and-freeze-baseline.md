@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0050"
 title: "Import the coordinator pack and freeze the real baseline"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0010"]
 depends_on: []
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "import-and-freeze-baseline", "milestone": "intake"}
