@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0032"
 title: "Add durable dispatch, report collection and bounded recovery"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0031", "ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "durable-results-and-recovery"}
