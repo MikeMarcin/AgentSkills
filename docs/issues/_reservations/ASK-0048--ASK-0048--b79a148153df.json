@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0048"
+  ],
+  "reserve_for": "delegation-activation",
+  "purpose": "",
+  "created": "2026-09-08T07:49:21.619802+00:00",
+  "base": "9db4f05fe6e47b047823c718a0af3503a3223f04"
+}
