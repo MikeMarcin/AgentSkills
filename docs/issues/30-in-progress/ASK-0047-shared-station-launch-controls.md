@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0047
 title: Shared station fresh-context controls and compact Claude server
-status: Ready
+status: "In Progress"
 rfcs: ["RFC-ASK-0003"]
 depends_on: []
 ---
