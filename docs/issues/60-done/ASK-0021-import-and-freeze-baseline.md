@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0021"
 title: "Import the pack and freeze the actual implementation baseline"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0005", "RFC-ASK-0006", "RFC-ASK-0007", "RFC-ASK-0008"]
 depends_on: []
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "import-and-freeze-baseline"}
+acceptance: [{"criterion":"ASK-0021 intake acceptance","outcome":"pass","revision":"be587d801662c5bd40355e2e171dc7b3d488e29f","evidence":{"kind":"observation","detail":"Pack integrity: 4 RFCs, 21 cards, 24 criteria, zero violations. Native documentation gate: 8 RFCs, 41 cards, zero violations. All baseline source hashes match; reservation committed before import; scoped queue excludes retained assets."}}]
 ---
 
 # ASK-0021: Import the pack and freeze the actual implementation baseline

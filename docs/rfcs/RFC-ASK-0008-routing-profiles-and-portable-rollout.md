@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0008"
 title: "Routing profiles, compact instructions and portable rollout"
-status: "Proposed"
+status: "Accepted"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
@@ -195,3 +195,7 @@ close native macOS/Windows/host-runtime acceptance.
 - **RFC-ASK-0008-AC04** — Compact progressive-disclosure instructions preserve original constraints, acceptance and uncertainty while avoiding mandatory duplicated provenance or broad context injection.
 - **RFC-ASK-0008-AC05** — Canonical and MASK-managed adoption is scoped and reversible, respects pinned artifacts and unrelated settings, and never treats --mask-projects collection as deployment authority.
 - **RFC-ASK-0008-AC06** — A bounded, separately attributed runner/routing/instruction evaluation records quality, all-in cost and actual limitations; promotion or retention/rollback is an explicit evidence-based owner decision.
+
+## Implementation authorization
+
+Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.

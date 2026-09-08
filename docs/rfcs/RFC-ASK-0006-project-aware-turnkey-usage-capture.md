@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0006"
 title: "Project-aware turnkey usage capture and MASK selection"
-status: "Proposed"
+status: "Accepted"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
@@ -194,3 +194,7 @@ with explicit scope or adapt it to this common parser without breaking its calle
 - **RFC-ASK-0006-AC04** — Large histories are streamed with bounded memory/indexing and visible truncation/coverage; a sample remains usable while concurrent writers append.
 - **RFC-ASK-0006-AC05** — Default exports exclude raw task/source/credential/command/reasoning content, linked skill files stay unchanged, existing output is preserved, and no model/network/upload occurs.
 - **RFC-ASK-0006-AC06** — Installed canonical and MASK-linked execution is verified on native macOS and Windows, including nested cwd, a Windows launcher and two registered worktrees; no cross-host completeness is implied.
+
+## Implementation authorization
+
+Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.

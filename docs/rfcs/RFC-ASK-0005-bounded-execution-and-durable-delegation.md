@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0005"
 title: "Bounded deterministic execution and durable delegation"
-status: "Proposed"
+status: "Accepted"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
@@ -219,3 +219,7 @@ making every ordinary issue carry a new administrative checklist.
 - **RFC-ASK-0005-AC04** — Eligible truncation supports one bounded report-only recovery or an explicit unsupported/blocked result; intentional cancellation is never automatically resumed.
 - **RFC-ASK-0005-AC05** — Codex and Claude adapters preserve native permissions and authentication, expose capability limits, and avoid LLM polling; each claimed native combination has direct evidence.
 - **RFC-ASK-0005-AC06** — Existing board, evidence and test-runner contracts remain authoritative; direct execution is available, and no mandatory daemon, second tracker, automatic billing switch or fleet dependency appears.
+
+## Implementation authorization
+
+Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.

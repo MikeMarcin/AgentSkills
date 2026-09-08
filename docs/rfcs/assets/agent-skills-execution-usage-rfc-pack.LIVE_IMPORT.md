@@ -44,3 +44,5 @@ Source differences against uploaded hashes at baseline:
 Current guarded claim/finish, evidence and test-runner contracts remain authoritative. Baseline treatment uses unchanged routing; retained measurements do not establish accepted-work cost or candidate savings.
 
 User requested import and implementation; RFC acceptance will be recorded after intake. No deployment or experiment result is asserted.
+
+Intake commit: 38529e1. Live queue selected only ASK-0021; all later cards remain dependency-bound.

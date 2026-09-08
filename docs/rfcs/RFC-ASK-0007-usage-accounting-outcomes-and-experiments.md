@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0007"
 title: "Reconciled usage accounting, account limits and task outcomes"
-status: "Proposed"
+status: "Accepted"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---
@@ -188,3 +188,7 @@ rollback belong to RFC-ASK-0008, not a fitted threshold invented after results.
 - **RFC-ASK-0007-AC04** — Task/attempt joins distinguish delivered, collected, accepted and reopened work; all-in comparisons include primary, child, retry, recovery, review and repair while retaining unassigned work.
 - **RFC-ASK-0007-AC05** — Offline v1/v2 archive reports validate privacy/integrity/bounds and expose partial coverage, opaque pools, overlapping-account activity and uncertainty instead of false exact totals.
 - **RFC-ASK-0007-AC06** — Controlled runner, routing and instruction experiments have separate treatment IDs, fixed comparison conditions, explicit spend ceilings, independent acceptance and an honest inconclusive outcome.
+
+## Implementation authorization
+
+Accepted for implementation by the owner’s import-and-implement request on 2026-09-07. Native and owner-decision criteria remain open until exercised.
