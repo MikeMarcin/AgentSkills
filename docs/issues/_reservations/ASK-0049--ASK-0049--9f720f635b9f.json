@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0049"
+  ],
+  "reserve_for": "agent-context-lifetime",
+  "purpose": "",
+  "created": "2026-09-08T15:23:12.345484+00:00",
+  "base": "d3ebb84acd4af3a35f3b3a0f8a3f0c73609ecde8"
+}
