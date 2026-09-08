@@ -2,11 +2,10 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0040"
 title: "Run bounded separate orchestration, routing and instruction comparisons"
-status: "Parked"
+status: "Ready"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0030", "ASK-0039"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "controlled-experiment-readout"}
-parked_on: "human-review"
 acceptance: [{"criterion":"RFC-ASK-0008-AC06","outcome":"pending","revision":"7c9828c78d10a8da1a5e507df4ff2b857d46c839","evidence":{"kind":"observation","detail":"Four authorized bounded attempts consumed; observational readout recorded, no controlled routing/instruction comparison or savings claim. Both consumers restored to baseline. Await explicit owner disposition on amended inconclusive closeout and deferral; no further model attempts authorized."}}]
 ---
 
