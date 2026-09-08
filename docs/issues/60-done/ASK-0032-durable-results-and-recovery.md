@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0032"
 title: "Add durable dispatch, report collection and bounded recovery"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0031", "ASK-0023"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "durable-results-and-recovery"}
+acceptance: [{"criterion":"RFC-ASK-0005-AC03/AC04 durable core","outcome":"pass","revision":"5f272132e70c05ce60e5464d475c24baa42fd267","evidence":{"kind":"command","command":"python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_slice_recovery.py","exit_code":0,"detail":"9 tests pass: crash intent refuses redispatch, both child/scout schedules, exact identity rejection, report/completion order, single report-only recovery, cancellation refusal, locking, torn tail, privacy projection, and 1000 idle/duplicate events without model polling. Native driver qualification remains separate."}}]
 ---
 
 # ASK-0032: Add durable dispatch, report collection and bounded recovery
