@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0034"
 title: "Implement the capability-checked Claude companion adapter"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0005"]
 depends_on: ["ASK-0032"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "claude-stream-adapter"}
