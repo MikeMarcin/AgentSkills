@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0008"
 title: "Routing profiles, compact instructions and portable rollout"
-status: "Implementing"
+status: "Auto-Verified"
 owner: "MikeMarcin"
 created: "2026-09-07"
 ---

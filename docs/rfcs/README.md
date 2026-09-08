@@ -23,4 +23,4 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0005 | Auto-Verified | Bounded deterministic execution and durable delegation |
 | RFC-ASK-0006 | Auto-Verified | Project-aware turnkey usage capture and MASK selection |
 | RFC-ASK-0007 | Auto-Verified | Reconciled usage accounting, account limits and task outcomes |
-| RFC-ASK-0008 | Implementing | Routing profiles, compact instructions and portable rollout |
+| RFC-ASK-0008 | Auto-Verified | Routing profiles, compact instructions and portable rollout |
