@@ -1,0 +1,109 @@
+{
+  "schema": "agent-skills.routing-target.v1",
+  "purpose": "Acceptance fixture, not a drop-in configuration or runtime capability observation",
+  "assignments": {
+    "rfc-utility": "mechanical",
+    "rfc-scout": "balanced",
+    "rfc-worker": "standard",
+    "rfc-worker-deep": "deep",
+    "rfc-test-runner": "mechanical",
+    "rfc-reviewer": "review",
+    "rfc-critical-reviewer": "critical"
+  },
+  "provider_classes": {
+    "codex": {
+      "mechanical": {
+        "model": "gpt-5.6-luna",
+        "effort": "xhigh"
+      },
+      "balanced": {
+        "model": "gpt-5.6-sol",
+        "effort": "low"
+      },
+      "standard": {
+        "model": "gpt-6-astra",
+        "effort": "low"
+      },
+      "deep": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      },
+      "critical": {
+        "model": "gpt-6-astra",
+        "effort": "xhigh"
+      },
+      "review": {
+        "model": "gpt-6-astra",
+        "effort": "medium"
+      }
+    },
+    "claude": {
+      "mechanical": {
+        "model": "claude-haiku-4-5",
+        "effort": null
+      },
+      "balanced": {
+        "model": "claude-opus-5",
+        "effort": "low"
+      },
+      "standard": {
+        "model": "claude-opus-5",
+        "effort": "xhigh"
+      },
+      "deep": {
+        "model": "claude-fable-5-1",
+        "effort": "high"
+      },
+      "critical": {
+        "model": "claude-fable-5-1",
+        "effort": "high"
+      },
+      "review": {
+        "model": "claude-fable-5-1",
+        "effort": "medium"
+      }
+    }
+  },
+  "roles": {
+    "rfc-utility": {
+      "mutation": "read-only",
+      "max_turns": 20,
+      "may_spawn_utility": false
+    },
+    "rfc-scout": {
+      "mutation": "read-only",
+      "max_turns": 28,
+      "may_spawn_utility": false
+    },
+    "rfc-worker": {
+      "mutation": "workspace-write",
+      "max_turns": 56,
+      "may_spawn_utility": false
+    },
+    "rfc-worker-deep": {
+      "mutation": "workspace-write",
+      "max_turns": 56,
+      "may_spawn_utility": false
+    },
+    "rfc-test-runner": {
+      "mutation": "build-write",
+      "max_turns": 56,
+      "may_spawn_utility": false
+    },
+    "rfc-reviewer": {
+      "mutation": "read-only",
+      "max_turns": 40,
+      "may_spawn_utility": false
+    },
+    "rfc-critical-reviewer": {
+      "mutation": "read-only",
+      "max_turns": 56,
+      "may_spawn_utility": false
+    }
+  },
+  "retired_dispatch_roles": [
+    "rfc-worker-routine"
+  ],
+  "minimum_claude_cli": "2.1.255",
+  "policy_basis": "Owner-directed settings from the current conversation; no measured savings or quality equivalence asserted"
+}

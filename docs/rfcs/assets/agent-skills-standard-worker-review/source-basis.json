@@ -1,0 +1,152 @@
+{
+  "schema": "agent-skills.pack-source.v1",
+  "uploads": [
+    {
+      "filename": "agent_skills_project_source.md",
+      "sha256": "c3aa4ed9d784e2311e50e3df8fe5970bb26138e153e9407e768794f163841103",
+      "generated": "2026-09-07T22:20:20-07:00"
+    },
+    {
+      "filename": "manage_agent_skills_project_source.md",
+      "sha256": "4a881743b413c35b7b37cf18f63072ebae06e9497f848a7da6d5d5a2565fb698",
+      "generated": "2026-09-07T22:20:26-07:00"
+    }
+  ],
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "kind": "repository-context",
+      "bytes": 1290,
+      "sha256": "308e8276fa5d0260d1a73b19eeea5036b9dda8c3fa1014b328645d5078cbc814",
+      "dump_line": 436
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "kind": "repository-context",
+      "bytes": 1289,
+      "sha256": "70f5281632a1ac2d855160e7a4e2e73f2af2ad04b641e421d403ad633134b399",
+      "dump_line": 453
+    },
+    {
+      "path": "docs/rfcs/README.md",
+      "kind": "rfc",
+      "bytes": 1888,
+      "sha256": "7a4ae7e46a3f2aebf157115703849791fa73d7b526e8ec4b0bb14b2996063933",
+      "dump_line": 491
+    },
+    {
+      "path": "docs/issues/README.md",
+      "kind": "issue",
+      "bytes": 1632,
+      "sha256": "eabd645f5c501567ccdc392a93277743ee533f5bd5588de7d4593eabac2ce8e1",
+      "dump_line": 525
+    },
+    {
+      "path": "docs/issues/NEXT_ID",
+      "kind": "issue",
+      "bytes": 9,
+      "sha256": "004a3216201073f6633eb6705cd83743d3aabaf5ba2eb8adb54981381809d6fa",
+      "dump_line": 567
+    },
+    {
+      "path": "skills/implement-rfc/SKILL.md",
+      "kind": "skill",
+      "bytes": 11436,
+      "sha256": "c73df9f4d340519f235194c56eef7fc10e00390efb41cf8e49c2b2e4750f5674",
+      "dump_line": 14945
+    },
+    {
+      "path": "skills/implement-rfc/config/roles.json",
+      "kind": "skill-config",
+      "bytes": 15604,
+      "sha256": "9e3f7ba5d559ad9529fbfc76812a9933e47b15baec8ab591ab17414e94737c00",
+      "dump_line": 15178
+    },
+    {
+      "path": "skills/implement-rfc/config/routing.json",
+      "kind": "skill-config",
+      "bytes": 1444,
+      "sha256": "eac1054f1a692ab2ad062da6b890fb1ffc6e7d3c069d5a06a87890074b3960e0",
+      "dump_line": 15324
+    },
+    {
+      "path": "skills/implement-rfc/schemas/routing.schema.json",
+      "kind": "skill-schema",
+      "bytes": 2358,
+      "sha256": "dfb5365cbdc9d39350f3fa7dc84f407acd53710c82b0376700f4c977f4e7d30e",
+      "dump_line": 18377
+    },
+    {
+      "path": "skills/implement-rfc/scripts/render_runtime_adapters.py",
+      "kind": "skill-script",
+      "bytes": 25407,
+      "sha256": "174efe2f22784dfa91bf0586f16104809ce08e41b755b03fa6bc91b865b627a8",
+      "dump_line": 23186
+    },
+    {
+      "path": "skills/implement-rfc/scripts/role_usage.py",
+      "kind": "skill-script",
+      "bytes": 19125,
+      "sha256": "457a093d9fb53ffacc37c9ef3cde6adccceb754e7a09a660aad0bace5f328df0",
+      "dump_line": 23740
+    },
+    {
+      "path": "skills/implement-rfc/scripts/codex_lane.py",
+      "kind": "skill-script",
+      "bytes": 11256,
+      "sha256": "06c0bc3bee025f391fbb175e416df4cb4c2cf9544256014b131efb06b98b6afc",
+      "dump_line": 19145
+    },
+    {
+      "path": "skills/implement-rfc/tests/test_codex_lane.py",
+      "kind": "skill-test",
+      "bytes": 11676,
+      "sha256": "b6522d8b55853857ccebdc04c184d52eb750eecdb709cad65caeef9e2dd14e68",
+      "dump_line": 27854
+    },
+    {
+      "path": "skills/implement-rfc/references/model-routing.md",
+      "kind": "skill-reference",
+      "bytes": 11465,
+      "sha256": "022af7c4dd8a597f45481254645b30524b81f420888692bfd904c44c8d269fdb",
+      "dump_line": 16485
+    },
+    {
+      "path": "skills/implement-rfc/references/delegated-execution.md",
+      "kind": "skill-reference",
+      "bytes": 10930,
+      "sha256": "18d6345adf666103b567ce7b0a271275ea8bf941458b09a286dfbea256c04830",
+      "dump_line": 16256
+    },
+    {
+      "path": "skills/implement-rfc/references/routing-audit.md",
+      "kind": "skill-reference",
+      "bytes": 6346,
+      "sha256": "2b398eaca62022315f45636a62bc96e5e3d0c3161e6e279cecff97710b425ef8",
+      "dump_line": 17221
+    },
+    {
+      "path": "docs/issues/60-done/ASK-0041-close-rollout-rfc.md",
+      "kind": "issue",
+      "bytes": 8392,
+      "sha256": "cadaa99d953c4847fae36f1ee4b19245b1acf549c69548e1940c03f449cb5bf9",
+      "dump_line": 3209
+    },
+    {
+      "path": ".mask/skill-config/implement-rfc/project.json",
+      "kind": "workflow-context",
+      "bytes": 2285,
+      "sha256": "cbd2979ef5fcc560daca171c91aa07d6694a64c00a087431e22b1bca15558703",
+      "dump_line": 612
+    }
+  ],
+  "live_git_sha": null,
+  "provisional_rfc": "RFC-ASK-0009",
+  "provisional_cards": [
+    "ASK-0043",
+    "ASK-0044",
+    "ASK-0045",
+    "ASK-0046"
+  ],
+  "claimed_quality_or_cost_win": false
+}

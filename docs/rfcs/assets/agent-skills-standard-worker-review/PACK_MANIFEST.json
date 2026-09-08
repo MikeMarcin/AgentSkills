@@ -1,0 +1,82 @@
+{
+  "schema": "agent-skills.small-rfc-pack.v1",
+  "id": "agent-skills-standard-worker-review",
+  "target_repository": "AgentSkills",
+  "rfcs": [
+    "RFC-ASK-0009"
+  ],
+  "issues": [
+    "ASK-0043",
+    "ASK-0044",
+    "ASK-0045",
+    "ASK-0046"
+  ],
+  "ids_are_provisional": true,
+  "implementation_included": false,
+  "files": {
+    "IMPLEMENTATION_PROMPT.md": {
+      "bytes": 2460,
+      "sha256": "91f12841f77c5482fd42260e597744ef2a7a95be7d9b064c08cf3ecada4897e1"
+    },
+    "IMPORT.md": {
+      "bytes": 3840,
+      "sha256": "2bbfe82b268b7122106f24da93697669d58a241f3d3817f2731942a61558434f"
+    },
+    "README.md": {
+      "bytes": 4107,
+      "sha256": "49d49cf0cd187e6cd3720a3504d5e3f6b9d2dcfba9fd4e3286a5d8190da63eb7"
+    },
+    "SOURCE_BASIS.md": {
+      "bytes": 3785,
+      "sha256": "400928f473c9a4591825478a70ee8780cb5664ef381721da72eaeff7c7e7bb9c"
+    },
+    "VALIDATION.md": {
+      "bytes": 3536,
+      "sha256": "a5ba924dffaa04b90c0be219d57574f2ae4a848307eda57b699c7603f3b6f3f9"
+    },
+    "docs/issues/10-backlog/ASK-0044-safe-role-migration-and-history.md": {
+      "bytes": 2190,
+      "sha256": "ae27432eaeddec41c33376bf5cc356c10c4c70927fa0cc49a78834644fb7c4dc"
+    },
+    "docs/issues/10-backlog/ASK-0045-qualify-routing-and-prepare-adoption.md": {
+      "bytes": 2381,
+      "sha256": "dab2dc2764a35c52b42f9e8e4f176aa63ffc1be253c4936248e03910d54e016b"
+    },
+    "docs/issues/10-backlog/ASK-0046-close-standard-worker-routing.md": {
+      "bytes": 2929,
+      "sha256": "a9021b43b36a1ccdb764ee6b305e0b117b389eae7d55f6e54c2ae1f4e1bdc6d4"
+    },
+    "docs/issues/20-ready/ASK-0043-standard-worker-policy-and-routes.md": {
+      "bytes": 1908,
+      "sha256": "28ee2d29cb61ad99bcb1d5dbedf00d95e10897f7a2a899b37f2f5c5b19ecadf4"
+    },
+    "docs/rfcs/RFC-ASK-0009-standard-worker-and-independent-review-routing.md": {
+      "bytes": 15569,
+      "sha256": "a4e267bc15d793bdd3ff96859a01963b225a895ba99c17b8469f6e195afea177"
+    },
+    "fixtures/selection-cases.json": {
+      "bytes": 3859,
+      "sha256": "1fc406cbe5972598a07d0038c77766be4bbade71c25f8f93faed7acbad28b626"
+    },
+    "fixtures/target-routing.json": {
+      "bytes": 2598,
+      "sha256": "582c01c0d0e7e426ec24b26154c9d894474ef0427ca1de6cf1b7589676d52b6d"
+    },
+    "source-basis.json": {
+      "bytes": 4757,
+      "sha256": "9a58e843dd340632c890578d050b72893c34ac7c0e8d86d4888640c2ee5a355c"
+    },
+    "tools/check_target_routes.py": {
+      "bytes": 6640,
+      "sha256": "60fe81ede21861b52ad97e7934f2a1d796265c9b796119f855d8828c3b749c7c"
+    },
+    "tools/test_check_target_routes.py": {
+      "bytes": 2759,
+      "sha256": "ba8e83103db801c99721cc26e8dc6a3356a7afd13cc61e0804f693edaa6bb611"
+    },
+    "tools/validate_pack.py": {
+      "bytes": 4518,
+      "sha256": "5355eabd7ea660fe1c1bc9629eb8aadaeec7e469ca494e7d61477c0d59db9d58"
+    }
+  }
+}

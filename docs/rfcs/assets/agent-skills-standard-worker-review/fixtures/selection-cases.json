@@ -1,0 +1,97 @@
+{
+  "schema": "agent-skills.selection-cases.v1",
+  "note": "Normative policy examples, not a live model benchmark or automatic routing classifier. Ordinary means medium only when independent review is warranted.",
+  "cases": [
+    {
+      "id": "feature-local-design",
+      "assignment": "Multi-file feature needs local design decisions; objective, paths and acceptance are clear; no identical prior pattern.",
+      "expected_path": "standard",
+      "review": "ordinary",
+      "deep_reason": null
+    },
+    {
+      "id": "approved-wire-change",
+      "assignment": "Implement an approved wire-format extension with specified compatibility; a material compatibility risk has been identified.",
+      "expected_path": "standard",
+      "review": "critical",
+      "deep_reason": null
+    },
+    {
+      "id": "permission-helper",
+      "assignment": "Add the agreed permission helper to a mutation path; existing policy is explicit; material authorization risk is named.",
+      "expected_path": "standard",
+      "review": "critical",
+      "deep_reason": null
+    },
+    {
+      "id": "first-test-failure",
+      "assignment": "A newly written focused test fails and exposes a straightforward implementation error.",
+      "expected_path": "standard",
+      "review": "ordinary",
+      "deep_reason": null
+    },
+    {
+      "id": "unfamiliar-package",
+      "assignment": "An unfamiliar package needs a bounded feature and tests, with no unresolved architecture approval.",
+      "expected_path": "standard",
+      "review": "ordinary",
+      "deep_reason": null
+    },
+    {
+      "id": "approved-lifetime-design",
+      "assignment": "Implement an approved lifetime/ownership protocol; subtle regressions warrant named independent review.",
+      "expected_path": "standard",
+      "review": "critical",
+      "deep_reason": null
+    },
+    {
+      "id": "contradictory-invariants",
+      "assignment": "Evidence from a bounded investigation contradicts the documented cross-thread teardown invariant.",
+      "expected_path": "deep",
+      "review": "critical",
+      "deep_reason": "Resolve the conflicting teardown and ownership invariants using the captured failing sequence."
+    },
+    {
+      "id": "known-hard-causal-problem",
+      "assignment": "Before dispatch, integrator identifies a difficult non-local causal bug with competing explanations within approved scope.",
+      "expected_path": "deep",
+      "review": "ordinary",
+      "deep_reason": "Discriminate the competing causes with a minimal reproduction; reuse prior observations."
+    },
+    {
+      "id": "scope-change",
+      "assignment": "Completion would require a material unapproved architecture or ownership expansion.",
+      "expected_path": "integrator_decision",
+      "review": "not_selected",
+      "deep_reason": null
+    },
+    {
+      "id": "prescribed-command",
+      "assignment": "Run the already selected build/test commands and collect outcomes without source edits.",
+      "expected_path": "prescribed_runner",
+      "review": "not_selected",
+      "deep_reason": null
+    },
+    {
+      "id": "small-coupled-edit",
+      "assignment": "Primary already owns and understands a small tightly coupled implementation.",
+      "expected_path": "direct",
+      "review": "ordinary",
+      "deep_reason": null
+    },
+    {
+      "id": "quota-exhaustion",
+      "assignment": "The selected model is unavailable because its allowance is exhausted; no alternative has approval.",
+      "expected_path": "capacity_policy",
+      "review": "not_selected",
+      "deep_reason": null
+    },
+    {
+      "id": "clean-medium-review",
+      "assignment": "Normal review reports no blocking findings and no independent material risk has been identified.",
+      "expected_path": "no_extra_worker",
+      "review": "ordinary_no_repeat",
+      "deep_reason": null
+    }
+  ]
+}
