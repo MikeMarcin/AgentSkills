@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0023"
 title: "Harden streaming provider capture, provenance and archive bounds"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0006"]
 depends_on: ["ASK-0022"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "capture-core-and-bounds"}
