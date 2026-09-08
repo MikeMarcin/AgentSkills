@@ -2,7 +2,7 @@
 schema: "implement-rfc.rfc.v1"
 id: "RFC-ASK-0010"
 title: "Interactive coordinator and milestone integrators"
-status: "Proposed"
+status: "Implementing"
 ---
 
 # Interactive coordinator and milestone integrators
@@ -402,3 +402,7 @@ and the linked cards. The live RFC should retain links to the imported packet
 assets or appropriate active docs after intake; import rewrites packet-relative
 links, preserving this retained original. Program runtime changes in ManageAgentSkills
 and migrations of unselected consumers are outside this RFC.
+
+## Implementation authorization
+
+The owner directed implementation of this pack on 2026-09-08, accepting this RFC. Scope is AgentSkills; original RFC_BASE_SHA remains 9f991d9027a1aaa9bd9827eb4c51ef6d33432f7a. M1 covers ASK-0051–0053; M2 covers ASK-0054–0056; M3 covers ASK-0057–0058. Native acceptance and selected adoption require actual evidence. No consumer fleet migration or push is authorized.
