@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0038"
 title: "Refactor task context and reporting without removing engineering requirements"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0008"]
 depends_on: ["ASK-0037", "ASK-0029"]
 metadata: {"packet": "agent-skills-execution-usage", "provisional_id": false, "packet_key": "compact-instructions-and-handoffs"}
