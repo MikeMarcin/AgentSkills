@@ -37,7 +37,8 @@ evidence, not execution or serving evidence from the reported UX task.
 11 test_unified_workflow and 14 test_render_runtime_adapters tests passed.
 quick_validate.py and validate_portable_agents.py --source-only passed; diff check
 passed. Pre-closeout documentation validation correctly reported this unfinished
-follow-up under the terminal RFC; rerun after finishing the card.
+follow-up under the terminal RFC. After finish, documentation validation passed
+(9 RFCs, 48 cards, zero violations); integrated portable source validation passed.
 
 The evaluator also observed older role names in the current runtime and an existing
 sandbox-fallback ambiguity. No role adapters or consumer sessions were changed;
