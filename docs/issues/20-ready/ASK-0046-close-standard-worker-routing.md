@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0046"
 title: "Integrate and close the standard-worker routing change"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0009"]
 depends_on: ["ASK-0045"]
 closeout_for: ["RFC-ASK-0009"]
