@@ -46,7 +46,7 @@ class CommandTests(unittest.TestCase):
         return runner.start(self.order,model.digest(self.order))
 
     def change_script(self,text):
-        self.script.write_text(text)
+        self.script.write_text(text, encoding='utf-8')
         self.order['input_hashes']['check.py']=model.file_hash(self.script)
 
     def test_public_cli_reaches_only_integration_gate(self):

@@ -47,8 +47,9 @@ class AuditTests(unittest.TestCase):
     def test_project_boundaries_and_worktree_alias(self):
         self.assertEqual(self.projects.match(str(self.project/'sub')), 'Example')
         self.assertIsNone(self.projects.match(str(self.project)+'-other'))
-        p = u.Projects([f'Example={self.project}'], ['Example=/old/deleted-worktree'])
-        self.assertEqual(p.match('/old/deleted-worktree/src'), 'Example')
+        old = self.project.parent / 'old-deleted-worktree'
+        p = u.Projects([f'Example={self.project}'], [f'Example={old}'])
+        self.assertEqual(p.match(str(old/'src')), 'Example')
         self.assertTrue(u.within(u.norm(r'C:\code\test\src'), u.norm(r'C:\code\test')))
         self.assertFalse(u.within(u.norm(r'C:\code\testing'), u.norm(r'C:\code\test')))
 
