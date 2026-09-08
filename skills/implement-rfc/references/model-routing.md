@@ -129,3 +129,5 @@ When a new model or effort level appears:
 
 Absent an explicit owner-directed promotion, establish a newly released model on representative utility, scout, or shadow-review work before assigning implementation or closeout-critical responsibility. An owner-directed promotion can proceed on documented public evidence and judgment; state which local evaluations were not performed.
 
+
+For owned adapter retirement, active sessions, pins and rollback, use [scoped adoption](role-adoption.md).

@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0045"
 title: "Qualify routing and prepare scoped consumer adoption"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0009"]
 depends_on: ["ASK-0044"]
 metadata: {"packet":"agent-skills-standard-worker-review", "provisional_id":true}
+acceptance: [{"criterion":"RFC-ASK-0009-AC01–AC06 qualification","outcome":"pass","revision":"fbe7c80f8059e61f4e2cf619c75e85e600ed564a plus supplied working paths","evidence":{"kind":"command","detail":"69 integration-focused renderer/target/usage capture/scope/CLI tests passed; 9 migration and 9 slice integration tests passed; portable source valid; immutable packet validator: 0 violations. Primary reviewed all 13 selection cases and full changed migration/routing diff. MASK capabilities/config/source status/project show were observational and establish development links, no selected pin, ahead/dirty canonical source. role-adoption.md documents scoped guarded adoption and clean rollback with native serving/quality/cost unclaimed."}}]
 ---
 
 # ASK-0045: Qualify routing and prepare scoped consumer adoption

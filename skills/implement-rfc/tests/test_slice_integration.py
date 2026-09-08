@@ -62,6 +62,20 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(report.read_text(),'Established fact')
         self.assertEqual(result['semantic_acceptance'],'not_decided_by_runner')
 
+    def test_renamed_reviewer_admission_and_retired_new_dispatch(self):
+        task = self.agent_order()
+        for role in ('rfc-reviewer-critical', 'rfc-critical-reviewer'):
+            task['route']['role'] = role
+            policy = self.root / 'permission.json'
+            data = json.loads(policy.read_text()); data['allowed_agents'] = [task['route']]
+            policy.write_text(json.dumps(data))
+            self.order['input_hashes']['permission.json'] = model.file_hash(policy)
+            model.validate(self.order)  # Historical frozen orders remain structurally readable.
+            if role == 'rfc-critical-reviewer':
+                with self.assertRaisesRegex(ValueError, 'Retired role selector'):
+                    self.execute()
+                self.assertFalse((self.root / '.mask/generated').exists())
+
     def test_agent_budget_packet_and_permissions_refuse(self):
         task=self.agent_order()
         self.order['max_agent_dispatches']=0

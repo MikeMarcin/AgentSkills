@@ -441,8 +441,11 @@ def manifest_hashes(manifest, project):
         return {}
     if manifest.get("schema") != ADAPTERS_SCHEMA or manifest.get("project") != project:
         raise ValueError("unrecognized consumer adapter manifest")
+    files = manifest.get("files")
+    if not isinstance(files, list) or not all(isinstance(item, dict) for item in files):
+        raise ValueError("invalid consumer adapter manifest files")
     result = {}
-    for item in manifest.get("files", []):
+    for item in files:
         relative, digest = item.get("path"), item.get("sha256")
         if (not isinstance(relative, str) or not re.fullmatch(
                 r"\.(?:codex/agents/rfc-[a-z-]+\.toml|claude/agents/rfc-[a-z-]+\.md)", relative)
@@ -473,7 +476,9 @@ def publish_adapters(root, generated, manifest_path, manifest, check):
     retired = set(old) - set(new)
     for role in RETIRED_ROLES:
         for family, suffix in (("codex", "toml"), ("claude", "md")):
-            retired.add(f".{family}/agents/{role}.{suffix}")
+            relative = f".{family}/agents/{role}.{suffix}"
+            if relative not in new:
+                retired.add(relative)
     for relative in sorted(set(old) | set(new) | retired):
         path = root / relative
         safe_destination(root, path)

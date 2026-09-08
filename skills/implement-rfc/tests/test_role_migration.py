@@ -164,3 +164,17 @@ class RoleMigrationTests(unittest.TestCase):
             self.assertEqual(receipt['origins'][provider]['rfc-reviewer'], 'explicit_user')
             self.assertEqual(routes[provider]['rfc-worker-deep'], ROUTING['providers'][provider]['classes']['deep'])
             self.assertIsNone(receipt['observed'])
+
+    def test_clean_prior_snapshot_can_be_restored_with_hash_preflight(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); manifest_path = self.legacy(root)
+            prior = json.loads(manifest_path.read_text())
+            snapshot = {root / item['path']: (root / item['path']).read_text() for item in prior['files']}
+            snapshot[manifest_path] = manifest_path.read_text()
+            self.assertEqual(self.run_renderer(root).returncode, 0)
+            renderer.publish_adapters(root, snapshot, manifest_path, prior, False)
+            for path, content in snapshot.items():
+                self.assertEqual(path.read_text(), content)
+            self.assertFalse((root / '.codex/agents/rfc-worker-deep.toml').exists())
+            self.assertFalse((root / '.codex/agents/rfc-reviewer-critical.toml').exists())
+            self.assertEqual(self.run_renderer(root, '--check').returncode, 1)

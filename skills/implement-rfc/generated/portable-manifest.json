@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "c73df9f4d340519f235194c56eef7fc10e00390efb41cf8e49c2b2e4750f5674"
+      "sha256": "82cdc576b8d09df5b0cc7b7da4cfd5531f3998cfe928eb092c161611dc7b20e0"
     },
     {
       "path": "agents/openai.yaml",
@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "9e3f7ba5d559ad9529fbfc76812a9933e47b15baec8ab591ab17414e94737c00"
+      "sha256": "95dc4ddd9004b3c40d70cd48da25287ae1ff32f31ccff4ba1d4de69f03d27d3e"
     },
     {
       "path": "config/routing-profiles.json",
@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "eac1054f1a692ab2ad062da6b890fb1ffc6e7d3c069d5a06a87890074b3960e0"
+      "sha256": "d3b53090b636acf411ffc40f7e46e20053707721b465361c739fe31136c8dca6"
     },
     {
       "path": "examples/projects/samplereview/project.json",
@@ -50,15 +50,15 @@
     },
     {
       "path": "references/codex-lanes.md",
-      "sha256": "244ec87c62476808f8f1a510bd2f3effa9cfad60f232637a31456b00851b9c19"
+      "sha256": "70a59d7d16f8cc64cb444a70a04f557ffffd6f948463dcad61e339c3bd969b0c"
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "18d6345adf666103b567ce7b0a271275ea8bf941458b09a286dfbea256c04830"
+      "sha256": "0f7e1abf4ac1fd38b881e5483d5c94848d9b6a084450836ecabad03766dc2d15"
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "022af7c4dd8a597f45481254645b30524b81f420888692bfd904c44c8d269fdb"
+      "sha256": "6610d0e0dba6bcfaaadad8b4d0b26a358c477ba22f25bfa819b251581c5a946d"
     },
     {
       "path": "references/pack-lifecycle.md",
@@ -69,12 +69,16 @@
       "sha256": "4c1ca75e586a7451efbc2cd450fcc1fbce37322daaffb02cc02dd139729a0441"
     },
     {
+      "path": "references/role-adoption.md",
+      "sha256": "e20102636421c456dd734407b7ecc8e038675174f7d2ebdc5fe34ecb333d6848"
+    },
+    {
       "path": "references/routing-audit.md",
-      "sha256": "2b398eaca62022315f45636a62bc96e5e3d0c3161e6e279cecff97710b425ef8"
+      "sha256": "9a4361ee4b4cc0bb7b5cc933d1d81600f372953858cccd68fe0c3f413fc7da88"
     },
     {
       "path": "references/runtime-compatibility.md",
-      "sha256": "6ab9eb52a05977dbe4ac8b4e7254598fb98b3f8439e408b4e968aa77a6e8c909"
+      "sha256": "21a2ad3661a33fbb20a256502d6138fad4f9e4498de268fd0b939d65f1dbb48c"
     },
     {
       "path": "references/usage-collection.md",
@@ -102,7 +106,7 @@
     },
     {
       "path": "schemas/routing.schema.json",
-      "sha256": "dfb5365cbdc9d39350f3fa7dc84f407acd53710c82b0376700f4c977f4e7d30e"
+      "sha256": "ec1ef9f3360252a6e883854f29c57afa5321a2e740cc1a78ffba9a70afeaa6df"
     },
     {
       "path": "scripts/allocation.py",
@@ -118,7 +122,7 @@
     },
     {
       "path": "scripts/codex_lane.py",
-      "sha256": "06c0bc3bee025f391fbb175e416df4cb4c2cf9544256014b131efb06b98b6afc"
+      "sha256": "06283df8eb98daae5b9a2fa0a99a8c7d901449e505142e6fc97cafbcace6ea71"
     },
     {
       "path": "scripts/codex_station.py",
@@ -146,15 +150,15 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "174efe2f22784dfa91bf0586f16104809ce08e41b755b03fa6bc91b865b627a8"
+      "sha256": "56b6fc3829864194500a57586c30d8dfce0c140966383e6c4ef1de15c34714be"
     },
     {
       "path": "scripts/role_usage.py",
-      "sha256": "457a093d9fb53ffacc37c9ef3cde6adccceb754e7a09a660aad0bace5f328df0"
+      "sha256": "0184e52e344ba84bd9cfe72256e846e44a37501c26590e509f36697c493b1f88"
     },
     {
       "path": "scripts/run_slice.py",
-      "sha256": "2bb046922ff6e4645f6cdf6fae41d68e371af6be1d56dab2605888ffffd87281"
+      "sha256": "f022b9e224eb3544936714493fa29e267c276369d1a4e04fe44bb5fba684c014"
     },
     {
       "path": "scripts/slice_claude.py",
@@ -170,7 +174,7 @@
     },
     {
       "path": "scripts/slice_model.py",
-      "sha256": "f5d8ca64249391f53ea8d8b428cc7ab8dc06679d9d4221c0e3ba80b4574f9c12"
+      "sha256": "9ae23b0aaf95839aeec6eb1ef0b12fa7a7524c167bf17391cdd6399810e9945f"
     },
     {
       "path": "scripts/slice_runtime.py",
@@ -222,7 +226,7 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "b6522d8b55853857ccebdc04c184d52eb750eecdb709cad65caeef9e2dd14e68"
+      "sha256": "efc4b88f3afcefc30ae4ee5cb1c0f3d1bee1d4c065fa63255a131ba3fd5b627d"
     },
     {
       "path": "tests/test_codex_station.py",
@@ -246,11 +250,15 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "12a7ba0b74aab7785217545875c258da8b1f38b41fc8eb2bef381dce7df70202"
+      "sha256": "6ad32f871d14b24f5ce98d447ed514691fddf313c8ffca1b6d546e3a72cdc4b9"
+    },
+    {
+      "path": "tests/test_role_migration.py",
+      "sha256": "003d17cc1d473e85ab7aa6c8fff471a678106ec8f5590dc495919e9203136e1d"
     },
     {
       "path": "tests/test_role_usage.py",
-      "sha256": "49a8721810cd5131ea817437996042a273a8b4e799d34d360197f25934b1020f"
+      "sha256": "caa7c7721e72a18318a8e8579ce122b0c1314b4e40674a997afeeca699bdaec2"
     },
     {
       "path": "tests/test_slice_claude.py",
@@ -262,15 +270,19 @@
     },
     {
       "path": "tests/test_slice_commands.py",
-      "sha256": "617d7b7f6f983aa4224691289e6a07749bb9352bef19ab9fcf744ef0097e4df4"
+      "sha256": "8c30ed536a608eada8478117ed9ef29e7a2dae147c5dae12373431b70922e199"
     },
     {
       "path": "tests/test_slice_integration.py",
-      "sha256": "dfd46de96e1fc120dfe5df22c488ccb8c90c585665a3b7d2618ba3c49d76d046"
+      "sha256": "14dd34f1867cce6f28a9b941e924a5d621688222e5adcabf54c7d07a4aa3e421"
     },
     {
       "path": "tests/test_slice_recovery.py",
       "sha256": "e55a47cf9e73d601278ab98c3130d1e81d05e54618f40955fc45cb59c5cda70c"
+    },
+    {
+      "path": "tests/test_standard_worker_target.py",
+      "sha256": "b14dcb1fcfa7d337183b4b86b1514238185ef75f566ddb0eb4af41fe924a737b"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -278,7 +290,7 @@
     },
     {
       "path": "tests/test_unified_workflow.py",
-      "sha256": "d0faf50c58cd690e436ddc870a7b7e54cdda9dbf1f10771ae4c879c852a56082"
+      "sha256": "1e96d3d9f1b18c0df4278d42320dde497743e7f097c7b01a096749b26a86aef1"
     },
     {
       "path": "tests/test_usage_accounting.py",
@@ -309,6 +321,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "94772ab837d810f6",
+  "portable_digest": "3ec7309dcc38a439",
   "schema": "implement-rfc.portable-manifest.v1"
 }
