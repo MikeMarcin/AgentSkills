@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0052"
 title: "Rewrite the common implement-rfc path around complete integrated milestones"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0051"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "milestone-focused-instructions", "milestone": "M1"}
