@@ -50,7 +50,7 @@ Planned cards: ASK-0050, ASK-0051, ASK-0052, ASK-0053, ASK-0054, ASK-0055, ASK-0
 
 | Acceptance | Direct check / evidence | Outcome | Implementation revision |
 |---|---|---|---|
-| RFC-ASK-0010-AC01 | Native course cards ASK-0054/0055 claimed; fixture setup underway | Open native evidence | 1c7f093 |
+| RFC-ASK-0010-AC01 | Native course cards ASK-0054/0055 claimed; both fixtures prepared; native startup awaits folder trust | Open native evidence | 1c7f093 |
 | RFC-ASK-0010-AC02 | ASK-0051 routing 19 renderer + 10 migration + historical fixture checks; independent routes/precedence | Source pass; actual serving open | 2df5aa4 |
 | RFC-ASK-0010-AC03 | ASK-0052/0053 instructions and M1 independent authority review; companion integrator admission refused | Source pass; native authority open | 7c3fc29, 1c7f093 |
 | RFC-ASK-0010-AC04 | Source slices implemented/tested with bounded workers; native catalog course pending | Source delivered; native composition open | 2df5aa4, 7c3fc29, 1c7f093 |
@@ -58,9 +58,9 @@ Planned cards: ASK-0050, ASK-0051, ASK-0052, ASK-0053, ASK-0054, ASK-0055, ASK-0
 | RFC-ASK-0010-AC06 | 12 handoff tests including duplicate/stale/quiescence/partial guards; independent review clear | Source pass; runtime observation open | 1c7f093 |
 | RFC-ASK-0010-AC07 | Focused public tests and two independent reviews; accounting findings corrected and rechecked | Source pass; native quality open | 1c7f093, 90bc01c |
 | RFC-ASK-0010-AC08 | ASK-0052 eight workflow reader scenarios and reachable entry tests | Source pass; runtime-limited observations pending | 7c3fc29 |
-| RFC-ASK-0010-AC09 | ASK-0052 recorded role/common instruction loads; source manifest validation and link tests | Source pass; final package check pending | 7c3fc29, 1c7f093, 90bc01c |
-| RFC-ASK-0010-AC10 | ASK-0054 In Progress; Codex CLI 0.153.4 installed | Open; no native pass yet | 1c7f093 |
-| RFC-ASK-0010-AC11 | ASK-0055 In Progress; Claude Code 2.1.260 installed | Open; no native pass yet | 1c7f093 |
+| RFC-ASK-0010-AC09 | ASK-0052 recorded role/common instruction loads; source manifest validation and link tests | Pass: 55 integration tests, MASK package validator, retained ZIP45/45 | 7c3fc29, 1c7f093, 90bc01c |
+| RFC-ASK-0010-AC10 | ASK-0054 In Progress; Codex CLI 0.153.4 installed | Open; native host awaits folder-trust decision | 1c7f093 |
+| RFC-ASK-0010-AC11 | ASK-0055 In Progress; Claude Code 2.1.260 installed | Open; native host awaits folder-trust decision | 1c7f093 |
 | RFC-ASK-0010-AC12 | ASK-0056 Done: owning-family public fixture; 93 usage checks, focused correction tests and independent recheck | Accounting pass; native cost readout open | 5772548, 90bc01c |
 | RFC-ASK-0010-AC13 | ASK-0051 two-consumer public renderer fixtures; selected activation/rollback in ASK-0057 | Isolation source pass; adoption open | 2df5aa4 |
 | RFC-ASK-0010-AC14 | Immutable baseline and all nine live cards retained; this checkpoint reconciles source only | Open; required native and adoption criteria remain | 8c40c2d |
@@ -70,4 +70,4 @@ or permission to lower quality.
 
 ## Implementation checkpoint
 
-ASK-0050–0053 and ASK-0056 are Done. ASK-0054 and ASK-0055 own the next native frontier. ASK-0057 and this closeout remain Backlog until required prerequisites pass. Source accounting correction commit is 90bc01c; no savings, deployment reload, or native continuity is inferred from source checks. No push or consumer fleet migration performed. Task-owned temporary candidates remain for qualification and will be removed after evidence consumption.
+ASK-0050–0053 and ASK-0056 are Done. ASK-0054 and ASK-0055 own the next native frontier. ASK-0057 and this closeout remain Backlog until required prerequisites pass. Source accounting correction commit is 90bc01c; no savings, deployment reload, or native continuity is inferred from source checks. No push or consumer fleet migration performed. Task-owned frozen qualification fixtures remain while both native folder-trust decisions are pending. No initial course prompt or model work has started. Source integration tests: 55 passed; configured gate: 10 RFCs, 58 cards, zero violations; package valid with fingerprint sha256:5bfe8efe01c9627618847247745598cce460863320db754f976255b306970ac9; all 45 retained packet files match ZIP bytes. MASK selected-project plan proposes state.record only, no link changes, and was not applied. Old native adapter outputs remain unchanged pending qualification/adoption.

@@ -38,6 +38,10 @@ Criterion coverage: RFC-ASK-0010-AC01, RFC-ASK-0010-AC02, RFC-ASK-0010-AC03, RFC
 
 ## Run record
 
-Not started. No native run, source implementation, reservation, accepted work or
-measured saving is claimed by this packet. Claim the live card before source work,
-preserve unrelated changes and commit only explicit owned paths.
+Native interactive Codex 0.153.4 launched on 2026-09-08 in the disposable consumer `/tmp/rfc0010-native-qualification-20260908/codex` at fixture commit `5fdebf603f9aa4894f0a26d39ab55d99e50f9397`. Source is a frozen archive of AgentSkills `d0d2e8d151d875ca90bf298ae086988095a66841`, exposed through both normal skill discovery symlinks. Generated adapter drift check validated 17 files; scoped board audit found zero violations/warnings; fixture starts clean with CAT-0001 ready and CAT-0002/CAT-0003 dependency-blocked. No catalog implementation was prewritten.
+
+Requested coordinator route: gpt-5.6-sol low. Generated integrator route remains independent: gpt-6-astra low. Actual served routes are unobserved. Claude global effort environment override was absent. Normal interactive CLI used, with no headless subcommand, API supervisor, altered trust or bypass flags.
+
+Startup stopped at the actual native folder-trust prompt. No initial course prompt has been submitted, no integrator has been created, and no model work/usage or two-milestone pass is inferred. Await owner decision for trusting only this disposable fixture. The existing PTY session reference is `94920` (ephemeral; reconcile liveness before resuming). The single initial assignment is retained at `/tmp/rfc0010-native-qualification-20260908/prompts/codex.txt`. If the host exits, next authorized invocation must account for that rather than claiming automatic continuation.
+
+Required native continuity, same-child correction, fresh M2 identity, native waiting/quiescence, effective routes and cost readout remain open. Fixtures and frozen source are intentionally retained while the trust decision is pending; no MASK registration or unrelated deployment changed.
