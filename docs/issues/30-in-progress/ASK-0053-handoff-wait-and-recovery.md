@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0053"
 title: "Make milestone handoff, native waiting and interruption safe"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0051", "ASK-0052"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "handoff-wait-and-recovery", "milestone": "M1"}
