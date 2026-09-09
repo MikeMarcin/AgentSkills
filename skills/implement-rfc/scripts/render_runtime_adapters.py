@@ -24,11 +24,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import project_config  # noqa: E402
 
 ROLE_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-MODEL_CLASSES = {"mechanical", "balanced", "standard", "deep", "review", "critical"}
+MODEL_CLASSES = {"mechanical", "balanced", "standard", "deep", "review", "critical", "integration"}
 MUTATIONS = {"read-only", "build-write", "workspace-write"}
 PLACEHOLDER_RE = re.compile(r"^<[^>]+>$|\$\{")
-ROLES_SCHEMA = "implement-rfc.roles.v1"
-ROUTING_SCHEMA = "implement-rfc.routing.v1"
+ROLES_SCHEMA = "implement-rfc.roles.v2"
+ROUTING_SCHEMA = "implement-rfc.routing.v2"
 ADAPTERS_SCHEMA = "implement-rfc.runtime-adapters.v1"
 PORTABLE_MANIFEST_SCHEMA = "implement-rfc.portable-manifest.v1"
 SKILL_NAME = "implement-rfc"
@@ -68,80 +68,130 @@ def deep_merge(base: Any, override: Any) -> Any:
     return override
 
 
+LEAF_ROLES = {"rfc-utility", "rfc-scout", "rfc-test-runner", "rfc-worker",
+              "rfc-worker-deep", "rfc-reviewer", "rfc-reviewer-critical"}
+INTEGRATOR = "rfc-integrator"
+
+
 def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    if data.get("schema") != ROLES_SCHEMA:
+    legacy = data.get("schema") == "implement-rfc.roles.v1"
+    if data.get("schema") not in (ROLES_SCHEMA, "implement-rfc.roles.v1"):
         raise ValueError("roles.json has an unsupported schema")
+    if set(data) != {"schema", "roles"}:
+        raise ValueError("unknown roles fields")
     roles = data.get("roles")
     if not isinstance(roles, dict) or not roles:
         raise ValueError("roles.json must contain a non-empty roles object")
-    for name, role in roles.items():
-        if not isinstance(name, str) or not ROLE_NAME_RE.fullmatch(name):
-            raise ValueError(f"invalid role name: {name!r}")
-        if not isinstance(role, dict):
+    known = LEAF_ROLES | (set(RETIRED_ROLES) if legacy else {INTEGRATOR})
+    if set(roles) - known:
+        raise ValueError("unknown role selector")
+    normalized = {}
+    for name, original in roles.items():
+        if not isinstance(original, dict):
             raise ValueError(f"role {name} must be an object")
+        role = dict(original)
+        allowed = {"description", "mutation", "max_turns", "instructions"}
+        allowed |= {"may_spawn_utility"} if legacy else {"delegation", "entrypoint"}
+        if set(role) - allowed:
+            raise ValueError(f"unknown fields for role {name}")
+        if legacy:
+            if role.pop("may_spawn_utility", False) is not False:
+                raise ValueError("v1 delegation requires explicit migration; only leaves are readable")
+            role["delegation"] = {"allowed_roles": []}
+        delegation = role.get("delegation")
+        if not isinstance(delegation, dict) or set(delegation) != {"allowed_roles"}:
+            raise ValueError(f"role {name} needs typed delegation")
+        children = delegation["allowed_roles"]
+        if (not isinstance(children, list) or not all(isinstance(child, str) for child in children)
+                or len(set(children)) != len(children) or set(children) - LEAF_ROLES
+                or (name != INTEGRATOR and children)):
+            raise ValueError(f"invalid child-role allowlist for {name}")
+        entrypoint = role.get("entrypoint")
+        if entrypoint is not None and (not isinstance(entrypoint, str)
+                or not re.fullmatch(r"references/[a-z0-9][a-z0-9/-]*\.md", entrypoint)
+                or "//" in entrypoint):
+            raise ValueError(f"invalid role entrypoint for {name}")
         if not isinstance(role.get("description"), str) or not role["description"].strip():
             raise ValueError(f"role {name} needs a description")
         if role.get("mutation") not in MUTATIONS:
             raise ValueError(f"role {name} has invalid mutation")
-        if not isinstance(role.get("max_turns"), int) or role["max_turns"] < 1:
+        if type(role.get("max_turns")) is not int or role["max_turns"] < 1:
             raise ValueError(f"role {name} has invalid max_turns")
-        if not isinstance(role.get("may_spawn_utility", False), bool):
-            raise ValueError(f"role {name} has invalid may_spawn_utility")
         instructions = role.get("instructions")
         if not isinstance(instructions, list) or not instructions or not all(
             isinstance(item, str) and item.strip() for item in instructions
         ):
             raise ValueError(f"role {name} needs non-empty instruction strings")
-    return roles
+        normalized[name] = role
+    return normalized
 
 
-def validate_routing(
-    data: dict[str, Any], roles: dict[str, dict[str, Any]]
-) -> tuple[
-    dict[str, str],
-    dict[str, dict[str, Any]],
-    dict[str, dict[str, Any]],
-]:
-    if data.get("schema") != ROUTING_SCHEMA:
+def validate_route(route, label):
+    if (not isinstance(route, dict) or set(route) != {"model", "effort"}
+            or not isinstance(route["model"], str) or not route["model"].strip()
+            or PLACEHOLDER_RE.search(route["model"])
+            or (route["effort"] is not None and (not isinstance(route["effort"], str)
+                                                or not route["effort"].strip()))):
+        raise ValueError(f"{label} requires exact model and effort without placeholders")
+
+
+def validate_capability(provider, route, capabilities):
+    validate_route(route, "override")
+    if not isinstance(capabilities, dict) or not isinstance(capabilities.get(provider, {}), dict):
+        raise ValueError("unsupported or unverified runtime capability")
+    supported = capabilities.get(provider, {}).get(route["model"], [])
+    if not isinstance(supported, list):
+        raise ValueError("invalid runtime capability efforts")
+    if route["effort"] not in supported:
+        raise ValueError(f"unsupported or unverified runtime capability: {provider}/{route['model']}/{route['effort']}")
+
+
+def validate_routing(data, roles):
+    legacy = data.get("schema") == "implement-rfc.routing.v1"
+    if data.get("schema") not in (ROUTING_SCHEMA, "implement-rfc.routing.v1"):
         raise ValueError("routing.json has an unsupported schema")
-    assignments = data.get("assignments")
-    providers = data.get("providers")
+    allowed = {"schema", "verified_as_of", "assignments", "providers"}
+    if not legacy:
+        allowed.add("session_routes")
+    if set(data) - allowed:
+        raise ValueError("unknown routing fields")
+    assignments, providers = data.get("assignments"), data.get("providers")
     if not isinstance(assignments, dict):
         raise ValueError("routing assignments must be an object")
     if set(assignments) & set(RETIRED_ROLES) and not set(roles) & set(RETIRED_ROLES):
         raise ValueError("retired role selector in routing assignments; explicitly migrate to current roles")
     if set(assignments) != set(roles):
-        missing = sorted(set(roles) - set(assignments))
-        extra = sorted(set(assignments) - set(roles))
-        raise ValueError(f"routing role mismatch; missing={missing}, extra={extra}")
-    for role_name, model_class in assignments.items():
-        if model_class not in MODEL_CLASSES:
-            raise ValueError(f"routing assigns invalid class {model_class} to {role_name}")
-    if not isinstance(providers, dict) or "codex" not in providers or "claude" not in providers:
-        raise ValueError("routing providers must contain codex and claude")
-
-    codex_classes = providers["codex"].get("classes")
-    claude_classes = providers["claude"].get("classes")
-    if not isinstance(codex_classes, dict) or not isinstance(claude_classes, dict):
-        raise ValueError("provider classes must be objects")
-    for provider_name, classes in (("codex", codex_classes), ("claude", claude_classes)):
-        if set(classes) - MODEL_CLASSES:
-            raise ValueError(f"{provider_name} has unknown route classes")
-        for model_class in set(assignments.values()):
-            route = classes.get(model_class)
-            if not isinstance(route, dict) or not isinstance(route.get("model"), str):
-                raise ValueError(f"{provider_name} lacks model route for {model_class}")
-            model = route["model"].strip()
-            if not model or PLACEHOLDER_RE.search(model):
-                raise ValueError(f"{provider_name} route {model_class} contains a placeholder")
-            effort = route.get("effort")
-            if effort is not None and not isinstance(effort, str):
-                raise ValueError(f"{provider_name} route {model_class} has invalid effort")
-    return assignments, codex_classes, claude_classes
+        raise ValueError(f"routing role mismatch; missing={sorted(set(roles) - set(assignments))}, extra={sorted(set(assignments) - set(roles))}")
+    classes_allowed = MODEL_CLASSES - {"integration"} if legacy else MODEL_CLASSES
+    for name, model_class in assignments.items():
+        if not isinstance(model_class, str) or model_class not in classes_allowed:
+            raise ValueError(f"routing assigns invalid class {model_class} to {name}")
+        if (name == INTEGRATOR) != (model_class == "integration"):
+            raise ValueError("integrator requires its independent integration class")
+    if not isinstance(providers, dict) or set(providers) != {"codex", "claude"}:
+        raise ValueError("routing providers must contain codex and claude only")
+    for provider, definition in providers.items():
+        if not isinstance(definition, dict) or set(definition) - {"classes", "minimum_cli_version"}:
+            raise ValueError("invalid provider definition")
+        classes = definition.get("classes")
+        if not isinstance(classes, dict) or set(classes) - classes_allowed:
+            raise ValueError(f"{provider} has unknown route classes")
+        for model_class in set(assignments.values()) | set(classes):
+            validate_route(classes.get(model_class), f"{provider} route {model_class}")
+    if not legacy:
+        sessions = data.get("session_routes")
+        if not isinstance(sessions, dict) or set(sessions) != {"rfc-coordinator"}:
+            raise ValueError("routing requires the session-only rfc-coordinator route")
+        coordinator = sessions["rfc-coordinator"]
+        if not isinstance(coordinator, dict) or set(coordinator) != set(providers):
+            raise ValueError("coordinator session route requires both providers")
+        for provider, route in coordinator.items():
+            validate_route(route, f"{provider} coordinator")
+    return assignments, providers["codex"]["classes"], providers["claude"]["classes"]
 
 
 def select_routes(routing, roles, profiles, profile="baseline", capabilities=None,
-                  order_routes=None, explicit_routes=None):
+                  order_routes=None, explicit_routes=None, preserved_integrator_routes=None):
     """Resolve per-role requests; rendering never selects the primary session."""
     assignments, codex, claude = validate_routing(routing, roles)
     if profiles.get("schema") != "implement-rfc.routing-profiles.v1":
@@ -151,9 +201,15 @@ def select_routes(routing, roles, profiles, profile="baseline", capabilities=Non
         raise ValueError("unknown routing profile")
     routes = {p: {name: dict(classes[assignments[name]]) for name in roles}
               for p, classes in (("codex", codex), ("claude", claude))}
-    origins = {p: {name: "baseline" for name in roles} for p in routes}
+    origins = {p: {name: "integration_default" if name == INTEGRATOR else "baseline"
+                   for name in roles} for p in routes}
+    preserved = preserved_integrator_routes or {}
+    if not isinstance(preserved, dict) or set(preserved) - set(routes):
+        raise ValueError("invalid preserved integrator providers")
+    preserved_overlay = {provider: {INTEGRATOR: route} for provider, route in preserved.items()}
     for origin, overlay in (("profile", selected.get("overrides", {})),
                             ("admitted_order", order_routes or {}),
+                            ("preserved_owner", preserved_overlay),
                             ("explicit_user", explicit_routes or {})):
         if not isinstance(overlay, dict) or set(overlay) - set(routes):
             raise ValueError("invalid route override providers")
@@ -163,21 +219,21 @@ def select_routes(routing, roles, profiles, profile="baseline", capabilities=Non
             if not isinstance(changes, dict) or set(changes) - set(roles):
                 raise ValueError("invalid route override roles")
             for name, route in changes.items():
-                if (not isinstance(route, dict) or set(route) != {"model", "effort"}
-                        or not isinstance(route["model"], str) or not route["model"].strip()
-                        or PLACEHOLDER_RE.search(route["model"])
-                        or (route["effort"] is not None and not isinstance(route["effort"], str))):
-                    raise ValueError("override requires exact model and effort")
-                supported = (capabilities or {}).get(provider, {}).get(route["model"], [])
-                if route["effort"] not in supported:
-                    raise ValueError(f"unsupported or unverified runtime capability: {provider}/{route['model']}/{route['effort']}")
+                validate_capability(provider, route, capabilities)
                 routes[provider][name] = dict(route)
                 origins[provider][name] = origin
     encoded = json.dumps(selected, sort_keys=True, separators=(",", ":")).encode()
     return routes, {"profile": profile, "profile_digest": hashlib.sha256(encoded).hexdigest(),
                     "experiment": selected.get("experiment"), "requested": routes,
-                    "origins": origins, "observed": None,
-                    "enforcement": {"codex": "agents-disabled", "claude": "Agent-tool-omitted"}}
+                    "origins": origins, "rendered": routes, "observed": None,
+                    "session_selection": {
+                        "requested": routing.get("session_routes", {}), "observed": None,
+                        "applied": False,
+                        "instructions": "Bind the integrator model and effort before selecting the coordinator in the native interactive session. Preserve an explicit owner session choice and report requested versus effective settings. This manifest does not select a session or change global defaults."},
+                    "enforcement": {
+                        "codex": "role agents.enabled; integrator child allowlist is policy",
+                        "claude": "leaf Agent tool omitted; delegated integrator child allowlist is policy",
+                        "observed": None}}
 
 
 FALLBACK_REASONS = {"synthetic_error", "unknown_effort", "unsupported_effort",
@@ -232,7 +288,8 @@ def project_instructions(role: dict[str, Any], project: dict[str, Any]) -> list[
 
 
 def rendered_role_instructions(
-    name: str, role: dict[str, Any], route: dict[str, Any], project: dict[str, Any]
+    name: str, role: dict[str, Any], route: dict[str, Any], project: dict[str, Any],
+    *, provider: str = "codex",
 ) -> list[str]:
     banner = startup_banner(name, route)
     addenda_roles = {
@@ -254,24 +311,26 @@ def rendered_role_instructions(
         *project_instructions(role, project),
         *addenda,
     ]
-    if role.get("may_spawn_utility", False):
-        instructions.append(
-            "Name every nested rfc-utility session with the role followed by a concise "
-            "purpose. Use rfc-utility-<purpose> where accepted or the runtime-safe "
-            "rfc_utility_<purpose> form for Codex task names; never use a purpose-only name."
-        )
+    if role.get("entrypoint"):
+        discovery = ".claude" if provider == "claude" else ".agents"
+        instructions.append(f"Read the assigned integrator entrypoint {discovery}/skills/implement-rfc/{role['entrypoint']} before engineering; do not restart the outer coordinator loop.")
+    children = role.get("delegation", {}).get("allowed_roles", [])
+    if children:
+        instructions.append("Delegate only to these leaf roles: " + ", ".join(children) +
+                            ". Never spawn peer integrators or coordinators. The child allowlist is policy in delegated contexts; runtime-loaded enforcement remains unverified.")
     return instructions
 
 
-def role_prompt(name: str, role: dict[str, Any], route: dict[str, Any], project: dict[str, Any]) -> str:
-    return "\n\n".join(rendered_role_instructions(name, role, route, project)) + "\n"
+def role_prompt(name: str, role: dict[str, Any], route: dict[str, Any], project: dict[str, Any],
+                *, provider: str = "codex") -> str:
+    return "\n\n".join(rendered_role_instructions(name, role, route, project, provider=provider)) + "\n"
 
 
 def render_codex_agent(
     name: str, role: dict[str, Any], route: dict[str, Any], project: dict[str, Any], digest: str
 ) -> str:
     sandbox = "read-only" if role["mutation"] == "read-only" else "workspace-write"
-    nested_agents = "true" if role.get("may_spawn_utility", False) else "false"
+    nested_agents = "true" if role.get("delegation", {}).get("allowed_roles", []) else "false"
     lines = [
         f"# Generated by implement-rfc/scripts/render_runtime_adapters.py ({digest}).",
         "# Do not edit directly; update config/roles.json, config/routing.json, or the consumer project.json.",
@@ -302,8 +361,8 @@ def render_claude_agent(
     tools = "Read, Grep, Glob, Bash"
     if source_edit:
         tools += ", Edit, Write, Skill"
-    if role.get("may_spawn_utility", False):
-        tools += ", Agent(rfc-utility)"
+    if role.get("delegation", {}).get("allowed_roles", []):
+        tools += ", Agent(" + ",".join(role["delegation"]["allowed_roles"]) + ")"
     permission_mode = "plan" if read_only else "acceptEdits"
     frontmatter = [
         "---",
@@ -311,7 +370,7 @@ def render_claude_agent(
         f"description: {q(role['description'])}",
         f"tools: {tools}",
         f"model: {q(route['model'])}",
-        f"permissionMode: {permission_mode}",
+        *([f"permissionMode: {permission_mode}"] if name != INTEGRATOR else []),
         f"maxTurns: {role['max_turns']}",
     ]
     if route.get("effort") is not None:
@@ -324,7 +383,7 @@ def render_claude_agent(
         f"# {name}",
         "",
     ]
-    for instruction in rendered_role_instructions(name, role, route, project):
+    for instruction in rendered_role_instructions(name, role, route, project, provider="claude"):
         body.append(f"- {instruction}")
     body.append("")
     return "\n".join(frontmatter + body)
@@ -553,11 +612,13 @@ def main() -> int:
     )
     parser.add_argument("--profile", help="Explicit consumer adapter profile; absent uses local selection or baseline.")
     parser.add_argument("--capabilities", type=Path, help="Verified provider/model to supported efforts JSON for overrides.")
+    parser.add_argument("--integrator-route", type=Path, help="Explicit provider-to-model/effort pairs for this task; requires verified capabilities.")
+    parser.add_argument("--preserved-integrator-route", type=Path, help="Owner-selected engineering pairs captured before coordinator selection; requires verified capabilities.")
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
 
     if args.write_source_manifest:
-        if args.repo_root or args.routing_override or args.profile or args.capabilities:
+        if args.repo_root or args.routing_override or args.profile or args.capabilities or args.integrator_route or args.preserved_integrator_route:
             parser.error("source manifest authoring does not accept consumer/routing options")
         owner = project_config._git(skill_dir, "rev-parse", "--show-toplevel")
         if owner is None or skill_dir != Path(owner).resolve() / "skills" / SKILL_NAME:
@@ -575,9 +636,14 @@ def main() -> int:
     routing_data = load_json(routing_path)
     project = context.config
     digest_paths = [script_path, skill_path, roles_path, routing_path, project_path]
+    original_routing = routing_data
     if args.routing_override:
         override_path = args.routing_override.resolve()
-        routing_data = deep_merge(routing_data, load_json(override_path))
+        overlay = load_json(override_path)
+        for provider in overlay.get("providers", {}).values():
+            for route in provider.get("classes", {}).values():
+                validate_route(route, "candidate override")
+        routing_data = deep_merge(routing_data, overlay)
         digest_paths.append(override_path)
 
     roles = validate_roles(roles_data)
@@ -597,19 +663,48 @@ def main() -> int:
     capabilities = load_json(args.capabilities) if args.capabilities else None
     if args.capabilities:
         digest_paths.append(args.capabilities)
+    for provider, definition in routing_data["providers"].items():
+        for name, route in definition["classes"].items():
+            if route != original_routing["providers"][provider]["classes"].get(name):
+                validate_capability(provider, route, capabilities)
+    for provider, route in routing_data.get("session_routes", {}).get("rfc-coordinator", {}).items():
+        if route != original_routing.get("session_routes", {}).get("rfc-coordinator", {}).get(provider):
+            validate_capability(provider, route, capabilities)
+    preserved = load_json(args.preserved_integrator_route) if args.preserved_integrator_route else None
+    explicit = load_json(args.integrator_route) if args.integrator_route else {}
+    if set(explicit) - {"codex", "claude"}:
+        raise ValueError("invalid explicit integrator providers")
+    for path in (args.integrator_route, args.preserved_integrator_route):
+        if path:
+            digest_paths.append(path)
+    reference_texts = {}
+    for name, role in roles.items():
+        if role.get("entrypoint"):
+            reference = skill_dir / role["entrypoint"]
+            if not reference.is_file() or reference.is_symlink():
+                raise ValueError(f"missing or linked role entrypoint: {reference}")
+            reference_texts[name] = reference.read_text()
+            digest_paths.append(reference)
     routes, provenance = select_routes(routing_data, roles, load_json(profiles_path),
-                                       profile or "baseline", capabilities)
+                                       profile or "baseline", capabilities,
+                                       explicit_routes={p: {INTEGRATOR: r} for p, r in explicit.items()},
+                                       preserved_integrator_routes=preserved)
     digest = hashlib.sha256((source_digest(*digest_paths) + json.dumps(provenance, sort_keys=True)).encode()).hexdigest()
     repo_root = context.repo_root
     generated: dict[Path, str] = {}
     for name, role in sorted(roles.items()):
-        model_class = assignments[name]
-        generated[repo_root / ".codex" / "agents" / f"{name}.toml"] = render_codex_agent(
-            name, role, routes["codex"][name], project, digest
-        )
-        generated[repo_root / ".claude" / "agents" / f"{name}.md"] = render_claude_agent(
-            name, role, routes["claude"][name], project, digest
-        )
+        for provider, suffix, render in (("codex", "toml", render_codex_agent),
+                                         ("claude", "md", render_claude_agent)):
+            # Other roles/providers/session choices do not change this request.
+            route = routes[provider][name]
+            role_digest = hashlib.sha256(json.dumps({
+                "renderer": script_path.read_text(), "role": role,
+                "prompt": role_prompt(name, role, route, project, provider=provider), "route": route,
+                "reference": reference_texts.get(name),
+            }, sort_keys=True).encode()).hexdigest()
+            generated[repo_root / f".{provider}/agents/{name}.{suffix}"] = render(
+                name, role, route, project, role_digest
+            )
 
     manifest_entries: list[dict[str, str]] = []
     for path, content in sorted(generated.items(), key=lambda item: str(item[0])):

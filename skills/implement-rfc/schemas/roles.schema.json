@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://implement-rfc.local/schemas/roles.v1.json",
+  "$id": "https://implement-rfc.local/schemas/roles.v2.json",
   "type": "object",
   "required": [
     "schema",
@@ -8,50 +8,135 @@
   ],
   "properties": {
     "schema": {
-      "const": "implement-rfc.roles.v1"
+      "const": "implement-rfc.roles.v2"
     },
     "roles": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": {
-        "type": "object",
-        "required": [
-          "description",
-          "mutation",
-          "max_turns",
-          "instructions"
-        ],
-        "properties": {
-          "description": {
-            "type": "string",
-            "minLength": 1
-          },
-          "mutation": {
-            "enum": [
-              "read-only",
-              "build-write",
-              "workspace-write"
-            ]
-          },
-          "max_turns": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "may_spawn_utility": {
-            "type": "boolean"
-          },
-          "instructions": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
+      "additionalProperties": false,
+      "propertyNames": {
+        "enum": [
+          "rfc-utility",
+          "rfc-scout",
+          "rfc-test-runner",
+          "rfc-reviewer",
+          "rfc-worker",
+          "rfc-worker-deep",
+          "rfc-reviewer-critical",
+          "rfc-integrator"
+        ]
+      },
+      "properties": {
+        "rfc-utility": {
+          "$ref": "#/$defs/leaf"
         },
-        "additionalProperties": false
+        "rfc-scout": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-test-runner": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-reviewer": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-worker": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-worker-deep": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-reviewer-critical": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-integrator": {
+          "$ref": "#/$defs/role"
+        }
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "role": {
+      "type": "object",
+      "required": [
+        "description",
+        "mutation",
+        "max_turns",
+        "instructions",
+        "delegation"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mutation": {
+          "enum": [
+            "read-only",
+            "build-write",
+            "workspace-write"
+          ]
+        },
+        "max_turns": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "instructions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "delegation": {
+          "type": "object",
+          "required": [
+            "allowed_roles"
+          ],
+          "properties": {
+            "allowed_roles": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "rfc-utility",
+                  "rfc-scout",
+                  "rfc-test-runner",
+                  "rfc-reviewer",
+                  "rfc-worker",
+                  "rfc-worker-deep",
+                  "rfc-reviewer-critical"
+                ]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "entrypoint": {
+          "type": "string",
+          "pattern": "^references/[a-z0-9][a-z0-9/-]*\\.md$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "leaf": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/role"
+        },
+        {
+          "properties": {
+            "delegation": {
+              "properties": {
+                "allowed_roles": {
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
 }

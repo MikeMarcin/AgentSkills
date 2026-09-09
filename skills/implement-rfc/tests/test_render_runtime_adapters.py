@@ -57,6 +57,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         # Approved role assignments are an independent expectation, not derived
         # from the routing file whose accidental edits this test should catch.
         expected = {
+            "rfc-integrator": ("gpt-6-astra", "low", "claude-opus-5", "xhigh", "workspace-write", True),
             "rfc-utility": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "read-only", False),
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
             "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),
@@ -70,7 +71,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             root = Path(temp)
             first = self.run_renderer(root)
             self.assertEqual(first.returncode, 0, first.stderr)
-            self.assertIn("rendered 15 files", first.stdout)
+            self.assertIn("rendered 17 files", first.stdout)
 
             for role, (model, effort, claude_model, claude_effort, mutation, nested) in expected.items():
                 with self.subTest(role=role):
@@ -84,7 +85,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                     instructions = codex["developer_instructions"]
                     self.assertTrue(instructions.startswith("Before any analysis or tool call"))
                     self.assertIn(self.expected_banner(role, "codex"), instructions)
-                    self.assertEqual("rfc_utility_<purpose>" in instructions, nested)
+                    self.assertEqual("Delegate only to these leaf roles:" in instructions, nested)
 
                     claude = (root / f".claude/agents/{role}.md").read_text()
                     frontmatter = claude.split("---", 2)[1].strip().splitlines()
@@ -92,14 +93,14 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                     self.assertEqual(header["name"], role)
                     self.assertEqual(json.loads(header["model"]), claude_model)
                     self.assertEqual(header.get("effort"), claude_effort)
-                    permission = "plan" if mutation == "read-only" else "acceptEdits"
-                    self.assertEqual(header["permissionMode"], permission)
+                    permission = None if role == "rfc-integrator" else ("plan" if mutation == "read-only" else "acceptEdits")
+                    self.assertEqual(header.get("permissionMode"), permission)
                     tools = set(header["tools"].split(", "))
                     expected_tools = {"Read", "Grep", "Glob", "Bash"}
                     if mutation == "workspace-write":
                         expected_tools.update({"Edit", "Write", "Skill"})
                     if nested:
-                        expected_tools.add("Agent(rfc-utility)")
+                        expected_tools.add("Agent(" + ",".join(VALIDATOR_MODULE.renderer.load_json(SKILL_DIR / "config/roles.json")["roles"][role]["delegation"]["allowed_roles"]) + ")")
                     self.assertEqual(tools, expected_tools)
                     body = claude.split(f"# {role}\n\n", 1)[1]
                     self.assertTrue(body.startswith("- Before any analysis or tool call"))
@@ -113,7 +114,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             manifest = json.loads((root / ".mask/generated/implement-rfc/runtime-adapters.json").read_text())
             self.assertEqual(manifest["schema"], "implement-rfc.runtime-adapters.v1")
             self.assertEqual(manifest["assignments"], ROUTING["assignments"])
-            self.assertEqual(len(manifest["files"]), 14)
+            self.assertEqual(len(manifest["files"]), 16)
             self.assertEqual(manifest["project"], PROJECT["project"])
 
             for worker in ("rfc-worker", "rfc-worker-deep"):
@@ -142,14 +143,16 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                 json.dumps(
                     {
                         "providers": {
-                            "codex": {"classes": {"balanced": {"model": "candidate-codex"}}},
-                            "claude": {"classes": {"balanced": {"model": "claude-candidate"}}},
+                            "codex": {"classes": {"balanced": {"model": "candidate-codex", "effort": "low"}}},
+                            "claude": {"classes": {"balanced": {"model": "claude-candidate", "effort": "low"}}},
                         }
                     }
                 ),
                 encoding="utf-8",
             )
-            rendered = self.run_renderer(root, "--routing-override", str(override))
+            caps = root / "caps.json"
+            caps.write_text(json.dumps({"codex": {"candidate-codex": ["low"]}, "claude": {"claude-candidate": ["low"]}}))
+            rendered = self.run_renderer(root, "--routing-override", str(override), "--capabilities", str(caps))
             self.assertEqual(rendered.returncode, 0, rendered.stderr)
             scout = tomllib.loads((root / ".codex/agents/rfc-scout.toml").read_text())
             self.assertEqual(scout["model"], "candidate-codex")
@@ -353,3 +356,137 @@ class ProfileTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             renderer.fallback_receipt({}, 'server_unavailability', alternative=alt,
                                       approval=approval, attempt=2)
+
+
+class IntegratorRoutingTests(unittest.TestCase):
+    def setUp(self):
+        self.renderer = VALIDATOR_MODULE.renderer
+        self.roles = self.renderer.validate_roles(self.renderer.load_json(SKILL_DIR / 'config/roles.json'))
+        self.profiles = {'schema': 'implement-rfc.routing-profiles.v1', 'profiles': {'baseline': {}}}
+
+    def test_independent_routes_and_explicit_precedence(self):
+        import copy
+        base, _ = self.renderer.select_routes(ROUTING, self.roles, self.profiles)
+        changed = copy.deepcopy(ROUTING)
+        for provider in ('codex', 'claude'):
+            changed['providers'][provider]['classes']['balanced'] = {'model': 'scout', 'effort': 'low'}
+            changed['providers'][provider]['classes']['standard'] = {'model': 'worker', 'effort': 'medium'}
+            changed['session_routes']['rfc-coordinator'][provider] = {'model': 'coordinator', 'effort': 'low'}
+        actual, receipt = self.renderer.select_routes(changed, self.roles, self.profiles)
+        for provider in ('codex', 'claude'):
+            self.assertEqual(actual[provider]['rfc-integrator'], base[provider]['rfc-integrator'])
+            self.assertEqual(receipt['origins'][provider]['rfc-integrator'], 'integration_default')
+            preserved = {provider: {'model': 'strong-prior', 'effort': 'high'}}
+            caps = {provider: {'strong-prior': ['high'], 'explicit': ['xhigh']}}
+            actual, receipt = self.renderer.select_routes(changed, self.roles, self.profiles,
+                capabilities=caps, preserved_integrator_routes=preserved)
+            self.assertEqual(actual[provider]['rfc-integrator'], preserved[provider])
+            self.assertEqual(receipt['origins'][provider]['rfc-integrator'], 'preserved_owner')
+            explicit = {provider: {'rfc-integrator': {'model': 'explicit', 'effort': 'xhigh'}}}
+            actual, receipt = self.renderer.select_routes(changed, self.roles, self.profiles,
+                capabilities=caps, preserved_integrator_routes=preserved, explicit_routes=explicit)
+            self.assertEqual(actual[provider]['rfc-integrator'], explicit[provider]['rfc-integrator'])
+            self.assertEqual(receipt['origins'][provider]['rfc-integrator'], 'explicit_user')
+            self.assertIsNone(receipt['observed'])
+            self.assertFalse(receipt['session_selection']['applied'])
+
+    def test_unknown_authority_versions_and_missing_routes_refuse(self):
+        import copy
+        original = self.renderer.load_json(SKILL_DIR / 'config/roles.json')
+        for change in ('unknown-version', 'unknown-role', 'leaf-delegation', 'recursive', 'old-field', 'entrypoint'):
+            value = copy.deepcopy(original)
+            if change == 'unknown-version': value['schema'] = 'implement-rfc.roles.v3'
+            if change == 'unknown-role': value['roles']['rfc-surprise'] = value['roles']['rfc-worker']
+            if change == 'leaf-delegation': value['roles']['rfc-worker']['delegation']['allowed_roles'] = ['rfc-utility']
+            if change == 'recursive': value['roles']['rfc-integrator']['delegation']['allowed_roles'] = ['rfc-integrator']
+            if change == 'old-field': value['roles']['rfc-worker']['may_spawn_utility'] = True
+            if change == 'entrypoint': value['roles']['rfc-integrator']['entrypoint'] = '../escape.md'
+            with self.subTest(change=change), self.assertRaises(ValueError): self.renderer.validate_roles(value)
+        for change in ('missing-integration', 'missing-session', 'unknown-version', 'integrator-class', 'unknown-session'):
+            value = copy.deepcopy(ROUTING)
+            if change == 'missing-integration': del value['providers']['codex']['classes']['integration']
+            if change == 'missing-session': del value['session_routes']
+            if change == 'unknown-version': value['schema'] = 'implement-rfc.routing.v3'
+            if change == 'integrator-class': value['assignments']['rfc-integrator'] = 'balanced'
+            if change == 'unknown-session': value['session_routes']['rfc-extra'] = {}
+            with self.subTest(change=change), self.assertRaises(ValueError): self.renderer.validate_routing(value, self.roles)
+        for route in ({'model': 'prior'}, {'model': 'prior', 'effort': 'high'}):
+            with self.assertRaises(ValueError):
+                self.renderer.select_routes(ROUTING, self.roles, self.profiles,
+                    preserved_integrator_routes={'codex': route})
+
+    def test_public_override_binds_both_values_and_preserves_leaf_outputs(self):
+        runner = RenderRuntimeAdaptersTests()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.assertEqual(runner.run_renderer(root).returncode, 0)
+            leaves = {p: p.read_bytes() for family, suffix in (('codex', 'toml'), ('claude', 'md'))
+                      for role in self.renderer.LEAF_ROLES
+                      for p in [root / f'.{family}/agents/{role}.{suffix}']}
+            prior = root / 'prior.json'; explicit = root / 'explicit.json'; caps = root / 'caps.json'
+            prior.write_text(json.dumps({p: {'model': 'prior', 'effort': 'high'} for p in ('codex','claude')}))
+            explicit.write_text(json.dumps({p: {'model': 'chosen', 'effort': 'xhigh'} for p in ('codex','claude')}))
+            caps.write_text(json.dumps({p: {'prior': ['high'], 'chosen': ['xhigh']} for p in ('codex','claude')}))
+            options = ('--preserved-integrator-route', str(prior), '--integrator-route', str(explicit))
+            refused = runner.run_renderer(root, *options)
+            self.assertEqual(refused.returncode, 2, refused.stderr)
+            args = (*options, '--capabilities', str(caps))
+            result = runner.run_renderer(root, *args)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            codex = tomllib.loads((root / '.codex/agents/rfc-integrator.toml').read_text())
+            self.assertEqual((codex['model'], codex['model_reasoning_effort']), ('chosen','xhigh'))
+            self.assertTrue(codex['agents']['enabled'])
+            self.assertNotIn('max_depth', codex['agents'])
+            claude = (root / '.claude/agents/rfc-integrator.md').read_text()
+            self.assertIn('model: "chosen"', claude); self.assertIn('effort: xhigh', claude)
+            self.assertNotIn('permissionMode:', claude)
+            for p, content in leaves.items(): self.assertEqual(p.read_bytes(), content)
+            self.assertFalse((root / '.codex/agents/rfc-coordinator.toml').exists())
+            self.assertFalse((root / '.claude/agents/rfc-coordinator.md').exists())
+            self.assertEqual(runner.run_renderer(root, *args, '--check').returncode, 0)
+            path = root / '.codex/agents/rfc-integrator.toml'; path.write_text(path.read_text() + '# owner edit\n')
+            before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
+            self.assertEqual(runner.run_renderer(root, *args).returncode, 2)
+            self.assertEqual(before, {p: p.read_bytes() for p in root.rglob('*') if p.is_file()})
+
+    def test_public_session_selection_changes_no_native_agent_files(self):
+        runner = RenderRuntimeAdaptersTests()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.assertEqual(runner.run_renderer(root).returncode, 0)
+            agents = {p: p.read_bytes() for family in ('codex', 'claude')
+                      for p in (root / f'.{family}/agents').iterdir()}
+            settings = root / '.codex/config.toml'; settings.write_text('model = "owner-selected"\n')
+            overlay = root / 'session.json'; caps = root / 'caps.json'
+            overlay.write_text(json.dumps({'session_routes': {'rfc-coordinator': {
+                'codex': {'model': 'session-choice', 'effort': 'medium'}}}}))
+            caps.write_text(json.dumps({'codex': {'session-choice': ['medium']}}))
+            result = runner.run_renderer(root, '--routing-override', str(overlay), '--capabilities', str(caps))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(agents, {p: p.read_bytes() for p in agents})
+            self.assertEqual(settings.read_text(), 'model = "owner-selected"\n')
+            manifest = json.loads((root / '.mask/generated/implement-rfc/runtime-adapters.json').read_text())
+            session = manifest['routing_provenance']['session_selection']
+            self.assertEqual(session['requested']['rfc-coordinator']['codex'], {'model':'session-choice','effort':'medium'})
+            self.assertFalse(session['applied']); self.assertIsNone(session['observed'])
+
+
+    def test_public_entrypoint_uses_each_providers_only_discovery_root(self):
+        for provider, discovery, suffix in (('codex', '.agents', 'toml'), ('claude', '.claude', 'md')):
+            with self.subTest(provider=provider), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                init_repo(root)
+                write_context(root, config=PROJECT)
+                entry = root / discovery / 'skills/implement-rfc'
+                entry.parent.mkdir(parents=True)
+                entry.symlink_to(SKILL_DIR, target_is_directory=True)
+                result = subprocess.run([sys.executable, '-B', str(entry / 'scripts/render_runtime_adapters.py'),
+                                         '--repo-root', str(root)], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                content = (root / f'.{provider}/agents/rfc-integrator.{suffix}').read_text()
+                expected = f'{discovery}/skills/implement-rfc/references/native-coordination.md'
+                self.assertIn(expected, content)
+                self.assertTrue((root / expected).is_file())
+                other = '.agents' if discovery == '.claude' else '.claude'
+                self.assertNotIn(f'{other}/skills/implement-rfc/references/native-coordination.md', content)
+                self.assertFalse((root / other / 'skills/implement-rfc').exists())

@@ -1,5 +1,5 @@
 {
-  "schema": "implement-rfc.routing.v1",
+  "schema": "implement-rfc.routing.v2",
   "verified_as_of": "2026-09-08",
   "assignments": {
     "rfc-utility": "mechanical",
@@ -8,7 +8,8 @@
     "rfc-test-runner": "mechanical",
     "rfc-reviewer": "review",
     "rfc-worker-deep": "deep",
-    "rfc-reviewer-critical": "critical"
+    "rfc-reviewer-critical": "critical",
+    "rfc-integrator": "integration"
   },
   "providers": {
     "codex": {
@@ -36,6 +37,10 @@
         "review": {
           "model": "gpt-6-astra",
           "effort": "medium"
+        },
+        "integration": {
+          "model": "gpt-6-astra",
+          "effort": "low"
         }
       }
     },
@@ -65,7 +70,23 @@
         "review": {
           "model": "claude-fable-5-1",
           "effort": "medium"
+        },
+        "integration": {
+          "model": "claude-opus-5",
+          "effort": "xhigh"
         }
+      }
+    }
+  },
+  "session_routes": {
+    "rfc-coordinator": {
+      "codex": {
+        "model": "gpt-5.6-sol",
+        "effort": "low"
+      },
+      "claude": {
+        "model": "claude-opus-5",
+        "effort": "low"
       }
     }
   }

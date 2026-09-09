@@ -18,5 +18,12 @@ class StandardWorkerTargetTests(unittest.TestCase):
         routing = json.loads((config / 'routing.json').read_text())
         target = json.loads((PACK / 'fixtures/target-routing.json').read_text().replace(
             'rfc-critical-reviewer', 'rfc-reviewer-critical'))
+        integrator = roles['roles'].pop('rfc-integrator')
+        self.assertEqual(set(integrator['delegation']['allowed_roles']), set(target['roles']))
+        self.assertEqual(integrator['mutation'], 'workspace-write')
+        self.assertEqual(routing['assignments'].pop('rfc-integrator'), 'integration')
+        for provider, expected in [('codex', {'model':'gpt-6-astra','effort':'low'}),
+                                   ('claude', {'model':'claude-opus-5','effort':'xhigh'})]:
+            self.assertEqual(routing['providers'][provider]['classes'].pop('integration'), expected)
         self.assertEqual(checker.configuration_findings(roles, routing, target), [])
         self.assertEqual(checker.rendering_findings(ROOT, roles, routing, target), [])

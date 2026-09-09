@@ -20,8 +20,12 @@ class RoleMigrationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         manifest_path = root / '.mask/generated/implement-rfc/runtime-adapters.json'
         manifest = json.loads(manifest_path.read_text())
-        for item in manifest['files']:
+        for item in list(manifest['files']):
             path = root / item['path']
+            if path.stem == 'rfc-integrator':
+                path.unlink()
+                manifest['files'].remove(item)
+                continue
             name = path.stem
             old = {'rfc-worker': 'rfc-worker-routine', 'rfc-worker-deep': 'rfc-worker',
                    'rfc-reviewer-critical': 'rfc-critical-reviewer'}.get(name)
@@ -177,6 +181,30 @@ class RoleMigrationTests(unittest.TestCase):
             renderer.publish_adapters(root, snapshot, manifest_path, prior, False)
             for path, content in snapshot.items():
                 self.assertEqual(path.read_text(), content)
+            self.assertFalse((root / '.codex/agents/rfc-integrator.toml').exists())
             self.assertFalse((root / '.codex/agents/rfc-worker-deep.toml').exists())
             self.assertFalse((root / '.codex/agents/rfc-reviewer-critical.toml').exists())
             self.assertEqual(self.run_renderer(root, '--check').returncode, 1)
+
+
+class SchemaMigrationTests(unittest.TestCase):
+    def test_narrow_v1_leaf_reader_and_extension_refusals(self):
+        import copy
+        original = renderer.load_json(Path(__file__).resolve().parents[1] / 'config/roles.json')
+        legacy = copy.deepcopy(original)
+        legacy['schema'] = 'implement-rfc.roles.v1'
+        del legacy['roles']['rfc-integrator']
+        for role in legacy['roles'].values():
+            del role['delegation']; role['may_spawn_utility'] = False
+        roles = renderer.validate_roles(legacy)
+        self.assertTrue(all(role['delegation'] == {'allowed_roles': []} for role in roles.values()))
+        routing = copy.deepcopy(ROUTING); routing['schema'] = 'implement-rfc.routing.v1'
+        del routing['assignments']['rfc-integrator']; del routing['session_routes']
+        for provider in routing['providers'].values(): del provider['classes']['integration']
+        renderer.validate_routing(routing, roles)
+        bad = copy.deepcopy(legacy); bad['roles']['rfc-worker']['delegation'] = {'allowed_roles': ['rfc-utility']}
+        with self.assertRaises(ValueError): renderer.validate_roles(bad)
+        bad = copy.deepcopy(legacy); bad['roles']['rfc-worker']['may_spawn_utility'] = True
+        with self.assertRaises(ValueError): renderer.validate_roles(bad)
+        routing['session_routes'] = ROUTING['session_routes']
+        with self.assertRaises(ValueError): renderer.validate_routing(routing, roles)

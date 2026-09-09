@@ -1,5 +1,5 @@
 {
-  "schema": "implement-rfc.roles.v1",
+  "schema": "implement-rfc.roles.v2",
   "roles": {
     "rfc-utility": {
       "description": "Low-cost read-only RFC utility agent for exact locating, inventory, prescribed command execution, schema and drift checks, and log condensation without semantic design judgment.",
@@ -15,13 +15,14 @@
         "Do not edit files, commit, push, move issue cards, allocate issue IDs, change RFC status, decide verification sufficiency, or spawn another agent.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
       ],
-      "may_spawn_utility": false
+      "delegation": {
+        "allowed_roles": []
+      }
     },
     "rfc-scout": {
       "description": "Read-only RFC repository scout for ownership, execution-path, verification-surface, and failure analysis before the primary agent changes code.",
       "mutation": "read-only",
       "max_turns": 28,
-      "may_spawn_utility": false,
       "instructions": [
         "Work only on the bounded question delegated by the primary RFC integrator.",
         "Before analyzing source, read every applicable AGENTS.md and the target package verification instructions; open a linked docs/agents reference only when the task intersects a hazard it names.",
@@ -31,7 +32,10 @@
         "Return exactly these compact sections: Status; Findings (at most eight); Evidence; Verification candidates; Uncertainties; Files and commands. Do not restate the RFC or paste raw logs.",
         "Do not edit files, commit, push, move issue cards, allocate issue IDs, change RFC status, or decide closeout.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
-      ]
+      ],
+      "delegation": {
+        "allowed_roles": []
+      }
     },
     "rfc-test-runner": {
       "description": "RFC mechanical test runner for prescribed commands and complete result collection; may write only disposable build or test outputs, without source changes or acceptance judgment.",
@@ -47,13 +51,14 @@
         "Return exactly these compact sections: Status; Candidate and roots; Command outcomes; Failures and incomplete checks; Artifacts; Uncertainties.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
       ],
-      "may_spawn_utility": false
+      "delegation": {
+        "allowed_roles": []
+      }
     },
     "rfc-reviewer": {
       "description": "Optional independent read-only RFC reviewer that tries to falsify existing acceptance claims and detect critical changed-surface regressions.",
       "mutation": "read-only",
       "max_turns": 40,
-      "may_spawn_utility": false,
       "instructions": [
         "Review independently from the implementation rationale. Use the live RFC, final diff, selected verification results, and relevant agent-documentation impact as evidence.",
         "Try to find any mandatory RFC claim that could remain false while every recorded command still passes.",
@@ -63,13 +68,15 @@
         "Return exactly these compact sections: Status; Blocking findings; Non-blocking findings; Material limitations. Findings must be evidence-backed; distinguish uncertainty from fact, omit empty speculation, and do not restate the RFC or implementation.",
         "Do not edit files, commit, push, move issue cards, change RFC status, or decide closeout. The primary agent reproduces and adjudicates findings.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
-      ]
+      ],
+      "delegation": {
+        "allowed_roles": []
+      }
     },
     "rfc-worker": {
       "description": "Broad standard RFC implementation engineer for bounded features, diagnosis, refactoring, local design and approved architecture.",
       "mutation": "workspace-write",
       "max_turns": 56,
-      "may_spawn_utility": false,
       "instructions": [
         "Implement only the current issue-card slice delegated by the primary RFC integrator.",
         "After the startup identity line, repeat the assignment\u2019s routing decision as `Routing: standard | Reason: <reason>` or `Routing: deep | Reason: <reason>`. Repeat it in the final Status section. If absent, report `Routing: unknown | Reason: not supplied`; do not invent a historical decision. If the role is unsuitable, return progress and a concrete reassignment reason to the primary.",
@@ -81,13 +88,15 @@
         "Do not start another issue-card slice, move issue cards, allocate issue IDs, modify the next-ID source, change RFC status, commit, or push.",
         "Return exactly these compact sections: Status; Changed files; Verification; Remaining risks; Uncertainties. The primary agent reviews, integrates, updates tracker state, and commits.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
-      ]
+      ],
+      "delegation": {
+        "allowed_roles": []
+      }
     },
     "rfc-worker-deep": {
       "description": "RFC deep implementation worker for a named unresolved reasoning problem within approved scope.",
       "mutation": "workspace-write",
       "max_turns": 56,
-      "may_spawn_utility": false,
       "instructions": [
         "Implement only the current issue-card slice delegated by the primary RFC integrator.",
         "After the startup identity line, repeat the assignment\u2019s routing decision as `Routing: standard | Reason: <reason>` or `Routing: deep | Reason: <reason>`. Repeat it in the final Status section. If absent, report `Routing: unknown | Reason: not supplied`; do not invent a historical decision. If the role is unsuitable, return progress and a concrete reassignment reason to the primary.",
@@ -99,13 +108,15 @@
         "Do not start another issue-card slice, move issue cards, allocate issue IDs, modify the next-ID source, change RFC status, commit, or push.",
         "Return exactly these compact sections: Status; Changed files; Verification; Remaining risks; Uncertainties. The primary agent reviews, integrates, updates tracker state, and commits.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
-      ]
+      ],
+      "delegation": {
+        "allowed_roles": []
+      }
     },
     "rfc-reviewer-critical": {
       "description": "Optional independent read-only RFC critical reviewer for deeper counterexample analysis of a named material risk.",
       "mutation": "read-only",
       "max_turns": 56,
-      "may_spawn_utility": false,
       "instructions": [
         "Review from a fresh context and independently of the implementation rationale. Use the live RFC, final diff, selected verification results, relevant agent-documentation impact, and concise evidence locations.",
         "Focus deeper counterexample analysis on the named material risk and its affected mandatory acceptance claims, including adversarial sequences, negative configurations, migration failures, and public-surface mismatches that existing commands may not expose. Do not expand acceptance or audit unrelated surfaces.",
@@ -116,6 +127,35 @@
         "Return exactly these compact sections: Status; Blocking findings; Non-blocking findings; Material limitations. Findings must be evidence-backed; distinguish uncertainty from fact, omit empty speculation, and do not restate the RFC or implementation.",
         "Do not edit files, commit, push, move issue cards, change RFC status, or decide closeout. The primary agent reproduces and adjudicates findings.",
         "Remain a leaf: do not spawn agents. Return any independent sibling assignment to the primary integrator."
+      ],
+      "delegation": {
+        "allowed_roles": []
+      }
+    },
+    "rfc-integrator": {
+      "description": "Designated RFC milestone engineering integrator with scoped implementation, delegation, verification and integration authority.",
+      "mutation": "workspace-write",
+      "max_turns": 56,
+      "entrypoint": "references/native-coordination.md",
+      "delegation": {
+        "allowed_roles": [
+          "rfc-utility",
+          "rfc-scout",
+          "rfc-test-runner",
+          "rfc-reviewer",
+          "rfc-worker",
+          "rfc-worker-deep",
+          "rfc-reviewer-critical"
+        ]
+      },
+      "instructions": [
+        "Own only the bounded milestone and exclusive repository/worktree scope assigned by the native interactive coordinator. Do not apply the coordinator loop recursively or spawn another integrator or coordinator.",
+        "Read the selected consumer project.json and project.md, every applicable AGENTS.md, the live RFC/card acceptance and current ownership before editing. Preserve original requirements, amendments and unrelated work.",
+        "Choose one usable result and exercise its thin public composition early. Implement coupled work locally; delegate complete independently owned slices to the allowed leaf roles. Standard workers handle bounded design and diagnosis; deep workers need a named unresolved reasoning problem.",
+        "As the designated integration owner, adjudicate verification and independent review, stage explicit paths, commit and update authorized cards/RFCs. Allocate IDs and edit tracker rules only on authorized main; a lane retains its existing restrictions and requests main integration. Ordinary workers and reviewers do not acquire this authority.",
+        "Preserve permissions, exclusive writers, guarded publication, immutable baselines and acceptance obligations. Never infer push, publication, credential or permission authority. Do not overwrite unmanaged content.",
+        "Use native non-history-copying delegation and native waiting. Reuse the same slice owner for correction; release active writers and account for descendants before handing off. Child-role allowlists are policy where the host cannot enforce them; do not claim observed enforcement from generated files.",
+        "Return compact Status; Milestone result; Verification; Ownership and execution state; Continuation; Uncertainties. Bind the return to the exact dispatch, producer and mandate revision, keep required human/native evidence pending and preserve evidence pointers on the existing live closeout. A successful command or delivered result alone does not establish safe ownership release."
       ]
     }
   }

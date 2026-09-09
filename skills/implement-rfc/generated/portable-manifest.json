@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "95dc4ddd9004b3c40d70cd48da25287ae1ff32f31ccff4ba1d4de69f03d27d3e"
+      "sha256": "18759c3a9dfb41c5b24431841a94bcf3696b9b8ee36e4f6d33c47664598d4940"
     },
     {
       "path": "config/routing-profiles.json",
@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "d3b53090b636acf411ffc40f7e46e20053707721b465361c739fe31136c8dca6"
+      "sha256": "fbebf1025fad58792d083dfe8fdb90da38e81d97b73b3c4416a54d60aaefabad"
     },
     {
       "path": "examples/projects/samplereview/project.json",
@@ -59,6 +59,10 @@
     {
       "path": "references/model-routing.md",
       "sha256": "6610d0e0dba6bcfaaadad8b4d0b26a358c477ba22f25bfa819b251581c5a946d"
+    },
+    {
+      "path": "references/native-coordination.md",
+      "sha256": "603977d4d8cc9e4abf98f0aea04be45238ceb6bbe6534f4a56574db0fa59818c"
     },
     {
       "path": "references/pack-lifecycle.md",
@@ -102,11 +106,11 @@
     },
     {
       "path": "schemas/roles.schema.json",
-      "sha256": "a6fbb14facd92f29b97e9497b1e80d07df90e9482ad681c3492b1c215f2fedae"
+      "sha256": "a668d9a7f37a4dcb4c92fb712b90990e03a09c6892a9f78dda003f19e441fc7b"
     },
     {
       "path": "schemas/routing.schema.json",
-      "sha256": "ec1ef9f3360252a6e883854f29c57afa5321a2e740cc1a78ffba9a70afeaa6df"
+      "sha256": "477e9a0dd565e2821c1b275d37fc05589ed954dce78604f573f15e7e51b563e4"
     },
     {
       "path": "scripts/allocation.py",
@@ -127,6 +131,10 @@
     {
       "path": "scripts/codex_station.py",
       "sha256": "f773b527ebe66fea3c3a3dd71c0d9c801e5a0ad545c75cffcb554ffe245a2dfd"
+    },
+    {
+      "path": "scripts/coordinator_handoff.py",
+      "sha256": "5c5596043fc39c61aee964282425bda603585690c2c23c8401d3f80d16fa2cb3"
     },
     {
       "path": "scripts/issue_board.py",
@@ -150,7 +158,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "56b6fc3829864194500a57586c30d8dfce0c140966383e6c4ef1de15c34714be"
+      "sha256": "4ef251a3230e89bc0683f314d621199b61351f7c121b9f0e7d5d4d32f5427ec0"
     },
     {
       "path": "scripts/role_usage.py",
@@ -233,6 +241,10 @@
       "sha256": "26a69e0641f49e29ff22d42e2de14c6353873b470f167c745432f6620c418c4f"
     },
     {
+      "path": "tests/test_coordinator_handoff.py",
+      "sha256": "846c618e58496db8e36d36146de0c17c3b87c0c3801000a3f165e0353c5553a9"
+    },
+    {
       "path": "tests/test_issue_board.py",
       "sha256": "45ea8711d7cda5a2ccfb0d71c51fd2180f2264db4a4faf09ce9f84487df8ac59"
     },
@@ -250,11 +262,11 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "6ad32f871d14b24f5ce98d447ed514691fddf313c8ffca1b6d546e3a72cdc4b9"
+      "sha256": "ec947c2464abfb6413440c9356765289855f1003b9b1197c6fc6c4804bb996b3"
     },
     {
       "path": "tests/test_role_migration.py",
-      "sha256": "3b8020b7f620f2d202d97af6a89f8a9c6c105e2eae7761b7c5c2f594d4bcc5eb"
+      "sha256": "4e2e6fc1e0b868ca25f1e13f0f7952ec0b846e4cb7039c1c730439c677285574"
     },
     {
       "path": "tests/test_role_usage.py",
@@ -282,7 +294,7 @@
     },
     {
       "path": "tests/test_standard_worker_target.py",
-      "sha256": "b14dcb1fcfa7d337183b4b86b1514238185ef75f566ddb0eb4af41fe924a737b"
+      "sha256": "98a2d0ef723073c370d21215fe29ba20adf0e01af0f6c4a0a86b2f79a3ae0e64"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -321,6 +333,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "607ae212f32bcb75",
+  "portable_digest": "34c5153ad7866d75",
   "schema": "implement-rfc.portable-manifest.v1"
 }

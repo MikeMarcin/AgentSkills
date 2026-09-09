@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://implement-rfc.local/schemas/routing.v1.json",
+  "$id": "https://implement-rfc.local/schemas/routing.v2.json",
   "$defs": {
     "modelRoute": {
       "type": "object",
@@ -39,7 +39,9 @@
             "balanced",
             "standard",
             "deep",
-            "critical"
+            "critical",
+            "review",
+            "integration"
           ],
           "properties": {
             "mechanical": {
@@ -59,6 +61,9 @@
             },
             "review": {
               "$ref": "#/$defs/modelRoute"
+            },
+            "integration": {
+              "$ref": "#/$defs/modelRoute"
             }
           },
           "additionalProperties": false
@@ -72,11 +77,12 @@
     "schema",
     "verified_as_of",
     "assignments",
-    "providers"
+    "providers",
+    "session_routes"
   ],
   "properties": {
     "schema": {
-      "const": "implement-rfc.routing.v1"
+      "const": "implement-rfc.routing.v2"
     },
     "verified_as_of": {
       "type": "string",
@@ -94,6 +100,23 @@
           "critical",
           "review"
         ]
+      },
+      "propertyNames": {
+        "enum": [
+          "rfc-utility",
+          "rfc-scout",
+          "rfc-test-runner",
+          "rfc-reviewer",
+          "rfc-worker",
+          "rfc-worker-deep",
+          "rfc-reviewer-critical",
+          "rfc-integrator"
+        ]
+      },
+      "properties": {
+        "rfc-integrator": {
+          "const": "integration"
+        }
       }
     },
     "providers": {
@@ -108,6 +131,31 @@
         },
         "claude": {
           "$ref": "#/$defs/provider"
+        }
+      },
+      "additionalProperties": false
+    },
+    "session_routes": {
+      "type": "object",
+      "required": [
+        "rfc-coordinator"
+      ],
+      "properties": {
+        "rfc-coordinator": {
+          "type": "object",
+          "required": [
+            "codex",
+            "claude"
+          ],
+          "properties": {
+            "codex": {
+              "$ref": "#/$defs/modelRoute"
+            },
+            "claude": {
+              "$ref": "#/$defs/modelRoute"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
