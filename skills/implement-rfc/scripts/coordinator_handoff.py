@@ -77,7 +77,8 @@ def validate_return(value: object) -> list[str]:
 
 
 def continuation(returned: object, assignment: dict, *, execution: str,
-                 consumed=(), cancelled: bool = False, review_relay: bool = False) -> dict:
+                 consumed=(), cancelled: bool = False, review_relay: bool = False,
+                 prior_partial: dict | None = None) -> dict:
     """Suggest a control action from explicit observations, without mutation.
 
     execution describes the producer AND its owned children/commands, not merely
@@ -92,7 +93,7 @@ def continuation(returned: object, assignment: dict, *, execution: str,
         return result("stop", "current user mandate is cancelled; account for outstanding effects")
     errors = validate_return(returned)
     if errors:
-        return result("clarify", "; ".join(errors))
+        return result("reconcile" if execution == "unknown" else "clarify", "; ".join(errors))
     if any(returned[key] != assignment.get(key) for key in IDENTITY):
         return result("ignore-stale", "result does not match the current native assignment and mandate")
     # A partial invocation may return repeatedly under one dispatch. The native
@@ -106,6 +107,13 @@ def continuation(returned: object, assignment: dict, *, execution: str,
         return result("wait", "owned execution remains active")
     if execution != "quiescent" or returned["ownership"] != "quiescent":
         return result("reconcile", "native effects and ownership are not established")
+    if returned["disposition"] == "review-request" and not review_relay:
+        return result("clarify", "native independent-review relay has not been qualified")
+    if returned["disposition"] == "continue-milestone" and prior_partial is not None:
+        progress_fields = ("producer_id", "milestone", "candidate_revision", "handoff_ref",
+                           "next_objective", "required_pending", "evidence_refs", "summary")
+        if all(returned[field] == prior_partial.get(field) for field in progress_fields):
+            return result("investigate", "repeated partial return supplies no new progress or actionable step")
     action = {
         "milestone-complete": "fresh-integrator",
         "continue-milestone": "resume-integrator",

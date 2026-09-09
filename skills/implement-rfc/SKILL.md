@@ -22,7 +22,7 @@ selects its consumer. Read its `.mask/skill-config/implement-rfc/project.json` a
 `project.md`, applicable instructions, and the user's selected scope. Preserve
 unrelated work and existing approval boundaries.
 
-Read [Coordination handoff](references/native-coordination.md) before dispatch or
+Read [Coordination handoff](references/coordination-handoff.md) before dispatch or
 resume. Bind the integrator's engineering route independently of the coordinator;
 use canonical configuration and actual host settings, not model names in prose.
 For setup, unavailable roles or model/effort conflicts, read the installed
@@ -81,7 +81,7 @@ alone does not establish that all writers have stopped.
 
 ## 4. Consume and continue
 
-Apply the disposition/identity rules in [Coordination handoff](references/native-coordination.md).
+Apply the disposition/identity rules in [Coordination handoff](references/coordination-handoff.md).
 Consume the compact result and current evidence pointers; the integrator already
 owns engineering verification. Return missing engineering judgment to it.
 

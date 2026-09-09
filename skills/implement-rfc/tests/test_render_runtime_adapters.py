@@ -484,9 +484,9 @@ class IntegratorRoutingTests(unittest.TestCase):
                                          '--repo-root', str(root)], capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 content = (root / f'.{provider}/agents/rfc-integrator.{suffix}').read_text()
-                expected = f'{discovery}/skills/implement-rfc/references/native-coordination.md'
+                expected = f'{discovery}/skills/implement-rfc/references/milestone-integration.md'
                 self.assertIn(expected, content)
                 self.assertTrue((root / expected).is_file())
                 other = '.agents' if discovery == '.claude' else '.claude'
-                self.assertNotIn(f'{other}/skills/implement-rfc/references/native-coordination.md', content)
+                self.assertNotIn(f'{other}/skills/implement-rfc/references/milestone-integration.md', content)
                 self.assertFalse((root / other / 'skills/implement-rfc').exists())

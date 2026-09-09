@@ -78,6 +78,8 @@ def load_role_route(role_name: str) -> tuple[dict, dict]:
         raise LaunchError("retired role selector; explicitly reissue using rfc-worker or rfc-reviewer-critical; preserve original route evidence")
     if role_name not in roles:
         raise LaunchError(f"unknown role {role_name!r}; known roles: {', '.join(sorted(roles))}")
+    if role_name not in renderer.LEAF_ROLES:
+        raise LaunchError("only leaf roles may use the companion; integrators require native interactive delegation")
     return roles[role_name], codex_classes[assignments[role_name]]
 
 

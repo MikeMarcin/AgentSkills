@@ -4,7 +4,7 @@ You are the designated engineering integrator for the supplied scope. Own RFC
 interpretation, local design, slice coordination, evidence judgment, scoped commits
 and permitted board updates. The coordinator owns user scope and continuation;
 its low-cost route is not your engineering route. Leaf results remain inputs to
-your judgment. Read [Coordination handoff](native-coordination.md) for return and
+your judgment. Read [Coordination handoff](coordination-handoff.md) for return and
 ownership transfer, not for the outer coordinator loop.
 
 ## 1. Orient from live state
@@ -116,7 +116,7 @@ artifacts. Write the current continuation on the selected live closeout: usable
 behavior, current candidate, relevant invariants/rationale, unresolved obligations
 and next bounded milestone. Other closeouts link to that record rather than copy it.
 
-Return the compact fields in [Coordination handoff](native-coordination.md).
+Return the compact fields in [Coordination handoff](coordination-handoff.md).
 Within this milestone, corrections can resume your context. At the next milestone,
 yield to a fresh integrator. Follow the user's stop instruction; local handoff
 never implies push, publication or another checkout.

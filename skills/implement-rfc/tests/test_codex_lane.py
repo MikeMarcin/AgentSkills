@@ -98,6 +98,11 @@ class CodexLaneTest(unittest.TestCase):
             self.assertIn('retired role selector', result.stderr)
         self.assertEqual(self._lane_log(), [])
 
+    def test_integrator_cannot_enter_external_companion(self) -> None:
+        result = self._launch('--role', 'rfc-integrator', '--task', 'Integrate.', '--write')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('integrators require native interactive delegation', result.stderr)
+
     def test_all_routes_are_forwarded_with_role_instructions_and_identity(self) -> None:
         module = _load_codex_lane()
         expected = {

@@ -207,3 +207,30 @@ The skill remains correct when an adapter is unavailable:
 - Claude Code model configuration: `https://code.claude.com/docs/en/model-config`
 - Claude model IDs: `https://platform.claude.com/docs/en/about-claude/models/overview`
 - Agent Skills progressive disclosure: `https://agentskills.io/skill-creation/best-practices`
+
+## Native coordinator qualification (2026-09-08 source update)
+
+The installed binaries reported Codex CLI 0.153.4 and Claude Code 2.1.260 during
+this implementation. Version output is not native behavioral qualification.
+Use [Coordination handoff](coordination-handoff.md) for native result/termination,
+duplicate/stale mandates, cancellation, no-progress returns and recovery.
+
+Current [Codex subagent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents)
+documents per-agent model/effort precedence and `agents.enabled`. The renderer
+binds both route values and disables delegation for leaves. Child-type allowlists
+remain policy; do not invent a depth key or claim native enforcement from a file.
+Current [Claude subagent documentation](https://code.claude.com/docs/en/sub-agents)
+documents per-agent effort overriding session effort. It limits the `Agent(type)`
+allowlist to a main `--agent` session; a delegated integrator's child-type list is
+policy even where native nested Agent calls work. Leaves omit Agent; integrators
+inherit permissions by omitting permissionMode. Requested and observed routes
+stay separate, and parent overrides require an actual serving check.
+
+Qualify in fresh normal signed-in interactive sessions using disposable consumers.
+Do not replace this with `codex exec`, `claude -p`, an SDK, external restart loop,
+API key, permission bypass or global low-effort environment variable. Native
+permission prompts remain user decisions. If unavailable, keep the required
+criterion open while independent source work continues. Review relay is confined
+to one integrator-selected independent review and returns judgment to that same
+integrator. Ordinary implementation stays local to the integrator when nesting
+is unavailable. Local handoff does not authorize a Git push.

@@ -98,8 +98,8 @@ conventions:
   ask the user which findings to fix; that plugin rule applies to ad-hoc
   interactive reviews, not to a delegated lane inside this skill.
 - A Codex lane never commits, moves cards, allocates IDs, or changes RFC
-  status; the role instructions already forbid it, and the primary remains
-  the sole integrator.
+  status; leaf role instructions forbid it. The designated milestone integrator
+  retains engineering authority within its assigned main/lane scope.
 - Treat lane output as evidence, not authority, exactly as for native
   lanes: cite paths and symbols, keep secrets out.
 
@@ -129,10 +129,12 @@ stays optional and risk-triggered per `SKILL.md`.
   (`/codex:setup` toggles it); it duplicates the skill's own review lanes at
   material cost.
 - Do not route structured lanes through `codex:codex-rescue`, and do not let
-  a lane spawn lanes on the other runtime; nesting stays within the runtime
-  that owns the lane, under the same one-level `rfc-utility` limit.
+  a leaf lane spawn agents on either runtime. All existing leaf roles remain
+  leaves; only the designated native integrator may delegate bounded leaf work.
 - When no Codex runtime is installed or the companion invocation fails, fall
-  back per the standard rule: run the same role on the native runtime or
-  serially in the primary, and record the fallback and its trigger.
+  back through the explicit route/capability policy. Keep ordinary engineering
+  local to the designated integrator; required independent review uses the
+  qualified native relay or stays pending. Never silently substitute the
+  coordinator or start an external supervisor. Record the actual limitation.
 
 Historical `rfc-worker-routine`, `rfc-critical-reviewer` and routine decisions remain raw history. New selectors use `rfc-worker`, `rfc-worker-deep` and `rfc-reviewer-critical`. A generic historical worker without contemporaneous routing evidence remains unclassified; current models and dates cannot relabel it. Collect admitted assignments before regenerating; explicitly reissue when necessary, preserving original route evidence. No live session is hot-migrated.

@@ -88,7 +88,11 @@ helpers only for already-selected supported mechanics; they do not decide accept
 
 ## Native assignment details
 
-Use role-prefixed task names and fresh non-history-copying contexts where supported.
+Use role-prefixed task names, such as `rfc_scout_backend_selection` or
+`rfc_utility_cache_inventory`, and fresh non-history-copying contexts where supported.
+Retain the startup banner `Role: <role> | Model: <model> | Effort: <effort>`
+when the selected adapter requires it; this records requested identity, not proof
+of the served route.
 Every assignment names Role and purpose; Repository root and branch/candidate;
 Question or acceptance claims; Allowed paths or roots; Explicit non-goals;
 Applicable instructions; Exact commands or evidence; Requested result. Add the

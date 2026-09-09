@@ -56,5 +56,55 @@ class NativeReturnTests(unittest.TestCase):
             self.assertTrue(validate_return(value))
 
 
+    def test_unknown_exit_requires_effects_reconciliation(self):
+        self.assertEqual(continuation({}, self.assignment, execution="unknown")["action"], "reconcile")
+
+    def test_active_descendant_keeps_ownership(self):
+        partial = dict(self.reply, disposition="continue-milestone", ownership="active")
+        result = continuation(partial, self.assignment, execution="quiescent")
+        self.assertEqual(result["action"], "wait")
+        self.assertIsNone(result["consume_key"])
+
+    def test_repeated_unchanged_partial_requires_investigation(self):
+        previous = dict(self.reply, disposition="continue-milestone")
+        renewed = dict(previous, dispatch_id="renewed")
+        assignment = dict(self.assignment, dispatch_id="renewed")
+        self.assertEqual(continuation(renewed, assignment, execution="quiescent",
+                                      prior_partial=previous)["action"], "investigate")
+        progressed = dict(renewed, candidate_revision="b"*40, evidence_refs=["new-check"])
+        self.assertEqual(continuation(progressed, assignment, execution="quiescent",
+                                      prior_partial=previous)["action"], "resume-integrator")
+
+    def test_review_relay_preserves_integrator_adjudication(self):
+        request = dict(self.reply, disposition="review-request", review_request={
+            "role":"rfc-reviewer", "candidate_ref":"a"*40,
+            "assignment":"Review the exact Unicode/order invariant."})
+        result = continuation(request,self.assignment,execution="quiescent")
+        self.assertEqual(result["action"],"clarify")
+        self.assertIsNone(result["consume_key"])
+        qualified = continuation(request,self.assignment,execution="quiescent",review_relay=True)
+        self.assertEqual(qualified["action"],"relay-review")
+        self.assertEqual(qualified["engineering_acceptance"],"not-evaluated")
+        request["review_request"]["role"]="rfc-worker"
+        self.assertTrue(validate_return(request))
+
+    def test_human_and_blocked_results_do_not_close_pack(self):
+        for disposition in ("human-pending","blocked"):
+            pending = dict(self.reply,disposition=disposition,required_pending=["actual decision"])
+            self.assertEqual(continuation(pending,self.assignment,execution="quiescent")["action"],"pending")
+
+    def test_wrong_producer_and_retired_duplicate_cannot_resume(self):
+        wrong = dict(self.reply,producer_id="unassigned")
+        self.assertEqual(continuation(wrong,self.assignment,execution="quiescent")["action"],"ignore-stale")
+        prior = continuation(self.reply,self.assignment,execution="quiescent")
+        self.assertEqual(continuation(self.reply,self.assignment,execution="quiescent",
+                                      consumed=[prior["consume_key"]])["action"],"ignore-duplicate")
+
+    def test_fresh_dispatch_still_does_not_prove_engineering_acceptance(self):
+        result = continuation(self.reply,self.assignment,execution="quiescent")
+        self.assertEqual(result["action"],"fresh-integrator")
+        self.assertEqual(result["engineering_acceptance"],"not-evaluated")
+
+
 if __name__ == "__main__":
     unittest.main()
