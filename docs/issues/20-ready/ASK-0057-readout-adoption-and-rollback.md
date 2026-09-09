@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0057"
 title: "Read out quality and cost, then activate only the selected owned workflow"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0054", "ASK-0055", "ASK-0056"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "readout-adoption-and-rollback", "milestone": "M3"}
