@@ -24,6 +24,17 @@ consequence selects safeguards and review. Known-hard work may start deep withou
 first wasting a standard attempt. Follow existing explicit fallback authority for
 unavailable routes rather than silently changing models or accounts.
 
+## Preserve the native route
+
+Select the generated custom role and omit optional model/effort arguments. In
+Claude, passing `model: sonnet` is an override, not a way to select the worker
+role; it can conflict with that role’s configured Opus route. If a host requires
+explicit fields, use only the authorized exact pair supported by that host.
+Unsupported fields do not authorize a family alias or silent fallback. Record
+the actual dispatch arguments, adapter route, banner and serving observations
+separately. A disagreement keeps route acceptance open until a bounded corrected
+native dispatch verifies the intended request; a matching banner cannot erase it.
+
 ## Complete assignment
 
 Provide the exact selected consumer/candidate, role/routing reason, live criterion

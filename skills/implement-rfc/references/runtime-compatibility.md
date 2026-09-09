@@ -14,8 +14,8 @@ Generated Codex agents:
 
 - use `sandbox_mode = "read-only"` for utility, scout, and reviewer roles;
 - use `sandbox_mode = "workspace-write"` for bounded workers and the source-immutable test runner because their configure/build/test/package roots must be writable;
-- enable nested sessions only for scouts, workers, and reviewers, whose role instructions permit `rfc-utility` children and forbid every other nested role;
-- keep `[agents] enabled = false` for `rfc-utility` and `rfc-test-runner` so nesting terminates after one level;
+- enable nested sessions only for the designated `rfc-integrator`; its configured leaf-role allowlist remains policy where the host cannot enforce types;
+- keep `[agents] enabled = false` for every worker, scout, reviewer, utility and test-runner leaf;
 - select models from `config/routing.json`.
 
 Important limitation: live parent permission and sandbox overrides can be reapplied to children. Do not rely on a generated read-only sandbox while running the parent with an override that widens it. Inspect `git status --short` after read-only work and reject unexpected writes.
@@ -115,8 +115,8 @@ Generated Claude agents:
 
 - use `permissionMode: plan` plus a read-focused tool allowlist for utility, scout, and reviewer roles;
 - use `permissionMode: acceptEdits` for bounded workers and the test runner; the test runner has no Edit/Write tools and its instructions prohibit repository-source edits, including through Bash;
-- list `Agent(rfc-utility)` for scouts, workers, and reviewers; the parenthesized type restriction is honored when one of those definitions runs as the main thread, but current Claude Code ignores the type list inside a delegated subagent, so the utility-only nesting boundary is enforced by role instructions there, exactly as on Codex;
-- omit the `Agent` tool from `rfc-utility` and `rfc-test-runner` so nesting terminates after one level;
+- list `Agent` with the configured leaf-role types only for `rfc-integrator`; type restrictions are not claimed as enforced within a delegated subagent;
+- omit `Agent` from every worker, scout, reviewer, utility and test-runner leaf;
 - only the designated integrator may delegate to the configured leaf roles; scouts, workers and reviewers remain leaves. A delegated child allowlist is policy where the host cannot enforce it;
 - leave foreground/background selection to the designated integrator so independent utility lanes can run concurrently within the configured cap;
 - select stable Anthropic model IDs from `config/routing.json`.
@@ -128,7 +128,7 @@ The checked-in route declares Claude Code 2.1.255 or later for Fable 5.1. This f
 Claude Code keeps its default concurrency limit of 10. The portable skill uses
 only bounded lanes that materially help the current task.
 
-Claude Code officially discovers project skills from `.claude/skills/`; Codex uses the cross-client `.agents/skills/` location. The renderer therefore creates a small `.claude/skills/implement-rfc/SKILL.md` entrypoint that loads the canonical `.agents/skills/implement-rfc/SKILL.md`. Do not maintain two full skill copies.
+Claude Code officially discovers project skills from `.claude/skills/`; Codex uses the cross-client `.agents/skills/` location. Managed consumers link both discovery paths to their selected shared package. The renderer writes agent adapters referencing the provider-specific installed entrypoint; it does not replace the managed skill link or create another full skill copy.
 
 ### Long multi-commit sessions
 

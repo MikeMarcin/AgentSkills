@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "9dbf83b656b562c6148946e3f82789c2702a733b8c211c583d13f5f90931e642"
+      "sha256": "6790744e2740935c16af3ef37f5c2325004a1f2c7c6398dfe8fda3f40bc3dd5b"
     },
     {
       "path": "config/routing-profiles.json",
@@ -62,7 +62,7 @@
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "bc1062355448252244d083145d12a4862ba68196d05b98c3224c846488f7f2a4"
+      "sha256": "9bd8e060deac15784f7a794f4516b6d98410098a63f17874d6052eb2375c3582"
     },
     {
       "path": "references/milestone-integration.md",
@@ -70,7 +70,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "9e3dc1b8541d9b583fec9771e97abd42f1fe368fcccc05718113768c0bb05531"
+      "sha256": "5e87c9b9974fb269b3e40a1b659ee9373dc318a4fc68c890d0a0d7f3983c71bb"
     },
     {
       "path": "references/native-coordination.md",
@@ -94,7 +94,7 @@
     },
     {
       "path": "references/runtime-compatibility.md",
-      "sha256": "bac0bff4bb22b30b01bbd2e06427658c374c7a1e9e40b0ccff3ccc7e54bf31d2"
+      "sha256": "2a7550b0b4061dc4af4e8f3dd4d220130ad1bcd40b25e21fda768b2469ce9f52"
     },
     {
       "path": "references/usage-collection.md",
@@ -357,6 +357,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "a7b553bed4a71916",
+  "portable_digest": "3ed166e11609a6d8",
   "schema": "implement-rfc.portable-manifest.v1"
 }

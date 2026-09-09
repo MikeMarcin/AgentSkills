@@ -27,6 +27,17 @@ model IDs and requested effort live in configuration; requests do not prove serv
 Claude's declared floor is 2.1.255; no automatic client upgrade, effort clamp,
 model fallback, reset or credit purchase is authorized. Preserve processing speed.
 
+## Native dispatch arguments
+
+A generated custom role already binds its model and effort. Omit optional
+per-call overrides when spawning it. For Claude `Agent`, choose the custom role
+without adding `model: sonnet`, `opus` or another family alias. If an actual host
+requires explicit model/effort fields, preserve the authorized exact pair and
+verified capability; inability to express it is a capability gap, not permission
+to substitute. Keep actual call arguments distinct from configuration, banners
+and serving telemetry. A conflicting launch request fails route qualification
+until corrected and rechecked through that native boundary.
+
 ## Lane Runtime Selection
 
 Each class has both a Codex and a Claude route. In a Claude Code primary
