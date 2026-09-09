@@ -114,7 +114,7 @@ renumbers at integration:
 A stopping point hands the lane to a fresh session or another harness. Before
 handing off:
 
-- push the lane branch;
+- push the lane branch only when the user explicitly authorized that push; a local handoff never implies publication;
 - make board folders truthful — no card sitting in a folder its state has
   outgrown;
 - record on the closeout card: the next slice, verification already run with

@@ -29,6 +29,10 @@ Required human/native work stays pending. Only a qualified no-grandchildren revi
 relay may dispatch one integrator-selected independent reviewer and then resume
 the same integrator for judgment.
 
+When the integrator cannot spawn ordinary leaf roles, keep implementation and
+verification local to that integrator. Use the coordinator only for the qualified
+independent-review relay; unavailable required review remains pending.
+
 Use the existing native interactive host and its wait/resume tools. No companion,
 headless CLI, API supervisor, permission bypass, or global low-effort setting is
 part of this path. Runtime qualification is recorded separately from these source

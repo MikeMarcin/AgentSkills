@@ -1,6 +1,10 @@
 # Model Routing And Updates
 
-`config/routing.json` owns delegated routes; primary session settings stay unchanged.
+`config/routing.json` v2 owns independently stored coordinator session routes and
+delegated engineering routes. Rendering never changes the active session.
+The coordinator is not a delegated role. Bind the integrator first: explicit task
+choice, preserved owner engineering choice, then independent integration default.
+The coordinator's current route is never an implicit engineering override.
 
 | Role | Class | Codex | Claude |
 |---|---|---|---|
@@ -38,7 +42,7 @@ session, native Claude agents are the default lane mechanism;
   requires an unresolved material concern or an explicit request. Reconcile
   findings using direct evidence, not a vote.
 - Prefer Codex for mechanical bulk when allowance economics favor it.
-- The primary integrator never runs through the launcher; it launches lanes only.
+- The designated integrator never runs through the launcher; it launches lanes only.
 
 A driver unable to launch the other family uses its native reviewer and records
 that limitation. Record each review's runtime per [codex-lanes.md](codex-lanes.md).
@@ -56,7 +60,7 @@ than spawning an agent. Workers normally run their own focused checks; a
 separate test runner is optional when it materially helps execution.
 
 Send failure diagnosis to a scout. Send questions about whether tests can pass
-while an RFC claim remains false to a reviewer or the primary. The primary
+while an RFC claim remains false to a reviewer or the integrator. The integrator
 selects sufficient verification and adjudicates all acceptance decisions.
 
 ## Critical Review Selection
@@ -71,7 +75,7 @@ review or the final diff materially affects one or more of:
 - destructive migrations.
 
 Selection remains discretionary: use review only when it is likely to add
-discriminating evidence. For other work, a primary-agent skeptical pass is
+discriminating evidence. For other work, a integrator skeptical pass is
 sufficient. A reviewer may block only on an evidence-backed failure of an
 existing acceptance criterion or a critical regression in the changed surface.
 
@@ -131,3 +135,29 @@ Absent an explicit owner-directed promotion, establish a newly released model on
 
 
 For owned adapter retirement, active sessions, pins and rollback, use [scoped adoption](role-adoption.md).
+
+## Coordinator and integrator selection
+
+The public renderer accepts `--integrator-route FILE` and
+`--preserved-integrator-route FILE`, each a JSON object mapping provider to an
+exact `{"model":"...","effort":"..."}` pair. Pass `--capabilities FILE` with
+verified provider/model supported efforts for overrides. Explicit task choices
+win preserved engineering choices; defaults are independently configured in
+`integration`, not copied from the current coordinator or scout at run time.
+Preserve these exact inputs for check/resume and inspect route origins on the
+owned adapter manifest. Unknown or unsupported choices refuse; no silent clamp.
+
+Coordinator defaults are `session_routes.rfc-coordinator`; use the native host's
+session controls only after binding engineering. Preserve an explicit owner
+session choice and report a difference from the defaults. Do not set a global
+subagent model or a global low-effort environment variable. The renderer records
+session-selection instructions and requested routes without applying them.
+
+For source authors, run `scripts/render_runtime_adapters.py --write-source-manifest`
+from the canonical checkout after changes, then
+`scripts/validate_portable_agents.py --source-only`. For an explicitly selected
+consumer, render with `--repo-root ROOT`, inspect the owned result and use the
+same options with `--check`. Preserve active assignments and ownership markers;
+never write through shared skill links or overwrite unexpected generated content.
+Roles/routing v2 express typed delegation; the narrow v1 reader admits historical
+leaf definitions without inventing delegation authority. Unknown versions refuse.

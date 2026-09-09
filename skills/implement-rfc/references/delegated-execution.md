@@ -1,261 +1,105 @@
-# Portable Delegated Execution
+# Delegated execution
 
-The skill explicitly requests sub-agent delegation when a bounded assignment
-can run independently alongside useful primary work and the runtime permits it.
-Assess that opportunity at scope intake, each new slice and integration. Useful
-assignments reduce primary-context load, improve elapsed throughput, isolate
-writable test output, or add a meaningfully independent check. Dispatch the
-selected assignment instead of doing the same work in the primary as well.
+The milestone integrator owns engineering decisions and authorized integration.
+It may delegate complete bounded slices; existing workers, scouts, utilities,
+test runners and reviewers remain leaves. The outer coordinator's serial dispatch
+is justified by context isolation even when it has no useful parallel work.
 
-This request satisfies a host policy that permits delegation when an applicable
-skill explicitly asks for it. It does not override a user prohibition, an
-unconditional host restriction, unavailable capabilities or ownership conflicts.
-Keep small, coupled or immediately blocking work local. Briefly state why a
-substantial slice stays local and reassess at the next boundary; do not infer a
-session-wide ban from one coupled slice. Agent count is not a quality metric.
+## Select work and role
 
-## Authority
-
-The primary RFC integrator alone owns:
-
-- interpretation of the live RFC, architecture decisions, and acceptance criteria;
-- `RFC_BASE_SHA`, issue allocation, board transitions, and RFC ordering;
-- staging, commits, pushes, and integration;
-- verification sufficiency, documentation impact, and RFC status.
-
-A delegated result is an input. It cannot expand acceptance, move cards, commit,
-or close an RFC.
-
-## Roles
-
-### `rfc-utility`
-
-Use for exact locating, inventories, prescribed read-only commands, schema or
-adapter drift checks, and log condensation. Promote to `rfc-scout` when the
-task requires semantic interpretation.
-
-### `rfc-scout`
-
-Use for bounded ownership, execution-path, package-selection,
-verification-surface, documentation-impact, or first-cause analysis. A scout
-should replace the corresponding broad primary scan; the primary confirms only
-material conclusions.
-
-### `rfc-worker` and `rfc-worker-deep`
-
-Standard `rfc-worker` handles normal features, diagnosis, multi-file changes,
-refactoring, local design and approved architecture. Require exclusive ownership,
-constraints, acceptance and a credible verification strategy; the worker may
-create that strategy. No copyable precedent is required. Workers never commit
-or mutate tracker/RFC state and preserve unrelated changes.
-
-Use `rfc-worker-deep` for a named unresolved reasoning problem: conflicting
-invariants, difficult causal diagnosis or materially ambiguous technical solutions.
-Known-hard work may start deep directly. Ordinary debugging stays standard while
-making progress. Difficulty selects effort; consequence selects safeguards and
-review. Sensitive domains alone do not mandate deep. Approval questions return
-to the integrator. Carry useful work forward, with no forced failure, quota,
-blind retry sequence or unnecessary handoff.
-
-### `rfc-test-runner`
-
-Use when an exact selected command set benefits from separate execution or a
-writable build root. Isolation is optional unless the user explicitly requires
-it or a concrete collision/source-integrity risk makes it useful.
-
-The test runner:
-
-- executes only supplied commands against the named candidate and output roots;
-- may write disposable build/test outputs, but never source, agent documentation,
-  trackers, RFCs, manifests, or generated repository files;
-- reports each command's outcome, failures, skipped tests, incomplete runs,
-  unexpected conditions, relevant diagnostics, artifacts, and uncertainties;
-- never diagnoses root cause, chooses extra tests, classifies acceptance blockers,
-  modifies commands to obtain a pass, or suppresses apparently unrelated failures;
-- returns unsupplied decisions to the primary and does not spawn other agents or
-  create seals, hash-bound evidence packages, or replay records.
-
-The primary selects verification and judges acceptance. Scouts investigate
-failures; reviewers examine whether recorded evidence can miss a broken claim.
-
-The primary consumes the result and reruns only a check affected by a later
-correction. It does not repeat unchanged passing commands.
-
-### `rfc-reviewer` And `rfc-reviewer-critical`
-
-Use an independent reviewer when explicitly requested or when it is likely to
-add discriminating evidence for a changed wire/protocol contract,
-persistence/migration behavior, authority/security boundary, concurrency
-primitive, or destructive migration. Use the critical role when the risk and
-expected value justify deeper counterexample search.
-
-Give the reviewer the live acceptance criteria, final bounded diff, commands
-already run, and concise result locations. Do not preload the implementation
-transcript or ask it to ratify the implementation narrative.
-
-Use one reviewer by default, preferring the opposite model family from the
-implementation when available. The critical role replaces the ordinary role for
-a named material risk. A second review requires an unresolved material concern
-or an explicit request; see [model-routing.md](model-routing.md) and the lane
-mechanics in [codex-lanes.md](codex-lanes.md).
-
-A blocking finding must be an evidence-backed failure of an existing acceptance
-criterion or a critical regression in the changed surface. Unsupported
-suspicions, broader hardening, alternate designs, and requirement expansion are
-non-blocking and become follow-up candidates. A correction receives only a
-narrow changed-surface recheck; it never starts a whole-candidate review loop.
-
-## Choosing Delegation
-
-Apply these routes when the independent-work condition above holds.
-
-| Work shape | Default |
+| Work | Owner |
 |---|---|
-| Small, directly verifiable change | Primary agent |
-| Substantial mechanical read-only inventory or commands | `rfc-utility` |
-| Bounded semantic repository investigation | `rfc-scout` |
-| Normal bounded engineering | `rfc-worker` |
-| Named unresolved difficult problem | `rfc-worker-deep` |
-| Exact separate test/build command set | `rfc-test-runner` |
-| Named high-risk trigger or explicit request | One reviewer when it adds discriminating evidence |
-| Missing safe runtime capability | Execute serially in the primary agent |
+| Small or tightly coupled engineering | Milestone integrator |
+| Exact read-only lookup or mechanical inventory | rfc-utility, only when a separate agent materially helps |
+| Bounded semantic investigation | rfc-scout |
+| Normal engineering, diagnosis, refactoring or local design | rfc-worker |
+| Named unresolved difficult reasoning problem | rfc-worker-deep |
+| Prescribed commands benefiting from separate output ownership | rfc-test-runner |
+| Requested or risk-selected independent review | rfc-reviewer or rfc-reviewer-critical |
 
-For delegated implementation, default to standard and record
-`Routing: standard | Reason: default implementation` (or the actual reason).
-For deep work record `Routing: deep | Reason: <specific unresolved problem>`.
-Repeat the decision after startup identity and in final Status. Missing supplied
-assignment information stays unknown. Preserve earlier assignment evidence on
-reissue. Capacity follows explicit fallback policy, not automatic escalation.
+Canonical configuration supplies routes. Standard engineering needs bounded scope,
+constraints, ownership and credible verification; the worker may develop the local
+approach. Existing patterns help but are not required. Difficulty selects effort;
+consequence selects safeguards and review. Known-hard work may start deep without
+first wasting a standard attempt. Follow existing explicit fallback authority for
+unavailable routes rather than silently changing models or accounts.
 
-Delegated roles are leaves by default. Commission independent siblings from the
-primary when needed; do not add unrestricted Agent tooling to a leaf. Inspect
-the driver capability before claiming enforcement rather than policy alone.
+## Complete assignment
 
-Run trivial deterministic commands directly. Workers normally run their own
-focused checks; there is no mandatory scout/worker/test-runner/reviewer pipeline.
+Provide the exact selected consumer/candidate, role/routing reason, live criterion
+references, exclusive allowed paths, constraints and shared interfaces, required
+focused verification and compact result. Refresh that scope for each assignment;
+previous write ownership does not silently carry forward. Implementation includes
+local diagnosis, relevant tests/docs and focused checks until candidate-ready.
 
-Parallel read-only agents must own different questions. Do not request duplicate
-same-prompt scans merely to obtain a vote. Stop delegation after it has answered
-the bounded question.
+For workers, preserve the routing receipt `Routing: standard | Reason: ...` or
+`Routing: deep | Reason: <named unresolved problem>`. Missing historical routing
+is unknown. Retain the native role banner as requested configuration; observed
+model/effort is a separate fact when telemetry exposes it.
 
-## Agent context lifetime
+The integrator consumes the result rather than repeats the worker's scan. It can
+inspect material conclusions and integration seams without reproducing every
+command. Parallel read-only agents own different questions, not duplicate prompts
+for voting. Add concurrency for independently useful results, not idle capacity.
 
-Choose reuse or fresh context before each assignment. Reuse is appropriate for
-clarification, a correction or narrow recheck of the same slice, and a closely
-related next slice when the agent's discoveries remain relevant and its role and
-configured route still fit. A new card alone does not require a fresh agent.
-Refresh the candidate, acceptance and exclusive owned paths for each new slice;
-previous write ownership does not carry forward implicitly.
+**Assigned:** one responsible owner, acceptance/candidate/path scope and result
+boundary are explicit; unexplained overlapping edits stop the assignment.
 
-Start a fresh agent for an unrelated subsystem or acceptance problem, a different
-role, or a new review boundary that calls for independent judgment. Do not turn
-an implementer into its own independent reviewer. Reuse a reviewer to check the
-specific correction to its finding; when a later slice independently warrants
-review, start fresh with that slice's criteria, diff and evidence. Fresh review
-is not an extra review after a passing review and does not create a review loop.
+## Leaf boundaries and results
 
-Do not reuse agents merely because they are idle or already configured. Avoid a
-permanent worker/reviewer pool spanning the whole pack. Accumulated irrelevant
-history, repeated stale assumptions or difficulty separating old and current
-scope are reasons to start fresh. Context size and compaction are signals to
-reassess relevance, not fixed expiry thresholds. Neither cache hits nor fresh
-context alone establish lower cost or better results; no token, turn or card
-quota is required.
+Workers modify only owned source/test/doc paths. The integrator claims/finishes
+cards, allocates IDs, stages/commits and adjudicates acceptance. Workers may
+prepare an authorized human-review artifact within their scope; they report its
+pending verdict and continue unattended work. They do not invent a human gate.
 
-When starting a fresh successor, consume the prior result and carry forward only current facts,
-relevant source/evidence locations, unresolved questions and applicable
-constraints. Spawn without inherited conversation history when supported
-(`fork_turns="none"` in the interactive Codex tool), using the assignment packet
-below. Do not copy an old transcript or its accumulated summaries into the new
-agent. For a writing handoff, finish or stop the prior assignment and inspect its
-changes before granting the successor exclusive ownership. Retire the replaced agent
-from further assignments; close it if the runtime supports that operation.
+Test runners execute exactly selected commands and write only assigned disposable
+build/test output. They report failures, skips and incomplete runs; diagnosis,
+extra tests and acceptance decisions return to the integrator. Scouts investigate
+bounded questions. Utility performs supplied mechanical work, not architecture.
 
-## Assignment Contract
+A worker returns Status, Changed files, Verification, Remaining risks and
+Uncertainties, with actual candidate/working state and evidence pointers. A reviewer
+returns Status, Blocking findings, Non-blocking findings and Material limitations.
+Use compact relevant content; logs and detailed output stay at the named evidence
+locations. An actionable blocker, interface change or completion warrants a message;
+status polling that cannot change a decision does not.
 
-Name the role and purpose, then provide only what the role needs. The following
-packet is the actual context boundary: link relevant source and original evidence,
-include applicable constraints verbatim, and leave unsearched facts explicit.
-Do not attach the parent transcript, every RFC, retained import assets, or a full
-board dump. Read a linked procedure only when the selected action needs it.
-Mechanical inventory cannot resolve architecture or authorization questions.
+## Context lifetime
 
-For example, a utility packet names exact paths/search terms and asks for matches;
-a test-runner packet names exact argv, candidate and disposable output roots;
-a semantic investigation uses a scout with a bounded question and acceptance
-references. Do not silently promote a utility because its output is convenient.
+Reuse a leaf for a correction, narrow recheck or closely related continuation when
+its context, role and route still fit. Refresh ownership/candidate on continuation.
+Start fresh for unrelated acceptance work, a different role or a new independent
+review. An implementer cannot become its own independent reviewer. Check the
+specific correction to a finding without restarting a full-candidate review loop.
 
-Name each root once; internal evidence may use repo-relative paths plus revision,
-symbol and line. Use absolute paths when crossing roots or when requested.
+At an integrator's completed milestone, collect or stop its children before ownership
+transfer. Do not retain a permanent worker/reviewer pool across the whole pack.
+For a replacement, account for the outgoing writer's effects first. A new card alone
+is not a leaf reset; a new milestone deliberately is an integrator reset.
 
-Assignment fields:
+## Review and optional runtimes
 
-```text
-Role and purpose:
-Routing: standard or deep | Reason: concrete reason (implementation workers only)
-Current card or review target:
-Repository root and branch/candidate:
-Question or acceptance claims:
-Allowed paths or roots:
-Explicit non-goals:
-Applicable instructions:
-Exact commands or evidence:
-Requested result:
-```
+Before commissioning review, read [Verification and closeout](verification-and-closeout.md).
+Native same-driver delegation is the ordinary path. Read installed
+`references/codex-lanes.md` or `references/remote-routing.md` only for an explicitly
+selected existing companion/station surface. This coordinator design does not
+require or authorize external agent invocation. Use existing bounded command
+helpers only for already-selected supported mechanics; they do not decide acceptance.
 
-Use a role-prefixed runtime name such as `rfc_scout_backend_selection` or
-`rfc_utility_cache_inventory`. For adapters without an authoritative compatible dispatch receipt, retain the startup banner
-`Role: <role> | Model: <model> | Effort: <effort>` before analysis so routing
-mistakes are visible. Role-to-model assignment and its rationale live in
-[model-routing.md](model-routing.md) and `config/routing.json`.
+## Native assignment details
 
-For workers, state that they must not commit, move cards, allocate IDs, or
-change RFC status. For test runners, name the candidate, exact commands, writable
-output root if any, and expected concise result.
+Use role-prefixed task names and fresh non-history-copying contexts where supported.
+Every assignment names Role and purpose; Repository root and branch/candidate;
+Question or acceptance claims; Allowed paths or roots; Explicit non-goals;
+Applicable instructions; Exact commands or evidence; Requested result. Add the
+routing reason for an implementation owner. Read required consumer instructions;
+never infer permission from an inherited summary. Keep the selected root explicit.
 
-## Result Contract
-
-Use the role-specific compact format in `config/roles.json`. Every result
-should:
-
-- lead with status or blocking failures;
-- cite exact paths, symbols, commands, and result locations;
-- distinguish fact, uncertainty, and unsearched surfaces;
-- avoid raw logs, copied RFC prose, and broad repository summaries.
-
-Unexpected source writes invalidate a read-only or test-runner result. Preserve
-unrelated user changes and inspect Git state after delegated work.
-
-## Runtime Fallback
-
-When an adapter, nested agent, read-only sandbox, or per-role model is
-unavailable, perform the bounded work serially while preserving the same
-acceptance boundary. A fallback may reduce speed or independence; it does not
-create new verification requirements. Report the omitted optional lane without
-blocking closeout.
-
-Use the optional [local routing audit](routing-audit.md) to count observed role
-usage in either driver and inspect recorded decisions. Missing historical reasons
-remain unknown; a startup banner alone is not runtime model evidence.
-
-## Receipt and profile compatibility
-
-Baseline `config/routing.json` remains the shared default. Explicit task/session
-selection wins over an admitted order route, selected profile and baseline.
-The former `astra-low-first` candidate is now the shared baseline; its separate
-profile has been removed. Future explicit profile overrides require verified
-capabilities. The capability file maps provider to exact model to supported effort
-values; it is an operator-supplied observation, not provider discovery. A missing
-capability refuses the override. No profile changes the primary session.
-
-The runtime-adapters manifest records requested settings, profile digest and
-experiment label. Driver dispatch receipts establish owned attempts; observed
-serving data is stronger than requests. Legacy role banners remain self-report
-metadata. Keep startup/final banners for the current interactive adapters until
-their receipt-aware parser and report path are qualified; do not silently replace
-that compatibility contract merely to reduce prose.
-
-`fallback_receipt` validates an explicit alternative and bounded approval scope;
-it never executes a fallback. Unknown effort, unsupported effort, actual `none`,
-synthetic errors, availability and model/shared quota are distinct. Capacity
-errors do not justify stronger reasoning. No automatic credit purchase or reset.
+Runtime model and effort selections follow [Model routing](model-routing.md).
+Use the existing startup identity banner and repeat the routing reason in the final
+Status where configured; an unavailable serving observation remains unknown.
+Only the designated integrator adjudicates acceptance and owns board/commit work.
+Return permission requests to the coordinator/user; do not approve them in a child.
+If a child cannot surface an approval, preserve its prepared work and return a
+reviewable patch or command to the integrator. Never wait indefinitely on an
+invisible approval or bypass the sandbox.

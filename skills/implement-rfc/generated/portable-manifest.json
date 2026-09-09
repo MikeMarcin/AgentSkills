@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "7799de169718dfce1de2c0ba2425ff7a98cb989ebdfed2882d538651e18eeea0"
+      "sha256": "7595fab5f87af2d30306b9fb2191231dcefb62e320b4977f8ffb366347b09ca2"
     },
     {
       "path": "SKILL.md",
-      "sha256": "88bf00ea5a237f19161f0a794d87aa9e249c03c8d0c57ae87ee8f8a4cd9e2028"
+      "sha256": "c3228f6fc7d6fa5ade925ece1ca212bad24121e2227a2199bbb7996696903a21"
     },
     {
       "path": "agents/openai.yaml",
@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "18759c3a9dfb41c5b24431841a94bcf3696b9b8ee36e4f6d33c47664598d4940"
+      "sha256": "9dbf83b656b562c6148946e3f82789c2702a733b8c211c583d13f5f90931e642"
     },
     {
       "path": "config/routing-profiles.json",
@@ -41,6 +41,10 @@
       "sha256": "7ca97f415063bac14438872eb36ac46301c3b2e0dfe8621f7d6147289e82c079"
     },
     {
+      "path": "references/attendance.md",
+      "sha256": "d78bef6d28ee1b9ee1fe6f7f9072ccb3e056985c61cd7ccbba78c652ef6fa724"
+    },
+    {
       "path": "references/bookkeeping.md",
       "sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a"
     },
@@ -54,19 +58,23 @@
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "f9b69ae0079fc6dba8fa1aa15cccedf64bfa046187d609d6d6b77064e983c8b9"
+      "sha256": "ca348e8c26f33307b7e1c4984049fd2e19f87c30d00a99ad1a943ddbb859f128"
+    },
+    {
+      "path": "references/milestone-integration.md",
+      "sha256": "a793dedb8bc405c4153d9f9400d00dd4d4039b36750dba0d7049f7ae3e16bf42"
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "6610d0e0dba6bcfaaadad8b4d0b26a358c477ba22f25bfa819b251581c5a946d"
+      "sha256": "9e3dc1b8541d9b583fec9771e97abd42f1fe368fcccc05718113768c0bb05531"
     },
     {
       "path": "references/native-coordination.md",
-      "sha256": "603977d4d8cc9e4abf98f0aea04be45238ceb6bbe6534f4a56574db0fa59818c"
+      "sha256": "a119cdea064ce3fa73d4e58ff0d5fa33f18d7633d13d82ee3c92729ee87bbf5a"
     },
     {
       "path": "references/pack-lifecycle.md",
-      "sha256": "37de6531e0e9f2e783c6ca4b483ee85216b509eaaf7a6fd003e4889a08106738"
+      "sha256": "a399cae235e0a8269b727b748408b85cb5645c26e4ec29cc0964130a8663aad7"
     },
     {
       "path": "references/remote-routing.md",
@@ -82,11 +90,15 @@
     },
     {
       "path": "references/runtime-compatibility.md",
-      "sha256": "bd5aaad736660072e292988b9f9e3103017ab21d5886557b0f03aa16869d36dd"
+      "sha256": "844b9501ec76bbc2f5ea0e11d7c5acc8e1cbd6b0e9a2d7424b38c940ed239185"
     },
     {
       "path": "references/usage-collection.md",
       "sha256": "56359855dd414ae4750655489b298284ba26291525dd95d0c7cd9066c5cb61c5"
+    },
+    {
+      "path": "references/verification-and-closeout.md",
+      "sha256": "d3c2bc8cf213c9d582ec2490e6f05b9f2ecf1432c3b288b652eddfa19098f571"
     },
     {
       "path": "schemas/issue-card.schema.json",
@@ -245,6 +257,10 @@
       "sha256": "846c618e58496db8e36d36146de0c17c3b87c0c3801000a3f165e0353c5553a9"
     },
     {
+      "path": "tests/test_instruction_paths.py",
+      "sha256": "8449901190df7d7ca1c726ede1bf852c167b6e7e2abe398738d577005f9340be"
+    },
+    {
       "path": "tests/test_issue_board.py",
       "sha256": "45ea8711d7cda5a2ccfb0d71c51fd2180f2264db4a4faf09ce9f84487df8ac59"
     },
@@ -302,7 +318,7 @@
     },
     {
       "path": "tests/test_unified_workflow.py",
-      "sha256": "1e96d3d9f1b18c0df4278d42320dde497743e7f097c7b01a096749b26a86aef1"
+      "sha256": "08c5b1d8b9172e1d2a441f967e7cf3e30828781bee67aed1a387968d4685161c"
     },
     {
       "path": "tests/test_usage_accounting.py",
@@ -333,6 +349,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "34c5153ad7866d75",
+  "portable_digest": "d5344d6b244ffd5f",
   "schema": "implement-rfc.portable-manifest.v1"
 }

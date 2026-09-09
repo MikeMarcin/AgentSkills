@@ -117,11 +117,11 @@ Generated Claude agents:
 - use `permissionMode: acceptEdits` for bounded workers and the test runner; the test runner has no Edit/Write tools and its instructions prohibit repository-source edits, including through Bash;
 - list `Agent(rfc-utility)` for scouts, workers, and reviewers; the parenthesized type restriction is honored when one of those definitions runs as the main thread, but current Claude Code ignores the type list inside a delegated subagent, so the utility-only nesting boundary is enforced by role instructions there, exactly as on Codex;
 - omit the `Agent` tool from `rfc-utility` and `rfc-test-runner` so nesting terminates after one level;
-- rely on Claude Code's support for nested subagents: a delegated scout, worker, or reviewer may launch its own `rfc-utility` children within the runtime depth limit, and the primary agent launches utility lanes directly only when depth or capability is unavailable;
-- leave foreground/background selection to the primary agent so independent utility lanes can run concurrently within the configured cap;
+- only the designated integrator may delegate to the configured leaf roles; scouts, workers and reviewers remain leaves. A delegated child allowlist is policy where the host cannot enforce it;
+- leave foreground/background selection to the designated integrator so independent utility lanes can run concurrently within the configured cap;
 - select stable Anthropic model IDs from `config/routing.json`.
 
-Parent permission modes can take precedence over a subagent's `permissionMode`. Before relying on read-only scouting or review, keep the parent in a permission mode that does not widen the child, and inspect `git status --short` after the run. The read-focused agents retain Bash for Git inspection and read-only verification commands, but `permissionMode: plan` denies mutating commands: configure, build, or test runs that write artifacts stay with the primary agent, bounded worker, or test runner. Unexpected repository-source writes from a test runner invalidate the result.
+Parent permission modes can take precedence over a subagent's `permissionMode`. Before relying on read-only scouting or review, keep the parent in a permission mode that does not widen the child, and inspect `git status --short` after the run. The read-focused agents retain Bash for Git inspection and read-only verification commands, but `permissionMode: plan` denies mutating commands: configure, build, or test runs that write artifacts stay with the designated integrator, bounded worker, or test runner. Unexpected repository-source writes from a test runner invalidate the result.
 
 The checked-in route declares Claude Code 2.1.255 or later for Fable 5.1. This floor is an owner-specified admission requirement; verify the installed runtime before claiming native serving. Configuration validation is not a live model-availability test. Worktree-isolated subagents received important main-checkout safety fixes by 2.1.210, but the default portable policy still does not enable static worktree isolation: a custom worktree subagent may branch from the repository's default branch rather than the primary session's current `HEAD`. Use worktree writers only after explicitly proving the desired base and integration behavior.
 
@@ -139,7 +139,7 @@ Where an agent-callable goal tool exists, follow the canonical skill's
 authorization, reuse and completion rules. Either facility is a progress view;
 the issue board and closeout cards stay authoritative.
 
-Claude Code compacts long conversations, and compaction can silently drop the in-memory task queue mid-run. The skill's reorientation procedure exists for exactly this failure: re-derive the next card from the live board and the closeout card, and never conclude from memory that no work remains. For pack-scale runs, a larger context window can delay compaction but does not remove reorientation. Delegate bounded read-heavy work when doing so materially protects the primary context; delegation is not required merely because a run is long.
+Claude Code compacts long conversations, and compaction can silently drop the in-memory task queue mid-run. The skill's reorientation procedure exists for exactly this failure: re-derive the next card from the live board and the closeout card, and never conclude from memory that no work remains. For pack-scale runs, a larger context window can delay compaction but does not remove reorientation. Delegate bounded read-heavy work when doing so materially protects the integrator context; delegation is not required merely because a run is long.
 
 Re-invoking the skill with the same arguments is the supported resume path after an interruption or a fresh session: reorientation recovers `RFC_BASE_SHA`, the ledgers, the phase checklist, and the next task from the closeout card, the board, and `git log`.
 
@@ -188,9 +188,9 @@ For Bedrock, keep the generated agent definitions unchanged and use `modelOverri
 
 The skill remains correct when an adapter is unavailable:
 
-- execute utility, scout, test-runner, or review work serially in the primary agent;
+- keep ordinary engineering local to the designated integrator; required independent review uses only the qualified native review relay or remains pending;
 - when a selected model does not support `max`, use the strongest supported effort, report the downgrade, and do not narrow the requested critical-review scope;
-- keep all writes in the primary agent if a bounded worker or test runner cannot be controlled safely, and record the serial fallback;
+- keep writes with the designated integrator if a bounded worker cannot be controlled safely; never silently substitute the low-cost coordinator for engineering;
 - preserve the same direct verification and closeout requirements;
 - report the omitted delegation lane in the final summary.
 

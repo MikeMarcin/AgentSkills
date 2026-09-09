@@ -172,5 +172,6 @@ class SelectedInstructionTests(unittest.TestCase):
             self.assertNotIn('assets/', packet)
             self.assertNotIn('bounded-execution.md', packet)
         core = (root / 'SKILL.md').read_text()
+        core += (root / 'references/verification-and-closeout.md').read_text()
         self.assertIn('A delivered report or successful command never approves acceptance', core)
         self.assertNotIn('slice-order.v1', core)

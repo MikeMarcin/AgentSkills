@@ -51,7 +51,7 @@ fails when two projects have drifted.
 ## Maintained Sources
 
 - `SKILL.md`: authoritative workflow and finish condition.
-- `config/roles.json`: portable role semantics (seven roles).
+- `config/roles.json`: portable role semantics (one integrator and seven leaves).
 - `config/routing.json`: capability-class routing for Codex and Claude.
 - `references/pack-lifecycle.md`: pack import, lane authority, milestone
   integration, renumbering, handoff, and cleanup.
@@ -77,8 +77,11 @@ fails when two projects have drifted.
   `scripts/launch_remote_station.py`, `scripts/codex_station.py`: remote
   station identity, single-writer protection, and launch.
 
-The primary agent remains the only tracker, commit, integration, and
-RFC-status authority. Delegated agents return bounded inputs to that decision.
+The designated milestone integrator owns authorized tracker, commit, integration
+and RFC-status decisions within its assigned main/lane scope. The native
+coordinator preserves the user mandate and continuation; leaves return bounded
+inputs to the integrator's judgment. Session routes are separate from delegated
+roles, and rendering does not select or hot-switch the current session.
 
 ## Select A Consumer
 
