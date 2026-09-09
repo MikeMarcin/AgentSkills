@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "fbebf1025fad58792d083dfe8fdb90da38e81d97b73b3c4416a54d60aaefabad"
+      "sha256": "3f583357a8f420cb7ec5e2ebd35c618e7b650d91fa7b50f28240c47b7cc433fb"
     },
     {
       "path": "examples/projects/samplereview/project.json",
@@ -70,7 +70,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "5e87c9b9974fb269b3e40a1b659ee9373dc318a4fc68c890d0a0d7f3983c71bb"
+      "sha256": "f39ba1b16db84534236195a9273894e97fad4d184843f6ffc8b2f51fa178ebd0"
     },
     {
       "path": "references/native-coordination.md",
@@ -357,6 +357,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "3ed166e11609a6d8",
+  "portable_digest": "3a51f26a70d32beb",
   "schema": "implement-rfc.portable-manifest.v1"
 }
