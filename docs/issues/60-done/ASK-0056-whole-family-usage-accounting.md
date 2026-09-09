@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0056"
 title: "Measure all integrator generations without losing or double-counting usage"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0051"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "whole-family-usage-accounting", "milestone": "M2"}
+acceptance: [{"criterion":"RFC-ASK-0010-AC12-source","outcome":"pass","revision":"90bc01c","evidence":{"kind":"observation","detail":"Owning response reconciliation and transitive lineage implemented in 5772548; corrections in 90bc01c. Usage suite 93 tests OK (3 platform/optional skips), final affected 51 tests OK; correction 29 tests OK plus 4 bounded/public checks. Synthetic public capture/report: four owning responses across root/two integrators/grandchild, input750 cached580 uncached170 output75 reasoning20 total825. Missing outcome null versus explicit empty zero. Independent native rfc-reviewer GPT6Astra high found conflicting cumulative and parent ancestry errors; both reproduced, fixed, and four focused review checks pass with no remaining blockers. No private audit was supplied; no native course or savings acceptance claimed."}}]
 ---
 
 # ASK-0056: Measure all integrator generations without losing or double-counting usage
