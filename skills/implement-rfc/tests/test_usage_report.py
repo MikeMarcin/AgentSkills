@@ -33,7 +33,8 @@ class ReportTests(unittest.TestCase):
             done=subprocess.run([sys.executable,'-B',r.__file__,str(path),'--out',str(out)],capture_output=True,text=True)
             self.assertEqual(done.returncode,0,done.stderr)
             summary=json.loads((out/'summary.json').read_text())
-            self.assertEqual(summary['outcomes']['accepted_task_count'],0)
+            self.assertIsNone(summary['outcomes']['accepted_task_count'])
+            self.assertEqual(summary['outcomes']['outcome_input'],'missing')
             self.assertIsNone(summary['outcomes']['observed_tokens_per_accepted_task'])
             self.assertEqual(path.read_bytes(),before)
             self.assertIn('unknown',(out/'REPORT.md').read_text())
@@ -78,6 +79,52 @@ class ReportTests(unittest.TestCase):
         validate_experiment(experiment)
         experiment['decision']='promote'
         with self.assertRaises(ValueError):validate_experiment(experiment)
+
+
+    def test_explicit_outcomes_without_acceptances_are_observed_zero(self):
+        path=self.capture()
+        summary=r.report([path],self.root/'observed-zero',outcomes={'schema':'implement-rfc.outcomes.v1','assignments':[],'events':[]})
+        self.assertEqual(summary['outcomes']['accepted_task_count'],0)
+        self.assertEqual(summary['outcomes']['outcome_input'],'observed')
+        self.assertIsNone(summary['outcomes']['observed_tokens_per_accepted_task'])
+        self.assertIn('Explicitly accepted tasks: 0.',(self.root/'observed-zero/REPORT.md').read_text())
+        with self.assertRaises(ValueError):Outcomes({})
+
+    def test_transitive_lineage_unknown_parents_and_cycles(self):
+        sessions={key:{'key':key,'provider':'codex','project':'p','kind':'subagent',
+                      'session_id':key,'role':'unknown','parent_session':parent}
+                  for key,parent in [('root',None),('integrator-1','root'),('worker','integrator-1'),
+                                     ('grandchild','worker'),('integrator-2','root'),('orphan','absent'),
+                                     ('cycle-a','cycle-b'),('cycle-b','cycle-a'),('unknown',None)]}
+        sessions['root']['kind']='primary'
+        lineage=r.session_lineage(sessions)
+        self.assertEqual(lineage['grandchild'],{'family_root':'root','lineage_depth':3,'lineage_status':'observed'})
+        self.assertEqual(lineage['integrator-2']['family_root'],'root')
+        for key in ('orphan','cycle-a','cycle-b','unknown'):self.assertIsNone(lineage[key]['family_root'])
+        self.assertEqual(lineage['cycle-a']['lineage_status'],'parent_cycle')
+        sessions['worker']['project']='different'
+        self.assertIsNone(r.session_lineage(sessions)['grandchild']['family_root'])
+
+    def test_legacy_native_parent_fields_resolve_both_providers(self):
+        for provider in ('codex','claude'):
+            sessions={'root':{'provider':provider,'project':'p','session_id':'root-id','agent_id':None,'kind':'primary'},
+                      'integrator':{'provider':provider,'project':'p','session_id':'integrator-id' if provider=='codex' else 'root-id',
+                                    'agent_id':None if provider=='codex' else 'integrator-id','kind':'subagent',
+                                    'parent_agent_id':'root-id' if provider=='codex' else None},
+                      'leaf':{'provider':provider,'project':'p','session_id':'leaf-id' if provider=='codex' else 'root-id',
+                              'agent_id':None if provider=='codex' else 'leaf-id','kind':'subagent','parent_agent_id':'integrator-id'}}
+            lineage=r.session_lineage(sessions)
+            self.assertEqual(lineage['leaf']['family_root'],'root' if provider=='codex' else None)
+            # Claude's missing parentAgentId cannot be guessed to mean direct-root.
+
+    def test_alternate_agreement_is_not_an_unknown_attempt(self):
+        outcome=Outcomes({'schema':'implement-rfc.outcomes.v1','assignments':[],
+            'events':[{'event_id':'accepted','state':'accepted','task_id':'task','timestamp':'2026-09-07T12:00:00Z','evidence_ref':'verdict'}]})
+        outcome.observe({'classification':'alternate_observation','anomalies':[]})
+        outcome.observe({'task_id':'task','attempt_id':'1','classification':'request_reconciled','tokens':{'input_tokens':10,'output_tokens':1}})
+        self.assertEqual(outcome.summary()['observed_tokens_per_accepted_task'],11)
+        outcome.observe({'classification':'alternate_observation','anomalies':['alternate_coverage_unresolved']})
+        self.assertIsNone(outcome.summary()['observed_tokens_per_accepted_task'])
 
 
 if __name__=='__main__':unittest.main()

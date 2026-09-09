@@ -165,6 +165,78 @@ class AuditTests(unittest.TestCase):
         again=subprocess.run(command,capture_output=True,text=True); self.assertNotEqual(again.returncode,0)
 
 
+    def test_native_response_owner_is_not_inherited_turn_context(self):
+        rows=[self.xe('session_meta',{'id':'child','cwd':str(self.project),'parent_thread_id':'root'}),
+              self.xe('turn_context',{'turn_id':'t','model':'configured-model','effort':'high'}),
+              self.xe('token_usage_record',{'thread_id':'child','response_id':'r','turn_id':'t',
+                       'usage':{'input_tokens':100,'cached_input_tokens':80,'cache_write_input_tokens':0,'output_tokens':10},
+                       'private':'PRIVATE SOURCE'}),
+              self.xe('token_usage_record',{'thread_id':'root','response_id':'inherited','turn_id':'t',
+                       'usage':{'input_tokens':20,'output_tokens':2}}),
+              self.xe('event_msg',{'type':'token_usage_record','response_id':'owner-missing','turn_id':'t',
+                       'usage':{'input_tokens':30,'output_tokens':3}}),
+              self.xe('token_usage_record',{'thread_id':'child','response_id':'','usage':{'input_tokens':10,'output_tokens':1}})]
+        write(self.cx/'sessions/child.jsonl',rows)
+        audit=self.audit();records=[e for e in self.events if e['kind']=='response_usage']
+        self.assertEqual([e['ownership'] for e in records],['explicit','other_thread','owner_missing','explicit'])
+        self.assertEqual(records[0]['owner_session'],u.ident('codex:child'))
+        self.assertIsNone(records[-1]['response_id'])
+        self.assertEqual(records[0]['model'],'unknown')
+        self.assertEqual(records[0]['usage']['cache_write_input_tokens'],0)
+        self.assertEqual(audit.sessions[u.ident('codex:child')]['parent_session'],u.ident('codex:root'))
+        self.assertNotIn('PRIVATE SOURCE',(self.out/'events.jsonl').read_text())
+
+    def test_public_owning_family_capture_report(self):
+        fixture=Path(__file__).resolve().parents[3]/'docs/rfcs/assets/agent-skills-interactive-coordinator-2026-09-08/fixtures/owning-response.synthetic.json'
+        original=fixture.read_bytes();value=json.loads(original)
+        for thread in value['lineage']:
+            native=thread['thread'];parent=thread['parent']
+            rows=[self.xe('session_meta',{'id':native,'cwd':str(self.project),
+                  'parent_thread_id':parent,'agent_role':'rfc-integrator' if native.startswith('integrator') else 'unknown'})]
+            baseline=self.xe('event_msg',{'type':'token_count','thread_id':native,
+                     'info':{'total_token_usage':{'input_tokens':0,'output_tokens':0}}})
+            baseline['timestamp']='2026-09-06T23:59:59Z';rows.append(baseline)
+            owning=[v for v in value['records'] if v['file_thread']==native]
+            rows += [self.xe(v['type'],{**v['payload'],'private':'PRIVATE SOURCE'}) for v in owning]
+            usage_counts=owning[0]['payload']['usage']
+            total=self.xe('event_msg',{'type':'token_count','thread_id':native,
+                     'info':{'total_token_usage':{'input_tokens':usage_counts['input_tokens'],'output_tokens':usage_counts['output_tokens']}}})
+            total['timestamp']='2026-09-07T12:00:01Z';rows.append(total)
+            write(self.cx/'sessions'/f'{native}.jsonl',rows)
+        capture=self.root/'family.zip'
+        command=[sys.executable,'-B',str(Path(u.__file__).with_name('usage.py')),'--project',f'Example={self.project}',
+                 '--since','2026-09-07','--until','2026-09-08','--claude-home',str(self.ch),'--codex-home',str(self.cx),'--out',str(capture)]
+        done=subprocess.run(command,capture_output=True,text=True)
+        self.assertEqual(done.returncode,0,done.stderr)
+        captured=capture.read_bytes()
+        with zipfile.ZipFile(capture) as archive:
+            for name in archive.namelist():self.assertNotIn(b'PRIVATE SOURCE',archive.read(name))
+            events=[json.loads(line) for line in archive.read('events.jsonl').splitlines()]
+            self.assertEqual(len([e for e in events if e['kind']=='response_usage']),4)
+        for observed in (False,True):
+            out=self.root/('family-observed' if observed else 'family-missing')
+            command=[sys.executable,'-B',str(Path(u.__file__).with_name('usage_report.py')),str(capture),'--out',str(out)]
+            if observed:
+                outcomes={'schema':'implement-rfc.outcomes.v1','assignments':[
+                    {'session':u.ident('codex:'+t['thread']),'task_id':'capability','attempt_id':str(i),
+                     'evidence_ref':'synthetic-assignment','since':'2026-09-07T00:00:00Z','until':'2026-09-08T00:00:00Z'}
+                    for i,t in enumerate(value['lineage'])],
+                    'events':[{'event_id':'accepted','state':'accepted','task_id':'capability','timestamp':STAMP,'evidence_ref':'synthetic-verdict'}]}
+                path=self.root/'outcomes.json';path.write_text(json.dumps(outcomes));command+=['--outcomes',str(path)]
+            done=subprocess.run(command,capture_output=True,text=True)
+            self.assertEqual(done.returncode,0,done.stderr)
+            report=json.loads((out/'summary.json').read_text());summary=report['captures'][0]
+            self.assertEqual(summary['classification_rows'],{'alternate_observation':4,'request_reconciled':4})
+            self.assertEqual(sum(g['observed_tokens'] for g in summary['groups']),825)
+            self.assertEqual(summary['families'],[{'root_session':u.ident('codex:coordinator'),
+                'observed_tokens':825,'unknown_rows':0,'session_count':4,'coverage':'observed_descendants_only'}])
+            self.assertEqual(summary['session_lineage'][u.ident('codex:worker-1')]['lineage_depth'],2)
+            self.assertEqual(report['outcomes']['accepted_task_count'],1 if observed else None)
+            self.assertEqual(report['outcomes']['observed_tokens_per_accepted_task'],825 if observed else None)
+        self.assertEqual(capture.read_bytes(),captured)
+        self.assertEqual(fixture.read_bytes(),original)
+
+
 class CaptureBoundsTests(AuditTests):
     def collector(self):
         audit = u.Collector(self.projects, u.dt('2026-09-07T00:00:00Z'), u.dt('2026-09-08T00:00:00Z'), self.out, 0, 4096)

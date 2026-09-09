@@ -103,3 +103,10 @@ links update policy immediately on disk; generated role adapters need an
 explicit render in the selected consumer, and active hosts may cache both.
 
 Historical `rfc-worker-routine`, `rfc-critical-reviewer` and routine decisions remain raw history. New selectors use `rfc-worker`, `rfc-worker-deep` and `rfc-reviewer-critical`. A generic historical worker without contemporaneous routing evidence remains unclassified; current models and dates cannot relabel it. Collect admitted assignments before regenerating; explicitly reissue when necessary, preserving original route evidence. No live session is hot-migrated.
+
+For whole-family consumption, use [usage collection](usage-collection.md) and
+`usage_report.py`. Its ancestry comes from observed native parent identities,
+including multiple integrator generations and their transitive descendants.
+Role activity counts are not task outcomes. Missing parents, unsupported usage
+surfaces and absent outcome input remain unknown; owning responses and alternate
+counter totals are never additive spend.

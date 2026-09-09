@@ -23,7 +23,8 @@ def validate_experiment(value):
 
 class Outcomes:
     def __init__(self,document=None):
-        document=document or {'schema':'implement-rfc.outcomes.v1','assignments':[],'events':[]}
+        self.input_observed=document is not None
+        if document is None:document={'schema':'implement-rfc.outcomes.v1','assignments':[],'events':[]}
         if document.get('schema')!='implement-rfc.outcomes.v1':raise ValueError('Unknown outcome schema')
         self.assignments=document.get('assignments',[]);events=document.get('events',[])
         if not isinstance(self.assignments,list) or not isinstance(events,list) or len(self.assignments)>10000 or len(events)>50000:raise ValueError('Outcome input exceeds bounds')
@@ -66,6 +67,7 @@ class Outcomes:
         return candidates[0]['task_id']
 
     def observe(self,row):
+        if row.get('classification')=='alternate_observation' and not row.get('anomalies'):return
         task=self.assign(row)
         if task is None:self.counts['unassigned_ledger_rows']+=1;return
         if row['classification'] not in ('request_reconciled','aggregate_only'):
@@ -77,7 +79,8 @@ class Outcomes:
     def summary(self):
         accepted=[task for task,value in self.tasks.items() if value['accepted']]
         all_tokens=sum(self.token_totals.values())
-        return {'tasks':self.tasks,'events':dict(self.counts),'accepted_task_count':len(accepted),
+        return {'tasks':self.tasks,'events':dict(self.counts),'accepted_task_count':len(accepted) if self.input_observed else None,
+                'outcome_input':'observed' if self.input_observed else 'missing',
                 'all_assigned_attempt_tokens':all_tokens,'unknown_rows_by_task':dict(self.unknown),
                 'observed_tokens_per_accepted_task':all_tokens/len(accepted) if accepted and all(task in self.token_totals for task in accepted) and not self.unknown and not self.counts['unassigned_ledger_rows'] else None,
                 'limitation':'Includes joined failures, recovery, review and repair; unassigned/unknown rows prevent an exact all-in ratio. No acceptance inferred from collection.'}

@@ -82,6 +82,32 @@ through capture.
 Duplicate captures are compared separately rather than summed. Missing baselines,
 ownership or serving settings remain unknown; synthetic errors are separate.
 
+Codex `token_usage_record` observations require the payload's owning thread and
+response ID. Repeated copies of one response under the same owner count once;
+conflicting copies and missing identities stay unknown. Input/cache and
+output/reasoning remain parent/subset counts. Native response totals take
+precedence over legacy request/turn/thread counters in the same session; those
+alternate observations are never added. A comparable baseline interval or exact
+response can corroborate them. Disagreement and unresolved overlap remain in the
+ledger, so partially covered legacy intervals cannot claim complete consumption.
+Sessions without owning response records retain the v1/v2 cumulative fallback.
+Unknown native shapes remain visible in the capture's shape inventory; they do
+not establish zero usage or known ownership.
+
+The report's `session_lineage`, `families` and ledger ancestry columns follow
+explicit native parent links transitively, including successive integrators,
+leaves, deeper descendants and resumed sessions. Legacy parent fields remain
+readable. Missing/conflicting parents and cycles stay unknown; the observed
+family is not a certificate that every descendant history was retained. Roles
+never assign a task, outcome or parent. Project scope is unchanged: missing or
+unselected parent histories are not fetched or silently added.
+
+Absent `--outcomes` produces `outcome_input: missing`, a null accepted task count
+and no per-accepted-task ratio. An explicitly supplied outcomes document with no
+accepted events reports an observed zero instead. Neither case establishes zero
+productivity. Alternate counters that corroborate counted responses do not
+create extra attempts; unresolved discrepancies still prevent an exact ratio.
+
 Acceptance comes from explicit outcome records, not completion text or a moved
 card inferred from time. Reopened tasks leave the accepted denominator; review,
 failed attempts and recovery still count toward attributable all-in consumption.
@@ -89,3 +115,8 @@ Unassigned/unknown usage prevents a precise per-accepted-task claim. Price
 equivalents from dated rates are estimates, not subscription charges. Compare
 routing, orchestration and instruction changes separately; heterogeneous real
 backlog work is observational and cannot automatically promote a profile.
+
+The coordinator/integrator rollout changes topology, instructions and coordinator
+route together. It is a combined observational rollout, not a one-factor
+experiment. Existing experiment validation and unmatched-promotion restrictions
+remain unchanged; token observations alone establish neither savings nor quality.

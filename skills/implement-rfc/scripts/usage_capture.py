@@ -26,10 +26,10 @@ import sys
 import tempfile
 import zipfile
 
-VERSION = '2.0.0'
+VERSION = '2.1.0'
 UTC = timezone.utc
 TOKEN_KEYS = ('input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens',
-              'cached_input_tokens', 'output_tokens', 'reasoning_output_tokens',
+              'cached_input_tokens', 'cache_write_input_tokens', 'output_tokens', 'reasoning_output_tokens',
               'total_tokens', 'ephemeral_5m_input_tokens', 'ephemeral_1h_input_tokens')
 KNOWN_TOOLS = {'Agent', 'Task', 'SendMessage', 'TaskOutput', 'TaskStop', 'Read', 'Grep',
                'Glob', 'Bash', 'Edit', 'Write', 'Skill', 'spawn_agent', 'send_input',
@@ -315,6 +315,8 @@ class Collector:
         key = ident(provider + ':' + str(native) + (':' + str(agent) if agent else ''))
         out = self.sessions.setdefault(key, {'key': key, 'provider': provider, 'project': project,
             'session_id': ident(native), 'agent_id': ident(agent), 'parent_agent_id': ident(parent),
+            'parent_session': ident(provider + ':' + str(parent)) if provider == 'codex' and parent else (
+                ident(provider + ':' + str(native) + ':' + str(parent)) if agent and parent else None),
             'kind': 'subagent' if agent or parent else 'primary', 'role': atom(role),
             'role_evidence': 'runtime_metadata' if role else 'unknown', 'events': 0,
             'source_ids': []})
@@ -505,11 +507,26 @@ class Collector:
             ownership = 'explicit' if p.get('thread_id') == native or t in owned_turns else (
                 'uncertain_fork_or_child' if is_child or session['forked_from'] else 'primary_log')
             context = contexts.get(t or turn, {'model': 'unknown', 'effort': 'unknown', 'service_tier': 'unknown'})
-            if typ == 'event_msg':
+            if typ == 'token_usage_record' or (typ == 'event_msg' and p.get('type') == 'token_usage_record'):
+                # The file is provenance, not response ownership: inherited copies
+                # cannot become requests of the child which retained them.
+                owner = p.get('thread_id')
+                owner = owner if isinstance(owner, str) and owner.strip() else None
+                response = p.get('response_id')
+                response = response if isinstance(response, str) and response.strip() else None
+                self.emit(session, 'response_usage', when, path, line,
+                          owner_session=ident('codex:' + str(owner)) if owner else None,
+                          response_id=ident(response), turn_id=ident(t or None),
+                          ownership='explicit' if owner == native else 'other_thread' if owner else 'owner_missing',
+                          usage=tokens(p.get('usage')),
+                          model=atom(p.get('model')), effort=atom(p.get('effort')),
+                          service_tier=atom(p.get('service_tier')))
+            elif typ == 'event_msg':
                 name = p.get('type')
                 if name == 'token_count':
                     info = obj(p.get('info'))
                     self.emit(session, 'token_observation', when, path, line, turn_id=ident(t or turn),
+                              response_id=ident(p.get('response_id')),
                               ownership=ownership, context_is_configuration_not_response=True, **context,
                               cumulative=tokens(info.get('total_token_usage')),
                               last=tokens(info.get('last_token_usage')),

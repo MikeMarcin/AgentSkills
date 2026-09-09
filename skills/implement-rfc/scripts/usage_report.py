@@ -68,6 +68,45 @@ class Capture:
     def close(self):self.archive.close()
 
 
+def session_lineage(sessions):
+    """Resolve only observed native parent edges, including older v1/v2 captures.
+
+    An observed root does not certify complete family coverage. Roles never
+    establish ancestry or acceptance/task identity.
+    """
+    native={}
+    for key,session in sessions.items():
+        native.setdefault((session.get('provider'),session.get('session_id'),session.get('agent_id')),[]).append(key)
+    parents={};resolved={}
+    for key,session in sessions.items():
+        parent=session.get('parent_session')
+        if not parent and session.get('parent_agent_id'):
+            identity=(session.get('provider'),session.get('parent_agent_id'),None) if session.get('provider')=='codex' else (
+                session.get('provider'),session.get('session_id'),session.get('parent_agent_id'))
+            candidates=native.get(identity,[])
+            if len(candidates)!=1:
+                resolved[key]={'family_root':None,'lineage_depth':None,'lineage_status':'missing_or_ambiguous_parent'}
+                continue
+            parent=candidates[0]
+        if parent:
+            target=sessions.get(parent)
+            if not target or any(target.get(k)!=session.get(k) for k in ('project','provider','provider_account_alias','device_alias')):
+                resolved[key]={'family_root':None,'lineage_depth':None,'lineage_status':'missing_or_conflicting_parent'}
+            else:parents[key]=parent
+        elif session.get('kind')=='primary' and not session.get('forked_from') and not session.get('ownership_conflict'):
+            resolved[key]={'family_root':key,'lineage_depth':0,'lineage_status':'observed'}
+        else:resolved[key]={'family_root':None,'lineage_depth':None,'lineage_status':'parent_unknown'}
+    for key in sessions:
+        path=[];seen=set();current=key
+        while current not in resolved and current not in seen:
+            seen.add(current);path.append(current);current=parents[current]
+        result=resolved.get(current,{'family_root':None,'lineage_depth':None,'lineage_status':'parent_cycle'})
+        for child in reversed(path):
+            result={**result,'lineage_depth':result['lineage_depth']+1 if result['lineage_depth'] is not None else None}
+            resolved[child]=result
+    return resolved
+
+
 def csv_row(writer,row):
     writer.writerow({k: "'"+v if isinstance(v,str) and v.startswith(('=','+','-','@','\t','\r','\n')) else v for k,v in row.items()})
 
@@ -83,11 +122,14 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
         with tempfile.TemporaryDirectory(prefix='rfc-usage-report-') as tmp:
             root=Path(tmp);results=[];all_outcomes=Outcomes(outcomes)
             with (root/'ledger.csv').open('w',newline='',encoding='utf-8') as stream:
-                writer=csv.DictWriter(stream,fieldnames=['capture','project','provider','session','task','classification','input_tokens','output_tokens','anomalies','role','session_kind','model','effort','price_equivalent','price_unit'])
+                writer=csv.DictWriter(stream,fieldnames=['capture','project','provider','session','response','family_root','lineage_depth','lineage_status','task','classification','input_tokens','output_tokens','anomalies','role','session_kind','model','effort','price_equivalent','price_unit'])
                 writer.writeheader()
                 for index,capture in enumerate(captures):
                     all_outcomes=Outcomes(outcomes)
                     sessions={v['key']:v for v in capture.json('sessions.json',[]) if isinstance(v,dict) and 'key' in v}
+                    lineage=session_lineage(sessions)
+                    family_sizes=Counter(v['family_root'] for v in lineage.values() if v['family_root'])
+                    family_tokens=Counter();family_unknown=Counter()
                     buckets=Counter();groups=Counter();unknown=Counter();activity=Counter();rate_coverage=Counter()
                     for event in capture.events():
                         if event.get('kind')=='tool_call':
@@ -96,21 +138,33 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
                     for row in reconcile(capture.events(),capture.json('counter_baselines.json',[]),capture.manifest['schema']):
                         session=sessions.get(row.get('session'),{})
                         row['role']=session.get('role','unknown');row['session_kind']=session.get('kind','unknown')
+                        row.update(lineage.get(row.get('session'),{'family_root':None,'lineage_depth':None,'lineage_status':'session_metadata_missing'}))
                         classification=row['classification'];buckets[classification]+=1;counts=row.get('tokens') or {}
                         key=(row.get('project') or 'unassigned',row.get('provider') or 'unknown',classification,row['role'],row['session_kind'],row.get('model'),row.get('effort'))
                         if classification in ('request_reconciled','aggregate_only'):
                             groups[key]+=counts.get('input_tokens',0)+counts.get('output_tokens',0)
-                        else:unknown[key]+=1
+                        elif classification!='alternate_observation' or row['anomalies']:unknown[key]+=1
+                        if row['family_root']:
+                            if classification in ('request_reconciled','aggregate_only'):
+                                family_tokens[row['family_root']]+=counts.get('input_tokens',0)+counts.get('output_tokens',0)
+                            elif classification!='alternate_observation' or row['anomalies']:family_unknown[row['family_root']]+=1
                         all_outcomes.observe(row)
                         price=estimate(row,rates,rate_mode)
                         rate_coverage['known' if price['amount'] is not None else 'unknown']+=1
                         csv_row(writer,{'capture':index,'project':row.get('project'),'provider':row.get('provider'),'session':row.get('session'),
+                                         'response':row.get('response_id'),**{k:row[k] for k in ('family_root','lineage_depth','lineage_status')},
                                          'task':all_outcomes.assign(row),'classification':classification,'input_tokens':counts.get('input_tokens'),
                                          'output_tokens':counts.get('output_tokens'),'anomalies':';'.join(row['anomalies']),'role':row['role'],'session_kind':row['session_kind'],'model':row.get('model'),'effort':row.get('effort'),'price_equivalent':price['amount'],'price_unit':price.get('unit')})
                     results.append({'capture':index,'schema':capture.manifest['schema'],'classification_rows':dict(buckets),
                                     'groups':[{'project':k[0],'provider':k[1],'classification':k[2],'observed_tokens':v,'role':k[3],'session_kind':k[4],'model':k[5],'effort':k[6]} for k,v in groups.items()],
                                     'unknown_groups':[{'project':k[0],'provider':k[1],'classification':k[2],'rows':v} for k,v in unknown.items()],
                                     'activity':dict(activity),'rate_coverage':dict(rate_coverage),'rate_mode':rate_mode,'coverage':capture.manifest.get('coverage','legacy_or_unknown'),
+                                    'families':[{'root_session':key,'observed_tokens':family_tokens[key],
+                                                 'unknown_rows':family_unknown[key],
+                                                 'session_count':family_sizes[key],
+                                                 'coverage':'observed_descendants_only'}
+                                                for key in sorted({v['family_root'] for v in lineage.values() if v['family_root']})],
+                                    'session_lineage':lineage,
                                     'outcomes':all_outcomes.summary(),
                                     'account_snapshots':[sanitize_snapshot(v) for v in capture.json('quota_snapshots.json',[])],
                                     'possible_cross_capture_duplicates':'not_summed_across_captures'})
@@ -124,11 +178,13 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
                     for group in result['groups']:csv_row(writer,{'capture':result['capture'],**group})
             (root/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
             accepted=summary['outcomes']['accepted_task_count']
+            if accepted is None:accepted='unknown (outcome input missing)'
             lines=['# Offline usage report','',f'Captures: {len(captures)}. Explicitly accepted tasks: {accepted}.',
                    '', 'Reconciled requests, aggregate-only deltas and unknown observations are separate. Cache and reasoning subsets are not added twice.',
                    'No subscription spend, quota debit, quality improvement or experiment winner is inferred.',
                    'Copied history across captures is not summed into a comparison total. Account pools remain opaque; concurrent account activity prevents attribution.',
-                   'Produced, collected and accepted work are distinct. Unassigned work remains visible; zero accepted work has no cost-per-accepted denominator.','']
+                   'Produced, collected and accepted work are distinct. Missing outcome input is unknown; explicitly observed zero accepted work also has no cost-per-accepted denominator.',
+                   'Families follow observed transitive native parent links across integrator generations. Missing parents remain unknown; retained descendants do not prove complete family coverage. Roles are not task identities.','']
             for result in results:
                 lines += [f"Capture {result['capture']}: {result['coverage']}; ledger classes {result['classification_rows']}.",
                           f"Control activity: {result['activity']}."]
