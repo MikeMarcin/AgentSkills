@@ -286,7 +286,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "0a73855a95b05c69d897f8171d9bf20d459920d53e28ee23ccacdfcb46f2dae7"
+      "sha256": "1d070cb70be4512453d79322d57a191f32183d8d1ef64390b6022f37ddefe7cc"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -357,6 +357,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "3a51f26a70d32beb",
+  "portable_digest": "01651314d3faba56",
   "schema": "implement-rfc.portable-manifest.v1"
 }
