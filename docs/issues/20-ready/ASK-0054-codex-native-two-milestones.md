@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0054"
 title: "Qualify two unattended milestones in native interactive Codex"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0053"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "codex-native-two-milestones", "milestone": "M2"}
