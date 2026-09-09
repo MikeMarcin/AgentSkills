@@ -51,6 +51,48 @@ class RoleMigrationTests(unittest.TestCase):
         return {str(p.relative_to(root)): p.read_bytes() for p in root.rglob('*')
                 if p.is_file() and not p.is_symlink() and '.git' not in p.parts}
 
+    def historical_max_turn_run(self, root):
+        run = root / '.mask/generated/implement-rfc/runs/historical'
+        run.mkdir(parents=True)
+        order = {
+            'run_id': 'historical',
+            'tasks': [{'id': 'worker', 'kind': 'agent'}],
+        }
+        (run / 'order.json').write_text(json.dumps(order))
+        outer = [
+            {'task_id': '__run__', 'event': 'admitted'},
+            {'task_id': 'worker', 'event': 'dispatch_intent',
+             'attempt_id': 'worker-1'},
+            {'task_id': 'worker', 'event': 'running', 'attempt_id': 'worker-1',
+             'driver_session_id': 'session-1', 'driver_turn_id': 'turn-1'},
+            {'task_id': 'worker', 'event': 'completion_unknown',
+             'attempt_id': 'worker-1', 'report_path': None,
+             'semantic_acceptance': 'not_decided_by_runner'},
+        ]
+        lifecycle = [
+            {'run_id': 'historical', 'task_id': 'worker', 'attempt_id': 'worker-1',
+             'sequence': 0, 'event': 'dispatch_intent'},
+            {'run_id': 'historical', 'task_id': 'worker', 'attempt_id': 'worker-1',
+             'sequence': 1, 'event': 'native_identity',
+             'driver_session_id': 'session-1', 'driver_turn_id': 'turn-1'},
+            {'run_id': 'historical', 'task_id': 'worker', 'attempt_id': 'worker-1',
+             'sequence': 2, 'event': 'dispatched',
+             'driver_session_id': 'session-1', 'driver_turn_id': 'turn-1'},
+            {'run_id': 'historical', 'task_id': 'worker', 'attempt_id': 'worker-1',
+             'sequence': 3, 'event': 'execution_failed', 'reason': 'max_turns',
+             'native_event_id': 'event-1'},
+            {'run_id': 'historical', 'task_id': 'worker', 'attempt_id': 'worker-1',
+             'sequence': 4, 'event': 'native_event_handled',
+             'native_event_id': 'event-1'},
+        ]
+        (run / 'events.jsonl').write_text(
+            ''.join(json.dumps(record) + '\n' for record in outer)
+        )
+        (run / 'lifecycle.jsonl').write_text(
+            ''.join(json.dumps(record) + '\n' for record in lifecycle)
+        )
+        return run, order, outer, lifecycle
+
     def test_clean_retirement_check_purity_and_repeat(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); self.legacy(root)
@@ -145,6 +187,75 @@ class RoleMigrationTests(unittest.TestCase):
             (run / 'events.jsonl').write_text('{"task_id":"worker","event":"collected"}\n')
             self.assertEqual(self.run_renderer(root).returncode, 0)
             self.assertEqual(json.loads((run / 'order.json').read_text()), order)
+
+    def test_handled_native_max_turn_failure_releases_historical_assignment(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); self.legacy(root)
+            run, _, _, _ = self.historical_max_turn_run(root)
+            journals = {name: (run / name).read_bytes()
+                        for name in ('order.json', 'events.jsonl', 'lifecycle.jsonl')}
+            result = self.run_renderer(root)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(journals, {name: (run / name).read_bytes()
+                                       for name in journals})
+
+    def test_uncertain_native_failure_evidence_keeps_assignment_active(self):
+        cases = {
+            'missing handled': lambda order, outer, lifecycle: lifecycle.pop(),
+            'mismatched run': lambda order, outer, lifecycle:
+                order.update(run_id='different'),
+            'mismatched attempt': lambda order, outer, lifecycle:
+                outer[-1].update(attempt_id='worker-2'),
+            'missing outer dispatch': lambda order, outer, lifecycle:
+                outer.pop(1),
+            'mismatched outer session': lambda order, outer, lifecycle:
+                outer[-2].update(driver_session_id='other'),
+            'mismatched task': lambda order, outer, lifecycle:
+                lifecycle[3].update(task_id='other'),
+            'mismatched session': lambda order, outer, lifecycle:
+                lifecycle[2].update(driver_session_id='other'),
+            'mismatched native event': lambda order, outer, lifecycle:
+                lifecycle[-1].update(native_event_id='other'),
+            'later recovery': lambda order, outer, lifecycle: lifecycle.append({
+                'run_id': 'historical', 'task_id': 'worker', 'attempt_id': 'worker-1',
+                'sequence': 5, 'event': 'recovery_intent'}),
+            'later reused outer attempt': lambda order, outer, lifecycle: outer.extend([
+                {'task_id': 'worker', 'event': 'running', 'attempt_id': 'worker-1',
+                 'driver_session_id': 'session-2', 'driver_turn_id': 'turn-2'},
+                {'task_id': 'worker', 'event': 'completion_unknown',
+                 'attempt_id': 'worker-1', 'report_path': None,
+                 'semantic_acceptance': 'not_decided_by_runner'},
+            ]),
+        }
+        for name, mutate in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp); self.legacy(root)
+                run, order, outer, lifecycle = self.historical_max_turn_run(root)
+                mutate(order, outer, lifecycle)
+                (run / 'order.json').write_text(json.dumps(order))
+                (run / 'events.jsonl').write_text(
+                    ''.join(json.dumps(record) + '\n' for record in outer)
+                )
+                (run / 'lifecycle.jsonl').write_text(
+                    ''.join(json.dumps(record) + '\n' for record in lifecycle)
+                )
+                before = self.snapshot(root)
+                result = self.run_renderer(root)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn('active assignments', result.stderr)
+                self.assertEqual(before, self.snapshot(root))
+
+    def test_torn_native_failure_journal_keeps_assignment_active(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); self.legacy(root)
+            run, _, _, _ = self.historical_max_turn_run(root)
+            lifecycle = run / 'lifecycle.jsonl'
+            lifecycle.write_bytes(lifecycle.read_bytes().rstrip(b'\n'))
+            before = self.snapshot(root)
+            result = self.run_renderer(root)
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertIn('active assignments', result.stderr)
+            self.assertEqual(before, self.snapshot(root))
 
     def test_retired_overrides_fail_explicitly(self):
         roles = renderer.validate_roles(renderer.load_json(Path(__file__).resolve().parents[1] / 'config/roles.json'))

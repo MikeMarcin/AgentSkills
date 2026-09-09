@@ -86,7 +86,7 @@
     },
     {
       "path": "references/role-adoption.md",
-      "sha256": "e20102636421c456dd734407b7ecc8e038675174f7d2ebdc5fe34ecb333d6848"
+      "sha256": "07ef79fc47518543ddb135aacc864b4bf86f748e2783d7d9dd9f7ed171cce4ea"
     },
     {
       "path": "references/routing-audit.md",
@@ -178,7 +178,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "4ef251a3230e89bc0683f314d621199b61351f7c121b9f0e7d5d4d32f5427ec0"
+      "sha256": "e5898f21e9ebf3933e4a2236e3125ca1d1b9590f05d889b15fef6fd42a3cef7d"
     },
     {
       "path": "scripts/role_usage.py",
@@ -290,7 +290,7 @@
     },
     {
       "path": "tests/test_role_migration.py",
-      "sha256": "4e2e6fc1e0b868ca25f1e13f0f7952ec0b846e4cb7039c1c730439c677285574"
+      "sha256": "b9f965f6607bd3e571034bb4678638a6fd67f705a09627b8c8ad916d8bc5ac0b"
     },
     {
       "path": "tests/test_role_usage.py",
@@ -357,6 +357,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "01651314d3faba56",
+  "portable_digest": "ab75e142e56ec7cc",
   "schema": "implement-rfc.portable-manifest.v1"
 }
