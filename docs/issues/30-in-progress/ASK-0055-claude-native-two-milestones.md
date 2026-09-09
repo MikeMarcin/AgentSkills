@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0055"
 title: "Qualify two unattended milestones in native interactive Claude Code"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0053"]
 metadata: {"packet": "agent-skills-interactive-coordinator-2026-09-08", "provisional_id": false, "packet_key": "claude-native-two-milestones", "milestone": "M2"}
