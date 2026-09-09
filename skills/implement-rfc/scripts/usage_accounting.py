@@ -133,14 +133,18 @@ def reconcile(events,baselines=(),schema='rfc-usage-evidence.v2'):
                     if event.get('ownership') in UNCERTAIN_OWNERSHIP:
                         yield ledger_row(event,'ownership_uncertain',anomalies=['inherited_or_conflicting_ownership']);continue
                     if native_sessions.get(key):
-                        if current and prior and current==prior['counters'] and not event.get('response_id'):continue
-                        anomalies=[];comparison=None
-                        if event.get('response_id') and event.get('last'):
-                            group=native.get(key+[event['response_id']])
+                        if current and prior and current==prior['counters'] and not event.get('response_id') and not event.get('last'):continue
+                        anomalies=[];comparisons=[]
+                        if event.get('last'):
+                            comparison=None
+                            group=native.get(key+[event['response_id']]) if event.get('response_id') else None
                             if group and not group['conflicts']:
                                 comparison=codex_counts(group['usage'])
-                            observed=codex_counts(tokens(event['last']))
-                        else:
+                            comparisons.append((codex_counts(tokens(event['last'])),comparison))
+                        # Request and cumulative surfaces are independent evidence.
+                        # Agreement on one cannot erase a conflict or gap on the other.
+                        if current or not event.get('last'):
+                            comparison=None
                             observed=codex_counts({k:current[k]-prior['counters'][k] for k in KEYS
                                 if type(current.get(k)) is int and prior and type(prior['counters'].get(k)) is int}) if prior else None
                             if prior and dt(prior.get('timestamp')):
@@ -155,9 +159,12 @@ def reconcile(events,baselines=(),schema='rfc-usage-evidence.v2'):
                                         elif name not in comparison or comparison[name] is not None:
                                             comparison[name]=comparison.get(name,0)+counts[name]
                                 if not found:comparison=None
-                        if not observed or not comparison:anomalies=['alternate_coverage_unresolved']
-                        elif any(observed[k]!=comparison[k] for k in KEYS if observed.get(k) is not None and comparison.get(k) is not None):
-                            anomalies=['alternate_counter_disagreement']
+                            comparisons.append((observed,comparison))
+                        for observed,comparison in comparisons:
+                            if not observed or not comparison:anomalies.append('alternate_coverage_unresolved')
+                            elif any(observed[k]!=comparison[k] for k in KEYS if observed.get(k) is not None and comparison.get(k) is not None):
+                                anomalies.append('alternate_counter_disagreement')
+                        anomalies=list(dict.fromkeys(anomalies))
                         if current:previous[key]={'counters':current,'epoch':prior['epoch'] if prior else 0,'timestamp':event['timestamp']}
                         yield ledger_row(event,'alternate_observation',anomalies=anomalies,basis='owning_responses_preferred')
                         continue

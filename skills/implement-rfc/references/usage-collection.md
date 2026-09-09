@@ -87,8 +87,10 @@ response ID. Repeated copies of one response under the same owner count once;
 conflicting copies and missing identities stay unknown. Input/cache and
 output/reasoning remain parent/subset counts. Native response totals take
 precedence over legacy request/turn/thread counters in the same session; those
-alternate observations are never added. A comparable baseline interval or exact
-response can corroborate them. Disagreement and unresolved overlap remain in the
+alternate observations are never added. Each supplied surface must corroborate
+independently against a comparable baseline interval or exact response; a matching
+last-response counter cannot validate a conflicting cumulative counter.
+Disagreement and unresolved overlap remain in the
 ledger, so partially covered legacy intervals cannot claim complete consumption.
 Sessions without owning response records retain the v1/v2 cumulative fallback.
 Unknown native shapes remain visible in the capture's shape inventory; they do

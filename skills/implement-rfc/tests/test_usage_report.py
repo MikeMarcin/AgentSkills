@@ -81,6 +81,33 @@ class ReportTests(unittest.TestCase):
         with self.assertRaises(ValueError):validate_experiment(experiment)
 
 
+    def test_public_conflicting_cumulative_prevents_exact_outcome_ratio(self):
+        from test_usage_accounting import event
+        owning=event(1,kind='response_usage',owner_session='s',response_id='r',
+                     usage={'input_tokens':100,'cached_input_tokens':80,'output_tokens':10,'reasoning_output_tokens':2})
+        for cumulative,baseline,anomaly in ((900,True,'alternate_counter_disagreement'),
+                                            (100,False,'alternate_coverage_unresolved')):
+            name=f'{cumulative}-{baseline}'
+            alternate=event(2,response_id='r',last=owning['usage'],
+                            cumulative={'input_tokens':cumulative,'output_tokens':90 if cumulative==900 else 10})
+            baselines=[event(0,cumulative={'input_tokens':0,'output_tokens':0})] if baseline else []
+            path=self.capture(name+'.zip',extra={
+                'events.jsonl':(''.join(json.dumps(v)+'\n' for v in (owning,alternate))).encode(),
+                'counter_baselines.json':json.dumps(baselines).encode(),
+                'sessions.json':json.dumps([{'key':'s','provider':'codex','project':'p','kind':'primary'}]).encode()})
+            outcomes=self.outcome_document();outcomes['events']=outcomes['events'][:-1]
+            outcome_path=self.root/(name+'-outcomes.json');outcome_path.write_text(json.dumps(outcomes))
+            out=self.root/name
+            done=subprocess.run([sys.executable,'-B',r.__file__,str(path),'--out',str(out),'--outcomes',str(outcome_path)],capture_output=True,text=True)
+            self.assertEqual(done.returncode,0,done.stderr)
+            summary=json.loads((out/'summary.json').read_text())
+            self.assertEqual(summary['outcomes']['accepted_task_count'],1)
+            self.assertEqual(summary['outcomes']['all_assigned_attempt_tokens'],110)
+            self.assertIsNone(summary['outcomes']['observed_tokens_per_accepted_task'])
+            self.assertEqual(summary['captures'][0]['families'][0]['unknown_rows'],1)
+            self.assertEqual(summary['captures'][0]['unknown_groups'][0]['classification'],'alternate_observation')
+            self.assertIn(anomaly,(out/'ledger.csv').read_text())
+
     def test_explicit_outcomes_without_acceptances_are_observed_zero(self):
         path=self.capture()
         summary=r.report([path],self.root/'observed-zero',outcomes={'schema':'implement-rfc.outcomes.v1','assignments':[],'events':[]})

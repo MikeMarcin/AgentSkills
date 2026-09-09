@@ -79,6 +79,9 @@ def session_lineage(sessions):
         native.setdefault((session.get('provider'),session.get('session_id'),session.get('agent_id')),[]).append(key)
     parents={};resolved={}
     for key,session in sessions.items():
+        if session.get('parent_conflict'):
+            resolved[key]={'family_root':None,'lineage_depth':None,'lineage_status':'conflicting_parent'}
+            continue
         parent=session.get('parent_session')
         if not parent and session.get('parent_agent_id'):
             identity=(session.get('provider'),session.get('parent_agent_id'),None) if session.get('provider')=='codex' else (

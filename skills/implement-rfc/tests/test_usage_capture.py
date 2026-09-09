@@ -186,6 +186,39 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(audit.sessions[u.ident('codex:child')]['parent_session'],u.ident('codex:root'))
         self.assertNotIn('PRIVATE SOURCE',(self.out/'events.jsonl').read_text())
 
+    def test_conflicting_session_parents_stay_unknown_in_both_orders(self):
+        for index,parents in enumerate((('a','b'),('b','a'))):
+            for filename,native,parent in [('root-a','a',None),('root-b','b',None),
+                    ('child-first','child',parents[0]),('child-second','child',parents[1]),
+                    ('leaf','leaf','child')]:
+                write(self.cx/'sessions'/f'{filename}.jsonl',[
+                    self.xe('session_meta',{'id':native,'cwd':str(self.project),'parent_thread_id':parent}),
+                    self.xe('token_usage_record',{'thread_id':native,'response_id':'r-'+native,
+                             'usage':{'input_tokens':10,'output_tokens':1}})])
+            capture=self.root/f'parents-{index}.zip';report_dir=self.root/f'parents-report-{index}'
+            command=[sys.executable,'-B',str(Path(u.__file__).with_name('usage.py')),
+                     '--project',f'Example={self.project}','--since','2026-09-07','--until','2026-09-08',
+                     '--claude-home',str(self.ch),'--codex-home',str(self.cx),'--out',str(capture)]
+            done=subprocess.run(command,capture_output=True,text=True)
+            self.assertEqual(done.returncode,0,done.stderr)
+            with zipfile.ZipFile(capture) as archive:
+                coverage=json.loads(archive.read('coverage.json'))
+                self.assertIn('native_session_parent_conflict',[v['code'] for v in coverage['warnings']])
+                sessions=json.loads(archive.read('sessions.json'))
+                child=next(v for v in sessions if v['key']==u.ident('codex:child'))
+                self.assertTrue(child['parent_conflict'])
+                self.assertIsNone(child['parent_session'])
+            done=subprocess.run([sys.executable,'-B',str(Path(u.__file__).with_name('usage_report.py')),
+                                 str(capture),'--out',str(report_dir)],capture_output=True,text=True)
+            self.assertEqual(done.returncode,0,done.stderr)
+            report=json.loads((report_dir/'summary.json').read_text())['captures'][0]
+            for native in ('child','leaf'):
+                lineage=report['session_lineage'][u.ident('codex:'+native)]
+                self.assertIsNone(lineage['family_root'])
+                self.assertEqual(lineage['lineage_status'],'conflicting_parent')
+            self.assertEqual(sum(v['observed_tokens'] for v in report['groups']),44)
+            self.assertEqual(sum(v['observed_tokens'] for v in report['families']),22)
+
     def test_public_owning_family_capture_report(self):
         fixture=Path(__file__).resolve().parents[3]/'docs/rfcs/assets/agent-skills-interactive-coordinator-2026-09-08/fixtures/owning-response.synthetic.json'
         original=fixture.read_bytes();value=json.loads(original)

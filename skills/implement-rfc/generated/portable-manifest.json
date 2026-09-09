@@ -98,7 +98,7 @@
     },
     {
       "path": "references/usage-collection.md",
-      "sha256": "dcd75cdca8ab7f7480ea2047dc521b815e7018a2ff38fd36265cdbcbb9133493"
+      "sha256": "148b0dbec87c591649e343ecdacca581bf7412e39a6c2014b567addd20b4ec1b"
     },
     {
       "path": "references/verification-and-closeout.md",
@@ -218,11 +218,11 @@
     },
     {
       "path": "scripts/usage_accounting.py",
-      "sha256": "168e4c61ce1bfed67041e55e9b0cadb84d481aad45194d15c1b8bdb8cd015f82"
+      "sha256": "bc9e3994a1292dda60e512c6f89c570135620ea5312b9eaec7740bf8c4793a3e"
     },
     {
       "path": "scripts/usage_capture.py",
-      "sha256": "242f97380750582e6a986426a228bedb504f626dae3f25910ffb6f0162fd5e14"
+      "sha256": "6e98bf8919f21afd5ea1047bbbae0afc8589bdf36e68397c2e3285c2ed23db81"
     },
     {
       "path": "scripts/usage_outcomes.py",
@@ -234,7 +234,7 @@
     },
     {
       "path": "scripts/usage_report.py",
-      "sha256": "db609b9067dd253e0560c3dadeabd01fc2b5d0e41a9af89ce428569cdbb97676"
+      "sha256": "5936c417f695b35513ea84a8c90d4dea024f9d9bf26f5f714113b6155e6b641a"
     },
     {
       "path": "scripts/usage_scope.py",
@@ -330,11 +330,11 @@
     },
     {
       "path": "tests/test_usage_accounting.py",
-      "sha256": "86e3c27030e7b1dae7c5af4ef4130d5be09ff308225417b19ba986a49c2dee4d"
+      "sha256": "f4833a9f4a797373d8665dfdf906156179b43039a9bf442754e145b3d2384e03"
     },
     {
       "path": "tests/test_usage_capture.py",
-      "sha256": "ac584f73e6cf87778dc8bc24520e38b47880f840626eb2f589d61c0744ac833d"
+      "sha256": "86aaaf19d2acf7418f343f8c639dff2bf31d04d02c08138620df5cbeb40bd2e2"
     },
     {
       "path": "tests/test_usage_cli.py",
@@ -346,7 +346,7 @@
     },
     {
       "path": "tests/test_usage_report.py",
-      "sha256": "ba48df10e896a3ca5952e107b4d7d2552f74dcad4f9bc3b816ed01c5f2fa8e7b"
+      "sha256": "2294210ec3fcafa4cda6b866d231ac3bb165b5b2cdfac6e5890aef214d79bb98"
     },
     {
       "path": "tests/test_usage_scope.py",
@@ -357,6 +357,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "c9fe5e8282f2f057",
+  "portable_digest": "a7b553bed4a71916",
   "schema": "implement-rfc.portable-manifest.v1"
 }

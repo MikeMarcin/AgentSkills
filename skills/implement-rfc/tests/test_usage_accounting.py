@@ -110,6 +110,20 @@ class AccountingTests(unittest.TestCase):
         self.assertEqual(rows[1]['anomalies'],['alternate_coverage_unresolved'])
         self.assertEqual(sum(r['tokens']['input_tokens'] for r in rows if r['tokens']),100)
 
+    def test_each_supplied_alternate_surface_must_reconcile(self):
+        owning=self.native();baseline=event(0,cumulative={'input_tokens':0,'output_tokens':0})
+        cases=[(owning['usage'],{'input_tokens':900,'output_tokens':90},[baseline],'alternate_counter_disagreement'),
+               ({'input_tokens':900,'output_tokens':90},{'input_tokens':100,'output_tokens':10},[baseline],'alternate_counter_disagreement'),
+               (owning['usage'],{'input_tokens':100,'output_tokens':10},[],'alternate_coverage_unresolved'),
+               (owning['usage'],{'input_tokens':100,'output_tokens':10},[baseline],None)]
+        for last,cumulative,baselines,anomaly in cases:
+            with self.subTest(last=last,cumulative=cumulative,baseline=bool(baselines)):
+                alternate=event(2,response_id='r',last=last,cumulative=cumulative)
+                rows=list(reconcile([owning,alternate],baselines))
+                self.assertEqual(rows[0]['anomalies'],[anomaly] if anomaly else [])
+                self.assertIsNone(rows[0]['tokens'])
+                self.assertEqual(rows[1]['tokens']['input_tokens'],100)
+
     def test_conflicting_native_and_missing_owner_or_response_are_unknown(self):
         a=self.native()
         rows=list(reconcile([a,{**a,'event_id':'conflict','usage':{**a['usage'],'input_tokens':101}},

@@ -320,6 +320,18 @@ class Collector:
             'kind': 'subagent' if agent or parent else 'primary', 'role': atom(role),
             'role_evidence': 'runtime_metadata' if role else 'unknown', 'events': 0,
             'source_ids': []})
+        observed_parent = ident(parent)
+        if observed_parent and not out.get('parent_conflict'):
+            if out['parent_agent_id'] and out['parent_agent_id'] != observed_parent:
+                # Duplicate exports may disagree on ancestry. Keep the session's
+                # own usage, but never attach it to whichever parent arrived first.
+                out['parent_conflict'] = True
+                out['parent_agent_id'] = out['parent_session'] = None
+                self.issue(path, 'native_session_parent_conflict')
+            elif not out['parent_agent_id']:
+                out['parent_agent_id'] = observed_parent
+                out['parent_session'] = (ident(provider + ':' + str(parent)) if provider == 'codex' else
+                                         ident(provider + ':' + str(native) + ':' + str(parent)) if agent else None)
         sid = ident(str(path))
         if sid not in out['source_ids'] and len(out['source_ids']) < 100: out['source_ids'].append(sid)
         if out['project'] != project:
