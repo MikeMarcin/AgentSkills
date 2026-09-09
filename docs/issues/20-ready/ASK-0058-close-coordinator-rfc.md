@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0058"
 title: "Verify and close the coordinator-and-milestone RFC"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0010"]
 depends_on: ["ASK-0057"]
 closeout_for: ["RFC-ASK-0010"]
