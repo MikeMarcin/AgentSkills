@@ -95,13 +95,18 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                     self.assertEqual(header.get("effort"), claude_effort)
                     permission = None if role == "rfc-integrator" else ("plan" if mutation == "read-only" else "acceptEdits")
                     self.assertEqual(header.get("permissionMode"), permission)
+                    configured = VALIDATOR_MODULE.renderer.load_json(SKILL_DIR / "config/roles.json")["roles"][role]
                     tools = set(header["tools"].split(", "))
                     expected_tools = {"Read", "Grep", "Glob", "Bash"}
                     if mutation == "workspace-write":
                         expected_tools.update({"Edit", "Write", "Skill"})
                     if nested:
-                        expected_tools.add("Agent(" + ",".join(VALIDATOR_MODULE.renderer.load_json(SKILL_DIR / "config/roles.json")["roles"][role]["delegation"]["allowed_roles"]) + ")")
+                        expected_tools.add("Agent(" + ",".join(configured["delegation"]["allowed_roles"]) + ")")
+                        expected_tools.update(VALIDATOR_MODULE.renderer.COORDINATION_TOOLS)
                     self.assertEqual(tools, expected_tools)
+                    turns = configured.get("max_turns")
+                    self.assertEqual(header.get("maxTurns"), None if turns is None else str(turns))
+                    self.assertEqual(turns is None, role == "rfc-integrator")
                     body = claude.split(f"# {role}\n\n", 1)[1]
                     self.assertTrue(body.startswith("- Before any analysis or tool call"))
                     self.assertIn(self.expected_banner(role, "claude"), body)

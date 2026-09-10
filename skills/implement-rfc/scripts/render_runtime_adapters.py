@@ -72,6 +72,9 @@ def deep_merge(base: Any, override: Any) -> Any:
 LEAF_ROLES = {"rfc-utility", "rfc-scout", "rfc-test-runner", "rfc-worker",
               "rfc-worker-deep", "rfc-reviewer", "rfc-reviewer-critical"}
 INTEGRATOR = "rfc-integrator"
+# Resume, collect from and release delegated children. A delegating role cannot
+# reuse the same slice owner for correction without these.
+COORDINATION_TOOLS = ("SendMessage", "TaskOutput", "TaskStop")
 
 
 def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -116,8 +119,9 @@ def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise ValueError(f"role {name} needs a description")
         if role.get("mutation") not in MUTATIONS:
             raise ValueError(f"role {name} has invalid mutation")
-        if type(role.get("max_turns")) is not int or role["max_turns"] < 1:
-            raise ValueError(f"role {name} has invalid max_turns")
+        if name != INTEGRATOR or "max_turns" in role:
+            if type(role.get("max_turns")) is not int or role["max_turns"] < 1:
+                raise ValueError(f"role {name} has invalid max_turns")
         instructions = role.get("instructions")
         if not isinstance(instructions, list) or not instructions or not all(
             isinstance(item, str) and item.strip() for item in instructions
@@ -364,6 +368,7 @@ def render_claude_agent(
         tools += ", Edit, Write, Skill"
     if role.get("delegation", {}).get("allowed_roles", []):
         tools += ", Agent(" + ",".join(role["delegation"]["allowed_roles"]) + ")"
+        tools += ", " + ", ".join(COORDINATION_TOOLS)
     permission_mode = "plan" if read_only else "acceptEdits"
     frontmatter = [
         "---",
@@ -372,7 +377,7 @@ def render_claude_agent(
         f"tools: {tools}",
         f"model: {q(route['model'])}",
         *([f"permissionMode: {permission_mode}"] if name != INTEGRATOR else []),
-        f"maxTurns: {role['max_turns']}",
+        *([f"maxTurns: {role['max_turns']}"] if "max_turns" in role else []),
     ]
     if route.get("effort") is not None:
         frontmatter.append(f"effort: {route['effort']}")

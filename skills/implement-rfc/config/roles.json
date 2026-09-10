@@ -135,7 +135,6 @@
     "rfc-integrator": {
       "description": "Designated RFC milestone engineering integrator with scoped implementation, delegation, verification and integration authority.",
       "mutation": "workspace-write",
-      "max_turns": 56,
       "entrypoint": "references/milestone-integration.md",
       "delegation": {
         "allowed_roles": [
