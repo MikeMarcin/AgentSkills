@@ -77,6 +77,35 @@ remains preserved. Earlier dispatch notes below are historical, superseded by th
 
 ## Selected adoption and limits
 
+### Second milestone frontier — dispatch-004, mandate 2
+
+Producer `/root/milestone_integrator_2` owns `adaptive-targets-and-qualified-adoption`
+under [the bound assignment](../../rfcs/plans/agent-skills-milestone-handling/dispatch-004.assignment.json).
+Adaptive source candidate: 68a4825d05bdc4f52024417fd3203846953c81fe.
+ASK-0063 acceptance is supported by 32 milestone/schema tests (schema interpreter
+`/tmp/milestone-schema-check.qySnXg/venv/bin/python`) and 12 historical handoff tests.
+Raw legacy adoption/resume, planless RFC/issue formation, disjoint criteria,
+dependency observations, subset restrictions, amendments and recovery are exercised
+through installed public helpers. These establish mechanics; the engineer still
+judges semantic normalization and evidence truth.
+
+Independent critical reviewer `/root/milestone_integrator_2/rfc_reviewer_adaptive`
+found projected prerequisite accounting and malformed-return diagnostic defects;
+both were corrected and narrowly rechecked, including an independent-work refusal
+for unfinished outside issue prerequisites. No remaining blocker was reported.
+Worker `/root/milestone_integrator_2/rfc_worker_adaptive` and reviewer are quiescent,
+with no children or task commands. Dispatches selected their named custom roles
+with `fork_turns: none`, no model/effort overrides. Configured/banner routes:
+worker Astra/low, reviewer Astra/xhigh; serving telemetry unknown. Initial worker
+routing was standard/bounded adaptive implementation; its correction return omitted
+the routing receipt and is recorded as unknown, not retroactively relabeled.
+
+M2 remains open for authoring/diagnostics, both actual interactive courses and selected
+adoption. Installed binaries report Claude 2.1.260 and Codex 0.153.4; preflight reports
+readiness drift/setup required. Version output, helper tests and current source links
+do not prove host loading. The pre-existing untracked native-role lock is preserved.
+No native course, quota saving, publication or unselected migration is claimed.
+
 ### Accepted first milestone — dispatch-003, mandate 2
 
 User amendment identified the maxTurns/coordination-tool edits as intentional and

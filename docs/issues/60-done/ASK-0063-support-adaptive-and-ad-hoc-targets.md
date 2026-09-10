@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0063"
 title: "Handle partial plans, legacy plans and ad-hoc targets"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0062"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC06", "RFC-ASK-0012-AC07", "RFC-ASK-0012-AC08"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
+acceptance: [{"criterion":"legacy-normalization","outcome":"pass","revision":"68a4825d05bdc4f52024417fd3203846953c81fe","evidence":{"kind":"observation","detail":"Raw legacy preparation retains source text/hash; explicit adoption and target-only assignment/resume run through two linked consumers. Evidence: 32 milestone/schema tests and 12 historical handoff tests passed; independent critical review corrections rechecked."}},{"criterion":"planless-and-partial","outcome":"pass","revision":"68a4825d05bdc4f52024417fd3203846953c81fe","evidence":{"kind":"observation","detail":"Planless RFC and loose issue collections, disjoint large-card criteria and partial remainder formation pass in test_milestone_adaptive.py. Evidence: 32 milestone/schema tests and 12 historical handoff tests passed; independent critical review corrections rechecked."}},{"criterion":"dependency-and-subset","outcome":"pass","revision":"68a4825d05bdc4f52024417fd3203846953c81fe","evidence":{"kind":"observation","detail":"Public projected acceptance leaves whole card open, rejects parent closeout and missing prerequisites; transitive dependency observations preserve excluded/unknown obligations. Evidence: 32 milestone/schema tests and 12 historical handoff tests passed; independent critical review corrections rechecked."}},{"criterion":"amendment-and-recovery","outcome":"pass","revision":"68a4825d05bdc4f52024417fd3203846953c81fe","evidence":{"kind":"observation","detail":"Amendment checks reject deleted selectors/exits; public recovery preserves bound projection and prerequisite evidence; stale dispatch, partial remainder and pending native obligations refuse false completion. Evidence: 32 milestone/schema tests and 12 historical handoff tests passed; independent critical review corrections rechecked."}}]
 ---
 
 # ASK-0063: Handle partial plans, legacy plans and ad-hoc targets
