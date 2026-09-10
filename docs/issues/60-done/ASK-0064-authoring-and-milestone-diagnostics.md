@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0064"
 title: "Publish offline authoring guidance and compact milestone diagnostics"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0063"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC02", "RFC-ASK-0012-AC09", "RFC-ASK-0012-AC12"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
+acceptance: [{"criterion":"offline-authoring","outcome":"pass","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"Copyable minimal plan and implementation entrypoint, single canonical schema, exact generated MILESTONES view and consumer-independent validator verified."}},{"criterion":"source-exports","outcome":"pass","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"Actual source-dump CLI and portable manifest include author kit/schema/current plan linkage; injected local session markers excluded."}},{"criterion":"decision-diagnostics","outcome":"pass","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"Existing assignment/check reporting exposes plan, outcome, producer/dispatch and actual recorded continuation reason; missing/stale history leaves generation index/reason unknown and no economics inferred."}},{"criterion":"compact-role-paths","outcome":"pass","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"38 milestone/schema/authoring/diagnostic tests, 3 instruction tests and 19 rendered-adapter tests pass; portable source valid, documentation 12 RFCs/66 cards/zero violations. Static shared reference grew 380 words/2902 bytes; worker prompt unchanged."}}]
 ---
 
 # ASK-0064: Publish offline authoring guidance and compact milestone diagnostics
