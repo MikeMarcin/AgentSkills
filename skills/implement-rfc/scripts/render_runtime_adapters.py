@@ -685,6 +685,104 @@ def coupling_findings(relative: Path, text: str, identities: list[str]) -> list[
     return findings
 
 
+ROLE_SUFFIX = {"codex": "toml", "claude": "md"}
+
+
+def role_relative(provider: str, name: str) -> str:
+    """Consumer-relative destination of one native role file."""
+    return f".{provider}/agents/{name}.{ROLE_SUFFIX[provider]}"
+
+
+def generate_roles(
+    context: "project_config.ProjectContext", *, profile: str | None = None,
+    routing_override: Path | None = None, capabilities_path: Path | None = None,
+    integrator_route_path: Path | None = None, preserved_route_path: Path | None = None,
+    skill_dir: Path | None = None,
+) -> tuple[dict[tuple[str, str], str], dict[str, Any]]:
+    """Pure generation: every (provider, role) -> rendered content for the selected consumer.
+
+    Nothing is written. The standalone renderer publishes the result into the
+    consumer; the MASK staging entrypoint writes a requested subset into a stage.
+    """
+    script_path = Path(__file__).resolve()
+    skill_dir = (skill_dir or script_path.parents[1]).resolve()
+    roles_path = skill_dir / "config" / "roles.json"
+    routing_path = skill_dir / "config" / "routing.json"
+    project_path = context.project_config_path
+    skill_path = skill_dir / "SKILL.md"
+    roles_data = load_json(roles_path)
+    routing_data = load_json(routing_path)
+    project = context.config
+    digest_paths = [script_path, skill_path, roles_path, routing_path, project_path]
+    original_routing = routing_data
+    if routing_override:
+        override_path = routing_override.resolve()
+        overlay = load_json(override_path)
+        for provider in overlay.get("providers", {}).values():
+            for route in provider.get("classes", {}).values():
+                validate_route(route, "candidate override")
+        routing_data = deep_merge(routing_data, overlay)
+        digest_paths.append(override_path)
+
+    roles = validate_roles(roles_data)
+    assignments, codex_classes, claude_classes = validate_routing(routing_data, roles)
+
+    profiles_path = skill_dir / "config/routing-profiles.json"
+    digest_paths.append(profiles_path)
+    selection_path = context.repo_root / ".mask/generated/implement-rfc/execution-selection.json"
+    if profile is None and selection_path.exists():
+        safe_destination(context.repo_root, selection_path)
+        selection = load_json(selection_path)
+        if selection.get("schema") != "implement-rfc.execution-selection.v1":
+            raise ValueError("unsupported execution selection schema")
+        profile = selection.get("profile", "baseline")
+        digest_paths.append(selection_path)
+    capabilities = load_json(capabilities_path) if capabilities_path else None
+    if capabilities_path:
+        digest_paths.append(capabilities_path)
+    for provider, definition in routing_data["providers"].items():
+        for name, route in definition["classes"].items():
+            if route != original_routing["providers"][provider]["classes"].get(name):
+                validate_capability(provider, route, capabilities)
+    for provider, route in routing_data.get("session_routes", {}).get("rfc-coordinator", {}).items():
+        if route != original_routing.get("session_routes", {}).get("rfc-coordinator", {}).get(provider):
+            validate_capability(provider, route, capabilities)
+    preserved = load_json(preserved_route_path) if preserved_route_path else None
+    explicit = load_json(integrator_route_path) if integrator_route_path else {}
+    if set(explicit) - {"codex", "claude"}:
+        raise ValueError("invalid explicit integrator providers")
+    for path in (integrator_route_path, preserved_route_path):
+        if path:
+            digest_paths.append(path)
+    reference_texts = {}
+    for name, role in roles.items():
+        if role.get("entrypoint"):
+            reference = skill_dir / role["entrypoint"]
+            if not reference.is_file() or reference.is_symlink():
+                raise ValueError(f"missing or linked role entrypoint: {reference}")
+            reference_texts[name] = reference.read_text()
+            digest_paths.append(reference)
+    routes, provenance = select_routes(routing_data, roles, load_json(profiles_path),
+                                       profile or "baseline", capabilities,
+                                       explicit_routes={p: {INTEGRATOR: r} for p, r in explicit.items()},
+                                       preserved_integrator_routes=preserved)
+    digest = hashlib.sha256((source_digest(*digest_paths) + json.dumps(provenance, sort_keys=True)).encode()).hexdigest()
+    generated: dict[tuple[str, str], str] = {}
+    for name, role in sorted(roles.items()):
+        for provider, render in (("codex", render_codex_agent), ("claude", render_claude_agent)):
+            # Other roles/providers/session choices do not change this request.
+            route = routes[provider][name]
+            role_digest = hashlib.sha256(json.dumps({
+                "renderer": script_path.read_text(), "role": role,
+                "prompt": role_prompt(name, role, route, project, provider=provider), "route": route,
+                "reference": reference_texts.get(name),
+            }, sort_keys=True).encode()).hexdigest()
+            generated[(provider, name)] = render(name, role, route, project, role_digest)
+    facts = dict(project=project, assignments=assignments, provenance=provenance, digest=digest,
+                 routing=routing_data, roles=roles)
+    return generated, facts
+
+
 def main() -> int:
     script_path = Path(__file__).resolve()
     skill_dir = script_path.parents[1]
@@ -715,83 +813,17 @@ def main() -> int:
         return 0 if write_or_check(path, json.dumps(portable_manifest(skill_dir), indent=2, sort_keys=True) + "\n", args.check) else 1
 
     context = project_config.resolve_context(repo_root=args.repo_root)
-    roles_path = skill_dir / "config" / "roles.json"
-    routing_path = skill_dir / "config" / "routing.json"
-    project_path = context.project_config_path
-    skill_path = skill_dir / "SKILL.md"
-    roles_data = load_json(roles_path)
-    routing_data = load_json(routing_path)
-    project = context.config
-    digest_paths = [script_path, skill_path, roles_path, routing_path, project_path]
-    original_routing = routing_data
-    if args.routing_override:
-        override_path = args.routing_override.resolve()
-        overlay = load_json(override_path)
-        for provider in overlay.get("providers", {}).values():
-            for route in provider.get("classes", {}).values():
-                validate_route(route, "candidate override")
-        routing_data = deep_merge(routing_data, overlay)
-        digest_paths.append(override_path)
-
-    roles = validate_roles(roles_data)
-    assignments, codex_classes, claude_classes = validate_routing(routing_data, roles)
-
-    profiles_path = skill_dir / "config/routing-profiles.json"
-    digest_paths.append(profiles_path)
-    selection_path = context.repo_root / ".mask/generated/implement-rfc/execution-selection.json"
-    profile = args.profile
-    if profile is None and selection_path.exists():
-        safe_destination(context.repo_root, selection_path)
-        selection = load_json(selection_path)
-        if selection.get("schema") != "implement-rfc.execution-selection.v1":
-            raise ValueError("unsupported execution selection schema")
-        profile = selection.get("profile", "baseline")
-        digest_paths.append(selection_path)
-    capabilities = load_json(args.capabilities) if args.capabilities else None
-    if args.capabilities:
-        digest_paths.append(args.capabilities)
-    for provider, definition in routing_data["providers"].items():
-        for name, route in definition["classes"].items():
-            if route != original_routing["providers"][provider]["classes"].get(name):
-                validate_capability(provider, route, capabilities)
-    for provider, route in routing_data.get("session_routes", {}).get("rfc-coordinator", {}).items():
-        if route != original_routing.get("session_routes", {}).get("rfc-coordinator", {}).get(provider):
-            validate_capability(provider, route, capabilities)
-    preserved = load_json(args.preserved_integrator_route) if args.preserved_integrator_route else None
-    explicit = load_json(args.integrator_route) if args.integrator_route else {}
-    if set(explicit) - {"codex", "claude"}:
-        raise ValueError("invalid explicit integrator providers")
-    for path in (args.integrator_route, args.preserved_integrator_route):
-        if path:
-            digest_paths.append(path)
-    reference_texts = {}
-    for name, role in roles.items():
-        if role.get("entrypoint"):
-            reference = skill_dir / role["entrypoint"]
-            if not reference.is_file() or reference.is_symlink():
-                raise ValueError(f"missing or linked role entrypoint: {reference}")
-            reference_texts[name] = reference.read_text()
-            digest_paths.append(reference)
-    routes, provenance = select_routes(routing_data, roles, load_json(profiles_path),
-                                       profile or "baseline", capabilities,
-                                       explicit_routes={p: {INTEGRATOR: r} for p, r in explicit.items()},
-                                       preserved_integrator_routes=preserved)
-    digest = hashlib.sha256((source_digest(*digest_paths) + json.dumps(provenance, sort_keys=True)).encode()).hexdigest()
+    roles_by_key, facts = generate_roles(
+        context, profile=args.profile, routing_override=args.routing_override,
+        capabilities_path=args.capabilities, integrator_route_path=args.integrator_route,
+        preserved_route_path=args.preserved_integrator_route,
+    )
+    project, assignments, provenance, digest, routing_data = (
+        facts["project"], facts["assignments"], facts["provenance"], facts["digest"], facts["routing"])
     repo_root = context.repo_root
     generated: dict[Path, str] = {}
-    for name, role in sorted(roles.items()):
-        for provider, suffix, render in (("codex", "toml", render_codex_agent),
-                                         ("claude", "md", render_claude_agent)):
-            # Other roles/providers/session choices do not change this request.
-            route = routes[provider][name]
-            role_digest = hashlib.sha256(json.dumps({
-                "renderer": script_path.read_text(), "role": role,
-                "prompt": role_prompt(name, role, route, project, provider=provider), "route": route,
-                "reference": reference_texts.get(name),
-            }, sort_keys=True).encode()).hexdigest()
-            generated[repo_root / f".{provider}/agents/{name}.{suffix}"] = render(
-                name, role, route, project, role_digest
-            )
+    for (provider, name), content in roles_by_key.items():
+        generated[repo_root / role_relative(provider, name)] = content
 
     manifest_entries: list[dict[str, str]] = []
     for path, content in sorted(generated.items(), key=lambda item: str(item[0])):

@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "inputs": [
+    {
+      "id": "project-config",
+      "path": ".mask/skill-config/implement-rfc/project.json",
+      "kind": "json",
+      "required": true
+    },
+    {
+      "id": "project-rules",
+      "path": ".mask/skill-config/implement-rfc/project.md",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "id": "execution-selection",
+      "path": ".mask/generated/implement-rfc/execution-selection.json",
+      "kind": "json",
+      "required": false
+    }
+  ],
+  "native_roles": [
+    {
+      "agent": "codex",
+      "name": "rfc-utility",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-utility",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-scout",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-scout",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-test-runner",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-test-runner",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-reviewer",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-reviewer",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-worker",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-worker",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-worker-deep",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-worker-deep",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-reviewer-critical",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-reviewer-critical",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-integrator",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-integrator",
+      "setup": "prepare-roles"
+    }
+  ],
+  "setup": [
+    {
+      "id": "prepare-roles",
+      "entrypoint": "scripts/prepare_mask_roles.py",
+      "inputs": [
+        "project-config",
+        "project-rules",
+        "execution-selection"
+      ],
+      "package_inputs": [
+        "scripts/prepare_mask_roles.py",
+        "scripts/render_runtime_adapters.py",
+        "scripts/project_config.py",
+        "scripts/slice_events.py",
+        "config/roles.json",
+        "config/routing.json",
+        "config/routing-profiles.json",
+        "SKILL.md",
+        "references/milestone-integration.md"
+      ],
+      "parameters": {},
+      "timeout_seconds": 60,
+      "effects": "staged-native-roles"
+    }
+  ]
+}
