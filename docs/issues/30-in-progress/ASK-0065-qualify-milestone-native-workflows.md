@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0065"
 title: "Qualify raw-input milestones on both native drivers"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0064"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC10", "RFC-ASK-0012-AC11", "RFC-ASK-0012-AC12"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
