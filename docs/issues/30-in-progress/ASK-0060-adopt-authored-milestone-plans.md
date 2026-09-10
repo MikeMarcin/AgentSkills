@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0060"
 title: "Adopt authored milestone plans through consumer intake"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0012"]
 depends_on: []
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC01", "RFC-ASK-0012-AC02", "RFC-ASK-0012-AC03"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
