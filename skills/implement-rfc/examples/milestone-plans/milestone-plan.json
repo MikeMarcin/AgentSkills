@@ -1,0 +1,15 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "public-path-fix",
+  "scope": {"issues": ["DEMO-0001"]},
+  "milestones": [
+    {
+      "id": "usable-fix",
+      "outcome": "The reported public-path failure is corrected and verified.",
+      "work": [{"issue": "DEMO-0001"}],
+      "depends_on": [],
+      "exit_criteria": ["The reported reproduction passes through the public entrypoint."],
+      "boundary": "A usable correction with its regression check and relevant documentation."
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "dcaf0aed6a4641378d203fa2525556dec2abf8dad2d60ec8b888389a36aab15d"
+      "sha256": "9222e8c330b11f0853159d4b7922293f34eb92a52fe8c93265d1f52edbf19f20"
     },
     {
       "path": "SKILL.md",
@@ -31,6 +31,26 @@
     {
       "path": "config/routing.json",
       "sha256": "3f583357a8f420cb7ec5e2ebd35c618e7b650d91fa7b50f28240c47b7cc433fb"
+    },
+    {
+      "path": "examples/milestone-plans/IMPLEMENTATION_PROMPT.md",
+      "sha256": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065"
+    },
+    {
+      "path": "examples/milestone-plans/MILESTONES.md",
+      "sha256": "8e6d264656b7facc48e11d82ddfc37f7673312b3c8ce3cc9a72dee47c7fde7bd"
+    },
+    {
+      "path": "examples/milestone-plans/README.md",
+      "sha256": "45d32a8bffd0bf612feaf158d1a8690fa6d4eab838c7cdae8d134e0a00e891fe"
+    },
+    {
+      "path": "examples/milestone-plans/milestone-plan.json",
+      "sha256": "0e3d22c33f730254a78d6e8f036a351ffab01d7948357f273c0879fa717c3784"
+    },
+    {
+      "path": "examples/milestone-plans/validate.py",
+      "sha256": "93969ebc75398c6af93aab2169ff18aa303e797bab93b7c1343979808921de52"
     },
     {
       "path": "examples/projects/samplereview/project.json",
@@ -74,7 +94,7 @@
     },
     {
       "path": "references/milestone-plans.md",
-      "sha256": "ffa598eb56cce8131f0265f8207044fec2270b3437eb56b7faffd836343ae161"
+      "sha256": "edbbdd01f36983681185fb6f5a3ff9632627a1ac85ecd8cd6197563f082e13ea"
     },
     {
       "path": "references/model-routing.md",
@@ -86,7 +106,7 @@
     },
     {
       "path": "references/pack-lifecycle.md",
-      "sha256": "7307e15ca0edf7cabd68b593731edb8576ceb814bcc4f01d7abfe6b589443e94"
+      "sha256": "390074a5acdf5edc80eadc5c334a95d4d742df06ad1da684a3868587bafc8717"
     },
     {
       "path": "references/remote-routing.md",
@@ -118,7 +138,7 @@
     },
     {
       "path": "schemas/milestone-assignment.schema.json",
-      "sha256": "70ebab5e715763607d60bb2072cca7de2f1b7d645e238aef312afbbed91d9d35"
+      "sha256": "d2965f38a62863bd96d68b5b068b3994c03a0eeb985372e11b52654292ed69f1"
     },
     {
       "path": "schemas/milestone-plan.schema.json",
@@ -126,7 +146,7 @@
     },
     {
       "path": "schemas/milestone-return-v2.schema.json",
-      "sha256": "e7cf70145783fc0f3084dade0a276043c9052dc18f65e3db491fce3b2665ef9c"
+      "sha256": "4ff8dc2d285649fe95f33afc7896180f17bb1b97c1b246d087c2ae94c1c44be0"
     },
     {
       "path": "schemas/milestone-return.schema.json",
@@ -174,7 +194,7 @@
     },
     {
       "path": "scripts/coordinator_handoff.py",
-      "sha256": "2c26570d849fd51b6b483543bdc87de6e5f27a10bcfc39306d3cf93add3a8cec"
+      "sha256": "7f7f16fab49fbfa011cce9b313f915fd65a6c6d23cf95d8eebc266cf5840c8a9"
     },
     {
       "path": "scripts/issue_board.py",
@@ -186,11 +206,11 @@
     },
     {
       "path": "scripts/milestone_continuation.py",
-      "sha256": "48fdb989abceb29f2307988245da97c2c5428a407ba66b416e0fa6a985bd61e3"
+      "sha256": "5369b571b912731c0a8e24602d8b4422724c745ded2860aa0e6bba590568a8ed"
     },
     {
       "path": "scripts/milestone_plan.py",
-      "sha256": "52f2da131326a5fb1dbe14d881249eddd2afa9255fb0386baec8b7f599a8b8ab"
+      "sha256": "0eab825e238593d78bd3b647b39f3a1ab9c16dde7b4c6d7eab2e880b8b7a03f4"
     },
     {
       "path": "scripts/milestone_plan_contract.py",
@@ -321,8 +341,24 @@
       "sha256": "007292bd9cab24b9f6bb3109efc3a3cb8b46c8b94d8d37f6de041fc58cec615d"
     },
     {
+      "path": "tests/test_milestone_adaptive.py",
+      "sha256": "6ddc6b9c950a4c9580535a2d4e42eff020c450c46f84f96d2e97659337948a9e"
+    },
+    {
+      "path": "tests/test_milestone_adaptive_public.py",
+      "sha256": "cf29e21527f903754141977a5045e38a844a8d9761531775d1175553b8063355"
+    },
+    {
+      "path": "tests/test_milestone_authoring.py",
+      "sha256": "e5c05c0e1c9d4a65972a0d94c5ddb3596a4dc81c4647801116afe7e6709adcba"
+    },
+    {
       "path": "tests/test_milestone_continuation.py",
-      "sha256": "0350b241fa66bb417e95eca7a2bc5284ce001cb10be92d811ca66e401d93697e"
+      "sha256": "6b4351a15fd326ab33d777091339eff0e532f4625f356da306f430a1061a339c"
+    },
+    {
+      "path": "tests/test_milestone_diagnostics.py",
+      "sha256": "1c7885ad82a87c02bd1d6207aa85584d552b9bd792ad02b0cb50e7880ad220c8"
     },
     {
       "path": "tests/test_milestone_plan.py",
@@ -417,6 +453,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "cf1fd7af09811415",
+  "portable_digest": "81fa17af58f6fb2b",
   "schema": "implement-rfc.portable-manifest.v1"
 }

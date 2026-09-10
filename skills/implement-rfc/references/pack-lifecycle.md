@@ -19,6 +19,11 @@ Roles:
 
 ## Import
 
+When authoring a new pack, copy the [offline milestone kit](../examples/milestone-plans/README.md)
+to its root and edit the JSON plan first. Include the implementation-entrypoint
+pointer, regenerate its Markdown view, and retain the schema with exported authoring
+materials. Live import remaps typed references while preserving milestone intent.
+
 The integrator imports a pack on `main` so lanes branch from a reconciled
 state:
 

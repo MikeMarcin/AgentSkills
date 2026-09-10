@@ -197,6 +197,40 @@ def independent_milestones(root, config, plan, accepted):
     return eligible
 
 
+def decision_diagnostics(assignment, returned, action):
+    """Compact linkage from supplied records, not reconstructed history or usage."""
+    binding = assignment['binding']
+    matched = (isinstance(returned, dict) and
+               all(returned.get(key) == assignment.get(key) for key in IDENTITY))
+    request = returned.get('continuation') if matched else None
+    return {'plan_id': binding['plan_id'], 'milestone_id': binding['milestone_id'],
+            'producer_id': assignment['producer_id'], 'dispatch_id': assignment['dispatch_id'],
+            'generation_index': None,
+            'requested_reason': request.get('reason') if isinstance(request, dict) else None,
+            'requested_detail': request.get('detail') if isinstance(request, dict) else None,
+            'decision': action, 'source': 'supplied assignment and return',
+            'economics': 'not inferred'}
+
+
+def human_report(result, outcome=None):
+    binding = result.get('binding', {})
+    context = result.get('diagnostics', {})
+    if not binding and not context:
+        return f"{result.get('action', 'Reconcile')}: {result.get('reason', 'unknown')}"
+    plan = binding.get('plan_id', context.get('plan_id'))
+    milestone = binding.get('milestone_id', context.get('milestone_id'))
+    producer = result.get('producer_id', context.get('producer_id'))
+    dispatch = result.get('dispatch_id', context.get('dispatch_id'))
+    lines = [f"Plan: {plan}", f"Current: {milestone}" + (f" — {outcome}" if outcome else ''),
+             f"Integrator: {producer}; dispatch {dispatch}; generation index unknown"]
+    if binding:
+        lines.append(f"Assigned: {len(binding['obligations'])} obligations; {len(binding['exit_criteria'])} exits")
+    else:
+        lines.append(f"Decision: {result['action']} — {result['reason']}")
+        lines.append(f"Recorded continuation reason: {context.get('requested_reason') or 'unknown'}")
+    return '\n'.join(lines)
+
+
 def main(argv=None):
     """Public observational composition over plan lookup and native observations."""
     import argparse
@@ -221,6 +255,7 @@ def main(argv=None):
     parser.add_argument('--review-relay', action='store_true')
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
+    outcome = None
     try:
         ctx = project_config.resolve_context(repo_root=args.repo_root)
         root = ctx.repo_root
@@ -235,6 +270,7 @@ def main(argv=None):
             selected = select_scope(plan, args.accepted_milestone, args.milestone)
             if selected is None:
                 raise ValueError('no eligible milestone; reconcile required accepted evidence')
+            outcome = selected['outcome']
             result = bind_assignment(root, path.relative_to(root).as_posix(), selected['id'],
                 run_id=args.run_id, dispatch_id=args.dispatch_id, producer_id=args.producer_id,
                 mandate_revision=args.mandate_revision,
@@ -251,6 +287,8 @@ def main(argv=None):
             current = plans.resolve_binding(root, binding.get('plan_path'), binding.get('milestone_id'),
                                             projection=binding.get('projection'))
             current_plan = plans.load_plan(plans.safe_path(root, binding['plan_path']))
+            outcome = next(item['outcome'] for item in current_plan['milestones']
+                           if item['id'] == binding['milestone_id'])
             # Validate prerequisite observations against the parent plan, while
             # projected completion accounts only for its own target milestone.
             plans.select_milestone(current_plan, args.accepted_milestone)
@@ -277,8 +315,9 @@ def main(argv=None):
                 # A result cannot bypass authored hard prerequisites when choosing
                 # its next outcome. Evidence for prior accepted IDs remains caller-owned.
                 select_scope(plan, accepted, request['next_milestone'])
+            result['diagnostics'] = decision_diagnostics(assignment, returned, result['action'])
         print(json.dumps(result, ensure_ascii=False) if args.json else
-              f"{result.get('action', 'Assigned')}: {result.get('reason', result.get('milestone'))}")
+              human_report(result, outcome))
         return 0 if result.get('action') not in ('clarify', 'reconcile') else 2
     except (ValueError, OSError, TypeError, KeyError) as error:
         result = {'action': 'reconcile', 'reason': str(error)[:8192], 'consume_key': None,

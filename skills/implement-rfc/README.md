@@ -76,6 +76,15 @@ fails when two projects have drifted.
 
 ## Maintained Sources
 
+New packs start with the [offline milestone authoring kit](examples/milestone-plans/README.md):
+a minimal JSON plan, generated view, entrypoint pointer and portable schema. Validation
+and rendering work outside a configured consumer. Live execution follows
+[Plan-first execution](references/milestone-plans.md).
+`coordinator_handoff.py assign` and `check` report the bound plan, current outcome,
+producer/dispatch and continuation decision. Machine output retains recorded
+replacement reasons; missing historical generation information stays unknown.
+These observations do not measure subscription savings.
+
 - `SKILL.md`: authoritative workflow and finish condition.
 - `config/roles.json`: portable role semantics (one integrator and seven leaves).
 - `config/routing.json`: capability-class routing for Codex and Claude.
