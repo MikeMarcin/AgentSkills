@@ -1,0 +1,136 @@
+{
+  "schema": "implement-rfc.milestone-return.v2",
+  "run_id": "agent-skills-milestone-handling",
+  "dispatch_id": "dispatch-004",
+  "producer_id": "/root/milestone_integrator_2",
+  "mandate_revision": "2",
+  "milestone": "adaptive-targets-and-qualified-adoption",
+  "disposition": "human-pending",
+  "summary": "Adaptive target lifecycle, offline authoring and compact diagnostics are verified; selected AgentSkills filesystem adoption is ready. Both native courses remain unrun pending the owner-approved ceiling and native driver instruction. M2 and RFC remain open.",
+  "candidate_revision": "718657c44d4c103bc3644a99ce83dd3e18828096",
+  "handoff_ref": "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md",
+  "ownership": "quiescent",
+  "next_objective": "Run the two bounded native courses and adjudicate ASK-0065/0066 in this same milestone after the capacity/driver decision.",
+  "required_pending": [
+    "Explicit owner-approved capacity/time ceiling for two initial native courses total.",
+    "Normal signed-in Claude and Codex native coordinator driver/operator instruction; native permission decisions remain human.",
+    "Direct passing evidence for both native courses, observed host loading and truthful final ASK-0066/RFC acceptance."
+  ],
+  "evidence_refs": [
+    "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md",
+    "docs/rfcs/plans/agent-skills-milestone-handling/ASK-0063.acceptance.json",
+    "docs/rfcs/plans/agent-skills-milestone-handling/ASK-0064.acceptance.json",
+    "docs/rfcs/plans/agent-skills-milestone-handling/ASK-0065.pending.json",
+    "docs/rfcs/plans/agent-skills-milestone-handling/selected-adoption.json"
+  ],
+  "binding": {
+    "plan_id": "agent-skills-milestone-handling",
+    "plan_path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json",
+    "milestone_id": "adaptive-targets-and-qualified-adoption",
+    "definition_fingerprint": "sha256:1b4a18a0d321d5f24036e2d2edbbce0b6ec07ab67893290fdeccacde50e8862c",
+    "obligations": [
+      {
+        "id": "ASK-0063:*",
+        "source": "ASK-0063",
+        "selector": null,
+        "source_fingerprint": "sha256:054d0f490e15d52bd7f2ff50e0a3bd4b6f8552cafe4761161b93991800793d79"
+      },
+      {
+        "id": "ASK-0064:*",
+        "source": "ASK-0064",
+        "selector": null,
+        "source_fingerprint": "sha256:e892d8edb82ea0c5ff241705689ac9e624df195e369fc0b8d3ae1f19291d7577"
+      },
+      {
+        "id": "ASK-0065:*",
+        "source": "ASK-0065",
+        "selector": null,
+        "source_fingerprint": "sha256:e844ad918f0dfe06a6bf2ed9722577272e072d3f740731fc00aed756e41e581f"
+      },
+      {
+        "id": "ASK-0066:*",
+        "source": "ASK-0066",
+        "selector": null,
+        "source_fingerprint": "sha256:87636e3900f77e1e6e25c7c62301bd226e1a254f5cc030d4ce8d0951e683b903"
+      }
+    ],
+    "obligation_fingerprint": "sha256:50b3b4d8d8e342706e89a6aa4e515f4073bc113a72dc50aafac4abceb5d67a7d",
+    "exit_criteria": [
+      {
+        "id": "adaptive-targets-and-qualified-adoption:exit:1",
+        "text": "Legacy normalization, planless formation, subset projection, dependency look-ahead, amendments and recovery preserve all selected obligations."
+      },
+      {
+        "id": "adaptive-targets-and-qualified-adoption:exit:2",
+        "text": "Offline authoring examples and generated human views agree with the canonical schema; compact diagnostics expose actual continuation decisions without inventing economics."
+      },
+      {
+        "id": "adaptive-targets-and-qualified-adoption:exit:3",
+        "text": "Both bounded native courses have direct passing evidence and selected adoption/closeout is truthful. Missing required evidence prevents this milestone and the RFC from being declared complete."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:3bb440333cf4245a2d417e1b84b937514093a037e64320a21c57dccaa18f7d84",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "acceptance_records": [
+    {
+      "id": "ASK-0063:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "ASK-0064:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "ASK-0065:*",
+      "outcome": "pending",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "ASK-0066:*",
+      "outcome": "pending",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "adaptive-targets-and-qualified-adoption:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "adaptive-targets-and-qualified-adoption:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "adaptive-targets-and-qualified-adoption:exit:3",
+      "outcome": "pending",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    }
+  ],
+  "continuation": {
+    "intent": "wait",
+    "next_milestone": "adaptive-targets-and-qualified-adoption",
+    "reason": "pending-obligation",
+    "detail": "Coordinator confirmed no existing approved native ceiling/driver and instructed human-pending handoff. All independent unattended work is finished; renew dispatch on this same integrator after the decision. No M2 boundary or pack completion is asserted."
+  }
+}
