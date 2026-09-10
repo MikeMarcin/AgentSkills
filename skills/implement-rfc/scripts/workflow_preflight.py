@@ -77,8 +77,13 @@ def preflight(root: Path, command: list[str]) -> dict:
         result["host_load"] = next((row.get("host_load") for row in report.get("roles") or [] if row.get("host_load")), "not_verified")
     error = ensure.get("error") or {}
     if scope is None or report is None or report.get("workflow") != "declared":
-        result.update(state="unsupported", detail="MASK did not examine a declared implement-rfc workflow for this consumer "
-                      f"(scope workflow: {scope.get('workflow') if scope else 'absent'}; error: {error.get('code') or 'none'})")
+        if error:
+            # The program supports the contract but could not examine this consumer (unregistered, unapproved, drifted...).
+            result.update(state="incomplete", detail=f"{error.get('code')}: {error.get('message')}")
+            return result
+        result.update(state="unsupported", detail="MASK returned success without examining a declared implement-rfc workflow "
+                      f"for this consumer (scope workflow: {scope.get('workflow') if scope else 'absent'}); "
+                      "link-only success is not workflow readiness")
         return result
     if ensure.get("ok") and scope.get("workflow") == "complete" and report.get("complete") and data.get("readiness") in ("ready_pinned", "ready_legacy_unpinned"):
         result.update(state="ready", detail="declared native roles and inputs match; host loading is not verified by this check")

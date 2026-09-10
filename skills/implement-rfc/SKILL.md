@@ -28,6 +28,13 @@ use canonical configuration and actual host settings, not model names in prose.
 For setup, unavailable roles or model/effort conflicts, read the installed
 `references/model-routing.md` and `references/runtime-compatibility.md`.
 
+Before the first native dispatch, check the required native role set with
+`scripts/workflow_preflight.py --repo-root ROOT --json`. It accepts only a MASK
+program that implements `workflow_readiness_v1` and reports complete declared
+readiness; `unsupported`, `incomplete` or `error` is a setup problem to report
+(`mask ensure --project ROOT` deploys or sets up the roles), never permission to
+spawn a default agent as an integrator.
+
 For **status only**, inspect the scoped live queue/closeout with existing helpers
 and report it; source, board state and agents remain unchanged. That branch ends
 here. For **review only**, dispatch one native read-only reviewer against the

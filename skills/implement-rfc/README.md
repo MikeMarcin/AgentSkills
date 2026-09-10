@@ -27,6 +27,32 @@ mode and its lane-plan validator, the blocking delegation audit, and the
 prescribed verification-matrix, documentation-ledger, and phase-checklist
 formats.
 
+## MASK workflow readiness
+
+`mask-workflow.json` is the passive descriptor MASK (RFC-MASK-0019) reads
+beside `SKILL.md`. It declares the consumer inputs (`project.json`,
+`project.md`, the optional execution selection) and every current role from
+`config/roles.json` for Codex and Claude, all produced by the setup action
+`prepare-roles`. Rendered roles carry consumer addenda and explicit routing
+profiles, so they are generated per consumer rather than shipped as universal
+static files. MASK runs `scripts/prepare_mask_roles.py` only under explicit
+`package.setup` consent (`mask ensure --project ROOT`, answering yes in a
+terminal, or `--expect-plan-hash` with `--allow-setup SOURCE/implement-rfc:prepare-roles`);
+the script writes the requested `STAGE/AGENT/NAME.ext` files through the same
+`generate_roles` path as the standalone renderer and nothing else. MASK
+validates the stage, writes the portable
+`.mask/skill-config/implement-rfc/native-roles.lock.json` and deploys or retires
+the role files through its own journal; an unchanged rerun runs no script, and a
+fresh clone with the lock and matching roles needs no setup.
+
+`scripts/workflow_preflight.py --repo-root ROOT --json` is the startup check:
+it requires the program's `workflow_readiness_v1` capability and a complete
+`ensure --check` result. An older MASK's link-only success is reported as
+`unsupported`. Filesystem readiness is not host loading. The standalone
+renderer (`render_runtime_adapters.py --repo-root ROOT`) remains available for
+authoring and consumers that do not use MASK; its outputs are a distinct owner
+from MASK-managed role files.
+
 ## What is project-specific
 
 Exactly two files under each consumer repository:

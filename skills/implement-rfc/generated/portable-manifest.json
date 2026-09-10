@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "7595fab5f87af2d30306b9fb2191231dcefb62e320b4977f8ffb366347b09ca2"
+      "sha256": "dcaf0aed6a4641378d203fa2525556dec2abf8dad2d60ec8b888389a36aab15d"
     },
     {
       "path": "SKILL.md",
-      "sha256": "60e009957c23af969bb498970d1cad4492446d24b10c05ead4cabdb037080cbd"
+      "sha256": "23b878d738555d9bd03bd3def0099fa61414373e8e95ee053b34be1e8224ad40"
     },
     {
       "path": "agents/openai.yaml",
@@ -39,6 +39,10 @@
     {
       "path": "examples/projects/samplereview/project.md",
       "sha256": "7ca97f415063bac14438872eb36ac46301c3b2e0dfe8621f7d6147289e82c079"
+    },
+    {
+      "path": "mask-workflow.json",
+      "sha256": "9575dc4fa8a69900236bd8d68634fdca5759124d91acf3cf8c22c6e83e4d70f1"
     },
     {
       "path": "references/attendance.md",
@@ -165,6 +169,10 @@
       "sha256": "f1f785f09dee72e93773c03f499a69ef7a60e5a349d447b658a628a2d00278db"
     },
     {
+      "path": "scripts/prepare_mask_roles.py",
+      "sha256": "8122dbabf344aa0b50de98d40b91d78d832c8e4095fea8b70deca8564f7fd24d"
+    },
+    {
       "path": "scripts/project_config.py",
       "sha256": "2c5c534af6ca2abf601d7dc5932542a24c50021005141b83488cf75d4722d890"
     },
@@ -178,7 +186,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "e5898f21e9ebf3933e4a2236e3125ca1d1b9590f05d889b15fef6fd42a3cef7d"
+      "sha256": "5d39b32e832a8d70f194845154aa9a78b9050ebe174b1cf8a9a8e49ed51da71c"
     },
     {
       "path": "scripts/role_usage.py",
@@ -245,6 +253,10 @@
       "sha256": "8a96814a24e8db27b3939396dfbc17dcdc9c865e9a811324cda82a876a6745ac"
     },
     {
+      "path": "scripts/workflow_preflight.py",
+      "sha256": "d6a7c3a7c41e6badc6b2f1ee620cd27c534c8bc595a4ef6f8e70ba2020cedba1"
+    },
+    {
       "path": "tests/project_fixtures.py",
       "sha256": "ecb0d67da547e9cc8dc50f6a0b5c44e4ab285bb6b21f77d580d1ba96eddafea3"
     },
@@ -275,6 +287,10 @@
     {
       "path": "tests/test_launch_remote_station.py",
       "sha256": "337222976ce04d9bab34fe0dc63401c17ab9e85e25be76ea956b02e1e399f378"
+    },
+    {
+      "path": "tests/test_mask_workflow.py",
+      "sha256": "007292bd9cab24b9f6bb3109efc3a3cb8b46c8b94d8d37f6de041fc58cec615d"
     },
     {
       "path": "tests/test_project_config.py",
@@ -357,6 +373,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "ab75e142e56ec7cc",
+  "portable_digest": "4f4a02e6ca100f39",
   "schema": "implement-rfc.portable-manifest.v1"
 }
