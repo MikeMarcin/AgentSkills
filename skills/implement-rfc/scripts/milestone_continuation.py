@@ -30,8 +30,21 @@ def binding_errors(binding):
     errors = []
     required = set(BINDING_FIELDS) | {'obligations', 'exit_criteria', 'structural', 'references',
         'semantic_coverage', 'diagnostics', 'diagnostics_truncated'}
-    if not required <= binding.keys() or binding.keys() - required - {'work'}:
+    if not required <= binding.keys() or binding.keys() - required - {'work', 'projection'}:
         errors.append('invalid binding fields')
+    if 'projection' in binding:
+        projection = binding['projection']
+        if not isinstance(projection, list) or not projection:
+            errors.append('invalid explicit projection')
+        else:
+            for ref in projection:
+                if (not isinstance(ref, dict) or len(set(ref) & {'issue', 'rfc'}) != 1
+                    or set(ref) - {'issue', 'rfc', 'criteria'}
+                    or not isinstance(ref.get('issue', ref.get('rfc')), str)
+                    or not ref.get('issue', ref.get('rfc'))
+                    or ('criteria' in ref and (not isinstance(ref['criteria'], list) or not ref['criteria']
+                        or any(not isinstance(x, str) or not x.strip() for x in ref['criteria'])))):
+                    errors.append('invalid explicit projection reference')
     if (binding.get('references') != 'resolved' or binding.get('structural') != 'valid'
         or binding.get('diagnostics_truncated') is not False or binding.get('diagnostics') != []
         or binding.get('semantic_coverage') != 'unknown'):
@@ -80,7 +93,8 @@ def v2_errors(value):
         or request.get('intent') not in ('continue', 'fresh', 'wait', 'stop')
         or request.get('reason') not in ('integrated-boundary', 'related-continuation',
             'context-pressure', 'producer-unavailable', 'ownership-recovery',
-            'explicit-user-request', 'current-milestone', 'pending-obligation', 'target-complete')
+            'explicit-user-request', 'current-milestone', 'pending-obligation', 'target-complete',
+            'independent-work')
         or not isinstance(request.get('detail'), str) or not request['detail'].strip()
         or (request.get('next_milestone') is not None and
             (not isinstance(request['next_milestone'], str) or not request['next_milestone'].strip()))):
@@ -112,7 +126,8 @@ def v2_errors(value):
             errors.append('completion has required pending evidence')
     return errors
 
-def v2_action(returned, assignment, current_binding, accepted_milestones=(), current_target_milestones=None):
+def v2_action(returned, assignment, current_binding, accepted_milestones=(), current_target_milestones=None,
+              eligible_milestones=()):
     """Return action/reason, after common identity and execution guards."""
     binding = assignment.get('binding')
     if binding_errors(binding):
@@ -128,6 +143,8 @@ def v2_action(returned, assignment, current_binding, accepted_milestones=(), cur
     intent, reason, next_id = request['intent'], request['reason'], request['next_milestone']
     complete = returned['disposition'] in ('milestone-complete', 'pack-complete')
     if returned['disposition'] == 'pack-complete':
+        if binding.get('projection'):
+            return 'clarify', 'a scoped projection cannot close its broader plan or RFC'
         if intent != 'stop' or next_id is not None:
             return 'clarify', 'target completion must stop with no next milestone'
         if current_target_milestones is None or assignment['target_milestones'] != current_target_milestones:
@@ -144,6 +161,11 @@ def v2_action(returned, assignment, current_binding, accepted_milestones=(), cur
     if not next_id:
         return 'clarify', 'renewed scope must name the intended milestone'
     if not complete and next_id != binding['milestone_id']:
+        if (returned['disposition'] in ('human-pending', 'blocked')
+            and reason == 'independent-work' and returned['required_pending']
+            and returned['handoff_ref'] and next_id in eligible_milestones
+            and next_id in assignment['target_milestones']):
+            return ('fresh-integrator' if intent == 'fresh' else 'resume-integrator'), request['detail']
         return 'reconcile', 'unfinished scope cannot silently transfer to another milestone'
     if intent == 'fresh':
         allowed = {'context-pressure', 'producer-unavailable', 'ownership-recovery', 'explicit-user-request'}

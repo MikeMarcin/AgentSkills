@@ -83,7 +83,8 @@ def validate_return(value: object) -> list[str]:
 def continuation(returned: object, assignment: dict, *, execution: str,
                  consumed=(), cancelled: bool = False, review_relay: bool = False,
                  prior_partial: dict | None = None, current_binding: dict | None = None,
-                 accepted_milestones=(), current_target_milestones=None) -> dict:
+                 accepted_milestones=(), current_target_milestones=None,
+                 eligible_milestones=()) -> dict:
     """Suggest a control action from explicit observations, without mutation.
 
     execution describes the producer AND its owned children/commands, not merely
@@ -132,7 +133,8 @@ def continuation(returned: object, assignment: dict, *, execution: str,
         if all(returned[field] == prior_partial.get(field) for field in progress_fields):
             return result("investigate", "repeated partial return supplies no new progress or actionable step")
     if returned["schema"] == V2:
-        action, reason = v2_action(returned, assignment, current_binding, accepted_milestones, current_target_milestones)
+        action, reason = v2_action(returned, assignment, current_binding, accepted_milestones,
+                                  current_target_milestones, eligible_milestones)
         return result(action, reason, key if action in {
             "resume-integrator", "fresh-integrator", "pending", "stop", "report-closeout", "relay-review"
         } else None)
@@ -148,11 +150,11 @@ def continuation(returned: object, assignment: dict, *, execution: str,
 
 
 def bind_assignment(root, plan_path, milestone, *, run_id, dispatch_id, producer_id,
-                    mandate_revision):
+                    mandate_revision, projection=None):
     """Compute scope identity from current consumer requirements, without writing."""
     import subprocess
     import milestone_plan as plans
-    binding = plans.resolve_binding(root, plan_path, milestone)
+    binding = plans.resolve_binding(root, plan_path, milestone, projection=projection)
     plan = plans.load_plan(plans.safe_path(root, plan_path))
     if binding['references'] != 'resolved' or binding['diagnostics_truncated']:
         raise ValueError('assignment has unresolved requirements: ' + '; '.join(binding['diagnostics']))
@@ -163,7 +165,8 @@ def bind_assignment(root, plan_path, milestone, *, run_id, dispatch_id, producer
     branch = subprocess.check_output(['git', '-C', str(root), 'branch', '--show-current'], text=True).strip()
     return dict(schema='implement-rfc.milestone-assignment.v1', **identity,
                 consumer_root=str(root), branch=branch, binding=binding,
-                target_milestones=[item['id'] for item in plan['milestones']])
+                target_milestones=([milestone] if binding.get('projection') else
+                                   [item['id'] for item in plan['milestones']]))
 
 
 def select_scope(plan, accepted, requested=None):
@@ -175,6 +178,23 @@ def select_scope(plan, accepted, requested=None):
     if selected is None or requested in accepted or not set(selected['depends_on']) <= set(accepted):
         raise ValueError('requested milestone is absent, already accepted or has pending prerequisites')
     return selected
+
+
+def independent_milestones(root, config, plan, accepted):
+    """Planning may include internal chains; pending outside prerequisites prevent bypass."""
+    import milestone_plan as plans
+    eligible = []
+    for item in plan['milestones']:
+        if item['id'] in accepted or not set(item['depends_on']) <= set(accepted):
+            continue
+        selected = {ref['issue'] for ref in item['work'] if 'issue' in ref}
+        rows = plans.planning_observations(root, config, plan, item['work'])['issues']
+        if any(row['external_depends_on'] or
+               set(row['unresolved_prerequisites']) - selected
+               for row in rows if row['id'] in selected):
+            continue
+        eligible.append(item['id'])
+    return eligible
 
 
 def main(argv=None):
@@ -190,6 +210,7 @@ def main(argv=None):
     parser.add_argument('--plan')
     parser.add_argument('--target', action='append', default=[])
     parser.add_argument('--milestone')
+    parser.add_argument('--projection', help='consumer-relative JSON list of explicitly authorized work references')
     parser.add_argument('--accepted-milestone', action='append', default=[])
     for field in ('run-id', 'dispatch-id', 'producer-id', 'mandate-revision', 'assignment', 'return-file'):
         parser.add_argument('--' + field)
@@ -216,7 +237,8 @@ def main(argv=None):
                 raise ValueError('no eligible milestone; reconcile required accepted evidence')
             result = bind_assignment(root, path.relative_to(root).as_posix(), selected['id'],
                 run_id=args.run_id, dispatch_id=args.dispatch_id, producer_id=args.producer_id,
-                mandate_revision=args.mandate_revision)
+                mandate_revision=args.mandate_revision,
+                projection=read(args.projection) if args.projection else None)
         else:
             assignment, returned = read(args.assignment), read(args.return_file)
             errors = assignment_errors(assignment)
@@ -226,16 +248,28 @@ def main(argv=None):
             if assignment.get('consumer_root') != str(root) or assignment.get('branch') != branch:
                 raise ValueError('assignment consumer or branch differs')
             binding = assignment.get('binding', {})
-            current = plans.resolve_binding(root, binding.get('plan_path'), binding.get('milestone_id'))
+            current = plans.resolve_binding(root, binding.get('plan_path'), binding.get('milestone_id'),
+                                            projection=binding.get('projection'))
             current_plan = plans.load_plan(plans.safe_path(root, binding['plan_path']))
+            # Validate prerequisite observations against the parent plan, while
+            # projected completion accounts only for its own target milestone.
+            plans.select_milestone(current_plan, args.accepted_milestone)
+            accepted_target = [mid for mid in args.accepted_milestone if mid in assignment['target_milestones']]
+            if isinstance(returned, dict) and returned.get('disposition') == 'pack-complete' and current_plan.get('unplanned_work'):
+                raise ValueError('partial plan still has required unplanned work; complete its formation before closeout')
             result = continuation(returned, assignment, execution=args.execution, current_binding=current,
                 consumed=read(args.consumed) if args.consumed else (), cancelled=args.cancelled,
-                accepted_milestones=args.accepted_milestone,
-                current_target_milestones=[item['id'] for item in current_plan['milestones']],
+                accepted_milestones=accepted_target,
+                current_target_milestones=([binding['milestone_id']] if binding.get('projection') else
+                                          [item['id'] for item in current_plan['milestones']]),
+                eligible_milestones=independent_milestones(root, ctx.config, current_plan,
+                                                         args.accepted_milestone),
                 review_relay=args.review_relay,
                 prior_partial=read(args.prior_partial) if args.prior_partial else None)
             if result['action'] in ('fresh-integrator', 'resume-integrator'):
                 request = returned['continuation']
+                if binding.get('projection') and request['next_milestone'] != binding['milestone_id']:
+                    raise ValueError('projected scope cannot authorize another milestone')
                 accepted = list(args.accepted_milestone)
                 if returned['disposition'] == 'milestone-complete':
                     accepted.append(binding['milestone_id'])

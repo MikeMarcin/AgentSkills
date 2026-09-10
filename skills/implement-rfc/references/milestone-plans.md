@@ -40,6 +40,48 @@ intent and every selected obligation; expose excluded dependencies and unsupport
 mechanical branches. Do not claim the helper normalized prose or proved semantic
 coverage. No synthetic RFC, planner agent or extra approval ceremony is required.
 
+### Adaptive preparation
+
+The implementing engineer writes a bounded JSON proposal, preserving legacy stage
+grouping and source intent. Run `prepare --source-root SOURCE --proposal proposal.json
+--target ID --repo-root ROOT --json` before adoption. This is a read-only check,
+not a Markdown parser. Retain its complete receipt beside the live plan in the
+existing workflow records: legacy `source_evidence` includes the original text,
+relative path and SHA-256. Keep the original source immutable. Adopt the proposal
+explicitly with `adopt --source-root SOURCE --plan proposal.json`; its normal
+source receipt identifies the normalized JSON. Both receipts are needed to trace
+legacy intent. Later target-only discovery follows the adopted JSON once.
+
+For absent plans, the same engineer defines the current outcome and executes it.
+For partial plans, retain `unplanned_work` until decomposed. Use `check-amendment
+--plan CURRENT --proposal PROPOSED --reason TEXT --source-basis TEXT` to check the
+refinement before publishing it. This observational check requires unchanged scope
+and plan identity, preserves all work selectors and exit text, and reports affected
+milestones. It does not authorize changed requirements or publication. Whole-source
+work cannot mechanically be replaced with a guessed criterion list. Reconcile such
+requirement changes explicitly under the existing mandate.
+
+`bind` and `inspect` accept a consumer-relative `--projection FILE` containing a
+nonempty typed work list. Selection must be within the current milestone; original
+exits and source definition identity remain bound. Narrowed completion applies only
+to the projection, never its parent card, milestone or RFC. `inspect` also reports
+transitive issue prerequisites, missing/unfinished and excluded prerequisites,
+external dependency records, and unplanned work. These are observations for planning;
+they do not claim eligibility, acceptance or permission to work outside the mandate.
+Consult actual board eligibility before claiming work, including human-pending
+prerequisites. Reuse relevant accepted evidence through the normal return contract.
+
+Before publishing an amendment, reconcile affected active assignments and safely
+renew their binding. Keep pending human/native decisions and their exact candidates
+in continuation evidence; the plan never stores acceptance state. An unchanged
+current definition with unchanged prerequisite/requirement fingerprints survives
+future-only refinement. Recovery carries the same outstanding obligations after
+writer quiescence and actual effects have been reconciled; it is not an amendment
+that deletes unfinished work.
+After a blocked or human-pending return, `independent-work` continuation may select
+an independently eligible authorized milestone after safe release. Preserve the
+pending candidate handoff; an unmet prerequisite cannot be bypassed by this reason.
+
 ## Complete and continue
 
 V2 returns carry the exact binding, acceptance records for every obligation/exit,

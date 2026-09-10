@@ -170,7 +170,8 @@
             "explicit-user-request",
             "current-milestone",
             "pending-obligation",
-            "target-complete"
+            "target-complete",
+            "independent-work"
           ]
         },
         "detail": {

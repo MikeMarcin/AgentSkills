@@ -200,7 +200,78 @@ def requirement_text(raw, matter):
     return body.strip()
 
 
-def resolve_binding(repo_root, plan_path, milestone_id):
+def project_work(milestone, projection):
+    if projection is None:
+        return milestone['work']
+    probe = {'schema': 'implement-rfc.milestone-plan.v1', 'id': 'projection',
+             'scope': {'rfcs': ['RFC-CHECK-1']},
+             'milestones': [dict(milestone, work=projection, depends_on=[])]}
+    # Validate reference syntax and overlap using the common contract.
+    errors = validate_plan(probe)
+    if errors:
+        raise PlanError('; '.join(errors))
+    selected = []
+    for original in milestone['work']:
+        kind = 'issue' if 'issue' in original else 'rfc'
+        matches = [r for r in projection if r.get(kind) == original[kind]]
+        for ref in matches:
+            if 'criteria' in original and ('criteria' not in ref or
+                    not set(ref['criteria']) <= set(original['criteria'])):
+                continue
+            selected.append(dict(ref, criteria=[c for c in original['criteria'] if c in ref['criteria']])
+                            if 'criteria' in original else ref)
+    if len(selected) != len(projection):
+        raise PlanError('projection must select only work in the current milestone')
+    return selected
+
+
+def planning_observations(root, config, plan, work):
+    docs = documents(root, config)
+    selected = {r['issue'] for r in work if 'issue' in r}
+    pending = list(sorted(selected))
+    rows = {}
+    while pending:
+        identity = pending.pop(0)
+        if identity in rows:
+            continue
+        values = docs[identity][2].values if identity in docs else {}
+        deps = values.get('depends_on', [])
+        if not isinstance(deps, list) or any(not isinstance(d, str) for d in deps):
+            raise PlanError(f'{identity}: invalid dependencies')
+        rows[identity] = {'id': identity, 'status': values.get('status', 'unknown'),
+            'depends_on': deps, 'excluded_prerequisites': [d for d in deps if d not in selected],
+            'unresolved_prerequisites': [d for d in deps if d not in docs or
+                docs[d][2].values.get('status') != 'Done'],
+            'external_depends_on': values.get('external_depends_on', [])}
+        pending.extend(d for d in deps if d not in rows)
+    return {'issues': list(rows.values()), 'unplanned_work': plan.get('unplanned_work', []),
+            'acceptance': 'unknown'}
+
+
+def check_amendment(before, after, reason, source_basis):
+    if not reason or not reason.strip() or not source_basis or not source_basis.strip():
+        raise PlanError('amendment requires a reason and source basis')
+    if before['id'] != after['id'] or before['scope'] != after['scope']:
+        raise PlanError('amendment cannot change plan identity or authorized scope')
+    def atoms(plan):
+        return {(r.get('issue', r.get('rfc')), c)
+                for refs in [m['work'] for m in plan['milestones']] + [plan.get('unplanned_work', [])]
+                for r in refs for c in r.get('criteria', ['*'])}
+    if atoms(before) != atoms(after):
+        raise PlanError('amendment must preserve every obligation; reconcile changed requirements separately')
+    old_exits = {e for m in before['milestones'] for e in m['exit_criteria']}
+    new_exits = {e for m in after['milestones'] for e in m['exit_criteria']}
+    if not old_exits <= new_exits:
+        raise PlanError('amendment must preserve all exit criteria, including pending decisions')
+    old = {m['id']: m for m in before['milestones']}
+    new = {m['id']: m for m in after['milestones']}
+    return {'state': 'amendment-checked', 'reason': reason, 'source_basis': source_basis,
+            'before_fingerprint': fingerprint(before), 'after_fingerprint': fingerprint(after),
+            'affected_milestones': sorted(k for k in old.keys() | new.keys() if old.get(k) != new.get(k)),
+            'semantic_coverage': 'unknown', 'next': 'reconcile affected assignments before publication'}
+
+
+def resolve_binding(repo_root, plan_path, milestone_id, projection=None):
     ctx = project_config.resolve_context(repo_root=repo_root)
     root = ctx.repo_root
     path = safe_path(root, str(plan_path))
@@ -215,7 +286,8 @@ def resolve_binding(repo_root, plan_path, milestone_id):
                'issues': {i: row[2].values for i, row in docs.items() if not i.startswith('RFC-')}}
     errors = validate_plan(plan, catalog)
     obligations = []
-    for ref in milestone['work']:
+    work = project_work(milestone, projection)
+    for ref in work:
         source = ref.get('issue', ref.get('rfc'))
         if source not in docs:
             continue
@@ -242,13 +314,16 @@ def resolve_binding(repo_root, plan_path, milestone_id):
     collect(milestone_id)
     exits = [{'id': f'{milestone_id}:exit:{i+1}', 'text': text}
              for i, text in enumerate(milestone['exit_criteria'])]
-    return {'plan_id': plan['id'], 'plan_path': str(plan_path), 'milestone_id': milestone_id,
+    result = {'plan_id': plan['id'], 'plan_path': str(plan_path), 'milestone_id': milestone_id,
         'definition_fingerprint': digest(milestone), 'obligations': obligations,
         'obligation_fingerprint': digest({'obligations': obligations, 'exit_criteria': exits}),
         'exit_criteria': exits, 'prerequisite_fingerprint': digest(prerequisites),
         'structural': 'valid', 'references': 'unresolved' if errors else 'resolved',
         'semantic_coverage': 'unknown', 'diagnostics': [e[:1024] for e in sorted(set(errors))[:32]],
         'diagnostics_truncated': len(set(errors)) > 32 or any(len(e) > 1024 for e in errors)}
+    if projection is not None:
+        result['projection'] = work
+    return result
 
 
 def select_milestone(plan, accepted=()):
@@ -330,12 +405,16 @@ def adopt(root, config, source, mapping):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('operation', choices=['discover', 'check', 'adopt', 'render', 'bind', 'inspect'])
+    parser.add_argument('operation', choices=['discover', 'check', 'adopt', 'render', 'bind', 'inspect', 'prepare', 'check-amendment'])
     parser.add_argument('--repo-root', required=True)
     parser.add_argument('--source-root')
     parser.add_argument('--plan')
     parser.add_argument('--target', action='append', default=[])
     parser.add_argument('--milestone')
+    parser.add_argument('--projection', help='consumer-relative JSON selected work list')
+    parser.add_argument('--proposal', help='source-relative engineer-authored plan JSON')
+    parser.add_argument('--reason')
+    parser.add_argument('--source-basis')
     parser.add_argument('--accepted-milestone', action='append', default=[],
                         help='previously accepted milestone ID (requires caller evidence)')
     parser.add_argument('--id-map', help='relative JSON ID map in source root')
@@ -345,6 +424,31 @@ def main(argv=None):
         ctx = project_config.resolve_context(repo_root=args.repo_root)
         result = discover(ctx.repo_root, ctx.config, source_root=args.source_root,
                           plan=args.plan, targets=args.target)
+        if args.operation in ('prepare', 'check-amendment'):
+            if not args.proposal:
+                raise PlanError('preparation/amendment requires an engineer-authored --proposal')
+            source = Path(args.source_root or ctx.repo_root).resolve()
+            proposal = load_plan(safe_path(source, args.proposal))
+            if result['state'] == 'found':
+                result = check_amendment(load_plan(Path(result['path'])), proposal, args.reason, args.source_basis)
+            elif args.operation == 'check-amendment':
+                raise PlanError('amendment requires an existing structured plan')
+            else:
+                evidence = None
+                if result['state'] == 'needs-normalization':
+                    legacy = Path(result['path'])
+                    if legacy.stat().st_size > 1024 * 1024:
+                        raise PlanError('legacy source exceeds 1 MiB')
+                    raw = legacy.read_bytes()
+                    evidence = {'path': legacy.relative_to(source).as_posix(),
+                        'sha256': hashlib.sha256(raw).hexdigest(), 'text': raw.decode('utf-8')}
+                if not set(args.target) <= plan_references(proposal):
+                    raise PlanError('proposal omits selected targets')
+                result = {'state': 'prepared', 'origin': result['state'], 'source_evidence': evidence,
+                    'plan': proposal, 'semantic_coverage': 'unknown',
+                    'next': 'engineer reconciles intent, retains this receipt, adopts and implements'}
+            print(json.dumps(result) if args.json else f"Plan: {proposal['id']} — {result['state']}; semantic coverage unknown")
+            return 0
         if result['state'] == 'found':
             path = Path(result['path'])
             plan = load_plan(path)
@@ -358,8 +462,10 @@ def main(argv=None):
                 if selected is None:
                     raise PlanError('no eligible milestone or unknown selected milestone', 'unresolved')
                 result = resolve_binding(ctx.repo_root, path.relative_to(ctx.repo_root).as_posix(),
-                                         selected['id'])
-                result['work'] = selected['work']
+                                         selected['id'], load_json(safe_path(ctx.repo_root, args.projection)) if args.projection else None)
+                result['work'] = result.get('projection', selected['work'])
+                if args.operation == 'inspect':
+                    result['planning'] = planning_observations(ctx.repo_root, ctx.config, plan, result['work'])
             elif args.operation == 'render':
                 view = render(plan)
                 if not args.json:

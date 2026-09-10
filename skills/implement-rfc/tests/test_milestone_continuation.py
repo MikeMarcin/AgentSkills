@@ -110,3 +110,16 @@ class BoundReturnTests(unittest.TestCase):
         self.assertEqual(self.action(accepted_milestones={'second':True}),'reconcile')
         self.assignment['unexpected']=True
         self.assertEqual(self.action(),'reconcile')
+
+    def test_pending_independent_work_requires_current_eligibility_and_durable_gap(self):
+        pending=copy.deepcopy(self.reply)
+        pending.update(disposition='human-pending', required_pending=['Native course remains'],
+                       acceptance_records=[])
+        pending['continuation'].update(reason='independent-work',
+            detail='Native course remains on the protected handoff; independent documentation is eligible.')
+        self.assertEqual(self.action(pending),'reconcile')
+        self.assertEqual(self.action(pending,eligible_milestones=['second']),'fresh-integrator')
+        pending['continuation']['intent']='continue'
+        self.assertEqual(self.action(pending,eligible_milestones=['second']),'resume-integrator')
+        pending['required_pending']=[]
+        self.assertEqual(self.action(pending,eligible_milestones=['second']),'reconcile')
