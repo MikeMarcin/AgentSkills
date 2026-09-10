@@ -1,10 +1,14 @@
 ---
 id: "RFC-ASK-0012"
 title: "Authored milestone plans and outcome-bound continuation"
-status: "Proposed"
+status: "Implementing"
 ---
 
 # RFC-ASK-0012: Authored milestone plans and outcome-bound continuation
+
+Accepted for implementation under the supplied pack mandate. Live plan:
+[agent-skills-milestone-handling](plans/agent-skills-milestone-handling/milestone-plan.json).
+Continuation and immutable baseline live on [ASK-0066](../issues/10-backlog/ASK-0066-close-milestone-handling.md).
 
 ## 1. Decision and scope
 
