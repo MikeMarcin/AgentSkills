@@ -48,34 +48,92 @@ Planned cards: ASK-0060, ASK-0061, ASK-0062, ASK-0063, ASK-0064, ASK-0065, ASK-0
 
 Current milestone plan: [agent-skills-milestone-handling](../../rfcs/plans/agent-skills-milestone-handling/milestone-plan.json).
 
-Current continuation: run agent-skills-milestone-handling / dispatch-003 / mandate revision 2;
-producer `/root/milestone_integrator_1`. `authored-plan-execution` is accepted at
-source candidate 0d3116bf6153332b1a15531e36b4ccb5ca6b25f2 after the evidence below.
-The [computed assignment](../../rfcs/plans/agent-skills-milestone-handling/dispatch-003.assignment.json)
-preserves all three original exits. Request fresh context for the next authored
-milestone, `adaptive-targets-and-qualified-adoption`: its adaptive branches and two
-native qualification courses form the next substantial outcome. Remaining plan is
-unchanged; M2 is unstarted. No native loading is asserted. Unrelated native-role lock
-remains preserved. Earlier dispatch notes below are historical, superseded by this record.
+Current continuation: run agent-skills-milestone-handling / dispatch-004 / mandate revision 2;
+producer `/root/milestone_integrator_2`. M1 remains accepted. M2
+`adaptive-targets-and-qualified-adoption` is human-pending: ASK-0063 and ASK-0064 are
+Done, ASK-0065 is parked for the native-course authorization, and ASK-0066 remains
+dependency-blocked Backlog. Source candidate 4938be2a68b3f74bedb0129a197cf352496218b9;
+selected adoption and partial qualification record 4f02a6f7face75bd899b8f728b8be499a469e8e5.
+The [current assignment](../../rfcs/plans/agent-skills-milestone-handling/dispatch-004.assignment.json)
+retains every original obligation/exit. Neither native course ran. The coordinator
+confirmed no approved capacity/time ceiling or native driver/operator instruction
+exists in the mandate and directed this human-pending handoff. Resume this integrator
+for the same milestone after that decision, with a new dispatch identity; no accepted
+M2 boundary or pack completion is asserted. Earlier frontiers below are historical.
 
 ## Closeout checklist
 
 | Acceptance | Direct check / evidence | Outcome | Implementation revision |
 |---|---|---|---|
-| RFC-ASK-0012-AC01 | Authored-plan-first discovery | Not run | Not recorded |
-| RFC-ASK-0012-AC02 | Portable plan contract and authoring | Not run | Not recorded |
-| RFC-ASK-0012-AC03 | Live adoption and resume linkage | Not run | Not recorded |
-| RFC-ASK-0012-AC04 | Plan-driven assignment and continuation | Not run | Not recorded |
-| RFC-ASK-0012-AC05 | Completion separate from context renewal | Not run | Not recorded |
-| RFC-ASK-0012-AC06 | Legacy and planless targets | Not run | Not recorded |
-| RFC-ASK-0012-AC07 | Dependency and partial-work correctness | Not run | Not recorded |
-| RFC-ASK-0012-AC08 | Reasoned amendment without lost work | Not run | Not recorded |
-| RFC-ASK-0012-AC09 | Role and verification efficiency | Not run | Not recorded |
-| RFC-ASK-0012-AC10 | Structural and public-path regression | Not run | Not recorded |
-| RFC-ASK-0012-AC11 | Bounded native qualification | Not run | Not recorded |
-| RFC-ASK-0012-AC12 | Safe selected adoption and truthful closeout | Not run | Not recorded |
+| RFC-ASK-0012-AC01 | Raw authored discovery/refusal; M1 public course and adaptive invalid-input tests | Offline pass | 0d3116b / 68a4825 |
+| RFC-ASK-0012-AC02 | Canonical schema, offline template, exact generated view, partial/RFC/criterion examples | Pass | 4938be2 |
+| RFC-ASK-0012-AC03 | Typed remap/adoption retry, target-only resume and linked-consumer isolation | Offline pass | 0d3116b / 68a4825 |
+| RFC-ASK-0012-AC04 | Bound assignment, intermediate card/refused false completion, explicit continuation | Offline pass; actual driver course under AC11 | 68a4825 |
+| RFC-ASK-0012-AC05 | Continue/fresh/pending/recovery/new dispatch and stale/duplicate guards | Offline pass; actual driver course under AC11 | 68a4825 |
+| RFC-ASK-0012-AC06 | Raw legacy receipt/adoption/resume, planless RFC/loose issues/disjoint criteria | Offline pass | 68a4825 |
+| RFC-ASK-0012-AC07 | Dependency look-ahead, narrowed target, pending prerequisite and parent-closeout refusals | Pass | 68a4825 |
+| RFC-ASK-0012-AC08 | Preserved work/exits in amendment, future/current drift, recovery and stale dispatch | Pass | 68a4825 |
+| RFC-ASK-0012-AC09 | 3 instruction + 19 actual rendered-adapter tests; role routes/addenda preserved; static reading count below | Pass | 4938be2 |
+| RFC-ASK-0012-AC10 | 38 milestone/schema/authoring/diagnostic tests; two linked public consumers, raw/refusal/recovery inputs | Pass | 4938be2 |
+| RFC-ASK-0012-AC11 | Both actual interactive courses | Pending: approved ceiling and native driver instruction absent; no course run | Candidate 4938be2 |
+| RFC-ASK-0012-AC12 | Guarded AgentSkills-only MASK setup and ready/no-op checks; recorded continuation diagnostics | Partial: filesystem adoption passed; native loading/final acceptance pending | 4938be2 / 4f02a6f |
 
 ## Selected adoption and limits
+
+### Prepared human decision and final unattended frontier
+
+Exact ask: provide the explicit capacity/time ceiling for two initial native courses
+total (one Claude, one Codex), and the normal signed-in native coordinator driver/operator
+instruction. Native permission prompts remain user decisions. No extra purchase,
+reset, billing fallback, exec/-p/API substitution or unapproved retry is authorized.
+Approval permits the bounded attempt; completion still requires direct passing evidence.
+
+Prepared offline page: `/tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html`.
+[Review definition](../../rfcs/plans/agent-skills-milestone-handling/native-course-review.json).
+Attended session `0408f2dc542e7ef5ed3431fc92384027`, candidate
+`ASK-0065-native-course-authorization`, fingerprint
+`9a77eb9b1620a4b0ee26b90936174b86e6e03d061dcd552b7dad9e968178462f` is ready/protected
+with no decision. Its resource is the immutable candidate; no live source path is
+locked. Import any offline export before consuming it, and verify its note actually
+supplies the ceiling/driver. There is no review server or model course running.
+
+Immutable candidate archive `/tmp/agent-skills-m2-adoption.rqZw9U/candidate-4938be2.tar`
+contains the exact skill and raw fixture pack at 4938be2; SHA-256
+`5d92be63eeccdfa230d622cda4e1e8732b4bab29c682c077f9241b4eb4c440e3`.
+Do not pre-adopt/discover the native fixture plan: the tested normal entrypoint must
+do that. Use each driver's raw authored course, actual progress/safe resume and
+integration transition, then its tiny planless follow-up. Native identities and
+full local transcripts remain future evidence, never fabricated fixture results.
+
+[Selected adoption receipt](../../rfcs/plans/agent-skills-milestone-handling/selected-adoption.json)
+records guarded AgentSkills-only MASK setup, all 16 roles, exact before/after lock
+hashes and recovery. `workflow_preflight` is ready; `ensure --offline --check` is
+unchanged/ready. All prior/current model/effort and sandbox/permission-mode fields
+match; lock context inputs/parameters and canonical routes/addenda are unchanged.
+The prior untracked lock was not authored by this run. Its exact bytes, all roles
+and the old standalone manifest are archived in
+`/tmp/agent-skills-m2-adoption.rqZw9U/prior-roles.tar` (SHA-256
+`39101be9bce708b6ec656d665988d99f4c467a2db690b07bd50feb16503fd7f1`).
+MASK regenerated the new portable lock and it is now committed. Keep the archive;
+do not unpack it over managed files. Any authorized rollback must inspect current
+ownership/drift and use supported scoped reconciliation with the prior source/inputs.
+The historical standalone renderer manifest was preserved and is not current MASK
+authority. Active coordinator/integrator assignments were retained without hot reload;
+filesystem adoption does not prove native loading.
+
+Final unattended checks: 38 milestone/schema tests (no skips), 12 historical handoff,
+3 instruction and 19 rendered-adapter tests pass. Portable source manifest valid;
+documentation gate reports 12 RFCs / 66 cards / zero violations. Worker and critical
+reviewer are natively completed, report no descendants, and left no unaccounted edits.
+All task commands finished. Retained archives/page are needed handoffs; ordinary test
+temporary roots were cleaned by their fixture contexts. No publication or unselected
+consumer migration occurred. RFC-ASK-0010/0011 and original baseline remain unchanged.
+
+Static common-path update: shared plan reference 547 words/4,389 bytes →
+927 words/7,291 bytes. With the same M1 counting method and fixed consumer material,
+coordinator total 5,406/43,381; integrator 5,178/41,912; worker unchanged 3,180/26,119.
+The offline kit is conditional authoring material. These whitespace-word/UTF-8-byte
+counts are not runtime input, quota debits or savings.
 
 ### Second milestone frontier — dispatch-004, mandate 2
 
