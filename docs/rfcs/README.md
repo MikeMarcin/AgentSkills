@@ -28,3 +28,5 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0009 | Auto-Verified | Standard implementation worker and independent review routing |
 
 | RFC-ASK-0010 | Auto-Verified | Interactive coordinator and milestone integrators |
+
+| RFC-ASK-0011 | Implementing | Declared MASK workflow readiness for implement-rfc |
