@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
 import os
 from pathlib import Path
@@ -81,6 +82,38 @@ def documents(root, config):
     return result
 
 
+def plan_references(plan):
+    refs = set(plan['scope'].get('issues', []) + plan['scope'].get('rfcs', []))
+    for work in [m['work'] for m in plan['milestones']] + [plan.get('unplanned_work', [])]:
+        refs.update(r.get('issue', r.get('rfc')) for r in work)
+    return refs
+
+
+def require_live_linkage(root, path, plan, docs):
+    """A published definition is not ready until every scoped link is durable."""
+    expected = {'id': plan['id'], 'path': path.relative_to(root).as_posix()}
+    missing = []
+    for identity in sorted(plan_references(plan)):
+        if identity not in docs:
+            missing.append(identity)
+            continue
+        document, raw, matter = docs[identity]
+        metadata = matter.values.get('metadata', {})
+        linked = isinstance(metadata, dict) and metadata.get('milestone_plan') == expected
+        if not linked and identity.startswith('RFC-'):
+            for pointer in re.findall(r'\[[^\]]*\]\(([^)]+milestone-plan\.json)\)', raw.decode()):
+                candidate = document.parent / pointer
+                relative = candidate.relative_to(root).as_posix()
+                if safe_path(root, relative) == path:
+                    linked = True
+        if not linked:
+            missing.append(identity)
+    if missing:
+        raise PlanError('incomplete adoption at ' + expected['path'] + ': missing linkage for '
+            + ', '.join(missing[:16]) + '; retry adopt with the original --source-root and --id-map; '
+            'the existing source receipt and live plan will be preserved', 'stale')
+
+
 def discover(root, config, *, source_root=None, plan=None, targets=()):
     source = Path(source_root or root).resolve()
     if plan is not None:
@@ -107,10 +140,23 @@ def discover(root, config, *, source_root=None, plan=None, targets=()):
                 # RFC links are relative to the RFC document, constrained to root.
                 relative = (path.parent / pointer).relative_to(root).as_posix()
                 links.add(str(safe_path(root, relative)))
+    # Bounded live-directory lookup recovers target-only resume even when an
+    # interrupted adoption has published no document metadata yet.
+    if targets:
+        live_paths = list(itertools.islice((root / config['rfc_root'] / 'plans').glob('*/milestone-plan.json'), 257))
+        if len(live_paths) > 256:
+            raise PlanError('live plan lookup exceeds 256 plans; select --plan explicitly')
+        for candidate in live_paths:
+            candidate = safe_path(root, candidate.relative_to(root).as_posix())
+            live = load_plan(candidate)
+            if set(targets) & plan_references(live):
+                links.add(str(candidate))
     if len(links) > 1:
         raise PlanError('conflicting live plan candidates', 'ambiguous')
     if links:
-        return {'state': 'found', 'path': links.pop(), 'origin': 'live'}
+        path = Path(links.pop())
+        require_live_linkage(root, path, load_plan(path), docs)
+        return {'state': 'found', 'path': str(path), 'origin': 'live'}
     pointers = set()
     for name in ('PACK_MANIFEST.json', 'packet-index.json'):
         path = safe_path(source, name)
@@ -164,6 +210,7 @@ def resolve_binding(repo_root, plan_path, milestone_id):
         raise PlanError(f'unknown milestone: {milestone_id}')
     milestone = milestones[milestone_id]
     docs = documents(root, ctx.config)
+    require_live_linkage(root, path, plan, docs)
     catalog = {'rfcs': [i for i in docs if i.startswith('RFC-')],
                'issues': {i: row[2].values for i, row in docs.items() if not i.startswith('RFC-')}}
     errors = validate_plan(plan, catalog)

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from pathlib import PurePosixPath
 import re
+from milestone_continuation import V2, v2_errors, v2_action, assignment_errors
 
 SCHEMA = "implement-rfc.milestone-return.v1"
 IDENTITY = ("run_id", "dispatch_id", "producer_id", "mandate_revision", "milestone")
@@ -25,9 +26,10 @@ def validate_return(value: object) -> list[str]:
     if not isinstance(value, dict) or not required <= value.keys():
         return ["missing required return fields"]
     errors = []
-    if value.keys() - required - {"review_request"}:
+    extension = {"binding", "continuation", "acceptance_records"} if value["schema"] == V2 else set()
+    if value.keys() - required - {"review_request"} - extension:
         errors.append("unknown return fields")
-    if value["schema"] != SCHEMA:
+    if value["schema"] not in (SCHEMA, V2):
         errors.append("unsupported return schema")
     for key in (*IDENTITY, "summary"):
         if not isinstance(value[key], str) or not value[key].strip():
@@ -73,12 +75,15 @@ def validate_return(value: object) -> list[str]:
             errors.append("invalid review request")
     elif "review_request" in value:
         errors.append("unexpected review request")
+    if value["schema"] == V2 and not errors:
+        errors.extend(v2_errors(value))
     return errors
 
 
 def continuation(returned: object, assignment: dict, *, execution: str,
                  consumed=(), cancelled: bool = False, review_relay: bool = False,
-                 prior_partial: dict | None = None) -> dict:
+                 prior_partial: dict | None = None, current_binding: dict | None = None,
+                 accepted_milestones=(), current_target_milestones=None) -> dict:
     """Suggest a control action from explicit observations, without mutation.
 
     execution describes the producer AND its owned children/commands, not merely
@@ -91,9 +96,21 @@ def continuation(returned: object, assignment: dict, *, execution: str,
 
     if cancelled:
         return result("stop", "current user mandate is cancelled; account for outstanding effects")
+    if (not isinstance(consumed, (list, tuple)) or any(not isinstance(item, (list, tuple))
+        or len(item) != len(IDENTITY) or any(not isinstance(v, str) for v in item) for item in consumed)):
+        return result('reconcile', 'consumed observations must be identity tuple lists')
+    if (isinstance(returned, dict) and returned.get("schema") == SCHEMA
+            and (assignment.get("binding") is not None or current_binding is not None)):
+        return result("reconcile", "legacy return needs scoped plan binding; preserve its native producer")
     errors = validate_return(returned)
     if errors:
         return result("reconcile" if execution == "unknown" else "clarify", "; ".join(errors))
+    if returned['schema'] == V2 and assignment_errors(assignment):
+        return result('reconcile', '; '.join(assignment_errors(assignment)))
+    if returned['schema'] == V2 and (not isinstance(accepted_milestones, (list, tuple))
+        or any(not isinstance(item, str) for item in accepted_milestones)
+        or set(accepted_milestones) - set(assignment['target_milestones'])):
+        return result('reconcile', 'accepted milestone observations differ from the assigned target')
     if any(returned[key] != assignment.get(key) for key in IDENTITY):
         return result("ignore-stale", "result does not match the current native assignment and mandate")
     # A partial invocation may return repeatedly under one dispatch. The native
@@ -114,6 +131,11 @@ def continuation(returned: object, assignment: dict, *, execution: str,
                            "next_objective", "required_pending", "evidence_refs", "summary")
         if all(returned[field] == prior_partial.get(field) for field in progress_fields):
             return result("investigate", "repeated partial return supplies no new progress or actionable step")
+    if returned["schema"] == V2:
+        action, reason = v2_action(returned, assignment, current_binding, accepted_milestones, current_target_milestones)
+        return result(action, reason, key if action in {
+            "resume-integrator", "fresh-integrator", "pending", "stop", "report-closeout", "relay-review"
+        } else None)
     action = {
         "milestone-complete": "fresh-integrator",
         "continue-milestone": "resume-integrator",
@@ -123,3 +145,113 @@ def continuation(returned: object, assignment: dict, *, execution: str,
         "review-request": "relay-review" if review_relay else "clarify",
     }[returned["disposition"]]
     return result(action, "consume references; engineering judgment remains with the designated integrator", key)
+
+
+def bind_assignment(root, plan_path, milestone, *, run_id, dispatch_id, producer_id,
+                    mandate_revision):
+    """Compute scope identity from current consumer requirements, without writing."""
+    import subprocess
+    import milestone_plan as plans
+    binding = plans.resolve_binding(root, plan_path, milestone)
+    plan = plans.load_plan(plans.safe_path(root, plan_path))
+    if binding['references'] != 'resolved' or binding['diagnostics_truncated']:
+        raise ValueError('assignment has unresolved requirements: ' + '; '.join(binding['diagnostics']))
+    identity = dict(run_id=run_id, dispatch_id=dispatch_id, producer_id=producer_id,
+                    mandate_revision=mandate_revision, milestone=milestone)
+    if any(not isinstance(value, str) or not value.strip() for value in identity.values()):
+        raise ValueError('assignment requires exact native and mandate identities')
+    branch = subprocess.check_output(['git', '-C', str(root), 'branch', '--show-current'], text=True).strip()
+    return dict(schema='implement-rfc.milestone-assignment.v1', **identity,
+                consumer_root=str(root), branch=branch, binding=binding,
+                target_milestones=[item['id'] for item in plan['milestones']])
+
+
+def select_scope(plan, accepted, requested=None):
+    import milestone_plan as plans
+    default = plans.select_milestone(plan, accepted)
+    if requested is None:
+        return default
+    selected = next((item for item in plan['milestones'] if item['id'] == requested), None)
+    if selected is None or requested in accepted or not set(selected['depends_on']) <= set(accepted):
+        raise ValueError('requested milestone is absent, already accepted or has pending prerequisites')
+    return selected
+
+
+def main(argv=None):
+    """Public observational composition over plan lookup and native observations."""
+    import argparse
+    import json
+    import subprocess
+    import milestone_plan as plans
+    import project_config
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('operation', choices=('assign', 'check'))
+    parser.add_argument('--repo-root', required=True)
+    parser.add_argument('--plan')
+    parser.add_argument('--target', action='append', default=[])
+    parser.add_argument('--milestone')
+    parser.add_argument('--accepted-milestone', action='append', default=[])
+    for field in ('run-id', 'dispatch-id', 'producer-id', 'mandate-revision', 'assignment', 'return-file'):
+        parser.add_argument('--' + field)
+    parser.add_argument('--execution', choices=('active', 'unknown', 'quiescent'), default='unknown')
+    parser.add_argument('--consumed', help='consumer-relative JSON list of consumed identity tuples')
+    parser.add_argument('--prior-partial', help='consumer-relative previous partial return')
+    parser.add_argument('--cancelled', action='store_true')
+    parser.add_argument('--review-relay', action='store_true')
+    parser.add_argument('--json', action='store_true')
+    args = parser.parse_args(argv)
+    try:
+        ctx = project_config.resolve_context(repo_root=args.repo_root)
+        root = ctx.repo_root
+        def read(relative):
+            return plans.load_json(plans.safe_path(root, relative))
+        if args.operation == 'assign':
+            found = plans.discover(root, ctx.config, plan=args.plan, targets=args.target)
+            if found['state'] != 'found':
+                raise ValueError('assignment needs adopted plan: ' + found['state'])
+            path = plans.Path(found['path'])
+            plan = plans.load_plan(path)
+            selected = select_scope(plan, args.accepted_milestone, args.milestone)
+            if selected is None:
+                raise ValueError('no eligible milestone; reconcile required accepted evidence')
+            result = bind_assignment(root, path.relative_to(root).as_posix(), selected['id'],
+                run_id=args.run_id, dispatch_id=args.dispatch_id, producer_id=args.producer_id,
+                mandate_revision=args.mandate_revision)
+        else:
+            assignment, returned = read(args.assignment), read(args.return_file)
+            errors = assignment_errors(assignment)
+            if errors:
+                raise ValueError('; '.join(errors))
+            branch = subprocess.check_output(['git', '-C', str(root), 'branch', '--show-current'], text=True).strip()
+            if assignment.get('consumer_root') != str(root) or assignment.get('branch') != branch:
+                raise ValueError('assignment consumer or branch differs')
+            binding = assignment.get('binding', {})
+            current = plans.resolve_binding(root, binding.get('plan_path'), binding.get('milestone_id'))
+            current_plan = plans.load_plan(plans.safe_path(root, binding['plan_path']))
+            result = continuation(returned, assignment, execution=args.execution, current_binding=current,
+                consumed=read(args.consumed) if args.consumed else (), cancelled=args.cancelled,
+                accepted_milestones=args.accepted_milestone,
+                current_target_milestones=[item['id'] for item in current_plan['milestones']],
+                review_relay=args.review_relay,
+                prior_partial=read(args.prior_partial) if args.prior_partial else None)
+            if result['action'] in ('fresh-integrator', 'resume-integrator'):
+                request = returned['continuation']
+                accepted = list(args.accepted_milestone)
+                if returned['disposition'] == 'milestone-complete':
+                    accepted.append(binding['milestone_id'])
+                plan = plans.load_plan(plans.safe_path(root, binding['plan_path']))
+                # A result cannot bypass authored hard prerequisites when choosing
+                # its next outcome. Evidence for prior accepted IDs remains caller-owned.
+                select_scope(plan, accepted, request['next_milestone'])
+        print(json.dumps(result, ensure_ascii=False) if args.json else
+              f"{result.get('action', 'Assigned')}: {result.get('reason', result.get('milestone'))}")
+        return 0 if result.get('action') not in ('clarify', 'reconcile') else 2
+    except (ValueError, OSError, TypeError, KeyError) as error:
+        result = {'action': 'reconcile', 'reason': str(error)[:8192], 'consume_key': None,
+                  'engineering_acceptance': 'not-evaluated'}
+        print(json.dumps(result) if args.json else 'Reconcile: ' + result['reason'])
+        return 2
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentskills:milestone-return:v2",
+  "title": "Plan-bound implement-rfc milestone return v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "dispatch_id",
+    "producer_id",
+    "mandate_revision",
+    "milestone",
+    "disposition",
+    "summary",
+    "candidate_revision",
+    "handoff_ref",
+    "ownership",
+    "next_objective",
+    "required_pending",
+    "evidence_refs",
+    "binding",
+    "continuation",
+    "acceptance_records"
+  ],
+  "properties": {
+    "schema": {
+      "const": "implement-rfc.milestone-return.v2"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dispatch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producer_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mandate_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "milestone": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "disposition": {
+      "enum": [
+        "milestone-complete",
+        "continue-milestone",
+        "human-pending",
+        "blocked",
+        "cancelled",
+        "pack-complete",
+        "review-request"
+      ]
+    },
+    "candidate_revision": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "handoff_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "ownership": {
+      "enum": [
+        "quiescent",
+        "active",
+        "unknown"
+      ]
+    },
+    "next_objective": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "required_pending": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "review_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "candidate_ref",
+        "assignment"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "rfc-reviewer",
+            "rfc-reviewer-critical"
+          ]
+        },
+        "candidate_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assignment": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "binding": {
+      "$ref": "milestone-assignment.schema.json#/$defs/binding"
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intent",
+        "next_milestone",
+        "reason",
+        "detail"
+      ],
+      "properties": {
+        "intent": {
+          "enum": [
+            "continue",
+            "fresh",
+            "wait",
+            "stop"
+          ]
+        },
+        "next_milestone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "reason": {
+          "enum": [
+            "integrated-boundary",
+            "related-continuation",
+            "context-pressure",
+            "producer-unavailable",
+            "ownership-recovery",
+            "explicit-user-request",
+            "current-milestone",
+            "pending-obligation",
+            "target-complete"
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "acceptance_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "outcome",
+          "evidence_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "outcome": {
+            "enum": [
+              "pass",
+              "fail",
+              "pending"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "pack-complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "ownership": {
+            "const": "quiescent"
+          },
+          "next_objective": {
+            "type": "null"
+          },
+          "required_pending": {
+            "maxItems": 0
+          },
+          "evidence_refs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "milestone-complete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "ownership": {
+            "const": "quiescent"
+          },
+          "handoff_ref": {
+            "type": "string"
+          },
+          "evidence_refs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "const": "review-request"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "review_request"
+        ],
+        "properties": {
+          "ownership": {
+            "const": "quiescent"
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "required": [
+            "review_request"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "disposition": {
+            "enum": [
+              "milestone-complete",
+              "pack-complete"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "required_pending": {
+            "maxItems": 0
+          },
+          "acceptance_records": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "outcome": {
+                  "const": "pass"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

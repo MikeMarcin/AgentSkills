@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agentskills:milestone-assignment:v1",
+  "title": "Bound implement-rfc milestone assignment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "dispatch_id",
+    "producer_id",
+    "mandate_revision",
+    "milestone",
+    "consumer_root",
+    "branch",
+    "binding",
+    "target_milestones"
+  ],
+  "properties": {
+    "target_milestones": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      }
+    },
+    "schema": {
+      "const": "implement-rfc.milestone-assignment.v1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "dispatch_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "producer_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "mandate_revision": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "milestone": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "consumer_root": {
+      "type": "string",
+      "pattern": "^(?:/|[A-Za-z]:[\\\\/]|\\\\\\\\).+"
+    },
+    "branch": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "binding": {
+      "$ref": "#/$defs/binding"
+    }
+  },
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_id",
+        "plan_path",
+        "milestone_id",
+        "definition_fingerprint",
+        "obligation_fingerprint",
+        "prerequisite_fingerprint",
+        "obligations",
+        "exit_criteria",
+        "structural",
+        "references",
+        "semantic_coverage",
+        "diagnostics",
+        "diagnostics_truncated"
+      ],
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "plan_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*[\\\\:]).+$"
+        },
+        "milestone_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "definition_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "obligation_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "prerequisite_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "obligations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "source",
+              "selector",
+              "source_fingerprint"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "selector": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "exit_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "text"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "structural": {
+          "const": "valid"
+        },
+        "references": {
+          "const": "resolved"
+        },
+        "semantic_coverage": {
+          "const": "unknown"
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "diagnostics_truncated": {
+          "const": false
+        },
+        "work": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "milestone-plan.schema.json#/$defs/work"
+          }
+        }
+      }
+    }
+  }
+}

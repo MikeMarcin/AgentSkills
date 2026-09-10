@@ -177,6 +177,43 @@ class PlanTests(unittest.TestCase):
         result = self.cli(self.roots[0], 'discover', '--target', 'ONE-0001', code=2)
         self.assertIn('metadata must be an object', result['diagnostic'])
 
+    def test_interrupted_adoption_target_only_resume_refuses_until_retry(self):
+        self.plan['scope']['rfcs'] = ['RFC-ONE-0001']
+        self.save(self.plan)
+        for root, failure in zip(self.roots, (3, 4)):
+            self.write(root / 'docs/rfcs/RFC-ONE-0001-demo.md',
+                       '---\nid: "RFC-ONE-0001"\n---\n## Acceptance\nAC01: usable.\n')
+            script = '''import sys
+sys.path.insert(0, sys.argv.pop(1))
+import milestone_plan as mp
+original = mp.os.replace
+calls = 0
+failure = int(sys.argv.pop(1))
+def replace(source, destination):
+    global calls
+    calls += 1
+    if calls == failure:
+        raise OSError('injected metadata publication failure')
+    return original(source, destination)
+mp.os.replace = replace
+sys.exit(mp.main())
+'''
+            result = subprocess.run([sys.executable, '-B', '-c', script,
+                str(root / '.agents/skills/implement-rfc/scripts'), str(failure), 'adopt',
+                '--repo-root', str(root), '--source-root', str(self.source), '--id-map', 'map.json', '--json'],
+                cwd=self.base, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+            receipt = root / 'docs/rfcs/plans/demo/source.json'
+            before = receipt.read_bytes()
+            for target in ('ONE-0001', 'RFC-ONE-0001'):
+                result = self.cli(root, 'discover', '--target', target, code=2)
+                self.assertEqual(result['state'], 'stale')
+                self.assertIn('original --source-root', result['diagnostic'])
+            self.cli(root, 'bind', '--plan', 'docs/rfcs/plans/demo/milestone-plan.json', code=2)
+            self.adopt(root)
+            self.assertEqual(receipt.read_bytes(), before)
+            self.assertEqual(self.cli(root, 'bind', '--target', 'RFC-ONE-0001')['references'], 'resolved')
+
 
 if __name__ == '__main__':
     unittest.main()
