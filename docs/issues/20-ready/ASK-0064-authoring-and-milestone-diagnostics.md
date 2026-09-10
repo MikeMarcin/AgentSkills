@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0064"
 title: "Publish offline authoring guidance and compact milestone diagnostics"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0063"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC02", "RFC-ASK-0012-AC09", "RFC-ASK-0012-AC12"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
