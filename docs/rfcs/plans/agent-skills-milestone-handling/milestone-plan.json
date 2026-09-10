@@ -1,0 +1,71 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "agent-skills-milestone-handling",
+  "scope": {
+    "rfcs": [
+      "RFC-ASK-0012"
+    ],
+    "issues": [
+      "ASK-0060",
+      "ASK-0061",
+      "ASK-0062",
+      "ASK-0063",
+      "ASK-0064",
+      "ASK-0065",
+      "ASK-0066"
+    ]
+  },
+  "coverage": "complete",
+  "unplanned_work": [],
+  "milestones": [
+    {
+      "id": "authored-plan-execution",
+      "outcome": "An authored milestone plan survives consumer intake and controls multi-card assignments and checked continuation.",
+      "work": [
+        {
+          "issue": "ASK-0060"
+        },
+        {
+          "issue": "ASK-0061"
+        },
+        {
+          "issue": "ASK-0062"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "The supplied structured plan is discovered through the normal target entrypoint and remapped without changing milestone grouping.",
+        "A disposable linked-consumer public path carries one assignment through intermediate card completion and validates its integrated boundary before selecting the next milestone.",
+        "Coordinator, integrator and worker instructions agree on plan-first scope and replacement decisions; focused schema/helper/instruction checks pass."
+      ],
+      "boundary": "The fixed authored-plan path is usable end to end before expanding legacy, partial and planless branches. Intake is part of this work, not a separate generation."
+    },
+    {
+      "id": "adaptive-targets-and-qualified-adoption",
+      "outcome": "Authored, legacy and ad-hoc targets share an adaptive milestone lifecycle with verified native behavior and reusable authoring guidance.",
+      "work": [
+        {
+          "issue": "ASK-0063"
+        },
+        {
+          "issue": "ASK-0064"
+        },
+        {
+          "issue": "ASK-0065"
+        },
+        {
+          "issue": "ASK-0066"
+        }
+      ],
+      "depends_on": [
+        "authored-plan-execution"
+      ],
+      "exit_criteria": [
+        "Legacy normalization, planless formation, subset projection, dependency look-ahead, amendments and recovery preserve all selected obligations.",
+        "Offline authoring examples and generated human views agree with the canonical schema; compact diagnostics expose actual continuation decisions without inventing economics.",
+        "Both bounded native courses have direct passing evidence and selected adoption/closeout is truthful. Missing required evidence prevents this milestone and the RFC from being declared complete."
+      ],
+      "boundary": "The general target behavior, documentation, native proof and routine closeout belong together. Individual test, documentation or closeout cards are not reset boundaries."
+    }
+  ]
+}

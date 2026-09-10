@@ -1,0 +1,248 @@
+{
+  "schema": "agentskills.rfc-pack-manifest.v1",
+  "id": "agent-skills-milestone-handling",
+  "milestone_plan": "milestone-plan.json",
+  "manifest_excluded_from_own_hash_list": true,
+  "files": [
+    {
+      "path": "CHANGE_MAP.md",
+      "bytes": 2932,
+      "sha256": "d2bea9ce5a1b3704fed458e91dee53ae2ac41ed098f9a46d97918855c542091b"
+    },
+    {
+      "path": "IMPLEMENTATION_PROMPT.md",
+      "bytes": 3446,
+      "sha256": "29cbc784318f84c61ece33a40513c13cbb66bd70379342d867c823028b411b21"
+    },
+    {
+      "path": "IMPORT.md",
+      "bytes": 3723,
+      "sha256": "736c22a2cff657b8ff4aee4b927a4a9f6ce41edc15071b1cba799d4b26c1b431"
+    },
+    {
+      "path": "MILESTONES.md",
+      "bytes": 2096,
+      "sha256": "6eca8c72c365bd4212c242bb99aada63e760cb3558e02278f7eadb1a438ca3df"
+    },
+    {
+      "path": "NATIVE_QUALIFICATION.md",
+      "bytes": 5555,
+      "sha256": "02ca1aea2bfb206d1da9658eaf5ede14eb46e1831e781b17e07291b2c72c94ff"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2366,
+      "sha256": "1987c409e4ae92368b0cb0817c513e00d7266eb22f7946cc21a1fcfff2293f1d"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 3887,
+      "sha256": "4667883ccdfd88dd945c3a2319df6a36c67f7f4cdd7617950b37a0d18eb23dc5"
+    },
+    {
+      "path": "VERIFICATION.md",
+      "bytes": 5010,
+      "sha256": "705f6bac9634bac0f439bc8ce8864a764415acc2d599e09fa2e2e3a20fb5ba87"
+    },
+    {
+      "path": "authoring/ENTRYPOINT.template.md",
+      "bytes": 1320,
+      "sha256": "1579332774733b91c89c0aa152235223ef45c3bc89e858d52012bb4b087b5ffd"
+    },
+    {
+      "path": "authoring/PACK_AUTHORING.md",
+      "bytes": 4060,
+      "sha256": "b07e680a6b751e6ff420cb198301846cbcc7ac7206d66482a0280130046038b1"
+    },
+    {
+      "path": "authoring/milestone-plan.template.json",
+      "bytes": 1480,
+      "sha256": "46d80160270175224da852874c9012fa735df7c058fdaa9f95a01e235ef48fe6"
+    },
+    {
+      "path": "contracts/CONTINUATION.md",
+      "bytes": 6740,
+      "sha256": "7e031efe8b3cf76f826362e7c8ff62f2e9cdadf614ad6e101c03b01ec170d840"
+    },
+    {
+      "path": "contracts/PLAN.md",
+      "bytes": 7953,
+      "sha256": "f968b30aa87476b92768edf40ddb5630b911bcb77ad6df3e834194b904f7985b"
+    },
+    {
+      "path": "contracts/milestone-plan.schema.json",
+      "bytes": 4485,
+      "sha256": "4a493f7e08a22522d0497d100257413618875727087f73cf4bedda0a521da548"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0059-adopt-authored-milestone-plans.md",
+      "bytes": 2827,
+      "sha256": "578604d5366ca5219f68316aca135af6e78dd9799f1cc63fde12b4bc856381b2"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0060-bind-milestone-continuation.md",
+      "bytes": 2863,
+      "sha256": "ad2d48017abc199f588e6e82e5ec5f3fe82b498c2d007aeebcf3b12142be6072"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0061-integrate-plan-first-roles.md",
+      "bytes": 3177,
+      "sha256": "ad377fd555d9be825291a56db9d33acd154b84ca810bce03c2177b01b88772ff"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0062-support-adaptive-and-ad-hoc-targets.md",
+      "bytes": 2899,
+      "sha256": "4fc246b7086a1b5b8e846dcdf4e96c5c919455a3b07c9a21eeb1785452b8f6cc"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0063-authoring-and-milestone-diagnostics.md",
+      "bytes": 3157,
+      "sha256": "0df44710461099e81e4bb8cd73618adf1fc644782acd8f88dcea6806668b81ef"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0064-qualify-milestone-native-workflows.md",
+      "bytes": 2992,
+      "sha256": "5796c6c9fd3cd1043d6b272d8cc7549b8f605bcc4d29282c0777987f3caa7f29"
+    },
+    {
+      "path": "docs/issues/10-backlog/ASK-0065-close-milestone-handling.md",
+      "bytes": 5112,
+      "sha256": "22bf628aa99fae90ecda4d3b1933129ed3962f58ca4f0bb8ba4ffee617dfe123"
+    },
+    {
+      "path": "docs/rfcs/README.md",
+      "bytes": 221,
+      "sha256": "0b68ee7f6a1b324f2c53a7f502a55ff58ae18f71f9876e4fb539dc5859da2d62"
+    },
+    {
+      "path": "docs/rfcs/RFC-ASK-0011-authored-milestone-plans-and-continuation.md",
+      "bytes": 28576,
+      "sha256": "84b254485a522f8107f706a860e6bbf8d67b11d085ed5e33f9e932e11b914690"
+    },
+    {
+      "path": "fixtures/README.md",
+      "bytes": 754,
+      "sha256": "85653005f651e9d4a5a81c82e57bd7214a12464756b6db11af15dd8a3ce38aea"
+    },
+    {
+      "path": "fixtures/legacy/IMPLEMENTATION_ORDER.md",
+      "bytes": 679,
+      "sha256": "df8fee8998dd88286519528f241bd73f8adac7bfc1864d944b3b79b3d84a802a"
+    },
+    {
+      "path": "fixtures/partial/DEMO-0100.md",
+      "bytes": 291,
+      "sha256": "716094778447a64d2f125053384ea42f5e9df79b5ce111190d2fa2075fc89896"
+    },
+    {
+      "path": "fixtures/partial/milestone-plan.json",
+      "bytes": 806,
+      "sha256": "2a50a7cc279e574a6cf4cd2d8ce42219b3a7a0de3ae1b6f6dda8b93e435f5ab3"
+    },
+    {
+      "path": "fixtures/planless/TARGET.md",
+      "bytes": 600,
+      "sha256": "71e8403e428646059ef08d74a8b5acd24e35143776d06a64290a41fef606c171"
+    },
+    {
+      "path": "fixtures/raw-pack/README.md",
+      "bytes": 575,
+      "sha256": "a25a5b2d443b04b2084be4dfd810f6088c70fb1210795645a48bee0dca22bce4"
+    },
+    {
+      "path": "fixtures/raw-pack/RFC-DEMO-0001.md",
+      "bytes": 1592,
+      "sha256": "612af64ef7746f0a2b15ce0fb98c8bdfb7d7cf2dd6b2305f0259d5e986829e38"
+    },
+    {
+      "path": "fixtures/raw-pack/issues/DEMO-0001.md",
+      "bytes": 464,
+      "sha256": "1db14d9c5dcc4dd5ca67535a6dd70b86b6f773bd0cf428485c32ed52b38881c8"
+    },
+    {
+      "path": "fixtures/raw-pack/issues/DEMO-0002.md",
+      "bytes": 471,
+      "sha256": "c9ef37ba863a37909f649b66adea21c2e1d38a80e8ed8f37401796361312f141"
+    },
+    {
+      "path": "fixtures/raw-pack/issues/DEMO-0003.md",
+      "bytes": 485,
+      "sha256": "1d515a6412ef1d36e6e1189d96b21809ef151b097a554c177ec42399e392abe1"
+    },
+    {
+      "path": "fixtures/raw-pack/issues/DEMO-0004.md",
+      "bytes": 461,
+      "sha256": "1b2507bd16693f04eaea7ecfdf6ffb2164dd29a31a8eec1883455f8e2453d8ca"
+    },
+    {
+      "path": "fixtures/raw-pack/issues/DEMO-0005.md",
+      "bytes": 461,
+      "sha256": "1c6590978ade3e78447bbecfbba22faa59f011034690d318678b41016a423467"
+    },
+    {
+      "path": "fixtures/raw-pack/issues/DEMO-0006.md",
+      "bytes": 992,
+      "sha256": "cbf788d190fcb1d0b105a7de748088ae4545dbd61f794fbcfd03c854ac56af80"
+    },
+    {
+      "path": "fixtures/raw-pack/milestone-plan.json",
+      "bytes": 1780,
+      "sha256": "5fc3b70e3221fcbf43ddeef0a1c9d13b1112a436fe6a2fdc578ad917884f8164"
+    },
+    {
+      "path": "fixtures/scenarios.json",
+      "bytes": 7498,
+      "sha256": "904d714deaba274d9035d044cc6502cdfd2e0c367471d2cd2238d03b1a3cbfef"
+    },
+    {
+      "path": "milestone-plan.json",
+      "bytes": 2743,
+      "sha256": "22fe6726cee4d1dbe8c26512b05fc7ec8fd7e289e3258ae3d0d337bf99e42ed8"
+    },
+    {
+      "path": "packet-index.json",
+      "bytes": 3045,
+      "sha256": "b4e6e0aab8b62fe2f19d2f59f76bed79e2d8c71fdd3663bab334e64db40a9112"
+    },
+    {
+      "path": "reference/SOURCE_BASIS.md",
+      "bytes": 3498,
+      "sha256": "51532326d6b3a20d1e8871a5744e7ef902113022f25d77d6304eab1679b81d2a"
+    },
+    {
+      "path": "reference/source-basis.json",
+      "bytes": 5162,
+      "sha256": "8776faada672b1696e474707678f25cbb96cef8cb8e6e6f7ad661cf1b84c0bce"
+    },
+    {
+      "path": "reference/writing-for-agents/SKILL-MECHANICS.md",
+      "bytes": 2629,
+      "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059"
+    },
+    {
+      "path": "reference/writing-for-agents/SKILL.md",
+      "bytes": 10886,
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    },
+    {
+      "path": "tools/plan_contract.py",
+      "bytes": 10676,
+      "sha256": "f9ad400369230cb672eebef26ea5cfbbe932c3e04004216ece24959f3a434fa5"
+    },
+    {
+      "path": "tools/render_milestones.py",
+      "bytes": 660,
+      "sha256": "7d4b8851b48946663ff4b7c70b3861879ee49afb82d01f0457de26002c356712"
+    },
+    {
+      "path": "tools/test_pack.py",
+      "bytes": 11617,
+      "sha256": "34725c6a0f94892c7b9cadc0bd9c1224ac5f5dff92259705cdf39bc18eddcfa9"
+    },
+    {
+      "path": "tools/validate_pack.py",
+      "bytes": 10603,
+      "sha256": "cca349c5b32cf39d036bdc49ab67e6c3ab4b4e9a22c4b5351863590cd0967b89"
+    }
+  ]
+}

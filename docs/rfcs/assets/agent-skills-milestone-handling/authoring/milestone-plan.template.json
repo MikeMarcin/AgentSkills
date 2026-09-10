@@ -1,0 +1,55 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "example-cli-improvement",
+  "scope": {
+    "rfcs": [
+      "RFC-APP-0001"
+    ],
+    "issues": [
+      "APP-0001",
+      "APP-0002",
+      "APP-0003",
+      "APP-0004"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "readable-output",
+      "outcome": "Normal invocations produce useful human output while JSON stays explicit.",
+      "work": [
+        {
+          "issue": "APP-0001"
+        },
+        {
+          "issue": "APP-0002"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "Actual CLI success and error examples are readable without --json.",
+        "Explicit JSON response compatibility is verified."
+      ],
+      "boundary": "Output behavior and its direct examples are integrated before changing complete task operations."
+    },
+    {
+      "id": "complete-operations",
+      "outcome": "The selected public operation completes the user task with safe confirmation and truthful documentation.",
+      "work": [
+        {
+          "issue": "APP-0003"
+        },
+        {
+          "issue": "APP-0004"
+        }
+      ],
+      "depends_on": [
+        "readable-output"
+      ],
+      "exit_criteria": [
+        "The supported operation passes its public success/refusal journeys.",
+        "Relevant documentation and final acceptance use actual evidence."
+      ],
+      "boundary": "Implementation, integration tests and routine closeout form one usable result."
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "schema": "agentskills.rfc-pack-index.v1",
+  "id": "agent-skills-milestone-handling",
+  "date": "2026-09-09",
+  "target_repository": "AgentSkills",
+  "milestone_plan": "milestone-plan.json",
+  "rfcs": [
+    {
+      "id": "RFC-ASK-0011",
+      "path": "docs/rfcs/RFC-ASK-0011-authored-milestone-plans-and-continuation.md"
+    }
+  ],
+  "issues": [
+    {
+      "id": "ASK-0059",
+      "path": "docs/issues/10-backlog/ASK-0059-adopt-authored-milestone-plans.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC01",
+        "RFC-ASK-0011-AC02",
+        "RFC-ASK-0011-AC03"
+      ]
+    },
+    {
+      "id": "ASK-0060",
+      "path": "docs/issues/10-backlog/ASK-0060-bind-milestone-continuation.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [
+        "ASK-0059"
+      ],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC04",
+        "RFC-ASK-0011-AC05",
+        "RFC-ASK-0011-AC08"
+      ]
+    },
+    {
+      "id": "ASK-0061",
+      "path": "docs/issues/10-backlog/ASK-0061-integrate-plan-first-roles.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [
+        "ASK-0060"
+      ],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC01",
+        "RFC-ASK-0011-AC04",
+        "RFC-ASK-0011-AC09",
+        "RFC-ASK-0011-AC10"
+      ]
+    },
+    {
+      "id": "ASK-0062",
+      "path": "docs/issues/10-backlog/ASK-0062-support-adaptive-and-ad-hoc-targets.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [
+        "ASK-0061"
+      ],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC06",
+        "RFC-ASK-0011-AC07",
+        "RFC-ASK-0011-AC08"
+      ]
+    },
+    {
+      "id": "ASK-0063",
+      "path": "docs/issues/10-backlog/ASK-0063-authoring-and-milestone-diagnostics.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [
+        "ASK-0062"
+      ],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC02",
+        "RFC-ASK-0011-AC09",
+        "RFC-ASK-0011-AC12"
+      ]
+    },
+    {
+      "id": "ASK-0064",
+      "path": "docs/issues/10-backlog/ASK-0064-qualify-milestone-native-workflows.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [
+        "ASK-0063"
+      ],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC10",
+        "RFC-ASK-0011-AC11",
+        "RFC-ASK-0011-AC12"
+      ]
+    },
+    {
+      "id": "ASK-0065",
+      "path": "docs/issues/10-backlog/ASK-0065-close-milestone-handling.md",
+      "rfcs": [
+        "RFC-ASK-0011"
+      ],
+      "depends_on": [
+        "ASK-0064"
+      ],
+      "criterion_coverage": [
+        "RFC-ASK-0011-AC01",
+        "RFC-ASK-0011-AC02",
+        "RFC-ASK-0011-AC03",
+        "RFC-ASK-0011-AC04",
+        "RFC-ASK-0011-AC05",
+        "RFC-ASK-0011-AC06",
+        "RFC-ASK-0011-AC07",
+        "RFC-ASK-0011-AC08",
+        "RFC-ASK-0011-AC09",
+        "RFC-ASK-0011-AC10",
+        "RFC-ASK-0011-AC11",
+        "RFC-ASK-0011-AC12"
+      ]
+    }
+  ],
+  "ids_are_provisional": true
+}

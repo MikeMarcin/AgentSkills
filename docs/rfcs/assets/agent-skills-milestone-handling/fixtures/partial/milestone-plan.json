@@ -1,0 +1,39 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "large-issue-partial",
+  "scope": {
+    "issues": [
+      "DEMO-0100"
+    ]
+  },
+  "coverage": "partial",
+  "unplanned_work": [
+    {
+      "issue": "DEMO-0100",
+      "criteria": [
+        "AC03",
+        "AC04"
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "first-public-path",
+      "outcome": "The first explicit criteria of a large issue form a usable path.",
+      "work": [
+        {
+          "issue": "DEMO-0100",
+          "criteria": [
+            "AC01",
+            "AC02"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "AC01 and AC02 have direct passing evidence."
+      ],
+      "boundary": "The remaining mutation criteria are still required but are not yet decomposed."
+    }
+  ]
+}

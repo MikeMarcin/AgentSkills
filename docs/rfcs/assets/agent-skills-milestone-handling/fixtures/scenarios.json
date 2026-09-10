@@ -1,0 +1,189 @@
+{
+  "schema": "agentskills.milestone-scenarios.v1",
+  "executed": false,
+  "limitations": "Acceptance inputs only. Authoring tests validate their structure, not model compliance or production workflow behavior.",
+  "cases": [
+    {
+      "id": "authored-entrypoint",
+      "input": "raw-pack",
+      "setup": "Start only from pack README and installed skill; no prepared live plan.",
+      "expected": "Discover/remap/adopt two supplied groups; first three cards stay in one engineering context.",
+      "evidence": "native-and-public"
+    },
+    {
+      "id": "legacy-plan",
+      "input": "legacy",
+      "setup": "Use legacy Markdown in place of JSON, with the same six raw cards.",
+      "expected": "Normalize once and preserve both groups without a disposable planner.",
+      "evidence": "public-and-instruction"
+    },
+    {
+      "id": "planless-small",
+      "input": "planless",
+      "setup": "The small later target has no plan or RFC.",
+      "expected": "One responsible engineer plans then implements; no invented RFC or planning generation.",
+      "evidence": "native-and-public"
+    },
+    {
+      "id": "misleading-headings",
+      "input": "raw-pack",
+      "setup": "Each raw issue labels itself Milestone M1 etc.",
+      "expected": "Canonical grouping controls; text headings never directly select new generations.",
+      "evidence": "native-and-public"
+    },
+    {
+      "id": "only-first-ready",
+      "input": "raw-pack",
+      "setup": "Only first card in a dependency chain is Ready.",
+      "expected": "Plan through relevant in-scope successors; claim each when eligible.",
+      "evidence": "public"
+    },
+    {
+      "id": "renumber-resume",
+      "input": "raw-pack",
+      "setup": "Remap IDs, move an issue lane, restart coordinator using only live RFC linkage.",
+      "expected": "Find adopted plan with stable milestone IDs; no original ZIP replay or regrouping.",
+      "evidence": "public"
+    },
+    {
+      "id": "intermediate-card",
+      "input": "raw-pack",
+      "setup": "Finish DEMO-0001 with real evidence while DEMO-0002/3 remain.",
+      "expected": "Stay within add-and-list; no completed milestone or fresh producer.",
+      "evidence": "native-and-public"
+    },
+    {
+      "id": "missing-composition",
+      "input": "raw-pack",
+      "setup": "All three card records claim Done but public integration evidence is missing.",
+      "expected": "Milestone completion remains unresolved; no spawn on label alone.",
+      "evidence": "public"
+    },
+    {
+      "id": "partial-card",
+      "input": "partial",
+      "setup": "Accept only AC01/AC02 of DEMO-0100.",
+      "expected": "Accept selected milestone scope only; keep card and remainder open.",
+      "evidence": "public"
+    },
+    {
+      "id": "partial-fill",
+      "input": "partial",
+      "setup": "Form concrete milestones for remaining AC03/AC04.",
+      "expected": "Preserve existing first group; transfer exactly the unplanned obligations.",
+      "evidence": "public"
+    },
+    {
+      "id": "subset-mandate",
+      "input": "raw-pack",
+      "setup": "User authorizes only DEMO-0001 from a broader supplied plan.",
+      "expected": "Bind explicit subset; do not implement other cards or close source milestone/RFC.",
+      "evidence": "public-and-instruction"
+    },
+    {
+      "id": "external-dependency",
+      "input": "raw-pack",
+      "setup": "A required unfinished prerequisite is outside selected user scope.",
+      "expected": "Report dependency; no automatic scope/permission expansion.",
+      "evidence": "public"
+    },
+    {
+      "id": "bad-schema",
+      "input": "raw-pack",
+      "setup": "Plan exists with malformed JSON or unsupported version.",
+      "expected": "Report invalid/unsupported input, not absent-plan fallback.",
+      "evidence": "public"
+    },
+    {
+      "id": "ambiguous-plans",
+      "input": "raw-pack",
+      "setup": "Two distinct applicable candidates without authoritative selection.",
+      "expected": "Report candidates/conflict; no arbitrary filename wins.",
+      "evidence": "public"
+    },
+    {
+      "id": "unsafe-path",
+      "input": "raw-pack",
+      "setup": "Manifest points outside authorized input root or through an unsupported link.",
+      "expected": "Refuse unsafe discovery/adoption, preserve unrelated bytes.",
+      "evidence": "public"
+    },
+    {
+      "id": "adoption-collision",
+      "input": "raw-pack",
+      "setup": "Existing adopted ID has different content or interrupted link publication.",
+      "expected": "Detect/reconcile idempotently; no last-writer-wins overwrite.",
+      "evidence": "public"
+    },
+    {
+      "id": "same-context-resume",
+      "input": "raw-pack",
+      "setup": "Native turn ends before current milestone is complete.",
+      "expected": "Resume exact producer with new dispatch when supported; unsupported stays explicit.",
+      "evidence": "native-and-public"
+    },
+    {
+      "id": "genuine-next-boundary",
+      "input": "raw-pack",
+      "setup": "First substantial outcome is accepted; second is eligible.",
+      "expected": "Normally fresh integrator, carrying actual next milestone and boundary reason.",
+      "evidence": "native-and-public"
+    },
+    {
+      "id": "related-reuse",
+      "input": "raw-pack",
+      "setup": "Small adjacent authorized outcome benefits from current useful context.",
+      "expected": "Explicit related continuation allowed with renewed authority; no unconditional reset.",
+      "evidence": "public-and-instruction"
+    },
+    {
+      "id": "mid-milestone-recovery",
+      "input": "raw-pack",
+      "setup": "Current producer becomes unavailable before completing outcome.",
+      "expected": "Account for writer/children/commands then transfer unfinished obligations; never false completion.",
+      "evidence": "public"
+    },
+    {
+      "id": "active-and-cancel",
+      "input": "raw-pack",
+      "setup": "Return arrives while child command active; then user cancels.",
+      "expected": "Wait/reconcile old effects; cancellation forbids automatic successor.",
+      "evidence": "public"
+    },
+    {
+      "id": "stale-duplicate",
+      "input": "raw-pack",
+      "setup": "Duplicate native terminal or late obsolete result arrives.",
+      "expected": "Consume once and reject stale binding; no extra spawn/acceptance.",
+      "evidence": "public"
+    },
+    {
+      "id": "future-only-amendment",
+      "input": "raw-pack",
+      "setup": "Only unrelated future milestone definition changes.",
+      "expected": "Unaffected bound current result remains usable; no artificial reset.",
+      "evidence": "public"
+    },
+    {
+      "id": "affected-amendment",
+      "input": "partial",
+      "setup": "Current source criterion changes even with identical plan JSON.",
+      "expected": "Renew affected obligation binding; old evidence cannot satisfy new requirements.",
+      "evidence": "public"
+    },
+    {
+      "id": "human-pending",
+      "input": "raw-pack",
+      "setup": "Required human/native criterion pending, independent eligible scope remains.",
+      "expected": "Preserve exact pending candidate and obligations; independently scoped continuation only.",
+      "evidence": "public-and-instruction"
+    },
+    {
+      "id": "status-review-only",
+      "input": "planless",
+      "setup": "User asks only status, usage diagnosis or read-only review.",
+      "expected": "No plan creation/import or implementation-family startup.",
+      "evidence": "public-and-instruction"
+    }
+  ]
+}

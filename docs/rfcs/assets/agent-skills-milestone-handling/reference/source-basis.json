@@ -1,0 +1,140 @@
+{
+  "schema": "agentskills.pack-source-basis.v1",
+  "source_filename": "agent_skills_project_source(2).md",
+  "source_generated": "2026-09-08T20:06:53-07:00",
+  "snapshot_sha256": "092b1d58ad6c68d04b763526a45b75db543a2a6e49553099beafad551385aa4f",
+  "live_head": null,
+  "files": [
+    {
+      "dump_line_start": 391,
+      "dump_line_end": 533,
+      "sha256": "936ebc7740e321a0103542a1de8d332ba55428908cfcfc1beaa75f5600e978a8",
+      "path": "README.md"
+    },
+    {
+      "dump_line_start": 542,
+      "dump_line_end": 550,
+      "sha256": "308e8276fa5d0260d1a73b19eeea5036b9dda8c3fa1014b328645d5078cbc814",
+      "path": "AGENTS.md"
+    },
+    {
+      "dump_line_start": 559,
+      "dump_line_end": 567,
+      "sha256": "70f5281632a1ac2d855160e7a4e2e73f2af2ad04b641e421d403ad633134b399",
+      "path": "CONTRIBUTING.md"
+    },
+    {
+      "dump_line_start": 635,
+      "dump_line_end": 668,
+      "sha256": "eabd645f5c501567ccdc392a93277743ee533f5bd5588de7d4593eabac2ce8e1",
+      "path": "docs/issues/README.md"
+    },
+    {
+      "dump_line_start": 677,
+      "dump_line_end": 677,
+      "sha256": "b54fdc807c6c213ea2a59d7a6c896a13ba7ca6f1d72031e938284c21886d8118",
+      "path": "docs/issues/NEXT_ID"
+    },
+    {
+      "dump_line_start": 6197,
+      "dump_line_end": 6614,
+      "sha256": "3066028fe891a4c52083ce17e87a1e9a109db9f65c6ba4c5382726a88a5df8ce",
+      "path": "docs/rfcs/RFC-ASK-0010-interactive-coordinator-and-milestone-integrators.md"
+    },
+    {
+      "dump_line_start": 23204,
+      "dump_line_end": 23301,
+      "sha256": "60e009957c23af969bb498970d1cad4492446d24b10c05ead4cabdb037080cbd",
+      "path": "skills/implement-rfc/SKILL.md"
+    },
+    {
+      "dump_line_start": 25178,
+      "dump_line_end": 25320,
+      "sha256": "a399cae235e0a8269b727b748408b85cb5645c26e4ec29cc0964130a8663aad7",
+      "path": "skills/implement-rfc/references/pack-lifecycle.md"
+    },
+    {
+      "dump_line_start": 24849,
+      "dump_line_end": 24973,
+      "sha256": "50892307e33916771355b9f8a8c7cfc72a83d872aad0610e5053dfd625b0cf11",
+      "path": "skills/implement-rfc/references/milestone-integration.md"
+    },
+    {
+      "dump_line_start": 24608,
+      "dump_line_end": 24712,
+      "sha256": "d7b1b08e8fb9a400fae4bce5a3d946f2798a64b81cf7522db6fce40c965e41a3",
+      "path": "skills/implement-rfc/references/coordination-handoff.md"
+    },
+    {
+      "dump_line_start": 24721,
+      "dump_line_end": 24840,
+      "sha256": "9bd8e060deac15784f7a794f4516b6d98410098a63f17874d6052eb2375c3582",
+      "path": "skills/implement-rfc/references/delegated-execution.md"
+    },
+    {
+      "dump_line_start": 26369,
+      "dump_line_end": 26436,
+      "sha256": "d3c2bc8cf213c9d582ec2490e6f05b9f2ecf1432c3b288b652eddfa19098f571",
+      "path": "skills/implement-rfc/references/verification-and-closeout.md"
+    },
+    {
+      "dump_line_start": 24203,
+      "dump_line_end": 24317,
+      "sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a",
+      "path": "skills/implement-rfc/references/bookkeeping.md"
+    },
+    {
+      "dump_line_start": 23351,
+      "dump_line_end": 23513,
+      "sha256": "6790744e2740935c16af3ef37f5c2325004a1f2c7c6398dfe8fda3f40bc3dd5b",
+      "path": "skills/implement-rfc/config/roles.json"
+    },
+    {
+      "dump_line_start": 29710,
+      "dump_line_end": 29834,
+      "sha256": "ec74809b336d585d90a5eabbff034e9aedd8317ba1b300832c2bd933d5caef1f",
+      "path": "skills/implement-rfc/scripts/coordinator_handoff.py"
+    },
+    {
+      "dump_line_start": 26636,
+      "dump_line_end": 26842,
+      "sha256": "55d57097c3c1f58c52bd32a6cedd7b1e6f4ef6f2f25904cc3affe4e2e1bd14e7",
+      "path": "skills/implement-rfc/schemas/milestone-return.schema.json"
+    },
+    {
+      "dump_line_start": 39177,
+      "dump_line_end": 39286,
+      "sha256": "4b2fc53bce99ab08c2d354a6647d29a786b0af177d4dd78ebb5f6c2f601974ba",
+      "path": "skills/implement-rfc/tests/test_coordinator_handoff.py"
+    },
+    {
+      "dump_line_start": 39295,
+      "dump_line_end": 39338,
+      "sha256": "8449901190df7d7ca1c726ede1bf852c167b6e7e2abe398738d577005f9340be",
+      "path": "skills/implement-rfc/tests/test_instruction_paths.py"
+    },
+    {
+      "dump_line_start": 32516,
+      "dump_line_end": 33347,
+      "sha256": "e5898f21e9ebf3933e4a2236e3125ca1d1b9590f05d889b15fef6fd42a3cef7d",
+      "path": "skills/implement-rfc/scripts/render_runtime_adapters.py"
+    },
+    {
+      "dump_line_start": 27925,
+      "dump_line_end": 28278,
+      "sha256": "b809e630545db62298303239e70a459bd8cd7379df96a95d067e3747d9394d0f",
+      "path": "skills/implement-rfc/scripts/board_model.py"
+    },
+    {
+      "dump_line_start": 31592,
+      "dump_line_end": 31906,
+      "sha256": "2c5c534af6ca2abf601d7dc5932542a24c50021005141b83488cf75d4722d890",
+      "path": "skills/implement-rfc/scripts/project_config.py"
+    }
+  ],
+  "notes": [
+    "User requirements in this conversation supersede earlier tentative recommendations.",
+    "Repository has changed during user implementation; inspect actual source, IDs, active sessions and contracts before import.",
+    "No new model routes or provider API capabilities are assumed."
+  ]
+}

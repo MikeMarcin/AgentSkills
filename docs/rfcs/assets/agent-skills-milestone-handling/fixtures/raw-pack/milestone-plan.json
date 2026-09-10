@@ -1,0 +1,64 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "catalog-cli",
+  "scope": {
+    "rfcs": [
+      "RFC-DEMO-0001"
+    ],
+    "issues": [
+      "DEMO-0001",
+      "DEMO-0002",
+      "DEMO-0003",
+      "DEMO-0004",
+      "DEMO-0005",
+      "DEMO-0006"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "add-and-list",
+      "outcome": "Names can be added and listed through a persistent, documented CLI.",
+      "work": [
+        {
+          "issue": "DEMO-0001"
+        },
+        {
+          "issue": "DEMO-0002"
+        },
+        {
+          "issue": "DEMO-0003"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "The actual subprocess add/list path preserves names across invocations.",
+        "Duplicate additions fail without changing the store.",
+        "Focused tests and runnable documentation cover that behavior."
+      ],
+      "boundary": "Persistence, creation, reading, tests and documentation form one usable public path before mutation operations are added."
+    },
+    {
+      "id": "rename-and-remove",
+      "outcome": "The CLI safely renames and removes names and has complete focused acceptance.",
+      "work": [
+        {
+          "issue": "DEMO-0004"
+        },
+        {
+          "issue": "DEMO-0005"
+        },
+        {
+          "issue": "DEMO-0006"
+        }
+      ],
+      "depends_on": [
+        "add-and-list"
+      ],
+      "exit_criteria": [
+        "Rename/remove subprocess paths work and rejected operations leave the store unchanged.",
+        "Affected tests and examples pass; all requested criteria and closeout are reconciled."
+      ],
+      "boundary": "Related mutations share the established persistence context; their tests, docs and routine closeout remain with that integration work."
+    }
+  ]
+}
