@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0059"
 title: "Declare MASK workflow readiness for implement-rfc"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0011"]
 depends_on: []
 closeout_for: ["RFC-ASK-0011"]
