@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0063"
 title: "Handle partial plans, legacy plans and ad-hoc targets"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0062"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC06", "RFC-ASK-0012-AC07", "RFC-ASK-0012-AC08"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
