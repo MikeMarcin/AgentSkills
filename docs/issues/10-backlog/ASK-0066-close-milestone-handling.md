@@ -48,7 +48,15 @@ Planned cards: ASK-0060, ASK-0061, ASK-0062, ASK-0063, ASK-0064, ASK-0065, ASK-0
 
 Current milestone plan: [agent-skills-milestone-handling](../../rfcs/plans/agent-skills-milestone-handling/milestone-plan.json).
 
-Continuation: run agent-skills-milestone-handling / dispatch-001 / mandate revision 1; producer /root/milestone_integrator_1 exclusively owns authored-plan-execution (ASK-0060, ASK-0061, ASK-0062). Bootstrap assignment retains source instructions at baseline. All three exit criteria in the linked plan remain pending; import is part of this milestone. No native loading is asserted. Unrelated native-roles.lock.json is preserved. Next authored milestone remains unchanged and unstarted.
+Current continuation: run agent-skills-milestone-handling / dispatch-003 / mandate revision 2;
+producer `/root/milestone_integrator_1`. `authored-plan-execution` is accepted at
+source candidate 0d3116bf6153332b1a15531e36b4ccb5ca6b25f2 after the evidence below.
+The [computed assignment](../../rfcs/plans/agent-skills-milestone-handling/dispatch-003.assignment.json)
+preserves all three original exits. Request fresh context for the next authored
+milestone, `adaptive-targets-and-qualified-adoption`: its adaptive branches and two
+native qualification courses form the next substantial outcome. Remaining plan is
+unchanged; M2 is unstarted. No native loading is asserted. Unrelated native-role lock
+remains preserved. Earlier dispatch notes below are historical, superseded by this record.
 
 ## Closeout checklist
 
@@ -68,6 +76,50 @@ Continuation: run agent-skills-milestone-handling / dispatch-001 / mandate revis
 | RFC-ASK-0012-AC12 | Safe selected adoption and truthful closeout | Not run | Not recorded |
 
 ## Selected adoption and limits
+
+### Accepted first milestone — dispatch-003, mandate 2
+
+User amendment identified the maxTurns/coordination-tool edits as intentional and
+authorized accommodating them. Their commit is 2047430; source integration is
+0d3116bf6153332b1a15531e36b4ccb5ca6b25f2. The ownership ambiguity is resolved.
+
+| Original milestone exit | Direct evidence | Outcome |
+|---|---|---|
+| Structured plan discovered and remapped without changing grouping | Raw supplied pack discovery; reservation 057493c/import 650d03a; immutable packet byte comparison; 9 plan tests including linked-consumer adoption/resume/refusals | Pass |
+| Linked-consumer assignment survives intermediate completion and checks integrated boundary | `test_milestone_public.py` starts raw six-card fixture through two linked consumers, typed adoption, public board move, assignment, false completion refusal, current projection reconciliation and next group selection | Pass |
+| Coordinator/integrator/worker agreement and focused checks | 3 instruction tests and 19 actual rendered-adapter tests; 10 continuation, 3 schema and 12 historical handoff tests; independent critical review and source/documentation gates | Pass |
+
+Integration batch: 23 milestone/schema tests passed with
+`/tmp/milestone-schema-check.qySnXg/venv/bin/python -B -m unittest discover -s skills/implement-rfc/tests -p 'test_milestone*.py'`.
+Renderer/instruction tests and portable source validation passed after user commit
+2047430. Documentation gate reports 12 RFCs / 66 cards / zero violations. Evidence
+truth is integrator-adjudicated; fixture checks do not claim actual native courses.
+
+Independent review `/root/milestone_integrator_1/rfc_reviewer_boundary` completed
+with no remaining helper or instruction-scope blocker after specific counterexample
+corrections. Its selected role was rfc-reviewer-critical, no dispatch model/effort
+overrides; banner Astra/xhigh, serving telemetry unobserved. Worker and reviewer
+reported quiescence, no descendants; no task commands remain running. The earlier
+scout was read-only and complete. No overlapping writer remains assigned to M1.
+
+Static common-path measurement (whitespace words / UTF-8 bytes; excludes selected
+RFC/card/plan and runtime/system content): coordinator 1,647/12,220 → 2,321/17,694;
+integrator prompt+entrypoint 1,411/10,760 → 2,093/16,225 (now includes shared plan
+reference); worker prompt 464/3,254 → 475/3,334. Fixed consumer material is
+2,705/22,785. New totals with consumer: coordinator 5,026/40,479; integrator
+4,798/39,010; worker 3,180/26,119. These are static reading costs, not tokens,
+account debits or quota savings. The shared plan contract explains the increase.
+
+M2 retains adaptive/legacy/planless/subset execution, authoring/diagnostics, actual
+Claude and Codex courses, selected adoption and final RFC closeout. AC06–AC08 and
+AC10 retain M2 branches; AC02 authoring and AC11–AC12 are not complete. RFC remains
+Implementing. Source edits affect shared links but do not prove host loading or
+authorize other consumer migration. The user's Claude fixes preserve routes/addenda,
+permission modes and leaf restrictions in rendered fixture evidence.
+
+Cleanup limitation: disposable schema/reproduction fixtures remain under the recorded
+temporary roots because prior cleanup was automatically rejected. No active command
+or writer remains there; no removal was asserted.
 
 ### Current first-milestone review frontier
 

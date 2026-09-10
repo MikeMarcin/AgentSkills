@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0062"
 title: "Integrate plan-first coordinator and multi-card role behavior"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0061"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC01", "RFC-ASK-0012-AC04", "RFC-ASK-0012-AC09", "RFC-ASK-0012-AC10"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
+acceptance: [{"criterion":"Plan-first entrypoint and rendered role agreement","outcome":"pass","revision":"0d3116bf6153332b1a15531e36b4ccb5ca6b25f2","evidence":{"kind":"observation","detail":"Mandatory plan resolution/binding precedes implementation dispatch; both rendered host families preserve routes/addenda/leaf restrictions. 3 instruction and 19 renderer tests pass; independent critical review found no material blocker."}},{"criterion":"Raw public composed milestone path","outcome":"pass","revision":"0d3116bf6153332b1a15531e36b4ccb5ca6b25f2","evidence":{"kind":"command","detail":"23 milestone/schema tests pass, including raw two-linked-consumer adoption, intermediate-card progress, missing exit/reduced projection refusal, bound accepted boundary and next-group assignment."}},{"criterion":"Complete explicit multi-card worker scope","outcome":"pass","revision":"0d3116bf6153332b1a15531e36b4ccb5ca6b25f2","evidence":{"kind":"observation","detail":"Standard/deep rendered workers allow several explicitly named cards while retaining exclusive paths, individual eligibility, leaf status and no independent work selection, board operations or commits."}},{"criterion":"Focused first-milestone verification","outcome":"pass","revision":"0d3116bf6153332b1a15531e36b4ccb5ca6b25f2","evidence":{"kind":"observation","detail":"All three authored exits adjudicated with closeout evidence; portable-source and documentation gates pass. User Claude maxTurns/tool changes preserved in 2047430. Native qualification remains explicitly pending ASK-0065; no runtime loading claim."}}]
 ---
 
 # ASK-0062: Integrate plan-first coordinator and multi-card role behavior
