@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0060"
 title: "Adopt authored milestone plans through consumer intake"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0012"]
 depends_on: []
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC01", "RFC-ASK-0012-AC02", "RFC-ASK-0012-AC03"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
+acceptance: [{"criterion":"Import and preserve authored grouping","outcome":"pass","revision":"d3ec4d8b9c15997b4541fcdc8deeae32205554b4","evidence":{"kind":"observation","detail":"Reservation 057493c and import 650d03a preserve immutable packet bytes; live RFC-ASK-0012 plan remaps ASK-0060–0066 with both groups and original exits. Structure gate passes."}},{"criterion":"Public structured plan intake","outcome":"pass","revision":"d3ec4d8b9c15997b4541fcdc8deeae32205554b4","evidence":{"kind":"command","detail":"python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_milestone_plan.py: 8 passed; raw supplied pack discover found both groups; live RFC-only bind resolved all three current work references."}},{"criterion":"Idempotent isolated adoption and resume","outcome":"pass","revision":"d3ec4d8b9c15997b4541fcdc8deeae32205554b4","evidence":{"kind":"observation","detail":"Two linked disposable consumers cover typed remap, no-op retry, collision refusal, missing-link repair, lane-move resume and acceptance fingerprint change. Duplicate/version/path/link/view/metadata failures diagnosed. Full milestone composition remains pending ASK-0061/0062."}}]
 ---
 
 # ASK-0060: Adopt authored milestone plans through consumer intake
