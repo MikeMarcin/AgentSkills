@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0062"
 title: "Integrate plan-first coordinator and multi-card role behavior"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0061"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC01", "RFC-ASK-0012-AC04", "RFC-ASK-0012-AC09", "RFC-ASK-0012-AC10"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
