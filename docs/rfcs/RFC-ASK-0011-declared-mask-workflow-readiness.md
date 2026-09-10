@@ -2,7 +2,7 @@
 schema: "implement-rfc.rfc.v1"
 id: "RFC-ASK-0011"
 title: "Declared MASK workflow readiness for implement-rfc"
-status: "Implementing"
+status: "Auto-Verified"
 ---
 
 # Declared MASK workflow readiness for implement-rfc
@@ -82,3 +82,11 @@ focused skill tests pass; the portable manifest is regenerated.
 The owner authorized this separate AgentSkills mandate on 2026-09-09 to unblock
 ManageAgentSkills MASK-0090/MASK-0092. Scope is this repository only; the MASK
 repository is read-only from here. No push, publication or consumer migration.
+
+## Verified implementation
+
+The sole [closeout](../issues/60-done/ASK-0059-declare-mask-workflow-readiness.md)
+records actual MASK CLI evidence for all seven criteria against baseline
+0dd8a29a3d93776a22da325db4d9a4f3299daf2a on macOS; Windows/Linux lanes and fresh
+host loading remain unverified. Descriptor, entrypoint, preflight and refactored
+renderer landed in 4bd053c and 0f8b3cd.

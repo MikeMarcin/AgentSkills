@@ -29,4 +29,4 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 
 | RFC-ASK-0010 | Auto-Verified | Interactive coordinator and milestone integrators |
 
-| RFC-ASK-0011 | Implementing | Declared MASK workflow readiness for implement-rfc |
+| RFC-ASK-0011 | Auto-Verified | Declared MASK workflow readiness for implement-rfc |
