@@ -1,0 +1,115 @@
+{
+  "schema": "implement-rfc.milestone-return.v2",
+  "run_id": "agent-skills-milestone-handling",
+  "dispatch_id": "dispatch-003",
+  "producer_id": "/root/milestone_integrator_1",
+  "mandate_revision": "2",
+  "milestone": "authored-plan-execution",
+  "disposition": "milestone-complete",
+  "summary": "Authored structured plans survive raw intake, typed adoption, target-only resume and multi-card bound continuation. All three first-milestone exits accepted; adaptive/native second milestone remains unstarted.",
+  "candidate_revision": "baa57e7c1d8994f1db74c40a2f451ea5c70207e0",
+  "handoff_ref": "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md",
+  "ownership": "quiescent",
+  "next_objective": "adaptive-targets-and-qualified-adoption",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+  ],
+  "binding": {
+    "plan_id": "agent-skills-milestone-handling",
+    "plan_path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json",
+    "milestone_id": "authored-plan-execution",
+    "definition_fingerprint": "sha256:416ab55142a56dd997026e9ddd45e842b812c7080c1ef72838a6ce15f3652246",
+    "obligations": [
+      {
+        "id": "ASK-0060:*",
+        "source": "ASK-0060",
+        "selector": null,
+        "source_fingerprint": "sha256:34e0d55f501e7f8508a8079c5a5d8151e57417c42b2a9f0e98f50ae42b3f4d68"
+      },
+      {
+        "id": "ASK-0061:*",
+        "source": "ASK-0061",
+        "selector": null,
+        "source_fingerprint": "sha256:cb18a2ba5fb084dfeeaf2a515a802f675b57d039419ff75b6145071110454785"
+      },
+      {
+        "id": "ASK-0062:*",
+        "source": "ASK-0062",
+        "selector": null,
+        "source_fingerprint": "sha256:8f021ff8c25ceecf9ce1d469b107ade736bfe02201d92ffbfc8bd7947385b626"
+      }
+    ],
+    "obligation_fingerprint": "sha256:3825b5df9574ac972787fd6fa7c498ab5c3f52f173f52a87c5b172f3e970fed8",
+    "exit_criteria": [
+      {
+        "id": "authored-plan-execution:exit:1",
+        "text": "The supplied structured plan is discovered through the normal target entrypoint and remapped without changing milestone grouping."
+      },
+      {
+        "id": "authored-plan-execution:exit:2",
+        "text": "A disposable linked-consumer public path carries one assignment through intermediate card completion and validates its integrated boundary before selecting the next milestone."
+      },
+      {
+        "id": "authored-plan-execution:exit:3",
+        "text": "Coordinator, integrator and worker instructions agree on plan-first scope and replacement decisions; focused schema/helper/instruction checks pass."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "acceptance_records": [
+    {
+      "id": "ASK-0060:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "ASK-0061:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "ASK-0062:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "authored-plan-execution:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "authored-plan-execution:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    },
+    {
+      "id": "authored-plan-execution:exit:3",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      ]
+    }
+  ],
+  "continuation": {
+    "intent": "fresh",
+    "next_milestone": "adaptive-targets-and-qualified-adoption",
+    "reason": "integrated-boundary",
+    "detail": "The fixed authored-plan public composition and role integration are accepted. Adaptive target branches, authoring/diagnostics and two native qualification courses are the next substantial outcome; remaining authored plan is unchanged."
+  }
+}
