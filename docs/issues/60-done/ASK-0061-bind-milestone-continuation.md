@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0061"
 title: "Bind assignments and returns to milestone obligations"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0060"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC04", "RFC-ASK-0012-AC05", "RFC-ASK-0012-AC08"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
+acceptance: [{"criterion":"Bound assignment and obligation completion","outcome":"pass","revision":"f3d92842302e94e68d3151de3aa854eaaf27abdf","evidence":{"kind":"observation","detail":"Public two-consumer raw fixture binds all three first-group cards and exits; reduced obligation and target lists, intermediate-card complete and missing exits refuse. Current source arrays and fingerprints are reconciled."}},{"criterion":"Explicit continuation and recovery","outcome":"pass","revision":"f3d92842302e94e68d3151de3aa854eaaf27abdf","evidence":{"kind":"command","detail":"10 continuation tests cover separate continue/fresh/wait/stop, related reuse, same-producer renewed dispatch and mid-milestone recovery. Public composed test validates boundary selection and affected vs future-only amendment."}},{"criterion":"Safeguards and historical compatibility","outcome":"pass","revision":"f3d92842302e94e68d3151de3aa854eaaf27abdf","evidence":{"kind":"observation","detail":"12 historical handoff tests and 3 schema tests pass; stale/duplicate/native execution/cancellation/review relay preserved. Independent rfc-reviewer-critical corrected-counterexample recheck reports no blocking findings; 9 plan tests include interrupted publication recovery. Native qualification and full first milestone instruction criterion remain pending."}}]
 ---
 
 # ASK-0061: Bind assignments and returns to milestone obligations

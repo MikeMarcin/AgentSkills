@@ -69,4 +69,47 @@ Continuation: run agent-skills-milestone-handling / dispatch-001 / mandate revis
 
 ## Selected adoption and limits
 
+### Current first-milestone review frontier
+
+Native continuation renewed to dispatch-002, mandate revision 1, same producer
+`/root/milestone_integrator_1`. No milestone boundary was asserted. At renewal,
+worker was complete/quiescent, reviewer was running its read-only correction check,
+and no task shell commands remained active. Current source candidate was df553bc
+plus the named continuation/adoption correction files. Newly observed role max-turn
+edits were preserved and sent to the coordinator for ownership reconciliation.
+
+Correction candidate: f3d92842302e94e68d3151de3aa854eaaf27abdf. Independent critical
+review rechecked each reported counterexample and found no remaining blocker in
+ASK-0060/0061 helper scope. Passing evidence: 9 plan tests, 10 continuation tests,
+one composed raw-plan/two-linked-consumer public test, 3 schema tests, and 12
+historical handoff tests. The public regression includes shortened persisted
+obligation/target attacks; the plan regression injects failures before first/second
+metadata publication and verifies stale refusal plus provenance-preserving retry.
+Review is complete/quiescent with no edits or descendants. Worker is complete/quiescent.
+
+Dispatch-002 disposition: human-pending due to unexplained concurrent changes to
+`skills/implement-rfc/config/roles.json` and `skills/implement-rfc/schemas/roles.schema.json`.
+They remove the integrator max_turns value/requirement. The coordinator confirmed
+ownership is unresolved and instructed no edits/staging of those overlapping paths.
+Required decision: identify the owner of these changes and confirm that its writer
+has stopped or safely transferred the paths before ASK-0062 instruction integration.
+The first milestone is not accepted: its instruction/role agreement exit remains
+pending, and full native qualification/selected adoption remains assigned to M2.
+Next bounded objective is finish ASK-0062 within authored-plan-execution after
+ownership resolution, using this same integrator if available. M2 is unstarted.
+
+Dispatch-001 remains in `authored-plan-execution`; ASK-0060's initial focused acceptance
+is recorded at d3ec4d8/354936b. Independent critical review then reproduced incomplete
+adoption linkage after an interrupted write, shortened assignment projections retaining
+old fingerprint strings, premature whole-target completion, and malformed continuation
+input handling. These are current milestone correction obligations, not a completed
+milestone or permission to advance the authored plan. Original acceptance/history is
+preserved; corrected public regression evidence will be recorded here before acceptance.
+
+Review producer: `/root/milestone_integrator_1/rfc_reviewer_boundary`, native
+`rfc-reviewer-critical` dispatch with `fork_turns: none` and no model/effort override.
+Configured route Astra/xhigh; observed serving telemetry unavailable. Plan worker
+`/root/milestone_integrator_1/rfc_worker_plan` owns the bounded adoption repair;
+integrator owns continuation repair. Scout completed read-only; no descendants reported.
+
 Record actual source/role versions, exact selected consumer, independent native loading evidence, still-active legacy run treatment, remaining obligations and cleanup. Closeout is part of the final engineering milestone, not a separate generation.
