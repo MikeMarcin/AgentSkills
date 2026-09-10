@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "23b878d738555d9bd03bd3def0099fa61414373e8e95ee053b34be1e8224ad40"
+      "sha256": "066da1940635aa4f4e83feeab86f0714018f46d7c0740fb157c4a9d6e975fe44"
     },
     {
       "path": "agents/openai.yaml",
@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "6790744e2740935c16af3ef37f5c2325004a1f2c7c6398dfe8fda3f40bc3dd5b"
+      "sha256": "7485c1f42343f5b02ee557de2882809b50237a57f90b619b5198293162bf4a65"
     },
     {
       "path": "config/routing-profiles.json",
@@ -62,15 +62,19 @@
     },
     {
       "path": "references/coordination-handoff.md",
-      "sha256": "d7b1b08e8fb9a400fae4bce5a3d946f2798a64b81cf7522db6fce40c965e41a3"
+      "sha256": "1e57dd4b742bf49a42d9a24caf215b2d9b6d39d66730e02db035267f20675c9a"
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "9bd8e060deac15784f7a794f4516b6d98410098a63f17874d6052eb2375c3582"
+      "sha256": "fa781cc058e96adc92cec2976fbb4ee0344dde5cfa3b0f0826fde840431c6a09"
     },
     {
       "path": "references/milestone-integration.md",
-      "sha256": "50892307e33916771355b9f8a8c7cfc72a83d872aad0610e5053dfd625b0cf11"
+      "sha256": "26c09236031ae84110552ba282c3ce09614358bac419465d49420518e2af0f26"
+    },
+    {
+      "path": "references/milestone-plans.md",
+      "sha256": "ffa598eb56cce8131f0265f8207044fec2270b3437eb56b7faffd836343ae161"
     },
     {
       "path": "references/model-routing.md",
@@ -82,7 +86,7 @@
     },
     {
       "path": "references/pack-lifecycle.md",
-      "sha256": "a399cae235e0a8269b727b748408b85cb5645c26e4ec29cc0964130a8663aad7"
+      "sha256": "7307e15ca0edf7cabd68b593731edb8576ceb814bcc4f01d7abfe6b589443e94"
     },
     {
       "path": "references/remote-routing.md",
@@ -106,11 +110,23 @@
     },
     {
       "path": "references/verification-and-closeout.md",
-      "sha256": "d3c2bc8cf213c9d582ec2490e6f05b9f2ecf1432c3b288b652eddfa19098f571"
+      "sha256": "6cd3aebe01ab7c128d298b81d5666e9afb6389dad4e754298477461ddcfe5165"
     },
     {
       "path": "schemas/issue-card.schema.json",
       "sha256": "65f42d73b0ec9e030610a2bce99164e0aa9199e1a6dc022502679425a60cf76c"
+    },
+    {
+      "path": "schemas/milestone-assignment.schema.json",
+      "sha256": "70ebab5e715763607d60bb2072cca7de2f1b7d645e238aef312afbbed91d9d35"
+    },
+    {
+      "path": "schemas/milestone-plan.schema.json",
+      "sha256": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d"
+    },
+    {
+      "path": "schemas/milestone-return-v2.schema.json",
+      "sha256": "e7cf70145783fc0f3084dade0a276043c9052dc18f65e3db491fce3b2665ef9c"
     },
     {
       "path": "schemas/milestone-return.schema.json",
@@ -130,7 +146,7 @@
     },
     {
       "path": "schemas/roles.schema.json",
-      "sha256": "a668d9a7f37a4dcb4c92fb712b90990e03a09c6892a9f78dda003f19e441fc7b"
+      "sha256": "73522e75cec83e4432021cda0ce555cd15b3e3b6889b76e39fe7a3aa953b6234"
     },
     {
       "path": "schemas/routing.schema.json",
@@ -158,7 +174,7 @@
     },
     {
       "path": "scripts/coordinator_handoff.py",
-      "sha256": "ec74809b336d585d90a5eabbff034e9aedd8317ba1b300832c2bd933d5caef1f"
+      "sha256": "2c26570d849fd51b6b483543bdc87de6e5f27a10bcfc39306d3cf93add3a8cec"
     },
     {
       "path": "scripts/issue_board.py",
@@ -167,6 +183,18 @@
     {
       "path": "scripts/launch_remote_station.py",
       "sha256": "f1f785f09dee72e93773c03f499a69ef7a60e5a349d447b658a628a2d00278db"
+    },
+    {
+      "path": "scripts/milestone_continuation.py",
+      "sha256": "48fdb989abceb29f2307988245da97c2c5428a407ba66b416e0fa6a985bd61e3"
+    },
+    {
+      "path": "scripts/milestone_plan.py",
+      "sha256": "52f2da131326a5fb1dbe14d881249eddd2afa9255fb0386baec8b7f599a8b8ab"
+    },
+    {
+      "path": "scripts/milestone_plan_contract.py",
+      "sha256": "34f000169e748ea52abcfcb1ab897431d3ffae9581d29d3c409cd526ba242bff"
     },
     {
       "path": "scripts/prepare_mask_roles.py",
@@ -186,7 +214,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "5d39b32e832a8d70f194845154aa9a78b9050ebe174b1cf8a9a8e49ed51da71c"
+      "sha256": "17a679c2bb6353469fcbae7dd8300afc6224a4239b6b6729403eebfaeddbdeaa"
     },
     {
       "path": "scripts/role_usage.py",
@@ -278,7 +306,7 @@
     },
     {
       "path": "tests/test_instruction_paths.py",
-      "sha256": "8449901190df7d7ca1c726ede1bf852c167b6e7e2abe398738d577005f9340be"
+      "sha256": "aa01e9e7096cf9cce1f4b5f7cbf5565bd50c16092619a09ef50034f7937d5f82"
     },
     {
       "path": "tests/test_issue_board.py",
@@ -293,6 +321,22 @@
       "sha256": "007292bd9cab24b9f6bb3109efc3a3cb8b46c8b94d8d37f6de041fc58cec615d"
     },
     {
+      "path": "tests/test_milestone_continuation.py",
+      "sha256": "0350b241fa66bb417e95eca7a2bc5284ce001cb10be92d811ca66e401d93697e"
+    },
+    {
+      "path": "tests/test_milestone_plan.py",
+      "sha256": "16d9b7c93822dd021a6ecf820e11663851f79f99757444670aaddb537a4d9d87"
+    },
+    {
+      "path": "tests/test_milestone_public.py",
+      "sha256": "de1bfc184e73a70d356f2cf8c705893f3b360e7f11f2be1f1bbd37da2b1012bd"
+    },
+    {
+      "path": "tests/test_milestone_schemas.py",
+      "sha256": "c3336f71b3fa273a73038feb8a08d7c55dda21f832b29da2627447d89e0d2bec"
+    },
+    {
       "path": "tests/test_project_config.py",
       "sha256": "8964f10f1771fb107dcb9301f1731fbc7fb9ae69a8d3b9336176692cd3afa6c7"
     },
@@ -302,7 +346,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "1d070cb70be4512453d79322d57a191f32183d8d1ef64390b6022f37ddefe7cc"
+      "sha256": "2829fabff819bcdc4c009366b120d08f25e3a9ecc8ed47ac5f59cf3dbf4d8e98"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -373,6 +417,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "4f4a02e6ca100f39",
+  "portable_digest": "cf1fd7af09811415",
   "schema": "implement-rfc.portable-manifest.v1"
 }

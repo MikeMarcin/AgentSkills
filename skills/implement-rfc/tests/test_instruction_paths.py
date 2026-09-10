@@ -11,6 +11,28 @@ from project_fixtures import CONFIG
 
 
 class InstructionPaths(unittest.TestCase):
+    def test_plan_first_projection_and_checked_continuation_in_both_hosts(self):
+        skill=(ROOT/'SKILL.md').read_text()
+        self.assertLess(skill.index('Before implementation dispatch'),skill.index('**Dispatched:**'))
+        rules=(ROOT/'references/milestone-plans.md').read_text()
+        self.assertIn('same context',rules)
+        self.assertIn('Card completion, commits and headings are progress',rules)
+        self.assertIn('Required human',rules)
+        roles=renderer.validate_roles(json.loads((ROOT/'config/roles.json').read_text()))
+        for host_render in (renderer.render_codex_agent,renderer.render_claude_agent):
+            for name in ('rfc-integrator','rfc-worker','rfc-worker-deep'):
+                rendered=host_render(name,roles[name],{'model':'fixture','effort':'low'},CONFIG,'test')
+                if name=='rfc-integrator':
+                    self.assertIn('assigned authored plan',rendered)
+                    self.assertIn('explicit continue/fresh/wait/stop',rendered)
+                    self.assertIn('bound obligations and exit evidence',rendered)
+                else:
+                    self.assertIn('several named cards',rendered)
+                    self.assertIn('Do not independently select unassigned work',rendered)
+                    self.assertNotIn('current issue-card slice',rendered)
+                    self.assertIn('commit, or push',rendered)
+                    self.assertEqual(roles[name]['delegation']['allowed_roles'],[])
+
     def test_all_selected_role_branch_links_resolve(self):
         selected=['SKILL.md','references/milestone-integration.md',
                   'references/delegated-execution.md','references/verification-and-closeout.md',

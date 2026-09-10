@@ -5,6 +5,11 @@ worker completion are inputs, not automatic acceptance. A delivered report or su
 
 ## Verify the behavior
 
+Check the bound milestone's assigned obligations and all exit criteria, including
+its composed public path. Whole-card Done is neither necessary for a partial-card
+projection nor sufficient for milestone acceptance. Follow
+[Plan-first execution](milestone-plans.md) for completion and explicit context renewal.
+
 Ordinary slices run focused changed-surface checks. Exercise the selected public
 path when internal helper tests could pass while an acceptance claim stayed false.
 Record actual outcomes, including failures, skips, incomplete commands and relevant

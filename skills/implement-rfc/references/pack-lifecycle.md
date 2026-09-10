@@ -29,8 +29,9 @@ state:
    collision-free with `<allocate_id_command>`; the live board outranks any
    snapshot the pack carries. Rewrite filenames, front matter, and every
    cross-reference together; the retained pack copy keeps the original IDs.
-3. Do not copy a top-level implementation-order document as a second mutable
-   tracker; encode sequencing in card dependencies. Exclude editor files,
+3. Adopt authored grouping and typed live references under
+   [Plan-first execution](milestone-plans.md), alongside card dependencies.
+   Generated views are not a second mutable tracker. Exclude editor files,
    build output, caches, transient logs, credentials, and screenshots made
    only for local inspection.
 4. Retain the pack itself as provenance under `<rfc_root>/assets/<pack>/` and

@@ -37,6 +37,10 @@ native dispatch verifies the intended request; a matching banner cannot erase it
 
 ## Complete assignment
 
+A complete slice may cover explicitly named work from several cards in the bound
+milestone. Retain individual eligibility and exclusive paths. Workers receive only
+their projection, never authority to choose another card or perform board/commits.
+
 Provide the exact selected consumer/candidate, role/routing reason, live criterion
 references, exclusive allowed paths, constraints and shared interfaces, required
 focused verification and compact result. Refresh that scope for each assignment;
@@ -86,7 +90,8 @@ specific correction to a finding without restarting a full-candidate review loop
 At an integrator's completed milestone, collect or stop its children before ownership
 transfer. Do not retain a permanent worker/reviewer pool across the whole pack.
 For a replacement, account for the outgoing writer's effects first. A new card alone
-is not a leaf reset; a new milestone deliberately is an integrator reset.
+is not a reset. Integrator continuation follows the checked outcome and explicit
+reason in [Plan-first execution](milestone-plans.md).
 
 ## Review and optional runtimes
 

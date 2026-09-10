@@ -58,10 +58,17 @@ not an invitation to select another repository or overwrite work.
 
 ## 2. Dispatch one integrator
 
+Before implementation dispatch, resolve plan state through
+[Plan-first execution](references/milestone-plans.md). Preserve the current authored
+group and exits; invalid/stale input remains unresolved. Status, review and usage-only
+requests bypass implementation planning. Raw intake and necessary plan formation
+belong to the first integrator's preparation-and-execution assignment.
+
 Send the current mandate revision, objective, live RFC/card references, baseline
 and current handoff references, authorized integration scope and return contract.
-The first integrator can select the next usable milestone from the authorized
-scope. Use a fresh native non-history-copying `rfc-integrator`; keep the coordinator
+Include adopted plan/current milestone binding, or exact raw-plan bootstrap scope
+until intake permits binding. Use a fresh native non-history-copying `rfc-integrator`
+for the initial assignment; keep the coordinator
 conversation and previous engineering transcripts out of its assignment.
 
 One small fix needs one integrator, not a mandatory team. Existing model/permission
@@ -93,8 +100,9 @@ Consume the compact result and current evidence pointers; the integrator already
 owns engineering verification. Return missing engineering judgment to it.
 
 Resume the same integrator for its current milestone's correction or partial
-invocation. After a safely completed milestone, dispatch a fresh integrator for
-the next eligible objective. Keep required human decisions open and continue
+invocation. Check completion separately from explicit continuation intent. Normally
+dispatch fresh at a substantial boundary; related small continuation may reuse context
+with a reason and renewed scope. Keep required human decisions open and continue
 independent authorized work. Present the exact human ask when that is the actual
 remaining boundary. Stop on the user's stop condition or an unresolved blocker.
 

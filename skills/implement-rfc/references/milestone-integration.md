@@ -26,7 +26,12 @@ are established. Missing context or an uncertain prior mutation remains unresolv
 
 ## 2. Select a usable milestone
 
-Within the authorized dependency order, choose the next bounded capability that
+Follow [Plan-first execution](milestone-plans.md): adopt the assigned authored group
+before forming new work. Keep import/baseline and execution in this context. Bind
+obligations after intake, then continue eligible constituent cards; intermediate
+card completion is progress, not a terminal milestone return.
+
+Where the plan is absent or incomplete, choose within authorized dependency order a capability that
 can be demonstrated through its relevant public path. Name its criteria, owned
 paths, shared interfaces and required native/human evidence on the existing live
 records. A milestone may group several cards; retain their separate acceptance.
@@ -117,8 +122,10 @@ behavior, current candidate, relevant invariants/rationale, unresolved obligatio
 and next bounded milestone. Other closeouts link to that record rather than copy it.
 
 Return the compact fields in [Coordination handoff](coordination-handoff.md).
-Within this milestone, corrections can resume your context. At the next milestone,
-yield to a fresh integrator. Follow the user's stop instruction; local handoff
+Within this milestone, corrections retain context with renewed dispatch authority.
+At its checked boundary return explicit continue/fresh/wait/stop intent and reason.
+Normally yield fresh for a substantial next outcome; small related continuation may
+reuse context with renewed scope. Follow the user's stop instruction; local handoff
 never implies push, publication or another checkout.
 
 **Transferred:** the result identifies the current mandate/candidate, effects and

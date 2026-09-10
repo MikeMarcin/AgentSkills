@@ -7,6 +7,10 @@ second backlog. Resolve all paths from the selected consumer, not the skill link
 
 ## Assignment
 
+Use [Plan-first execution](milestone-plans.md) for discovery and computed binding.
+Bind current outcome, obligations and exits; grouping survives card progress.
+V2 separates acceptance from explicit continuation intent and reason.
+
 Give the integrator: run/dispatch and current mandate identity; exact root/branch;
 authorized RFC/card/area scope and milestone objective; applicable closeout and
 immutable baseline references; ownership and allowed side effects; engineering
@@ -39,9 +43,9 @@ a few paragraphs; context savings never justify deleting a live constraint.
 
 | Result | Next action |
 |---|---|
-| milestone-complete | When quiescent, fresh integrator for the next milestone |
+| milestone-complete | Check bound obligations/exits and explicit continuation; normally fresh at a substantial boundary, related reuse needs reason and renewed scope |
 | continue-milestone | Same integrator, same current problem with renewed scope and a new dispatch identity |
-| human-pending | Keep the exact ask/candidate open; fresh integrator for eligible independent work, otherwise present the ask |
+| human-pending | Keep exact ask/candidate open; eligible independent work needs checked continuation and safe release, otherwise present the ask |
 | blocked | Account for effects; continue independent eligible work only after safe release, otherwise report blocker |
 | cancelled | Stop and preserve; no automatic restart |
 | pack-complete | Report verified closeout; no required criterion may remain pending |
@@ -87,13 +91,15 @@ at the next user-authorized invocation. No automatic external restart is promise
 `scripts/coordinator_handoff.py` validates the logical return and suggests a
 control action from supplied native observations. It launches no models, stores
 no queue or leases, and approves no engineering claim. The versioned shape lives
-in `schemas/milestone-return.schema.json`.
+in `schemas/milestone-return-v2.schema.json`; the old v1 schema remains historical.
 
 Call `continuation` with the current assignment and execution state covering the
 producer, descendants and task commands. Supply already consumed identity tuples
 from the existing private memo; JSON lists are accepted after reload. A result
 with no consumption key is not consumed. Renew dispatch identity when explicitly
-resuming the same integrator; new milestones use a new native producer identity.
+resuming the same integrator. New milestones use the explicit checked continuation
+decision: normally a new native producer at a substantial boundary, or related reuse
+with renewed scope. Historical v1 interpretation cannot bypass a plan-aware binding.
 Supply `prior_partial` when comparing repeated partial returns. Identical candidate,
 handoff, evidence, pending work and next-step observations require investigation;
 the agent still judges whether superficially changed prose represents progress.
