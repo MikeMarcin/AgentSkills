@@ -1,0 +1,42 @@
+{
+  "approved": true,
+  "decision": "human-pending",
+  "records": [
+    {
+      "criterion": "raw-public-regressions",
+      "outcome": "pass",
+      "revision": "4938be2a68b3f74bedb0129a197cf352496218b9",
+      "evidence": {
+        "kind": "command",
+        "detail": "38 milestone/schema tests pass through two linked consumers; original authored course plus adaptive/refusal/recovery paths."
+      }
+    },
+    {
+      "criterion": "actual-claude-and-codex-courses",
+      "outcome": "pending",
+      "revision": "4938be2a68b3f74bedb0129a197cf352496218b9",
+      "evidence": {
+        "kind": "observation",
+        "detail": "Neither native course was run. Coordinator confirms no approved capacity/time ceiling or native driver/operator instruction in the mandate. Prepared decision page /tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html; source/adoption artifacts retained."
+      }
+    },
+    {
+      "criterion": "native-identities-and-boundaries",
+      "outcome": "pending",
+      "revision": "4938be2a68b3f74bedb0129a197cf352496218b9",
+      "evidence": {
+        "kind": "observation",
+        "detail": "Neither native course was run. Coordinator confirms no approved capacity/time ceiling or native driver/operator instruction in the mandate. Prepared decision page /tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html; source/adoption artifacts retained."
+      }
+    },
+    {
+      "criterion": "approved-capacity-and-native-driver",
+      "outcome": "pending",
+      "revision": "4938be2a68b3f74bedb0129a197cf352496218b9",
+      "evidence": {
+        "kind": "observation",
+        "detail": "Neither native course was run. Coordinator confirms no approved capacity/time ceiling or native driver/operator instruction in the mandate. Prepared decision page /tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html; source/adoption artifacts retained."
+      }
+    }
+  ]
+}

@@ -2,10 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0065"
 title: "Qualify raw-input milestones on both native drivers"
-status: "In Progress"
+status: "Parked"
 rfcs: ["RFC-ASK-0012"]
 depends_on: ["ASK-0064"]
 metadata: {"packet": "agent-skills-milestone-handling", "provisional_id": false, "criterion_coverage": ["RFC-ASK-0012-AC10", "RFC-ASK-0012-AC11", "RFC-ASK-0012-AC12"], "milestone_plan": {"id": "agent-skills-milestone-handling", "path": "docs/rfcs/plans/agent-skills-milestone-handling/milestone-plan.json"}}
+parked_on: "human-review"
+acceptance: [{"criterion":"raw-public-regressions","outcome":"pass","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"command","detail":"38 milestone/schema tests pass through two linked consumers; original authored course plus adaptive/refusal/recovery paths."}},{"criterion":"actual-claude-and-codex-courses","outcome":"pending","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"Neither native course was run. Coordinator confirms no approved capacity/time ceiling or native driver/operator instruction in the mandate. Prepared decision page /tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html; source/adoption artifacts retained."}},{"criterion":"native-identities-and-boundaries","outcome":"pending","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"Neither native course was run. Coordinator confirms no approved capacity/time ceiling or native driver/operator instruction in the mandate. Prepared decision page /tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html; source/adoption artifacts retained."}},{"criterion":"approved-capacity-and-native-driver","outcome":"pending","revision":"4938be2a68b3f74bedb0129a197cf352496218b9","evidence":{"kind":"observation","detail":"Neither native course was run. Coordinator confirms no approved capacity/time ceiling or native driver/operator instruction in the mandate. Prepared decision page /tmp/agent-skills-m2-adoption.rqZw9U/native-course-review.html; source/adoption artifacts retained."}}]
 ---
 
 # ASK-0065: Qualify raw-input milestones on both native drivers

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "candidates": [
+    {
+      "id": "ASK-0065-native-course-authorization",
+      "title": "Authorize the two bounded native milestone courses",
+      "revision": "4938be2a68b3f74bedb0129a197cf352496218b9",
+      "criteria": [
+        "Specify an explicit capacity/time ceiling for two initial courses total: one Claude and one Codex.",
+        "Specify how the normal signed-in native coordinator sessions will be operated; native permission prompts remain user decisions."
+      ],
+      "content": "Source candidate 4938be2a68b3f74bedb0129a197cf352496218b9 has 38 passing milestone/schema tests plus passing role/adapter and source/documentation checks. AgentSkills-only guarded MASK adoption is filesystem-ready; native host loading is not yet proved. No native course has run. In the note, give the approved capacity/time ceiling and native driver/operator instruction, then accept. An empty acceptance note does not provide the missing limits or authorize a launch. The course starts from the raw six-card name-catalog pack, observes grouping/progress/safe resume and an integration transition, then one small planless follow-up per driver. No exec/-p/API substitution, extra purchase/reset, billing fallback, unrelated migration or retries beyond the approved limit. This decision authorizes a bounded attempt, not RFC acceptance. Native evidence remains pending until the actual courses pass.",
+      "paths": [],
+      "resources": [
+        "candidate:AgentSkills:4938be2a68b3f74bedb0129a197cf352496218b9"
+      ],
+      "resource_versions": {
+        "candidate:AgentSkills:4938be2a68b3f74bedb0129a197cf352496218b9": "4938be2a68b3f74bedb0129a197cf352496218b9"
+      },
+      "metadata": {
+        "candidate_archive": "/tmp/agent-skills-m2-adoption.rqZw9U/candidate-4938be2.tar",
+        "closeout": "docs/issues/10-backlog/ASK-0066-close-milestone-handling.md"
+      }
+    }
+  ]
+}

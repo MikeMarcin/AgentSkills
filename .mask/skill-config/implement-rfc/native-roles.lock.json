@@ -1,0 +1,100 @@
+{
+  "contract_sha256": "9575dc4fa8a69900236bd8d68634fdca5759124d91acf3cf8c22c6e83e4d70f1",
+  "coordinate": "legacy/implement-rfc",
+  "input_paths": {
+    "execution-selection": ".mask/generated/implement-rfc/execution-selection.json",
+    "project-config": ".mask/skill-config/implement-rfc/project.json",
+    "project-rules": ".mask/skill-config/implement-rfc/project.md"
+  },
+  "inputs": {
+    "execution-selection": null,
+    "project-config": "cbd2979ef5fcc560daca171c91aa07d6694a64c00a087431e22b1bca15558703",
+    "project-rules": "c3524b3b436cfe97e0fe7ad00eb305d180b28601364b7feae7c22d81141f68df"
+  },
+  "parameters_sha256": "af5c532cc1f9691784b11a327bce2bbca2923eabfab1d9cc6db2fb4919cc170c",
+  "role_inputs_sha256": "62f2c88d9b97dc675fa7526df88a1d78f3238267d4756ea8b374a47d210a3000",
+  "roles": [
+    {
+      "agent": "claude",
+      "name": "rfc-integrator",
+      "sha256": "9a7ed3a5481d3455ae2958aed4fe7fa4284a80a474bd4ed120d5a32b7f330ff1"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-reviewer",
+      "sha256": "19eef7062d9e60f355b6cbf54756c069defa927db04f85a8213beeef4ee518a5"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-reviewer-critical",
+      "sha256": "4d08e4565af35f26bc45e6be151b4cd1da962169ff93dc054ec4346a64f706b5"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-scout",
+      "sha256": "20b1245841084fadab80adede019a45e414bf4d36e56ac89d6b1edea7b610913"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-test-runner",
+      "sha256": "4ad54a87108436b2a6f65e83193748ad2cba35da0ae7853de754029eed7dd3c1"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-utility",
+      "sha256": "8bbd9e35d68c9f937c797d96abd130f6301c2c42912a3a61c8b95737bcfc10c3"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-worker",
+      "sha256": "66ed79936bc177febb71afb73af13b19683e62cc7946304584f4c23eba6a1544"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-worker-deep",
+      "sha256": "7cbbbd6d950301d00fcf602fd3f27132f7cbe4fb45c078fb33968d89c62cffd1"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-integrator",
+      "sha256": "25e851a51d8579e1bd8cb87c0a17b3705755361e92ef3a103157c65939d5ab0a"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-reviewer",
+      "sha256": "09ff290f010f7ab97c7476f5094460699c7cdbf8ef0f718582d3dd47b4a989f9"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-reviewer-critical",
+      "sha256": "68ed71790f035bb3c97a0d48dbb693190500c02b216386d23c8e1bde2bc50a9c"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-scout",
+      "sha256": "1fcff32893857020ac9abacf0628e5d214aaaf805f7368b92029aa2f322eff32"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-test-runner",
+      "sha256": "165297067d5039059906dbe5ab3e923482514878dff19fdfb0cf9525e58d2864"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-utility",
+      "sha256": "3ea7a8e0a35a2c7657607a9e78fd48b1a5e1dda3fe17b9fa5fb417b2040a2aa7"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-worker",
+      "sha256": "b07fd3436c60d46721040ec66f6a83d16df02ff9bcece90a977e536538e9b9c7"
+    },
+    {
+      "agent": "codex",
+      "name": "rfc-worker-deep",
+      "sha256": "eef9693bb163b796ace0b3651ab70216cabad7caac38bea7d96f6f0be4b942e8"
+    }
+  ],
+  "schema": "mask.native-role-lock.v1",
+  "schema_version": 1
+}
