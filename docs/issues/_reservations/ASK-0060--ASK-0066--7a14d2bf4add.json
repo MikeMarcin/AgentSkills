@@ -1,0 +1,16 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0060",
+    "ASK-0061",
+    "ASK-0062",
+    "ASK-0063",
+    "ASK-0064",
+    "ASK-0065",
+    "ASK-0066"
+  ],
+  "reserve_for": "agent-skills-milestone-handling",
+  "purpose": "",
+  "created": "2026-09-10T05:55:54.872697+00:00",
+  "base": "154025bdd374a448a0aaa9742703d6459d64be2e"
+}
