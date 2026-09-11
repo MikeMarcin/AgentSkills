@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0069"
 title: "Judge consumer adapters against the MASK lock, not the legacy render manifest"
-status: "Backlog"
+status: "Ready"
 rfcs: []
 depends_on: []
 priority: "P2"
