@@ -23,7 +23,7 @@ class StandardWorkerTargetTests(unittest.TestCase):
         self.assertEqual(integrator['mutation'], 'workspace-write')
         self.assertEqual(routing['assignments'].pop('rfc-integrator'), 'integration')
         for provider, expected in [('codex', {'model':'gpt-6-astra','effort':'low'}),
-                                   ('claude', {'model':'claude-opus-5','effort':'xhigh'})]:
+                                   ('claude', {'model':'claude-fable-5-1','effort':'low'})]:
             self.assertEqual(routing['providers'][provider]['classes'].pop('integration'), expected)
         self.assertEqual(checker.configuration_findings(roles, routing, target), [])
         self.assertEqual(checker.rendering_findings(ROOT, roles, routing, target), [])
