@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0069"
 title: "Judge consumer adapters against the MASK lock, not the legacy render manifest"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P2"
 metadata: {"origin": "mask ensure --all --repair on 2026-09-11 left validate_portable_agents --repo-root red in two consumers", "skills": ["implement-rfc"]}
+acceptance: [{"criterion":"consumer-checks-pass-under-mask-lock","outcome":"pass","revision":"a70b4f1561d4f7527e971d936f438513c05a408c","evidence":{"kind":"command","detail":"validate_portable_agents.py --repo-root passes for SampleReview and SamplePlanner after mask ensure --all --repair re-staged the roles; legacy manifest reported as ignored."}},{"criterion":"drifted-adapter-still-fails-under-lock","outcome":"pass","revision":"a70b4f1561d4f7527e971d936f438513c05a408c","evidence":{"kind":"command","detail":"test_mask_locked_consumer_is_judged_by_lock_and_fresh_render: an appended line makes --check exit 1 with stale generated file and lock drift."}},{"criterion":"direct-render-refused-under-lock","outcome":"pass","revision":"a70b4f1561d4f7527e971d936f438513c05a408c","evidence":{"kind":"command","detail":"Same test: render without --check exits 2 naming mask ensure; the 19 fixture renderer tests are unchanged and pass."}},{"criterion":"manifest-and-gates","outcome":"pass","revision":"a70b4f1561d4f7527e971d936f438513c05a408c","evidence":{"kind":"command","detail":"--write-source-manifest regenerated; --source-only valid; documentation gate 0 violations; full suite 462 tests OK."}}]
 ---
 
 # ASK-0069: Judge consumer adapters against the MASK lock, not the legacy render manifest
@@ -35,4 +36,6 @@ Owned surfaces: `skills/implement-rfc/scripts/render_runtime_adapters.py` (`publ
 
 ## Verification and execution record
 
-Run `python3 -B -m unittest discover -s skills/implement-rfc/tests -p 'test_render_runtime_adapters.py'`, then the two consumer checks and the documentation gate. Not started.
+Source revision a70b4f1561d4f7527e971d936f438513c05a408c. Renderer tests: 20 pass, including the new locked-consumer test (current files pass with a stale legacy manifest; a drifted file reports stale and lock drift; a lock disagreeing with current files reports lock drift only; direct render refused with a `mask ensure` message). Full implement-rfc discovery: 462 tests, 8 skipped, 0 failures. Portable source manifest regenerated and valid; documentation gate 12 RFCs, 69 cards, 0 violations.
+
+Consumer checks, 2026-09-11: the renderer edit itself changes every adapter's header digest, so MASK's doctor reported setup required and `mask ensure --all --repair` re-staged the roles (102 backups). After that, `validate_portable_agents.py --repo-root` passes for SampleReview (17 files, source ea04ecde) and SamplePlanner (17 files, source 373ca930), each noting the ignored legacy manifest. SamplePlanner also carried four gitignored retired adapters (rfc-critical-reviewer and rfc-worker-routine, both providers) that MASK does not remove; they were deleted by hand. Adapters are gitignored in both consumers; only the locks are tracked and were committed after the re-stage.
