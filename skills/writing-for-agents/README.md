@@ -1,35 +1,18 @@
 # Writing for agents
 
-Notes for people maintaining this package. Agents use [SKILL.md](SKILL.md) and,
-for skill packages, [skill mechanics](references/skill-mechanics.md); nothing
-points them here.
+Notes for people maintaining this package. Agents use [SKILL.md](SKILL.md) and, for skill packages, [skill mechanics](references/skill-mechanics.md); nothing points them here.
 
 ## Provenance
 
-Adapted on 2026-09-11 under ASK-0071 from Matt Pocock's MIT-licensed
-`writing-for-agents` skill (`https://github.com/mattpocock/skills`,
-`skills/productivity/writing-for-agents`), read from a local checkout at commit
-`3cca18b368ae95cdbdebbff572ccafa662551015`. That directory's tree is
-`ad2925850efb8973a72d2e666f7a975f9a2d4a9b`; it last changed in `3216582`.
+Adapted on 2026-09-11 under ASK-0071 from Matt Pocock's MIT-licensed `writing-for-agents` skill (`https://github.com/mattpocock/skills`, `skills/productivity/writing-for-agents`), read from a local checkout at commit `3cca18b368ae95cdbdebbff572ccafa662551015`. That directory's tree is `ad2925850efb8973a72d2e666f7a975f9a2d4a9b`; it last changed in `3216582`.
 
-The concepts and their names are kept: context pointers, the two loads, the
-information hierarchy, completion criteria, splitting, leading words and
-pruning. The text is rewritten for AgentSkills rather than copied, as the wizard
-companion was. Changes from the source:
+The concepts and their names are kept: context pointers, the two loads, the information hierarchy, completion criteria, splitting, leading words and pruning. The text is rewritten for AgentSkills rather than copied, as the wizard companion was. Changes from the source:
 
-- Skill mechanics target plain MASK packages shared by Claude and Codex. With no
-  portable user-invoked mode, the invocation guidance becomes selection scope,
-  reaching other skills by name, and the catalog in place of router skills.
-- The applications recorded in RFC-ASK-0008 and RFC-ASK-0010 are folded in:
-  operation-specific pointers, per-path load counting, obligations kept out of
-  leading words, prohibitions reserved for authority and side-effect
-  boundaries, and verification by tabletop and reachability rather than word
-  quotas.
-- Examples use AgentSkills vocabulary. The Codex `agents/openai.yaml` interface
-  file is not carried over.
+- Skill mechanics target plain MASK packages shared by Claude and Codex. With no portable user-invoked mode, the invocation guidance becomes selection scope, reaching other skills by name, and the catalog in place of router skills.
+- The applications recorded in RFC-ASK-0008 and RFC-ASK-0010 are folded in: operation-specific pointers, per-path load counting, obligations kept out of leading words, prohibitions reserved for authority and side-effect boundaries, and verification by tabletop and reachability rather than word quotas.
+- Examples use AgentSkills vocabulary. The Codex `agents/openai.yaml` interface file is not carried over.
 
-This package substantially adapts that material, so the upstream notice is
-retained:
+This package substantially adapts that material, so the upstream notice is retained:
 
 ```text
 MIT License
