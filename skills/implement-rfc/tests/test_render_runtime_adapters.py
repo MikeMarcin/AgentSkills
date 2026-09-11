@@ -287,6 +287,45 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertIn('missing project configuration', result.stderr)
             self.assertEqual(before, {str(p): p.read_bytes() for p in local.rglob('*') if p.is_file()})
 
+    def test_mask_locked_consumer_is_judged_by_lock_and_fresh_render(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.assertEqual(self.run_renderer(root).returncode, 0)
+            # MASK publishes the same files under its own lock and never touches the
+            # renderer's manifest; leave that manifest carrying digests from an older render.
+            roles = []
+            for path in sorted([*root.glob(".claude/agents/rfc-*.md"), *root.glob(".codex/agents/rfc-*.toml")]):
+                roles.append({"agent": path.parts[-3].lstrip("."), "name": path.stem,
+                              "sha256": __import__("hashlib").sha256(path.read_bytes()).hexdigest()})
+            lock_path = root / ".mask/skill-config/implement-rfc/native-roles.lock.json"
+            lock_path.write_text(json.dumps({"schema": "mask.native-role-lock.v1", "schema_version": 1, "roles": roles}), encoding="utf-8")
+            manifest_path = root / ".mask/generated/implement-rfc/runtime-adapters.json"
+            manifest_path.write_text(manifest_path.read_text().replace("a", "b", 3), encoding="utf-8")
+            check = self.run_renderer(root, "--check")
+            self.assertEqual(check.returncode, 0, check.stderr)
+            self.assertIn("ignored legacy adapter manifest", check.stderr)
+            # Direct rendering would publish beside MASK's record; it is refused.
+            direct = self.run_renderer(root)
+            self.assertEqual(direct.returncode, 2)
+            self.assertIn("run mask ensure", direct.stderr)
+            # A file that no longer equals the fresh render is stale, and it no longer matches the lock either.
+            drifted = root / ".codex/agents/rfc-worker.toml"
+            original = drifted.read_text(encoding="utf-8")
+            drifted.write_text(original + "# drift\n", encoding="utf-8")
+            check = self.run_renderer(root, "--check")
+            self.assertEqual(check.returncode, 1)
+            self.assertIn("stale generated file", check.stderr)
+            self.assertIn("lock drift", check.stderr)
+            drifted.write_text(original, encoding="utf-8")
+            # Files current but the lock disagreeing is drift for mask ensure, not staleness.
+            lock = json.loads(lock_path.read_text())
+            lock["roles"][0]["sha256"] = "0" * 64
+            lock_path.write_text(json.dumps(lock), encoding="utf-8")
+            check = self.run_renderer(root, "--check")
+            self.assertEqual(check.returncode, 1)
+            self.assertIn("lock drift", check.stderr)
+            self.assertNotIn("stale generated file", check.stderr)
+
     def test_noop_render_and_check_are_observational(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

@@ -142,7 +142,10 @@ validated inputs inside the selected consumer; they cannot redirect output.
 ## Role Adapters
 
 Generate optional role adapters with `scripts/render_runtime_adapters.py --repo-root
-/path/to/consumer`; pass `--check` for observational drift checking. It writes
+/path/to/consumer`; pass `--check` for observational drift checking. A consumer
+that carries MASK's `native-roles.lock.json` is judged against the fresh render and
+that lock, its legacy publication manifest is ignored, and direct rendering into it
+is refused in favour of `mask ensure`. Without a lock the renderer writes
 `.codex/agents/rfc-*.toml`, `.claude/agents/rfc-*.md`, and
 `.mask/generated/implement-rfc/runtime-adapters.json`. It never emits a Claude
 skill shim or writes through either skill link. Linked destination parents and
