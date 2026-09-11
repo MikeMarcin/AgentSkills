@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0068"
 title: "Give attended verdicts an engineering owner and survive hosts without SendMessage"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P1"
 metadata: {"origin": "SampleReview UX redesign coordinator session, 2026-09-10", "skills": ["implement-rfc"]}
+acceptance: [{"criterion":"coordinator-forwards-pointers-not-conclusions","outcome":"pass","revision":"d435015e53b39d395c399b77a2df933161a8b742","evidence":{"kind":"command","detail":"test_verdicts_go_to_the_integrator_and_resume_has_a_fallback asserts SKILL.md step 4 forbids summarising or interpreting the note and attendance.md names the forwarded session id, cursor and candidate ids."}},{"criterion":"no-sendmessage-dispositions-and-quiescence","outcome":"pass","revision":"d435015e53b39d395c399b77a2df933161a8b742","evidence":{"kind":"command","detail":"coordination-handoff.md gains 'Hosts without SendMessage' with the fresh-dispatch path, fresh-dispatch-ready returns and the quiescence check; both disposition rows name the fallback; the test guards each."}},{"criterion":"desktop-code-tab-observation-recorded","outcome":"pass","revision":"d435015e53b39d395c399b77a2df933161a8b742","evidence":{"kind":"observation","detail":"runtime-compatibility.md records the 2026-09-10 desktop app Code tab observation on Claude Code 2.1.260 as dated, separate from terminal CLI behaviour, linking the handoff section."}},{"criterion":"routes-addenda-allowlists-byte-identical","outcome":"pass","revision":"d435015e53b39d395c399b77a2df933161a8b742","evidence":{"kind":"command","detail":"git diff of config/, schemas/ and generated/ excluding the regenerated manifest is empty; validate_portable_agents --source-only valid and --compare SamplePlanner identical; 19 renderer tests pass."}}]
 ---
 
 # ASK-0068: Give attended verdicts an engineering owner and survive hosts without SendMessage
@@ -37,4 +38,6 @@ Owned surfaces: `skills/implement-rfc/SKILL.md` steps 3 and 4, `references/atten
 
 ## Verification and execution record
 
-Run `python3 -m unittest discover -s skills/implement-rfc/tests -p 'test_instruction_paths.py'` and `test_render_runtime_adapters.py`, then the documentation gate. Not started.
+Source revision d435015e53b39d395c399b77a2df933161a8b742. Instruction-path tests: 4 pass, including the new guard over the forwarded-pointer rule, the no-SendMessage disposition rows and the dated desktop observation. Renderer tests: 19 pass. Full implement-rfc discovery: 461 tests, 8 skipped, 1 failure that is pre-existing at HEAD (`test_standard_worker_target` expects the Claude integration route opus/xhigh; commit 0af7c0e set it to fable/low without updating the test). Documentation gate: 12 RFCs, 68 cards, 0 violations. `validate_portable_agents.py --source-only`: portable source valid after regenerating the manifest; `--compare` against SamplePlanner's installed skill: identical. `config/`, `schemas/` and rendered role text are byte-identical to the pre-change head; the fresh-dispatch-ready return requirement lives in the compact-return contract of coordination-handoff.md, which the rendered integrator role already binds through its entrypoint, rather than in roles.json. `workflow_preflight.py` was not changed; the SendMessage record is a coordinator bind-time observation.
+
+Pre-existing consumer drift, outside this card: `validate_portable_agents.py --repo-root SampleReview` reports its `.claude/agents/rfc-integrator.md` as stale or unrecognized at the head before this card's commits; reconcile through MASK in that consumer.
