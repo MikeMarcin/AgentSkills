@@ -1,6 +1,6 @@
 # Skill mechanics
 
-The skill-specific branch of [`writing-for-agents`](../SKILL.md): what changes when the document is a skill (the portable package, the selection that replaces the invocation choice, and splitting). Everything else about writing it is the universal reference in `SKILL.md`.
+The skill-specific branch of [`writing-for-agents`](SKILL.md): what changes when the document is a skill (the portable package, the selection that replaces the invocation choice, and splitting). Everything else about writing it is the universal reference in `SKILL.md`.
 
 ## Portable package
 
