@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0070"
 title: "Recover useful child work and verify judgeable portable outcomes"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: "P1"
