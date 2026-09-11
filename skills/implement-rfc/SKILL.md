@@ -23,7 +23,9 @@ selects its consumer. Read its `.mask/skill-config/implement-rfc/project.json` a
 unrelated work and existing approval boundaries.
 
 Read [Coordination handoff](references/coordination-handoff.md) before dispatch or
-resume. Bind the integrator's engineering route independently of the coordinator;
+resume. Record whether this host exposes `SendMessage`: without it no integrator can
+be resumed, and the dispositions there take their fresh-dispatch form.
+Bind the integrator's engineering route independently of the coordinator;
 use canonical configuration and actual host settings, not model names in prose.
 For setup, unavailable roles or model/effort conflicts, read the installed
 `references/model-routing.md` and `references/runtime-compatibility.md`.
@@ -102,8 +104,16 @@ Apply the disposition/identity rules in [Coordination handoff](references/coordi
 Consume the compact result and current evidence pointers; the integrator already
 owns engineering verification. Return missing engineering judgment to it.
 
+A human verdict is engineering input, not a coordinator conclusion. Forward the
+attended session id, the `status --after` cursor and the exact candidate ids to the
+integrator as its next objective, unread beyond confirming they exist. Do not
+summarise or interpret the note, rank its symptoms, or decide which other candidates
+a rejection invalidates; a low-effort coordinator holding the verdict is still not
+authorised to adjudicate it.
+
 Resume the same integrator for its current milestone's correction or partial
-invocation. Check completion separately from explicit continuation intent. Normally
+invocation where the host exposes `SendMessage`; otherwise dispatch a fresh integrator
+carrying the return's continuation pointers under a renewed dispatch identity. Check completion separately from explicit continuation intent. Normally
 dispatch fresh at a substantial boundary; related small continuation may reuse context
 with a reason and renewed scope. Keep required human decisions open and continue
 independent authorized work. Present the exact human ask when that is the actual

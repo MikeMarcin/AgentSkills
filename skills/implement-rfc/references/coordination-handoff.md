@@ -44,12 +44,12 @@ a few paragraphs; context savings never justify deleting a live constraint.
 | Result | Next action |
 |---|---|
 | milestone-complete | Check bound obligations/exits and explicit continuation; normally fresh at a substantial boundary, related reuse needs reason and renewed scope |
-| continue-milestone | Same integrator, same current problem with renewed scope and a new dispatch identity |
+| continue-milestone | Same integrator, same current problem with renewed scope and a new dispatch identity; without `SendMessage`, a fresh integrator carrying the return's continuation pointers |
 | human-pending | Keep exact ask/candidate open; eligible independent work needs checked continuation and safe release, otherwise present the ask |
 | blocked | Account for effects; continue independent eligible work only after safe release, otherwise report blocker |
 | cancelled | Stop and preserve; no automatic restart |
 | pack-complete | Report verified closeout; no required criterion may remain pending |
-| review-request | No-grandchildren fallback only: forward the selected native review assignment, wait, then resume this integrator to adjudicate |
+| review-request | No-grandchildren fallback only: forward the selected native review assignment, wait, then resume this integrator to adjudicate; without `SendMessage`, a fresh integrator receives the review result reference |
 
 ## Completion and ownership
 
@@ -85,6 +85,18 @@ not a general worker broker; unavailable required review stays unresolved.
 
 If the interactive host exits, retain the memo/closeout and resume from live state
 at the next user-authorized invocation. No automatic external restart is promised.
+
+## Hosts without SendMessage
+
+Resume is `SendMessage`. Where the host does not expose it, record that at bind
+time and treat every continue-milestone and review-request as a fresh
+`rfc-integrator` dispatch carrying the previous return's continuation pointers,
+current candidate, evidence locations and a renewed dispatch identity. Every compact
+return must therefore already be fresh-dispatch-ready: a successor reading only the
+durable continuation and the return can take over without the retired context.
+Before retiring an integrator on such a host, confirm its children and task commands
+are quiescent; nothing can reach them afterwards, and orphaned children keep
+spending. The coordinator still forwards pointers, never its own engineering summary.
 
 ## Optional data checks
 

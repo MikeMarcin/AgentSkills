@@ -38,7 +38,11 @@ Validate returned verdicts against the candidate they describe. The engineering
 integrator incorporates partial decisions, verifies any correction and performs
 the normal acceptance/board update. The coordinator preserves the human's actual
 instructions; it does not synthesize missing verdicts or decide acceptance from
-an empty queue remembered in conversation.
+an empty queue remembered in conversation. Nor does it interpret them: it forwards
+the session id, the event cursor and the candidate ids, and leaves what a rejection
+means, which other candidates it touches and whether a remark is a defect or a
+requirement change to the integrator. Interpreting a rejection to a root cause is a
+named unresolved reasoning problem the integrator may delegate to `rfc-worker-deep`.
 
 **Consumed:** received decisions remain attached to their actual candidates,
 unanswered requirements stay pending, and conflicting protection is resolved

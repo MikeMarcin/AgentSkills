@@ -234,3 +234,16 @@ criterion open while independent source work continues. Review relay is confined
 to one integrator-selected independent review and returns judgment to that same
 integrator. Ordinary implementation stays local to the integrator when nesting
 is unavailable. Local handoff does not authorize a Git push.
+
+### Desktop app Code tab observation (2026-09-10)
+
+Two coordinator sessions in the Claude desktop app Code tab on Claude Code 2.1.260
+could not resume a completed integrator. One listed `SendMessage` and then reported
+`SendMessage is disabled for this session, in subagents as well as here`; a later
+session did not list the tool at all. Neither had a permission deny rule, both had
+`crossSessionInbound: accept`, and the version exceeds the documented minimum. The
+rendered `rfc-integrator` role grants the tool, which does not make it available.
+Treat the desktop Code tab as a host without `SendMessage` and run the fresh-dispatch
+dispositions in [Coordination handoff](coordination-handoff.md#hosts-without-sendmessage);
+the terminal CLI remains the qualified host for resume. This is a dated observation,
+not a documented platform contract.

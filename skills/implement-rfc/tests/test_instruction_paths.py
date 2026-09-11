@@ -33,6 +33,26 @@ class InstructionPaths(unittest.TestCase):
                     self.assertIn('commit, or push',rendered)
                     self.assertEqual(roles[name]['delegation']['allowed_roles'],[])
 
+    def test_verdicts_go_to_the_integrator_and_resume_has_a_fallback(self):
+        skill=(ROOT/'SKILL.md').read_text()
+        self.assertIn('Record whether this host exposes `SendMessage`',skill)
+        self.assertIn('Do not\nsummarise or interpret the note',skill)
+        self.assertLess(skill.index('A human verdict is engineering input'),skill.index('**Closed:**'))
+        self.assertIn('otherwise dispatch a fresh integrator',skill)
+        attendance=(ROOT/'references/attendance.md').read_text()
+        self.assertIn('it forwards\nthe session id, the event cursor and the candidate ids',attendance)
+        self.assertIn('may delegate to `rfc-worker-deep`',attendance)
+        handoff=(ROOT/'references/coordination-handoff.md').read_text()
+        self.assertIn('## Hosts without SendMessage',handoff)
+        self.assertIn('fresh-dispatch-ready',handoff)
+        self.assertIn('confirm its children and task commands\nare quiescent',handoff)
+        for row in ('continue-milestone','review-request'):
+            line=next(l for l in handoff.splitlines() if l.startswith(f'| {row} |'))
+            self.assertIn('without `SendMessage`',line)
+        compatibility=(ROOT/'references/runtime-compatibility.md').read_text()
+        self.assertIn('### Desktop app Code tab observation',compatibility)
+        self.assertIn('coordination-handoff.md#hosts-without-sendmessage',compatibility)
+
     def test_all_selected_role_branch_links_resolve(self):
         selected=['SKILL.md','references/milestone-integration.md',
                   'references/delegated-execution.md','references/verification-and-closeout.md',
