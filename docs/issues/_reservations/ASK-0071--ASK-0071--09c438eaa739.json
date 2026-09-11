@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0071"
+  ],
+  "reserve_for": "writing-for-agents-port-20260911",
+  "purpose": "Adapt writing-for-agents as a portable AgentSkills skill",
+  "created": "2026-09-11T21:18:21.750601+00:00",
+  "base": "4e5b971c128737e098b649fdb98220aedea81d98"
+}
