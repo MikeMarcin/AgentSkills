@@ -1,0 +1,11 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0067",
+    "ASK-0068"
+  ],
+  "reserve_for": "workflow-wake-and-verdict",
+  "purpose": "",
+  "created": "2026-09-11T03:10:49.083175+00:00",
+  "base": "bf623d166527b18e99e3064737ee1df0ae3d282a"
+}
