@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0069"
+  ],
+  "reserve_for": "adapter-check-honours-mask-lock",
+  "purpose": "",
+  "created": "2026-09-11T04:54:30.736840+00:00",
+  "base": "a24d208dbf5fffdc82c9f9b19b9666422e4039fe"
+}
