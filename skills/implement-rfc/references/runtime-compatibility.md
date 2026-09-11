@@ -247,3 +247,10 @@ Treat the desktop Code tab as a host without `SendMessage` and run the fresh-dis
 dispositions in [Coordination handoff](coordination-handoff.md#hosts-without-sendmessage);
 the terminal CLI remains the qualified host for resume. This is a dated observation,
 not a documented platform contract.
+
+Follow-up, 2026-09-11: after the owner updated, a running desktop Code tab session
+(desktop app 1.52386.0, Claude Code 2.1.260) gained `SendMessage` as a loadable tool
+mid-session, and a send to a completed subagent resumed it and returned its reply.
+Availability therefore varies by desktop build and session, not by CLI version or
+settings. Record the observation at bind time in each run and select the resume or
+fresh-dispatch disposition from what that session actually exposes.
