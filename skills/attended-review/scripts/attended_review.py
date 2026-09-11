@@ -29,6 +29,14 @@ class ReviewError(ValueError):
     pass
 
 
+class WaitTimeout(ReviewError):
+    """A bounded wait ended with nothing to report; carries the sequence it watched from."""
+
+    def __init__(self, message, sequence):
+        super().__init__(message)
+        self.sequence = sequence
+
+
 MAXIMUM_ATTACHMENTS = 4
 MAXIMUM_ATTACHMENT_BYTES = 4 * 1024 * 1024
 # One verdict with its images, and headroom for the envelope around them.
@@ -290,6 +298,7 @@ class Session:
                         previous.update(candidate)
                     else:
                         state["candidates"][cid] = {**candidate, "fingerprint": fingerprint, "phase": "waiting", "protected": False, "decision": None, "observations": []}
+                        state["handed_back"] = None
                     self.event(state, "candidate", candidate=cid, fingerprint=fingerprint)
                 atomic_json(self.path, state)
         return self.status()
@@ -323,6 +332,7 @@ class Session:
             self.acquire(state, resources, item)
             item["phase"] = "ready"
             item.pop("error", None)
+            state["handed_back"] = None
             if evidence:
                 item["observations"].append({"time": now(), "evidence": evidence})
             self.event(state, "ready", candidate=cid)
@@ -393,6 +403,7 @@ class Session:
                         raise ReviewError("Preparation interrupted before publication")
                     item["phase"] = "ready"
                     item.pop("error", None)
+                    state["handed_back"] = None
                     item["observations"].append({"time": now(), "evidence": evidence})
                     self.event(state, "ready", candidate=cid)
             except (ReviewError, OSError, KeyboardInterrupt) as exc:
@@ -485,11 +496,39 @@ class Session:
             self.event(state, "handed-back", decided=decided, pending=pending)
         return {"handed_back": self.load()["handed_back"], "decided": decided, "pending": pending}
 
+    def wait(self, after=None, kinds=("handed-back", "decision"), timeout=None, interval=0.5):
+        """Block until the human acts. A driver arms this before ending its turn; the exit is its wake.
+
+        Only the file's modification time is polled while idle. The session file
+        is read under the ordinary lock, and only when that time has moved.
+        """
+        kinds = tuple(kinds) or ("handed-back", "decision")
+        state = self.load()
+        cursor = state["sequence"] if after is None else after
+        deadline = None if timeout is None else time.monotonic() + timeout
+        seen = None
+        while True:
+            try:
+                stamp = self.path.stat().st_mtime_ns
+            except FileNotFoundError:
+                raise ReviewError("Session file removed while waiting") from None
+            if stamp != seen:
+                seen = stamp
+                state = self.load()
+                events = [e for e in state["events"] if e["sequence"] > cursor and e["kind"] in kinds]
+                if events:
+                    return {"session": state["id"], "sequence": state["sequence"], "handed_back": state.get("handed_back"), "events": events}
+            if deadline is not None and time.monotonic() >= deadline:
+                raise WaitTimeout(f"No {'/'.join(kinds)} event after sequence {cursor} within {timeout:g}s", state["sequence"])
+            time.sleep(interval)
+
     def pause(self, paused=True, interrupt=False):
         with self.transaction() as (state, _):
             if state is None:
                 raise ReviewError("No session")
             state["paused"] = paused
+            if not paused:
+                state["handed_back"] = None
             if interrupt:
                 state["preparation_epoch"] = state.get("preparation_epoch", 0) + 1
                 for item in state["candidates"].values():
@@ -517,6 +556,8 @@ class Session:
                         if not item.get("decision"):
                             item["phase"] = "waiting"
                     affected.append(item["id"])
+            if affected:
+                state["handed_back"] = None
             self.event(state, "resume-development", candidates=affected, preparation_stopped=preparation_stopped)
         return {"affected": affected, "status": self.status()}
 
@@ -670,6 +711,7 @@ def main(argv=None):
     sub.add_parser("html").add_argument("--output", required=True)
     sub.add_parser("pause")
     sub.add_parser("hand-back")
+    p = sub.add_parser("wait", help="Block until the reviewer hands back or decides; arm it as a background watch whose exit wakes the driver"); p.add_argument("--after", type=int, help="Sequence cursor; defaults to the current sequence"); p.add_argument("--kind", action="append", default=[], help="Event kind to wait for (repeatable); default handed-back and decision"); p.add_argument("--timeout", type=float, help="Seconds before giving up with exit 1 and the current sequence")
     p = sub.add_parser("start"); p.add_argument("--keep-preparing", action="store_true")
     p = sub.add_parser("resume-development"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[]); p.add_argument("--candidate", action="append", default=[]); p.add_argument("--all", action="store_true"); p.add_argument("--preparation-stopped", action="store_true", help="Recovery attestation: driver has verified the interrupted preparation command tree is stopped")
     p = sub.add_parser("conflicts"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[])
@@ -687,6 +729,7 @@ def main(argv=None):
         elif command == "html": result = session.html(args.output)
         elif command == "pause": result = session.pause()
         elif command == "hand-back": result = session.hand_back()
+        elif command == "wait": result = session.wait(args.after, args.kind, args.timeout)
         elif command == "start": result = session.pause(False, not args.keep_preparing)
         elif command == "resume-development": result = session.resume_development(args.paths, args.resources, args.candidate, args.all, args.preparation_stopped)
         elif command == "conflicts": result = session.conflicts(args.paths, args.resources)
@@ -697,7 +740,10 @@ def main(argv=None):
         print(json.dumps(result))
         return 0
     except (ReviewError, OSError, ValueError) as exc:
-        print(json.dumps({"error": str(exc)}), file=sys.stderr)
+        failure = {"error": str(exc)}
+        if isinstance(exc, WaitTimeout):
+            failure["sequence"] = exc.sequence
+        print(json.dumps(failure), file=sys.stderr)
         return 1
 
 

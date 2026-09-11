@@ -81,7 +81,10 @@ integrator owns the current engineering scope.
 
 ## 3. Wait for an actionable event
 
-Use native completion or the suitable blocking wait. While the child works, wait;
+Use native completion or the suitable blocking wait. An open attended session is
+a second event source: keep its `wait` armed as [Attendance](references/attendance.md)
+describes, so a hand-back or decision re-invokes this loop without a human message.
+While the child works, wait;
 its transcript, repetitive status checks and speculative engineering are not the
 coordinator's work. A wait timeout continues the same wait. Provide host-required
 user updates without creating additional internal status traffic.

@@ -132,6 +132,76 @@ class ReviewTests(unittest.TestCase):
         self.assertIsNone(next(c for c in after["candidates"] if c["id"] == "B")["decision"])
         self.assertEqual(next(c for c in after["candidates"] if c["id"] == "A")["decision"]["note"], "not yet")
 
+    def test_wait_wakes_the_driver_on_hand_back_or_decision_and_not_before(self):
+        self.init(self.candidate(), self.candidate("B"))
+        state = self.cli("prepare")
+        # Nothing has happened: a bounded wait gives up and names the sequence it watched.
+        quiet = self.cli("wait", "--after", str(state["sequence"]), "--timeout", "0.3", success=False)
+        self.assertEqual(quiet.returncode, 1)
+        self.assertEqual(json.loads(quiet.stderr)["sequence"], state["sequence"])
+        # Events older than the cursor never satisfy it.
+        self.intake(self.decision(state))
+        later = self.cli("status")
+        self.assertEqual(self.cli("wait", "--after", str(later["sequence"]), "--timeout", "0.3", success=False).returncode, 1)
+        # A driver blocked in wait is released by the hand-back click, with the event in hand,
+        # printed as one line so a host turns it into one notification.
+        process = subprocess.Popen(self.args("wait", "--after", str(later["sequence"]), "--timeout", "10"), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            time.sleep(0.5)
+            self.assertIsNone(process.poll())
+            self.cli("hand-back")
+            out, err = process.communicate(timeout=10)
+        finally:
+            if process.poll() is None:
+                process.kill(); process.wait()
+        self.assertEqual(process.returncode, 0, err)
+        self.assertEqual(out.count("\n"), 1)
+        woke = json.loads(out)
+        self.assertEqual([e["kind"] for e in woke["events"]], ["handed-back"])
+        self.assertEqual(woke["events"][0]["decided"], ["A"])
+        self.assertIsNotNone(woke["handed_back"])
+        # A decision alone also wakes the default wait; a wait for hand-back only ignores it.
+        process = subprocess.Popen(self.args("wait", "--after", str(woke["sequence"]), "--timeout", "10"), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            time.sleep(0.5)
+            self.intake(self.decision(later, "B"))
+            out, err = process.communicate(timeout=10)
+        finally:
+            if process.poll() is None:
+                process.kill(); process.wait()
+        self.assertEqual(process.returncode, 0, err)
+        decided = json.loads(out)
+        self.assertEqual([(e["kind"], e["candidate"]) for e in decided["events"]], [("decision", "B")])
+        self.assertEqual(self.cli("wait", "--after", str(woke["sequence"]), "--kind", "handed-back", "--timeout", "0.3", success=False).returncode, 1)
+
+    def test_new_work_clears_the_previous_hand_back(self):
+        self.init(self.candidate())
+        state = self.cli("prepare")
+        self.intake(self.decision(state, outcome="reject"))
+        self.cli("hand-back")
+        self.assertIsNotNone(self.cli("status")["handed_back"])
+        # Releasing the candidate for more development means the queue will change.
+        self.cli("resume-development", "--candidate", "A")
+        self.assertIsNone(self.cli("status")["handed_back"])
+        self.cli("hand-back")
+        # A new revision is work the reviewer has not seen.
+        self.init(self.candidate(revision="build-2"))
+        self.assertIsNone(self.cli("status")["handed_back"])
+        self.cli("hand-back")
+        self.cli("prepare")
+        self.assertIsNone(self.cli("status")["handed_back"])
+        self.cli("hand-back")
+        # Starting review again, or adding a candidate, likewise.
+        self.cli("start")
+        self.assertIsNone(self.cli("status")["handed_back"])
+        self.cli("hand-back")
+        self.init(self.candidate(revision="build-2"), self.candidate("B"))
+        self.assertIsNone(self.cli("status")["handed_back"])
+        # Re-supplying unchanged material is not new work.
+        self.cli("hand-back")
+        self.init(self.candidate(revision="build-2"), self.candidate("B"))
+        self.assertIsNotNone(self.cli("status")["handed_back"])
+
     def test_a_candidate_offers_the_values_it_asks_to_be_pasted(self):
         self.init({**self.candidate(), "copy": [{"label": "Pull request", "value": "https://example.test/owner/name/pull/7"}]})
         self.cli("prepare")
