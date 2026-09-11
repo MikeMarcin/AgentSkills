@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0067"
 title: "Let an attended hand-back wake the driver and clear stale hand-back state"
-status: "Backlog"
+status: "Ready"
 rfcs: []
 depends_on: []
 priority: "P1"
