@@ -6,13 +6,13 @@ Notes for people maintaining this package. Agents use [SKILL.md](SKILL.md) and, 
 
 Adapted on 2026-09-11 under ASK-0071 from Matt Pocock's MIT-licensed `writing-for-agents` skill (`https://github.com/mattpocock/skills`, `skills/productivity/writing-for-agents`), read from a local checkout at commit `3cca18b368ae95cdbdebbff572ccafa662551015`. That directory's tree is `ad2925850efb8973a72d2e666f7a975f9a2d4a9b`; it last changed in `3216582`.
 
-The concepts and their names are kept: context pointers, the two loads, the information hierarchy, completion criteria, splitting, leading words and pruning. The text is rewritten for AgentSkills rather than copied, as the wizard companion was. Changes from the source:
+`SKILL.md` is the upstream text with the changes below applied to it, so a later upstream revision can be diffed and merged paragraph by paragraph; `diff` against the upstream file shows the whole adaptation. Changes from the source:
 
-- Skill mechanics target plain MASK packages shared by Claude and Codex. With no portable user-invoked mode, the invocation guidance becomes selection scope, reaching other skills by name, and the catalog in place of router skills.
-- The applications recorded in RFC-ASK-0008 and RFC-ASK-0010 are folded in: operation-specific pointers, per-path load counting, obligations kept out of leading words, prohibitions reserved for authority and side-effect boundaries, and verification by tabletop and reachability rather than word quotas.
-- Examples use AgentSkills vocabulary. The Codex `agents/openai.yaml` interface file is not carried over.
+- `references/skill-mechanics.md` is rewritten for plain MASK packages shared by Claude and Codex. There is no portable user-invoked mode, so the invocation choice becomes selection scope, reaching other skills by name, and the catalog in place of router skills. Upstream sentences that still hold are kept.
+- `SKILL.md` gains the applications recorded in RFC-ASK-0008 and RFC-ASK-0010: pointers that name an operation and a target, per-path load counting, an obligations rule so requirements, authority boundaries and uncertainty survive compression, the same qualifier on the negation guardrail, and a "Verify by running" section using tabletop and reachability rather than word quotas.
+- The description adds the review and role-prompt branches this library uses; pointer targets follow `references/skill-mechanics.md`; an H1 matches the other packages. The Codex `agents/openai.yaml` interface file is not carried over.
 
-This package substantially adapts that material, so the upstream notice is retained:
+The instruction text is therefore Matt Pocock's, copied and changed, and his notice travels with it as the licence requires:
 
 ```text
 MIT License

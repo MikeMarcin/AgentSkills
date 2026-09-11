@@ -35,3 +35,9 @@ skill tree `ad29258`). The two upstream files are byte-identical to the
 editorial copies retained under `docs/rfcs/assets/*/reference/writing-for-agents/`.
 The package README records the adaptations and retains the upstream notice. No
 project or personal selection changed.
+
+`SKILL.md` first carried an original rewrite of that material. It now keeps the
+upstream wording wherever the adaptation does not change the content, so
+upstream revisions stay diffable; the MASK mechanics reference and the
+RFC-ASK-0008/0010 additions remain this library's own. The card's recorded
+rewrite evidence describes revision `096f3c8`, not the current text.
