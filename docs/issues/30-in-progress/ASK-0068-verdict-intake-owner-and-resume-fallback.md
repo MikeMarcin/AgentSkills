@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0068"
 title: "Give attended verdicts an engineering owner and survive hosts without SendMessage"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: "P1"
