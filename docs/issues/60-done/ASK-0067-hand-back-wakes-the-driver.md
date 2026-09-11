@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0067"
 title: "Let an attended hand-back wake the driver and clear stale hand-back state"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P1"
 metadata: {"origin": "SampleReview attended session v002/v003, 2026-09-10", "skills": ["attended-review", "implement-rfc"]}
+acceptance: [{"criterion":"hand-back-wakes-an-armed-driver","outcome":"pass","revision":"929ab4c5ad55125a3ec0bbc33a92e9acc0a753c1","evidence":{"kind":"observation","detail":"Live Claude course: wait armed via Monitor on a disposable consumer; shell hand-back at 2026-09-11T03:19:47Z produced one host notification with the handed-back event at sequence 4; no human message in between."}},{"criterion":"fresh-revision-reports-no-hand-back","outcome":"pass","revision":"929ab4c5ad55125a3ec0bbc33a92e9acc0a753c1","evidence":{"kind":"command","detail":"test_new_work_clears_the_previous_hand_back: handed_back is null after resume-development, a new revision, prepare, start and an added candidate, and survives re-supplied unchanged material."}},{"criterion":"contract-names-wait-and-arming-rule","outcome":"pass","revision":"929ab4c5ad55125a3ec0bbc33a92e9acc0a753c1","evidence":{"kind":"observation","detail":"session-contract.md gains the wait row and handed-back event; attended-review SKILL.md step 4 and implement-rfc attendance.md/SKILL.md step 3 name the arm-before-ending rule and Monitor persistent watch; no daemon."}},{"criterion":"focused-tests-pass-no-other-behaviour-change","outcome":"pass","revision":"929ab4c5ad55125a3ec0bbc33a92e9acc0a753c1","evidence":{"kind":"command","detail":"22 attended-review tests, 3 instruction-path tests and the documentation gate pass; only hand-back state and the new wait subcommand changed."}}]
 ---
 
 # ASK-0067: Let an attended hand-back wake the driver and clear stale hand-back state
@@ -37,4 +38,6 @@ Owned surfaces: `skills/attended-review/scripts/attended_review.py`, `skills/att
 
 ## Verification and execution record
 
-Run `python3 -m unittest skills/attended-review/tests/test_attended_review.py` and the documentation gate. Not started.
+Source revision 929ab4c5ad55125a3ec0bbc33a92e9acc0a753c1. `python3 -B -m unittest skills/attended-review/tests/test_attended_review.py`: 22 tests pass, including the new wait and stale-flag tests. Instruction-path tests (3) and the documentation gate (12 RFCs, 68 cards, 0 violations) pass.
+
+Live Claude course, 2026-09-11, Claude Code 2.1.260 in the desktop app Code tab, disposable consumer under the session scratchpad: `wait --after 3 --timeout 120` armed through `Monitor`; `hand-back` run from a shell at 03:19:47Z; the wait exited and the host delivered one notification carrying `{"sequence": 4, "kind": "handed-back", "pending": ["ASK-0067-wake"]}` (attended session 18c01e0a963bdfb228c626ae383cbf78). No human message was written between the click-equivalent and the wake. Codex was not exercised.
