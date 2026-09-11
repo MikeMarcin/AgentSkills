@@ -17,6 +17,7 @@ The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarci
 | [coauthoring](skills/coauthoring/SKILL.md) | Collaborate on long-form prose while preserving the author’s voice. |
 | [code-simplifier](skills/code-simplifier/SKILL.md) | Simplify touched code while preserving behavior and local conventions. |
 | [technical-book-humanizer](skills/technical-book-humanizer/SKILL.md) | Revise technical prose for precision, stance and an experienced engineering voice. |
+| [writing-for-agents](skills/writing-for-agents/SKILL.md) | Write and review skills, AGENTS.md files and other instructions agents consume. |
 | [instamat-image-to-pbr](skills/instamat-image-to-pbr/SKILL.md) | Prepare and review PBR texture maps with the InstaMAT Pipeline CLI. |
 | [trellis-image-to-3d](skills/trellis-image-to-3d/SKILL.md) | Prepare images and use hosted TRELLIS providers, with offline validation and optional ExampleWorkflow receipts. |
 | [concept-art-approval-pipeline](skills/concept-art-approval-pipeline/SKILL.md) | Produce and review concept-art candidates with exact, persistent approval records. |
@@ -107,7 +108,7 @@ description: Describe the task this skill handles and when to use it.
 Write the instructions an agent needs to perform the task.
 ```
 
-Use a portable lowercase ID such as `example-skill`. MASK's package convention accepts single-line plain or quoted `name` and `description` scalars. Keep supporting files inside the package; linked, special and case-colliding entries are rejected. Validation is passive and does not execute skill code.
+Use a portable lowercase ID such as `example-skill`. MASK's package convention accepts single-line plain or quoted `name` and `description` scalars. Keep supporting files inside the package; linked, special and case-colliding entries are rejected. Validation is passive and does not execute skill code. [writing-for-agents](skills/writing-for-agents/SKILL.md) covers writing the description and instructions.
 
 Edit canonical files here, leaving project-specific facts in consumer context. Validate the package with `mask skill validate example-skill --json` against a machine configured to use this checkout. To inspect every package, use `mask skill validate --all --json`.
 

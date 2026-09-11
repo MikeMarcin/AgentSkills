@@ -26,3 +26,12 @@ packages retain authored bytes, excluding caches. TRELLIS and concept-art retain
 existing external formats; AST-specific sprite tooling stays in AST. The original
 installation inventory and restorable backups are machine-local under
 `~/.mask/migration-backups/selected-skills-2026-09-05/`.
+
+## Adapted writing-for-agents
+
+On 2026-09-11, ASK-0071 added `skills/writing-for-agents`, adapted from Matt
+Pocock's MIT-licensed `writing-for-agents` (mattpocock/skills at `3cca18b`,
+skill tree `ad29258`). The two upstream files are byte-identical to the
+editorial copies retained under `docs/rfcs/assets/*/reference/writing-for-agents/`.
+The package README records the adaptations and retains the upstream notice. No
+project or personal selection changed.
