@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0071"
 title: "Adapt writing-for-agents as a portable AgentSkills skill"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: "P2"
