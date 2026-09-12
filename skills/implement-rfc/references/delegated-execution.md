@@ -115,7 +115,7 @@ helpers only for already-selected supported mechanics; they do not decide accept
 
 ## Native assignment details
 
-Use role-prefixed task names, such as `rfc_scout_backend_selection` or
+Use role-prefixed task names or descriptions, such as `rfc_scout_backend_selection` or
 `rfc_utility_cache_inventory`, and fresh non-history-copying contexts where supported.
 Retain the startup banner `Role: <role> | Model: <model> | Effort: <effort>`
 when the selected adapter requires it; this records requested identity, not proof

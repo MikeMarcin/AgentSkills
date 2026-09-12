@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "767cb3f9e7808ce27365d5bd83da83c7ff16cb466d71deff27959d38afef90b3"
+      "sha256": "921dfe68fba651597b7e19c9109340c6793a40356a1e7a41f422701d3616f248"
     },
     {
       "path": "config/routing-profiles.json",
@@ -86,7 +86,7 @@
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "a2df63bb4a65175a68b5e57d627811cd69c146ee587df052ce4f580531b67879"
+      "sha256": "d1bd6b2693f4f940c9d4c287b865bcbbfc1be1af341292340e5079cfd64026bd"
     },
     {
       "path": "references/milestone-integration.md",
@@ -481,6 +481,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "fb4849a3e902c9af",
+  "portable_digest": "be153e8d3b6f3dad",
   "schema": "implement-rfc.portable-manifest.v1"
 }
