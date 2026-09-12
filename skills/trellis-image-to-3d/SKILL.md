@@ -20,7 +20,7 @@ remote job, downloads artifacts, and writes redacted evidence.
 Resolve `trellis_skill_root` to the directory containing the loaded `SKILL.md`,
 using its absolute installation path. The examples below use that variable;
 they work through project or personal MASK links from any working directory.
-The optional ExampleWorkflow work-order mode does not require an SAMPLE_STUDIO checkout for ordinary
+The optional ExampleWorkflow work-order mode does not require a sample studio checkout for ordinary
 image generation, preparation, probing, or GLB audit.
 
 ```bash

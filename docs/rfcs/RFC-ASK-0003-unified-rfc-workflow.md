@@ -7,7 +7,7 @@ status: "Auto-Verified"
 # Unified RFC implementation and attended workflow
 
 The user approved the complete design and Q1–Q13 answers with “Implement the plan”.
-Authoritative design: ManageAgentSkills `docs/development/unified-rfc-workflow-plan-and-interview.md` at commit `9a78f09`.
+Authoritative design: the scope and acceptance contract in this RFC.
 
 Unify implement-rfc, attended-review and wizard in AgentSkills, with external repository facts and one model policy. Use ordinary focused validation and one warranted integration pass; no default exhaustive matrix, hermetic replay or manual approval ritual. Migrations are explicitly authorized for all six consumers, one-off and outside durable skills. Preserve unrelated dirty product work and historical truth.
 

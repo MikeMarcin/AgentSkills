@@ -196,7 +196,7 @@ use `--repo-root` and `--routing-override` with a temporary directory.
    checkout, and read its external rules before implementation.
 
 The inherited context is retained in
-`examples/projects/samplereview/project.json` and `project.md` as an
+`examples/projects/sample-review/project.json` and `project.md` as an
 example only. It is never a default for an arbitrary consumer.
 
 All consumers require external v2 context and canonical cards. Historical

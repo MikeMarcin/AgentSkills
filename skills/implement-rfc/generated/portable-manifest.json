@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "98b0219bde380238ccf591980d7d98d21710d700b16e85eb0d32dfc81f12ac13"
+      "sha256": "ac1ed531a29d3254de6a6f459eacad31afd02fbb50741fde02d5b6885131dab4"
     },
     {
       "path": "SKILL.md",
@@ -10,7 +10,7 @@
     },
     {
       "path": "agents/openai.yaml",
-      "sha256": "4092e303a5d4c8c39d3e0b0af183eeea9884290173bcf6357ae9c909e7cece5e"
+      "sha256": "12b40a0311763ccebf45c2d882de6720099375992567c1b3b817be1f9d290f75"
     },
     {
       "path": "config/claude-bedrock-model-overrides.example.json",
@@ -53,12 +53,12 @@
       "sha256": "93969ebc75398c6af93aab2169ff18aa303e797bab93b7c1343979808921de52"
     },
     {
-      "path": "examples/projects/samplereview/project.json",
-      "sha256": "32827fbfa45c22925bdb72aca2c614eec0122699bcb1d9c34c1fe945efd17dfa"
+      "path": "examples/projects/sample-review/project.json",
+      "sha256": "1e8a1ca4c954f174a3b1ebb6b1d8c99461bb5ab65eaf983de9367c8f6c3ac7ea"
     },
     {
-      "path": "examples/projects/samplereview/project.md",
-      "sha256": "7ca97f415063bac14438872eb36ac46301c3b2e0dfe8621f7d6147289e82c079"
+      "path": "examples/projects/sample-review/project.md",
+      "sha256": "49ea96abc8613b071ae105a40ee3e46f93e02d40454080d944ab273421f97e55"
     },
     {
       "path": "mask-workflow.json",
@@ -118,7 +118,7 @@
     },
     {
       "path": "references/remote-routing.md",
-      "sha256": "15da6fafc84ba5ec2173052c9cbf15e3ebcece509e6a49b1b4b8eb1f3122e263"
+      "sha256": "00a0ba7c77317dba61df640f6f847f2390e6309ddb06d616c992d6082581911e"
     },
     {
       "path": "references/role-adoption.md",
@@ -194,7 +194,7 @@
     },
     {
       "path": "scripts/codex_lane.py",
-      "sha256": "bb4d828c74a37aee58c28381b4c3c971f9ff15bdf4aec87e8c21e5ee1dca25d2"
+      "sha256": "89d7a587657e29623783c434044c8b2f36d4a596156a460a6674ec6ed5907fdf"
     },
     {
       "path": "scripts/codex_station.py",
@@ -234,7 +234,7 @@
     },
     {
       "path": "scripts/project_config.py",
-      "sha256": "2c5c534af6ca2abf601d7dc5932542a24c50021005141b83488cf75d4722d890"
+      "sha256": "5f379659c5bf7a8a43c54a4f665eade8fbd44b4fb253982e0fb7b5b4ed4d5809"
     },
     {
       "path": "scripts/qualification_guard.py",
@@ -334,7 +334,7 @@
     },
     {
       "path": "tests/test_codex_station.py",
-      "sha256": "26a69e0641f49e29ff22d42e2de14c6353873b470f167c745432f6620c418c4f"
+      "sha256": "a00d3244a3cf02666f08fe994c6eb07a0add85434433c3b602fc9f61f76ce43d"
     },
     {
       "path": "tests/test_coordinator_handoff.py",
@@ -354,7 +354,7 @@
     },
     {
       "path": "tests/test_launch_remote_station.py",
-      "sha256": "337222976ce04d9bab34fe0dc63401c17ab9e85e25be76ea956b02e1e399f378"
+      "sha256": "98acc25d799ff671a21946a074afb0708b57bd9509161a85ef626b2b6c2bd8a2"
     },
     {
       "path": "tests/test_mask_workflow.py",
@@ -398,7 +398,7 @@
     },
     {
       "path": "tests/test_project_config.py",
-      "sha256": "8964f10f1771fb107dcb9301f1731fbc7fb9ae69a8d3b9336176692cd3afa6c7"
+      "sha256": "8fdae3b319f942cd315b57d515eae3c61420f7d4d1ff760903222240edc16fc7"
     },
     {
       "path": "tests/test_qualification_guard.py",
@@ -481,6 +481,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "be153e8d3b6f3dad",
+  "portable_digest": "cef3f91811cc7422",
   "schema": "implement-rfc.portable-manifest.v1"
 }

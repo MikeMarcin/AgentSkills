@@ -15,7 +15,7 @@ acceptance: [{"criterion":"RFC-ASK-0003-AC06","outcome":"pass","revision":"ba45a
 RFC_BASE_SHA: dd5494d4a27e5e8a35046f7e15cb3cb873ea1bc3
 
 Planned cards: ASK-0008, ASK-0009, ASK-0010, ASK-0011, ASK-0012, ASK-0013, ASK-0014.
-Accepted design and full Q&A: ManageAgentSkills `docs/development/unified-rfc-workflow-plan-and-interview.md`, approved in 9a78f09 and linked to execution in 79810bb.
+Accepted design and outcome: AgentSkills RFC-ASK-0003 and this closeout record.
 
 | Criterion | Check / result | Implementation commits |
 |---|---|---|

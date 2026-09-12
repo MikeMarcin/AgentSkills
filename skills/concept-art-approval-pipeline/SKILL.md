@@ -66,7 +66,7 @@ Use the bundled offline review package for multi-candidate or multi-piece waves,
 
 Read [references/offline-review.md](references/offline-review.md) before building a page or processing its export. In summary:
 
-1. Write an `sample_studio.art_review_batch_input` manifest with one stable `candidate_id` per item, isolation media, context media, and any exact non-preview identity files.
+1. Write a `sample_studio.art_review_batch_input` manifest with one stable `candidate_id` per item, isolation media, context media, and any exact non-preview identity files.
 2. Build the file-local package with `scripts/build_art_review.py build`. The builder derives candidate digests from metadata and file bytes and derives a deterministic batch ID.
 3. Present the generated `index.html` to the user and stop. Do not create placeholder decisions or an empty verdict when no art is awaiting review.
 4. Ask the user to resolve every candidate and paste the complete exported JSON back to Codex.

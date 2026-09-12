@@ -2,7 +2,7 @@
 
 Read README.md, CONTRIBUTING.md, docs/rfcs/README.md, docs/issues/README.md, the requested live RFC and card, and the nearest nested AGENTS.md. Use the portable implement-rfc workflow with this repository's `.mask/skill-config/implement-rfc/` context. The shared skills are deployed through managed links. Verified bootstrap copies are retained outside discovery roots; use README.md for current setup and consumer-context guidance.
 
-This is the private canonical skill library. implement-rfc is imported first; manage-agent-skills second. Program runtime code belongs in ManageAgentSkills.
+This is the canonical skill library. implement-rfc is imported first; manage-agent-skills second. Program runtime code belongs in ManageAgentSkills.
 
 Routine skill management uses `mask ... --json`, or the known absolute Python entrypoint if PATH is not configured. Inspect capabilities/state and preview meaningful changes. Preserve incremental versus exact-set intent. Never edit MASK's internal state or bypass a collision with destructive shell commands.
 

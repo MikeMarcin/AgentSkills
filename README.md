@@ -82,7 +82,7 @@ The workflow reads exactly two consumer-specific files:
 <project>/.mask/skill-config/implement-rfc/project.md
 ```
 
-Use this repository's [project configuration](.mask/skill-config/implement-rfc/project.json) and [project rules](.mask/skill-config/implement-rfc/project.md) as structural examples. Adapt the complete repository identity, paths, issue lanes, verification commands and rules to the consumer. Do not copy another project's facts unchanged or embed them in the shared skill. The [inherited example](skills/implement-rfc/examples/projects/samplereview/) is historical reference, not an active default.
+Use this repository's [project configuration](.mask/skill-config/implement-rfc/project.json) and [project rules](.mask/skill-config/implement-rfc/project.md) as structural examples. Adapt the complete repository identity, paths, issue lanes, verification commands and rules to the consumer. Do not copy another project's facts unchanged or embed them in the shared skill. The [inherited example](skills/implement-rfc/examples/projects/sample-review/) is historical reference, not an active default.
 
 After configuring the consumer, deploy `implement-rfc` with the same preview/guard sequence above. Verify selection and inspect the board through the linked workflow:
 
