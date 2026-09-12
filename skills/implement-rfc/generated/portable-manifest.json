@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "6458d515a78cf0f8cbb7ab2a992c2496a9b4f15029ceae88325137c427aca702"
+      "sha256": "3673f20f75aea63627e6e51b852d3ccf8fd66f7dc3d0e34e6ffb3a44d42d1703"
     },
     {
       "path": "agents/openai.yaml",
@@ -109,6 +109,10 @@
       "sha256": "390074a5acdf5edc80eadc5c334a95d4d742df06ad1da684a3868587bafc8717"
     },
     {
+      "path": "references/progress-relay.md",
+      "sha256": "108ff2b705e3b171a313d785580834e8729cccbd79307c9421ea5f957462b58d"
+    },
+    {
       "path": "references/qualification-guard.md",
       "sha256": "54dc19310841f7659c80677e0b0f9b491d5491d5781b0805dc4ae6b0c5977a03"
     },
@@ -126,7 +130,7 @@
     },
     {
       "path": "references/runtime-compatibility.md",
-      "sha256": "c246e5afa185dbba43a19db58627795fc5f6c3188ad7ced9d7f8a9a12cd0b94c"
+      "sha256": "b7f2bf7471ea0ab774b4638d783e61defb818e5ba245e69446a0e5bac6faaebb"
     },
     {
       "path": "references/usage-collection.md",
@@ -223,6 +227,10 @@
     {
       "path": "scripts/prepare_mask_roles.py",
       "sha256": "8122dbabf344aa0b50de98d40b91d78d832c8e4095fea8b70deca8564f7fd24d"
+    },
+    {
+      "path": "scripts/progress_trail.py",
+      "sha256": "18cce5b33ac7b1e627568f66cbe44987dc918495c2c149c8db6ec2cfa8af5786"
     },
     {
       "path": "scripts/project_config.py",
@@ -334,7 +342,7 @@
     },
     {
       "path": "tests/test_instruction_paths.py",
-      "sha256": "f86d0adc7440179581eff46144d6aa6fdcec1d59f6211b8288ea2acfdee8d56d"
+      "sha256": "125c6366b898f4c66384cfc53699306883a1bb7b8c3c0414bf76b222ed64d12c"
     },
     {
       "path": "tests/test_integrator_waits.py",
@@ -383,6 +391,10 @@
     {
       "path": "tests/test_milestone_schemas.py",
       "sha256": "c3336f71b3fa273a73038feb8a08d7c55dda21f832b29da2627447d89e0d2bec"
+    },
+    {
+      "path": "tests/test_progress_trail.py",
+      "sha256": "bdf180003dd1829830e1559eee8a35317b7831a5de343ab50ffc04797a4088bd"
     },
     {
       "path": "tests/test_project_config.py",
@@ -469,6 +481,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "ad2f1d35ec9cb0bb",
+  "portable_digest": "bde9a5818577ada8",
   "schema": "implement-rfc.portable-manifest.v1"
 }

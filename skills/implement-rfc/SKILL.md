@@ -87,6 +87,8 @@ integrator owns the current engineering scope.
 Use native completion or the suitable blocking wait. An open attended session is
 a second event source: keep its `wait` armed as [Attendance](references/attendance.md)
 describes, so a hand-back or decision re-invokes this loop without a human message.
+For an owner-requested visible run, dispatch the integrator in the background and
+arm the trail digest within the wake budget in [Progress relay](references/progress-relay.md).
 While the child works, wait;
 its transcript, repetitive status checks and speculative engineering are not the
 coordinator's work. A wait timeout continues the same wait. Provide host-required

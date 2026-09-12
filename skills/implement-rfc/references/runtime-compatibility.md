@@ -279,3 +279,21 @@ returned short partials, and the scouts' reports reached the coordinator.
 children inside the turn. Forward a stray leaf completion's result verbatim when
 resuming the integrator that dispatched it; an agent task's `.output` file is that
 child's full transcript, not a report.
+
+### Foreground dispatch and Monitor events (2026-09-11)
+
+Observed in the desktop app Code tab on Claude Code 2.1.266. A `Monitor` armed on a
+command emitting one line every twenty seconds, followed in the same message by a
+foreground `Agent` dispatch that held the turn for ninety-five seconds: all five
+events emitted during the dispatch reached the main session as one batch only after
+the `Agent` call returned, and the main loop took no turn between them. Monitor
+events therefore queue behind a foreground dispatch; an armed trail gives no
+in-session visibility while the coordinator is blocked, and no relay turn is spent.
+
+In the same session an `rfc-integrator` dispatched with `run_in_background: true`
+reported its tools as `Read, Bash, Edit, Write, Skill, Agent, SendMessage, TaskStop`,
+with `Grep` and `Glob` absent, dispatched a foreground `rfc-utility` leaf, received
+its reply and returned it; the completion reached the main session as a notification.
+A background integrator can therefore assign slices on this host. Both are dated
+observations of one desktop build, not documented platform contracts;
+[Progress relay](progress-relay.md) selects the dispatch mode from them.

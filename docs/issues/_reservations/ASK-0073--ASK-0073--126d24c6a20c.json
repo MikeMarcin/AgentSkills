@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0073"
+  ],
+  "reserve_for": "progress-relay",
+  "purpose": "Coordinator progress relay: trail digest helper and wake budget",
+  "created": "2026-09-12T04:57:23.362935+00:00",
+  "base": "3070ea00086375e6b5519b2660a540df52eb9e58"
+}

@@ -72,10 +72,27 @@ class InstructionPaths(unittest.TestCase):
         self.assertIn('independent judgeable candidates can proceed',attendance)
         self.assertIn('digest identifies',attendance)
 
+    def test_progress_relay_is_a_disclosed_wake_budget_not_a_status_loop(self):
+        skill=(ROOT/'SKILL.md').read_text()
+        sentence='For an owner-requested visible run, dispatch the integrator in the background and\narm the trail digest within the wake budget in [Progress relay](references/progress-relay.md).'
+        self.assertIn(sentence,skill)
+        self.assertLess(skill.index(sentence),skill.index('**Return ready:**'))
+        self.assertLessEqual(len(sentence.encode('utf-8'))+1,250)
+        self.assertNotIn('progress_trail',skill)  # mechanics stay behind the pointer
+        relay=(ROOT/'references/progress-relay.md').read_text()
+        for phrase in ('## Wake budget','zero relay wakes','`persistent: true`','`TaskStop`',
+                       'Hosts without Monitor (Codex)','--since CURSOR','uses no tool',
+                       'not a reason to query, message or replace the child','must not background its leaves'):
+            self.assertIn(phrase,relay)
+        compatibility=(ROOT/'references/runtime-compatibility.md').read_text()
+        self.assertIn('### Foreground dispatch and Monitor events (2026-09-11)',compatibility)
+        self.assertIn('queue behind a foreground dispatch',compatibility)
+        self.assertIn('A background integrator can therefore assign slices',compatibility)
+
     def test_all_selected_role_branch_links_resolve(self):
         selected=['SKILL.md','references/milestone-integration.md',
                   'references/delegated-execution.md','references/verification-and-closeout.md',
-                  'references/attendance.md','references/model-routing.md']
+                  'references/attendance.md','references/model-routing.md','references/progress-relay.md']
         for rel in selected:
             file=ROOT/rel
             for target in re.findall(r'\]\(([^\s)]+)\)',file.read_text()):
