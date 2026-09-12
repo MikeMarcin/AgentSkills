@@ -57,7 +57,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         # Approved role assignments are an independent expectation, not derived
         # from the routing file whose accidental edits this test should catch.
         expected = {
-            "rfc-integrator": ("gpt-6-astra", "low", "claude-fable-5-1", "low", "workspace-write", True),
+            "rfc-integrator": ("gpt-5.6-sol", "xhigh", "claude-opus-5", "xhigh", "workspace-write", True),
             "rfc-utility": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "read-only", False),
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
             "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),

@@ -65,6 +65,13 @@ or wait; consume the owner's result rather than repeat its investigation. A
 scout replaces a bounded scan, and a separate test runner is optional, not a stage
 all work must pass through. Use ordinary deterministic tools for trivial mechanics.
 
+Collect children inside your turn. Your final message is your return: a child that
+finishes afterwards reports to the coordinator, not to you. On Claude Code, dispatch
+leaves in the foreground (`run_in_background: false`), several in one message to run
+them concurrently. `TaskOutput` does not exist inside subagents, and a `SendMessage`
+resume runs in the background: keep working until its result arrives between tool
+calls, or re-dispatch in the foreground with the partial result.
+
 **Assigned:** every active slice has one owner, refreshed candidate/path scope,
 criteria, neighboring interfaces and a concise result contract.
 

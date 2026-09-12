@@ -74,7 +74,9 @@ LEAF_ROLES = {"rfc-utility", "rfc-scout", "rfc-test-runner", "rfc-worker",
 INTEGRATOR = "rfc-integrator"
 # Resume, collect from and release delegated children. A delegating role cannot
 # reuse the same slice owner for correction without these.
-COORDINATION_TOOLS = ("SendMessage", "TaskOutput", "TaskStop")
+# TaskOutput is stripped from every subagent, so granting it only misleads; see
+# references/runtime-compatibility.md "Nested child results".
+COORDINATION_TOOLS = ("SendMessage", "TaskStop")
 
 
 def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:

@@ -118,7 +118,7 @@ Generated Claude agents:
 - list `Agent` with the configured leaf-role types only for `rfc-integrator`; type restrictions are not claimed as enforced within a delegated subagent;
 - omit `Agent` from every worker, scout, reviewer, utility and test-runner leaf;
 - only the designated integrator may delegate to the configured leaf roles; scouts, workers and reviewers remain leaves. A delegated child allowlist is policy where the host cannot enforce it;
-- leave foreground/background selection to the designated integrator so independent utility lanes can run concurrently within the configured cap;
+- have the designated integrator dispatch leaf roles in the foreground, several per message for concurrency within the configured cap (see [nested child results](#nested-child-results-2026-09-11));
 - select stable Anthropic model IDs from `config/routing.json`.
 
 Parent permission modes can take precedence over a subagent's `permissionMode`. Before relying on read-only scouting or review, keep the parent in a permission mode that does not widen the child, and inspect `git status --short` after the run. The read-focused agents retain Bash for Git inspection and read-only verification commands, but `permissionMode: plan` denies mutating commands: configure, build, or test runs that write artifacts stay with the designated integrator, bounded worker, or test runner. Unexpected repository-source writes from a test runner invalidate the result.
@@ -254,3 +254,28 @@ mid-session, and a send to a completed subagent resumed it and returned its repl
 Availability therefore varies by desktop build and session, not by CLI version or
 settings. Record the observation at bind time in each run and select the resume or
 fresh-dispatch disposition from what that session actually exposes.
+
+### Nested child results (2026-09-11)
+
+A nested child returns through its `Agent` call. The subagent documentation returns
+a child's summary to its caller and strips `TaskOutput` from every subagent even
+when the `tools` field lists it, so a foreground dispatch is the collection
+mechanism and no nested wait primitive exists. A background child's result arrives
+as a completion notification instead, and a resumed parent's history holds only what
+its children delivered while it ran. The same definition resolves to a reduced
+built-in tool set in the background.
+
+Observed in Claude Code 2.1.266: an agent that has ended its turn is not re-invoked
+when a child agent finishes; the completion goes to the main session, or is dropped
+if it was queued just before the parent's last message. A parent still in its turn
+receives it between tool calls, concurrently for dispatches issued in one message.
+`TaskOutput` fails with `TaskOutput is not available inside subagents`, while
+`TaskStop`, also documented as stripped, worked; depend on neither. A command a leaf
+leaves running outlives its report and later re-invokes it: one stray search ran
+about 90 minutes. Integrators that backgrounded their scouts and ended their turns
+returned short partials, and the scouts' reports reached the coordinator.
+
+[Milestone integration](milestone-integration.md#3-assign-complete-slices) collects
+children inside the turn. Forward a stray leaf completion's result verbatim when
+resuming the integrator that dispatched it; an agent task's `.output` file is that
+child's full transcript, not a report.
