@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0074"
 title: "Consume MASK-owned workflow paths without hardcoded lock locations"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0011"]
 depends_on: []
 ---
