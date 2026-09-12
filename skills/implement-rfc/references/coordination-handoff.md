@@ -34,6 +34,10 @@ or its labelled equivalent supported by the native host:
 - Required human/native/blocker obligations and the next bounded objective, or
   the explicit reason no eligible independent work remains.
 
+Keep a concise current-frontier paragraph at the top of the existing closeout:
+current outcome/binding and candidate, accepted evidence pointers, pending obligations,
+active ownership/commands and next step. Link historical detail below instead of
+requiring successors to rediscover the current state from chronological reports.
 Put enduring invariants, architectural decisions and relevant failed approaches
 in the durable continuation. Return pointers rather than logs, full diffs, copied
 RFCs or older summaries. Preserve necessary rationale even when it needs more than
@@ -60,7 +64,9 @@ again for the same child, not spawn its replacement. A partial turn can resume
 without pretending it ended the milestone. Repeated unchanged partial returns
 need an actionable diagnosis, not an indefinite resume loop.
 
-Before replacing a writer, establish that it and its descendants stopped and
+Before replacing a writer, collect its available result and checkpoint/artifact
+pointers through its current owner; inspect useful partial work before repeating it.
+Then establish that it and its descendants stopped and
 account for their edits/commands. Dirty unrelated files can remain; dirty owned
 partial work must be explicitly transferred and inspected. Missing or contradictory
 state goes back to the current integrator, or to a recovery assignment after prior
@@ -88,8 +94,11 @@ at the next user-authorized invocation. No automatic external restart is promise
 
 ## Hosts without SendMessage
 
-Resume is `SendMessage`. Where the host does not expose it, record that at bind
-time and treat every continue-milestone and review-request as a fresh
+`SendMessage` denotes native resume capability here, not a required tool spelling.
+Record the actual tool and behavior at bind time: some hosts separate messaging an
+active child from resuming an idle child (for example `send_message` and
+`followup_task`). An exposed message tool alone does not prove idle resume works.
+Where no native resume is available, treat every continue-milestone and review-request as a fresh
 `rfc-integrator` dispatch carrying the previous return's continuation pointers,
 current candidate, evidence locations and a renewed dispatch identity. Every compact
 return must therefore already be fresh-dispatch-ready: a successor reading only the

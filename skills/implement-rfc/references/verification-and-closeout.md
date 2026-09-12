@@ -12,6 +12,17 @@ projection nor sufficient for milestone acceptance. Follow
 
 Ordinary slices run focused changed-surface checks. Exercise the selected public
 path when internal helper tests could pass while an acceptance claim stayed false.
+Name the user entry point and the terminal observable result required by the claim:
+opening a screen is insufficient when acceptance requires reading a file or reaching
+a comparison. When false success is plausible, use a focused negative control that
+removes the essential dependency or breaks the assertion and demonstrate failure.
+For an installed/release claim, exercise that bundle with its actual test-only
+features disabled. Choose these checks for the claim, not a universal test matrix.
+
+Mutation-capable qualification uses the explicit disposable roots and live-state
+comparison in [Qualification guard](qualification-guard.md). Record the limits of
+that cooperative check; it cannot sandbox a native agent or authorize live edits.
+
 Record actual outcomes, including failures, skips, incomplete commands and relevant
 limitations. Required unavailable native or human evidence remains open.
 

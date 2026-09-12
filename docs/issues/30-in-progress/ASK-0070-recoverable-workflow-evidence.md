@@ -51,3 +51,27 @@ are supplementary evidence, not the complete standalone Claude/Codex ASK-0065
 courses. Independent review targets fixture guard authority and recovery gaps.
 Detailed evidence stays local; exact revisions and result pointers will be recorded
 here. Exit: all four correction criteria accepted with truthful native limits.
+
+## Current execution evidence
+
+Source candidate is the working correction over claim 4e5b971. Native worker
+`/root/workflow_improvement_integrator/rfc_worker_fixture_guard` completed its
+exclusive helper/test/guide slice and returned its checkpoint and result before
+integration. Actual dispatch used `agent_type: rfc-worker`, `fork_turns: none`,
+no model/effort overrides; banner Astra/low, serving telemetry unavailable.
+Checkpoint `/tmp/ask0070-worker-checkpoint.md`; no child descendants or active
+commands reported. Independent critical reviewer is checking guard authority and
+recovery boundaries; acceptance is not yet asserted.
+
+Existing focused checks: 5 instruction, 20 rendered-adapter, 1 public two-consumer
+milestone, 12 handoff and 12 usage-report tests pass. Worker guard checks: 2 public
+courses/API tests pass. Source manifest validation and documentation gate pass
+(12 RFCs / 70 cards). Initial instruction check failed only while the worker-owned
+linked guide was not yet present; the integrated instruction check passed.
+
+Config/routes/schemas and selected declarations remain byte-identical to baseline;
+MASK working tree is clean. No active role reload or full native course is claimed.
+Static coordinator SKILL plus handoff reference grows by 816 UTF-8 bytes / 108
+whitespace words; operation-specific recovery/verification/attendance/usage material
+is loaded only when needed. Counts are reading-size observations, not measured
+runtime tokens, bills or savings. Detail: `/tmp/ask0070-static-reading.json`.

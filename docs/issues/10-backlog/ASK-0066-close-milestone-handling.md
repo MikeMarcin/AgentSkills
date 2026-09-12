@@ -11,6 +11,22 @@ closeout_for: ["RFC-ASK-0012"]
 
 # ASK-0066: Close milestone handling with evidence and selected adoption
 
+## Current frontier — September 11 workflow correction
+
+Run `rfc-workflow-improvements-20260911`, dispatch `d1`, mandate revision 1;
+producer `/root/workflow_improvement_integrator`. The bounded correction plan and
+acceptance live on [ASK-0070](../30-in-progress/ASK-0070-recoverable-workflow-evidence.md).
+Its baseline is 8a52908; the original RFC_BASE_SHA below remains immutable. The
+correction extends recovery, public acceptance and disposable qualification; it
+does not replace the authored M2 grouping or its unsatisfied obligations.
+Source work and verification are in progress. Original ASK-0065 both-driver native
+courses and ASK-0066 final acceptance remain open. See ASK-0065's course supplement;
+actual native child collection/resume evidence alone cannot close the two courses.
+The implementation owner cannot launch a coordinator or peer integrator under its
+leaf-role allowlist. Standalone course execution therefore requires the authorized
+native interactive driver/operator boundary; no headless/API substitute was used.
+All older continuation paragraphs below are historical snapshots.
+
 Governing RFC: [RFC-ASK-0012](../../rfcs/RFC-ASK-0012-authored-milestone-plans-and-continuation.md).
 
 ## Objective and owned paths

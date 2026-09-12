@@ -12,6 +12,15 @@ Expose ready items promptly, prepare quick items first, and let slow preparation
 be interrupted. The coordinator presents the resulting page/ask without repeating
 engineering preparation.
 
+Before marking each candidate ready, run the shortest public path needed to make
+its review scenario judgeable on that exact candidate. Record the entry point,
+terminal result and evidence pointer beside the candidate. A digest identifies the
+candidate but does not prove it can perform the scenario. Classify a failed
+prerequisite against each candidate: keep affected candidates unready with the
+concrete failure, while independent judgeable candidates can proceed. Do not build
+successive review bundles while their relevant prerequisite remains red; repair it
+and rerun the affected path first. Required human judgment remains pending.
+
 Use local HTML and practical captured evidence. If a server is unavailable, use
 the existing offline export/import path; server absence does not force a different
 acceptance standard. Before ending the turn, arm the attended-review `wait` command

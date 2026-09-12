@@ -38,3 +38,24 @@ Contributes to: RFC-ASK-0012-AC10, RFC-ASK-0012-AC11, RFC-ASK-0012-AC12. These a
 Use the direct tests named by the governing RFC and the retained pack's VERIFICATION.md. The live milestone plan, not this card's completion, defines the integration boundary. Preserve dependency-ready claims, explicit path commits, existing routing and required acceptance. No worker may acquire board/commit authority.
 
 Not started. No implementation result, native qualification, source revision or quota saving is asserted by this packet.
+
+## September 11 correction course supplement (pending)
+
+ASK-0070 extends the course without replacing its original authored two-group and
+planless obligations. Use the immutable exact corrected candidate selected at
+launch, explicit task-owned disposable roots and live declaration/role-lock
+sentinels, through `references/qualification-guard.md`. Native agents must be given
+those fixture roots explicitly; the command wrapper is not a native-agent sandbox.
+Compare the named live files before/after the entire course, including interruption.
+
+During one bounded native child slice retain its checkpoint/artifact pointer and
+observe a partial boundary or late completion. Collect that actual result before
+any replacement, account for descendants/commands, and continue with the same
+unsatisfied authored obligations. Record the actual resume tool and active/idle
+behavior rather than inferring capability from a tool name or banner. If the host
+cannot resume, preserve evidence and use the existing safe-recovery branch.
+
+Standalone Claude and Codex course evidence remains pending. The September 11
+implementation run may supply narrower actual child collection/resume observations;
+those are not a substitute for the complete courses. Existing archived candidate,
+authorization record and RFC baseline remain historical and unchanged.

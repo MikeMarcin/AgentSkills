@@ -23,8 +23,9 @@ selects its consumer. Read its `.mask/skill-config/implement-rfc/project.json` a
 unrelated work and existing approval boundaries.
 
 Read [Coordination handoff](references/coordination-handoff.md) before dispatch or
-resume. Record whether this host exposes `SendMessage`: without it no integrator can
-be resumed, and the dispositions there take their fresh-dispatch form.
+resume. Record whether this host exposes `SendMessage` or an equivalent native
+resume operation, including its actual tool name and active/idle behavior; without
+native resume the dispositions there take their fresh-dispatch form.
 Bind the integrator's engineering route independently of the coordinator;
 use canonical configuration and actual host settings, not model names in prose.
 For setup, unavailable roles or model/effort conflicts, read the installed

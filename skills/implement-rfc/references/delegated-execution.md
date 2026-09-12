@@ -79,6 +79,25 @@ Use compact relevant content; logs and detailed output stay at the named evidenc
 locations. An actionable blocker, interface change or completion warrants a message;
 status polling that cannot change a decision does not.
 
+## Recover useful work
+
+Before a long command, likely runtime limit or handoff, update one short checkpoint
+at the assignment's existing evidence location: current diagnosis, owned changed
+paths/candidate, completed checks and log/artifact pointers, active command IDs,
+and next discriminating step. Include negative results that prevent repeated work.
+Refresh on material progress, not every command; a checkpoint is not another board.
+The assignment names this location so a missing final answer is recoverable.
+
+Before repeating an interrupted assignment, collect the child's available result
+and inspect its checkpoint/artifacts. Resume the same owner for a bounded result
+or correction when supported. If resume is unavailable, prefer integrator-local
+work unless a child can finish a useful bounded deliverable; before retiring the
+parent, collect or stop every child and account for commands and partial edits.
+A child that reports late still belongs to its original dispatch: reconcile its
+result before granting overlapping write ownership. A limit or missing summary
+does not make surviving diagnosis, code or logs worthless. Do not replay uncertain
+mutations. Transfer the useful frontier and every unsatisfied obligation.
+
 ## Context lifetime
 
 Reuse a leaf for a correction, narrow recheck or closely related continuation when

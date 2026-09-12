@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "528ce57371b0ae505061d58b6cf78d81e426b321ab1511133aa5a2da818f032a"
+      "sha256": "6458d515a78cf0f8cbb7ab2a992c2496a9b4f15029ceae88325137c427aca702"
     },
     {
       "path": "agents/openai.yaml",
@@ -66,7 +66,7 @@
     },
     {
       "path": "references/attendance.md",
-      "sha256": "e0eb4c8921d578475c3001d8ff425af9bcc22a65c7a8d40bd744424cd94117c0"
+      "sha256": "6d999523148fb7b5980befb013bc4bbc630b81c6cf19c8589bd7ea15177bd978"
     },
     {
       "path": "references/bookkeeping.md",
@@ -82,11 +82,11 @@
     },
     {
       "path": "references/coordination-handoff.md",
-      "sha256": "733a2c89dc3834595567784e2cf9c5570053f4eb21aa5829c35d960ff7fd740e"
+      "sha256": "20ac86951dbef2207006c93f7af48ce48a0430749cdd87947b7a49fa2e8313e0"
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "fa781cc058e96adc92cec2976fbb4ee0344dde5cfa3b0f0826fde840431c6a09"
+      "sha256": "cf79733c32eceb3348cde41a3747dfb8f2dbc11cd608852afbb19458c934f42b"
     },
     {
       "path": "references/milestone-integration.md",
@@ -109,6 +109,10 @@
       "sha256": "390074a5acdf5edc80eadc5c334a95d4d742df06ad1da684a3868587bafc8717"
     },
     {
+      "path": "references/qualification-guard.md",
+      "sha256": "54dc19310841f7659c80677e0b0f9b491d5491d5781b0805dc4ae6b0c5977a03"
+    },
+    {
       "path": "references/remote-routing.md",
       "sha256": "15da6fafc84ba5ec2173052c9cbf15e3ebcece509e6a49b1b4b8eb1f3122e263"
     },
@@ -126,11 +130,11 @@
     },
     {
       "path": "references/usage-collection.md",
-      "sha256": "148b0dbec87c591649e343ecdacca581bf7412e39a6c2014b567addd20b4ec1b"
+      "sha256": "52dbd9bbdbe6661f8689189d347c7dc428602cf43aa411a0b00f6b25073a690e"
     },
     {
       "path": "references/verification-and-closeout.md",
-      "sha256": "6cd3aebe01ab7c128d298b81d5666e9afb6389dad4e754298477461ddcfe5165"
+      "sha256": "a9e4eb2ddb5583de86739c8d3d0e0a4c5e74ced9e7f4f08423995c94fc62a504"
     },
     {
       "path": "schemas/issue-card.schema.json",
@@ -223,6 +227,10 @@
     {
       "path": "scripts/project_config.py",
       "sha256": "2c5c534af6ca2abf601d7dc5932542a24c50021005141b83488cf75d4722d890"
+    },
+    {
+      "path": "scripts/qualification_guard.py",
+      "sha256": "aef48f3bd2bab732e480be48f8a786ed7610d206aec48f8ca8360b6c201c0769"
     },
     {
       "path": "scripts/record_evidence.py",
@@ -326,7 +334,7 @@
     },
     {
       "path": "tests/test_instruction_paths.py",
-      "sha256": "306452615a012d079e64d0bac5d7cfa21ab9c9e8022c333619bcd341220d83c1"
+      "sha256": "f86d0adc7440179581eff46144d6aa6fdcec1d59f6211b8288ea2acfdee8d56d"
     },
     {
       "path": "tests/test_integrator_waits.py",
@@ -379,6 +387,10 @@
     {
       "path": "tests/test_project_config.py",
       "sha256": "8964f10f1771fb107dcb9301f1731fbc7fb9ae69a8d3b9336176692cd3afa6c7"
+    },
+    {
+      "path": "tests/test_qualification_guard.py",
+      "sha256": "227c4e7d2db8eeecdee481a6d5e3d1d05346576c9d8453b1b8c13f7fcac91a93"
     },
     {
       "path": "tests/test_remote_station_guard.py",
@@ -457,6 +469,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "e23af27d4454dee5",
+  "portable_digest": "ad2f1d35ec9cb0bb",
   "schema": "implement-rfc.portable-manifest.v1"
 }

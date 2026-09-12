@@ -122,3 +122,13 @@ The coordinator/integrator rollout changes topology, instructions and coordinato
 route together. It is a combined observational rollout, not a one-factor
 experiment. Existing experiment validation and unmatched-promotion restrictions
 remain unchanged; token observations alone establish neither savings nor quality.
+
+For a measured outcome comparison, reuse the existing `implement-rfc.outcomes.v1`
+input: record explicit accepted/reopened events with unique event IDs, timestamps,
+task IDs and live acceptance evidence references. Join exact session/attempt
+intervals for implementation, review, repair and recovery under the same task family;
+unknown ancestry remains unknown. Record collection separately from acceptance.
+Keep the workflow revision and comparable outcome scope beside the evidence. Derive
+these events from existing closeouts rather than maintaining another mutable board.
+A small matched sample can inform a later decision; this workflow change alone
+establishes no savings, and absent outcome input remains missing rather than zero.

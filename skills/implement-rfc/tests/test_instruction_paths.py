@@ -53,6 +53,25 @@ class InstructionPaths(unittest.TestCase):
         self.assertIn('### Desktop app Code tab observation',compatibility)
         self.assertIn('coordination-handoff.md#hosts-without-sendmessage',compatibility)
 
+    def test_recovery_and_behavioral_acceptance_reach_operation_references(self):
+        delegation=(ROOT/'references/delegated-execution.md').read_text()
+        handoff=(ROOT/'references/coordination-handoff.md').read_text()
+        verification=(ROOT/'references/verification-and-closeout.md').read_text()
+        attendance=(ROOT/'references/attendance.md').read_text()
+        self.assertIn("assignment's existing evidence location",delegation)
+        self.assertLess(delegation.index("collect the child's available result"),
+                        delegation.index('Resume the same owner'))
+        self.assertIn('every unsatisfied obligation',delegation)
+        self.assertIn('followup_task',handoff)
+        self.assertIn('active child from resuming an idle child',handoff)
+        self.assertIn('collect its available result and checkpoint/artifact',handoff)
+        self.assertIn('terminal observable result',verification)
+        self.assertIn('negative control',verification)
+        self.assertIn('qualification-guard.md',verification)
+        self.assertIn('Before marking each candidate ready',attendance)
+        self.assertIn('independent judgeable candidates can proceed',attendance)
+        self.assertIn('digest identifies',attendance)
+
     def test_all_selected_role_branch_links_resolve(self):
         selected=['SKILL.md','references/milestone-integration.md',
                   'references/delegated-execution.md','references/verification-and-closeout.md',
