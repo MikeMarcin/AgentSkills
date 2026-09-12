@@ -32,6 +32,21 @@ VALIDATOR_SPEC.loader.exec_module(VALIDATOR_MODULE)
 
 
 class RenderRuntimeAdaptersTests(unittest.TestCase):
+    def setUp(self):
+        from unittest.mock import patch
+        self.mask_temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.mask_temp.cleanup)
+        self.mask_stub = Path(self.mask_temp.name) / 'mask.py'
+        self.set_mask_paths('.mask/generated/{skill}/native-roles.lock.json',
+                            ['.mask/skill-config/{skill}/native-roles.lock.json'])
+        self.environment = patch.dict(os.environ, MASK_PROGRAM=str(self.mask_stub))
+        self.environment.start()
+        self.addCleanup(self.environment.stop)
+
+    def set_mask_paths(self, canonical, retired):
+        value = dict(data=dict(workflow=dict(paths=dict(native_role_lock=canonical, retired_native_role_locks=retired))))
+        self.mask_stub.write_text('import json, sys\nassert sys.argv[1:] == ["capabilities", "--json"]\nprint(' + repr(json.dumps(value)) + ')\n')
+
     def run_renderer(self, repo_root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
         if not (repo_root / ".git").exists():
             init_repo(repo_root)
@@ -288,6 +303,8 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertEqual(before, {str(p): p.read_bytes() for p in local.rglob('*') if p.is_file()})
 
     def test_mask_locked_consumer_is_judged_by_lock_and_fresh_render(self):
+        # The owner can move its lock without editing package input bytes.
+        self.set_mask_paths('.mask/future/{skill}/roles.json', ['.mask/previous/{skill}/roles.json'])
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             self.assertEqual(self.run_renderer(root).returncode, 0)
@@ -297,7 +314,8 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             for path in sorted([*root.glob(".claude/agents/rfc-*.md"), *root.glob(".codex/agents/rfc-*.toml")]):
                 roles.append({"agent": path.parts[-3].lstrip("."), "name": path.stem,
                               "sha256": __import__("hashlib").sha256(path.read_bytes()).hexdigest()})
-            lock_path = root / ".mask/skill-config/implement-rfc/native-roles.lock.json"
+            lock_path = root / ".mask/future/implement-rfc/roles.json"
+            lock_path.parent.mkdir(parents=True, exist_ok=True)
             lock_path.write_text(json.dumps({"schema": "mask.native-role-lock.v1", "schema_version": 1, "roles": roles}), encoding="utf-8")
             manifest_path = root / ".mask/generated/implement-rfc/runtime-adapters.json"
             manifest_path.write_text(manifest_path.read_text().replace("a", "b", 3), encoding="utf-8")
@@ -325,6 +343,38 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertEqual(check.returncode, 1)
             self.assertIn("lock drift", check.stderr)
             self.assertNotIn("stale generated file", check.stderr)
+
+    def test_mask_path_discovery_refuses_unsupported_and_unsafe_paths(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.mask_stub.write_text('print("{}")\n')
+            result = self.run_renderer(root)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('does not advertise workflow paths', result.stderr)
+            self.set_mask_paths('../outside/roles.json', [])
+            result = self.run_renderer(root)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('unsafe workflow paths', result.stderr)
+            self.assertFalse((root / '.codex/agents').exists())
+
+    def test_mask_retired_fallback_is_read_only_and_canonical_has_priority(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.set_mask_paths('.mask/new/roles.json', ['.mask/old/roles.json'])
+            self.assertEqual(self.run_renderer(root).returncode, 0)
+            roles = [dict(agent=path.parts[-3].lstrip('.'), name=path.stem,
+                          sha256=__import__('hashlib').sha256(path.read_bytes()).hexdigest())
+                     for path in [*root.glob('.claude/agents/*'), *root.glob('.codex/agents/*')]]
+            legacy = root / '.mask/old/roles.json'
+            legacy.parent.mkdir(parents=True)
+            legacy.write_text(json.dumps(dict(schema='mask.native-role-lock.v1', roles=roles)))
+            self.assertEqual(self.run_renderer(root, '--check').returncode, 0)
+            self.assertEqual(self.run_renderer(root).returncode, 2)
+            canonical = root / '.mask/new/roles.json'
+            canonical.parent.mkdir(parents=True)
+            canonical.write_text('{}')
+            self.assertEqual(self.run_renderer(root, '--check').returncode, 2)
+            self.assertTrue(legacy.is_file())
 
     def test_noop_render_and_check_are_observational(self):
         with tempfile.TemporaryDirectory() as temp:

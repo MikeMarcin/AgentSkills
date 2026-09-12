@@ -41,9 +41,12 @@ terminal, or `--expect-plan-hash` with `--allow-setup SOURCE/implement-rfc:prepa
 the script writes the requested `STAGE/AGENT/NAME.ext` files through the same
 `generate_roles` path as the standalone renderer and nothing else. MASK
 validates the stage, writes the portable
-`.mask/skill-config/implement-rfc/native-roles.lock.json` and deploys or retires
-the role files through its own journal; an unchanged rerun runs no script, and a
-fresh clone with the lock and matching roles needs no setup.
+`.mask/generated/implement-rfc/native-roles.lock.json` (it still reads a lock at the
+retired `.mask/skill-config/implement-rfc/` location when that one is absent) and
+deploys or retires the role files through its own journal; an unchanged rerun runs no
+script. The canonical location is regenerable state that consumers conventionally
+gitignore, so a fresh clone that should need no setup has to commit the lock and the
+matching roles deliberately.
 
 `scripts/workflow_preflight.py --repo-root ROOT --json` is the startup check:
 it requires the program's `workflow_readiness_v1` capability and a complete
@@ -52,6 +55,22 @@ it requires the program's `workflow_readiness_v1` capability and a complete
 renderer (`render_runtime_adapters.py --repo-root ROOT`) remains available for
 authoring and consumers that do not use MASK; its outputs are a distinct owner
 from MASK-managed role files.
+
+Consumer rendering discovers MASK's lock locations from `mask capabilities
+--json` (`data.workflow.paths`), using `MASK_PROGRAM` or the `mask` on PATH.
+This requires a MASK version advertising those paths, even for standalone
+publication; an unavailable/older program is reported instead of guessing its
+layout. Source-manifest generation and staged role generation do not need this
+lookup. Setup requests also publish these consumer-relative paths, but the
+staging entrypoint has no reason to open the lock: MASK owns publication.
+Canonical lookup precedes retired fallback lookup. Retired-file cleanup belongs
+to `mask ensure --repair`, with backups, never to the renderer.
+
+MASK supports `compatible_locks` assertions for byte-identical package-input
+changes. This renderer refactor does not qualify: each role's generated header
+embeds a hash of the renderer source, so even a path-only edit changes output
+bytes. No prior pair is vouched for by this package. One regeneration is needed
+for this adoption; future MASK-only layout moves require no renderer edit.
 
 ## What is project-specific
 

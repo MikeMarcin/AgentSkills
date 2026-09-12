@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "21286fb3f7c5cc614b8fbe945fe9210e3009885b31b655ba7aa9106d827a8193"
+      "sha256": "98b0219bde380238ccf591980d7d98d21710d700b16e85eb0d32dfc81f12ac13"
     },
     {
       "path": "SKILL.md",
@@ -250,7 +250,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "e0124cb5944115c4709864deb941d71335aceaad52072e9e108dec21ee5e563e"
+      "sha256": "bbcd420b8135329d1469e3798c120fc4cbe83988430b3036c68867fdc51abbab"
     },
     {
       "path": "scripts/role_usage.py",
@@ -410,7 +410,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "47617d39ceccdde0f86ef42bd5eac5b672f200de97cb5f27897e1e85d3ca3629"
+      "sha256": "c04db8edb19c2435fdab748ce6698ce45a43da598d37533d7f316cb99b0c2f2a"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -481,6 +481,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "b08fe210386d69ec",
+  "portable_digest": "fb4849a3e902c9af",
   "schema": "implement-rfc.portable-manifest.v1"
 }
