@@ -34,14 +34,19 @@ or its labelled equivalent supported by the native host:
 - Required human/native/blocker obligations and the next bounded objective, or
   the explicit reason no eligible independent work remains.
 
-Keep a concise current-frontier paragraph at the top of the existing closeout:
-current outcome/binding and candidate, accepted evidence pointers, pending obligations,
-active ownership/commands and next step. Link historical detail below instead of
-requiring successors to rediscover the current state from chronological reports.
-Put enduring invariants, architectural decisions and relevant failed approaches
-in the durable continuation. Return pointers rather than logs, full diffs, copied
-RFCs or older summaries. Preserve necessary rationale even when it needs more than
-a few paragraphs; context savings never justify deleting a live constraint.
+## Current frontier
+
+Before a long command, likely runtime limit or handoff, refresh one concise
+checkpoint at the top of the existing closeout or assignment's evidence location:
+current outcome/binding, candidate and diagnosis; owned changed paths; completed
+checks and log/artifact pointers, including useful negative results; active command
+IDs and owners; pending obligations and the next discriminating step. Each assignment
+names this location so a missing final answer is recoverable. Refresh on material
+progress rather than every command.
+
+Link historical detail below. Keep enduring invariants and decisions there; return
+pointers instead of copied logs or RFCs. Preserve the rationale and live constraints
+needed by a successor, even when that requires more than a few paragraphs.
 
 ## Dispositions
 
@@ -65,9 +70,10 @@ without pretending it ended the milestone. Repeated unchanged partial returns
 need an actionable diagnosis, not an indefinite resume loop.
 
 Before replacing a writer, collect its available result and checkpoint/artifact
-pointers through its current owner; inspect useful partial work before repeating it.
-Then establish that it and its descendants stopped and
-account for their edits/commands. Dirty unrelated files can remain; dirty owned
+pointers through its current owner. If that owner is unavailable, the assigned
+recovery owner inspects surviving artifacts after prior writers are inactive.
+Establish that the writer and its descendants stopped, account for their
+edits/commands, and inspect useful partial work before repeating it. Dirty unrelated files can remain; dirty owned
 partial work must be explicitly transferred and inspected. Missing or contradictory
 state goes back to the current integrator, or to a recovery assignment after prior
 writers are inactive. Mutation is not blindly replayed after an uncertain exit.

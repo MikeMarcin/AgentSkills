@@ -17,9 +17,9 @@ its review scenario judgeable on that exact candidate. Record the entry point,
 terminal result and evidence pointer beside the candidate. A digest identifies the
 candidate but does not prove it can perform the scenario. Classify a failed
 prerequisite against each candidate: keep affected candidates unready with the
-concrete failure, while independent judgeable candidates can proceed. Do not build
-successive review bundles while their relevant prerequisite remains red; repair it
-and rerun the affected path first. Required human judgment remains pending.
+concrete failure, while independent judgeable candidates can proceed. Repair a red
+prerequisite and rerun its affected path before rebuilding that review bundle.
+Required human judgment remains pending.
 
 Use local HTML and practical captured evidence. If a server is unavailable, use
 the existing offline export/import path; server absence does not force a different

@@ -77,6 +77,7 @@ criteria, neighboring interfaces and a concise result contract.
 
 ## 4. Implement and verify the changed behavior
 
+Before long work or interruption, refresh the [current frontier](coordination-handoff.md#current-frontier).
 Slice owners implement and diagnose within their scope, add relevant tests/docs,
 and inspect touched code for straightforward simplification. Communicate an
 actionable blocker, required interface/ownership change or completed result.

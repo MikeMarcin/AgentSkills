@@ -58,10 +58,13 @@ class InstructionPaths(unittest.TestCase):
         handoff=(ROOT/'references/coordination-handoff.md').read_text()
         verification=(ROOT/'references/verification-and-closeout.md').read_text()
         attendance=(ROOT/'references/attendance.md').read_text()
-        self.assertIn("assignment's existing evidence location",delegation)
+        self.assertIn("assignment's evidence location",handoff)
+        self.assertIn("coordination-handoff.md#current-frontier",delegation)
+        self.assertIn("coordination-handoff.md#current-frontier",
+                      (ROOT/"references/milestone-integration.md").read_text())
         self.assertLess(delegation.index("collect the child's available result"),
                         delegation.index('Resume the same owner'))
-        self.assertIn('every unsatisfied obligation',delegation)
+        self.assertIn('every unsatisfied obligation',' '.join(delegation.split()))
         self.assertIn('followup_task',handoff)
         self.assertIn('active child from resuming an idle child',handoff)
         self.assertIn('collect its available result and checkpoint/artifact',handoff)

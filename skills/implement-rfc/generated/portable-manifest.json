@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "3673f20f75aea63627e6e51b852d3ccf8fd66f7dc3d0e34e6ffb3a44d42d1703"
+      "sha256": "41b65a6a52a12d4ef0de7734e6c184b1614fc3e47602577868aecc29291e80af"
     },
     {
       "path": "agents/openai.yaml",
@@ -66,7 +66,7 @@
     },
     {
       "path": "references/attendance.md",
-      "sha256": "6d999523148fb7b5980befb013bc4bbc630b81c6cf19c8589bd7ea15177bd978"
+      "sha256": "bc0ff56ca6d813bed4d950b6b1ef0b91035f83a70277d613cbb7c2fa4927a20b"
     },
     {
       "path": "references/bookkeeping.md",
@@ -82,15 +82,15 @@
     },
     {
       "path": "references/coordination-handoff.md",
-      "sha256": "20ac86951dbef2207006c93f7af48ce48a0430749cdd87947b7a49fa2e8313e0"
+      "sha256": "b47ad94cc9ddc9e72059e5a89b710df4ed9bfbeefcf0ae7dda684c5ce013be0b"
     },
     {
       "path": "references/delegated-execution.md",
-      "sha256": "cf79733c32eceb3348cde41a3747dfb8f2dbc11cd608852afbb19458c934f42b"
+      "sha256": "a2df63bb4a65175a68b5e57d627811cd69c146ee587df052ce4f580531b67879"
     },
     {
       "path": "references/milestone-integration.md",
-      "sha256": "b986ce6bedbd22e05020ead7d113dba44d9c70aaf2a025299e35d8da23381827"
+      "sha256": "0f9a31c67258a2a639125e89bd72ebfb84858e8a6ac7259cf5bbb190d7b2e0a0"
     },
     {
       "path": "references/milestone-plans.md",
@@ -342,7 +342,7 @@
     },
     {
       "path": "tests/test_instruction_paths.py",
-      "sha256": "125c6366b898f4c66384cfc53699306883a1bb7b8c3c0414bf76b222ed64d12c"
+      "sha256": "3e6d83c1a9934d993e2a3decee3a0fc16ff35bc6979ba0f421ae90d2f2bec9ca"
     },
     {
       "path": "tests/test_integrator_waits.py",
@@ -481,6 +481,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "bde9a5818577ada8",
+  "portable_digest": "b08fe210386d69ec",
   "schema": "implement-rfc.portable-manifest.v1"
 }

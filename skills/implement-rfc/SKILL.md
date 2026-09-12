@@ -22,8 +22,8 @@ selects its consumer. Read its `.mask/skill-config/implement-rfc/project.json` a
 `project.md`, applicable instructions, and the user's selected scope. Preserve
 unrelated work and existing approval boundaries.
 
-Read [Coordination handoff](references/coordination-handoff.md) before dispatch or
-resume. Record whether this host exposes `SendMessage` or an equivalent native
+**Before dispatch or resume**, read [Coordination handoff](references/coordination-handoff.md).
+Record whether this host exposes `SendMessage` or an equivalent native
 resume operation, including its actual tool name and active/idle behavior; without
 native resume the dispositions there take their fresh-dispatch form.
 Bind the integrator's engineering route independently of the coordinator;
@@ -115,7 +115,7 @@ a rejection invalidates; a low-effort coordinator holding the verdict is still n
 authorised to adjudicate it.
 
 Resume the same integrator for its current milestone's correction or partial
-invocation where the host exposes `SendMessage`; otherwise dispatch a fresh integrator
+invocation where the host supports native resume; otherwise dispatch a fresh integrator
 carrying the return's continuation pointers under a renewed dispatch identity. Check completion separately from explicit continuation intent. Normally
 dispatch fresh at a substantial boundary; related small continuation may reuse context
 with a reason and renewed scope. Keep required human decisions open and continue
