@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0072"
+  ],
+  "reserve_for": "integrator-child-collection-and-integration-route",
+  "purpose": "",
+  "created": "2026-09-12T00:58:13.685613+00:00",
+  "base": "75ece6a9f5f478401694bf21e5f94a3659e9a412"
+}
