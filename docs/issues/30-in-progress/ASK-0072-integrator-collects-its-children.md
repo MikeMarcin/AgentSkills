@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0072"
 title: "An integrator collects its children instead of ending its turn to wait"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: "P1"
