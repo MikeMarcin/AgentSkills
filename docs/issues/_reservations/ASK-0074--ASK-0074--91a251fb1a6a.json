@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0074"
+  ],
+  "reserve_for": "mask-public-workflow-paths",
+  "purpose": "",
+  "created": "2026-09-12T15:33:56.426299+00:00",
+  "base": "266c364c140fd0412556265ee43df31a7811cf70"
+}
