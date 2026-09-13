@@ -204,6 +204,11 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
             for relative in tracked:
                 content = (tracker / relative).read_text()
                 self.assertNotIn(str(base), content)
+            audit = subprocess.run([sys.executable, "-B", str(SCRIPTS / "audit_board.py"),
+                "--repo-root", str(source), "--rfc", "RFC-PRS-0001"],
+                env=env, capture_output=True, text=True)
+            self.assertEqual(audit.returncode, 0, audit.stdout + audit.stderr)
+            self.assertIn("board conforms: no violations", audit.stdout)
             self.assertEqual(git(source, "status", "--porcelain=v1", "--untracked-files=all"), "")
 
 

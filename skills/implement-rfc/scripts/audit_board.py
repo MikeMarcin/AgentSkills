@@ -102,6 +102,8 @@ def audit(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=None)
+    parser.add_argument("--mode", choices=("project", "personal"))
+    parser.add_argument("--workflow-root", type=Path)
     parser.add_argument("--rfc", action="append", default=[], help="Scope workflow findings to selected RFCs; repeat for a pack")
     parser.add_argument("--transcripts-dir", type=Path, default=None)
     parser.add_argument(
@@ -111,17 +113,18 @@ def main() -> int:
         help=argparse.SUPPRESS,
     )
     args = parser.parse_args()
-    context = project_config.resolve_context(repo_root=args.repo_root, project_config_path=args.project_config)
+    context = project_config.resolve_context(repo_root=args.repo_root, project_config_path=args.project_config,
+                                             mode=args.mode, workflow_root=args.workflow_root)
     config = context.config
-    args.repo_root = context.repo_root
+    workflow_root = context.workflow_root
 
     transcripts = args.transcripts_dir
     if transcripts is None:
-        flattened = str(args.repo_root.resolve()).replace("/", "-")
+        flattened = str(context.source_root.resolve()).replace("/", "-")
         candidate = Path.home() / ".claude/projects" / flattened
         transcripts = candidate if candidate.is_dir() else None
 
-    violations, warnings, infos = audit(args.repo_root.resolve(), config, transcripts, args.rfc)
+    violations, warnings, infos = audit(workflow_root, config, transcripts, args.rfc)
     for title, rows in (
         ("VIOLATIONS", violations),
         ("WARNINGS", warnings),
