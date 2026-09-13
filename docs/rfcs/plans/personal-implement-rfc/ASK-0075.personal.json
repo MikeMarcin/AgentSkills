@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0075:personal-binding",
+  "outcome": "pass",
+  "revision": "9ad89cc4bd2854557b210787943557e50541dbfb",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"-m\", \"unittest\", \"discover\", \"-s\", \"skills/implement-rfc/tests\", \"-p\", \"test_personal_binding.py\", \"-q\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 9.182,
+    "stdout_tail": "",
+    "stderr_tail": "----------------------------------------------------------------------\nRan 9 tests in 9.137s\n\nOK\n"
+  }
+}

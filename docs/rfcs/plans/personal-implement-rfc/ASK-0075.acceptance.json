@@ -1,0 +1,33 @@
+{
+  "approved": true,
+  "decision": "done",
+  "records": [
+    {
+      "criterion": "Explicit personal selection, shared common-repository binding and supplied tracker association",
+      "outcome": "pass",
+      "revision": "9ad89cc4bd2854557b210787943557e50541dbfb",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "ASK-0075.personal.json: nine public subprocess tests exercise unconfigured refusal, managed and supplied setup, persistent status, same-common-dir worktrees, independent clone and reused-path explicit association. Critical reviewer rechecked its reused-path counterexample without a blocker."
+      }
+    },
+    {
+      "criterion": "Observational status and safe external state without source footprint",
+      "outcome": "pass",
+      "revision": "9ad89cc4bd2854557b210787943557e50541dbfb",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "ASK-0075.personal.json hashes the complete disposable source worktree and Git directory before/after setup and status. It checks overlap, symlinked local-state parents, external tracker Git common dir, staged unrelated tracker index and malformed binding refusal. Critical review reproduced and then rechecked the corrected public paths."
+      }
+    },
+    {
+      "criterion": "Project-mode context compatibility and interim private-helper isolation",
+      "outcome": "pass",
+      "revision": "9ad89cc4bd2854557b210787943557e50541dbfb",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "ASK-0075.project.json records 15 existing context tests; ASK-0075.linked.json records one composed two-linked-consumer public plan test. ASK-0075.personal.json also proves explicit project override, project under IMPLEMENT_RFC_HOME, and unadapted board allocation refusal before source mutation. Full personal board/lifecycle adaptation remains ASK-0076–0078."
+      }
+    }
+  ]
+}

@@ -37,14 +37,22 @@ Planned cards: ASK-0075, ASK-0076, ASK-0077, ASK-0078, ASK-0079, ASK-0080, ASK-0
 
 Current milestone plan: [personal-implement-rfc](../../rfcs/plans/personal-implement-rfc/milestone-plan.json).
 
-Current frontier — September 12, first milestone claimed: run personal-mode-20260913, dispatch pm-001, producer /root/personal_mode_integrator, mandate revision 1. Reservation c0ab9cd, live intake f02a8af, MASK intake 0d0e692. [Bound assignment](../../rfcs/plans/personal-implement-rfc/pm-001.assignment.json) retains ASK-0075 and all three `personal-binding` exits. ASK-0075 claim baacfc5 precedes source edits. Owned source paths for this boundary: shared context resolver, personal setup/status helper, focused tests and conditional skill guidance; no child writer or task command is active. Next: implement managed/supplied tracker binding and observational resolution through the public helper, then test source footprint and project-mode compatibility. Required Codex and Claude Code native qualification remains a later open criterion; it cannot establish pack completion by omission.
+Current frontier — September 12, first milestone accepted: run personal-mode-20260913, dispatch pm-001, producer /root/personal_mode_integrator, mandate revision 1. Reservation c0ab9cd, live intake f02a8af, MASK intake 0d0e692. [Bound assignment](../../rfcs/plans/personal-implement-rfc/pm-001.assignment.json) retains ASK-0075 and all three `personal-binding` exits. ASK-0075 claim baacfc5 preceded source edits; source candidate 9ad89cc4bd2854557b210787943557e50541dbfb supplies explicit managed/supplied tracker setup and observational status. `source_root`, `workflow_root`, `runtime_root` and mode resolve separately. Same Git-common worktrees share a binding; another clone or replacement checkout requires explicit association. Interim unadapted board helpers fail closed in personal mode, preserving private source footprint until ASK-0076–0078 adapt them. Owned changed paths are the shared context resolver, personal state/setup helper, conditional skill reference, focused public tests and generated portable manifest. [Personal](../../rfcs/plans/personal-implement-rfc/ASK-0075.personal.json), [project-context](../../rfcs/plans/personal-implement-rfc/ASK-0075.project.json) and [linked-consumer](../../rfcs/plans/personal-implement-rfc/ASK-0075.linked.json) evidence at 9ad89cc record 9/15/1 passing tests. Source manifest validation, MASK package validation, six instruction-path tests, board and documentation gates pass. Critical reviewer `/root/personal_mode_integrator/rfc_reviewer_critical_binding` reproduced five concrete path, index and identity failures; all were corrected and its narrow public recheck reports no blocker. Dispatch selected `rfc-reviewer-critical` with `fork_turns:none` and no model/effort override; generated role and banner Astra/xhigh, actual serving telemetry unavailable. Reviewer and task commands are quiescent; no descendants. Next bounded objective: `private-workflow-lifecycle` adapts real board/plan/claim/commit helpers through both roots, paired lanes and crash receipts under ASK-0076–0078. Fresh context is appropriate after this integrated boundary. Required Codex and Claude Code native qualification remains an open later criterion; it cannot establish pack completion by omission.
+
+### Accepted first milestone: personal-binding
+
+| Bound exit | Direct evidence | Outcome |
+|---|---|---|
+| Public managed/supplied setup, same Git-common worktree identity, explicit override and safe refusal | ASK-0075.personal.json; direct critical-review counterexamples and narrow recheck | Pass on disposable macOS repositories at 9ad89cc |
+| Zero workflow-generated source or Git-directory changes after setup/observation | Whole-tree byte snapshots in ASK-0075.personal.json, including source `.git`; reviewer verified legacy allocation now refuses before mutation | Pass; this does not claim full private source-commit lifecycle |
+| Existing project-mode context and two linked consumers remain valid | ASK-0075.project.json and ASK-0075.linked.json; six instruction-path tests | Pass at 9ad89cc |
 
 ## Closeout checklist
 
 | Acceptance | Direct evidence | Outcome | Source revision |
 |---|---|---|---|
-| RFC-ASK-0013-AC01 | Pending | Pending | Pending |
-| RFC-ASK-0013-AC02 | Pending | Pending | Pending |
+| RFC-ASK-0013-AC01 | ASK-0075.personal.json and critical review; later paired-lane reconciliation remains separate AC04 | Offline pass | 9ad89cc |
+| RFC-ASK-0013-AC02 | ASK-0075.personal.json, ASK-0075.project.json, ASK-0075.linked.json; shared helper routing remains ASK-0076 | Partial | 9ad89cc |
 | RFC-ASK-0013-AC03 | Pending | Pending | Pending |
 | RFC-ASK-0013-AC04 | Pending | Pending | Pending |
 | RFC-ASK-0013-AC05 | Pending | Pending | Pending |

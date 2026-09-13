@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0075:project-context",
+  "outcome": "pass",
+  "revision": "9ad89cc4bd2854557b210787943557e50541dbfb",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"-m\", \"unittest\", \"discover\", \"-s\", \"skills/implement-rfc/tests\", \"-p\", \"test_project_config.py\", \"-q\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 3.479,
+    "stdout_tail": "",
+    "stderr_tail": "----------------------------------------------------------------------\nRan 15 tests in 3.415s\n\nOK\n"
+  }
+}
