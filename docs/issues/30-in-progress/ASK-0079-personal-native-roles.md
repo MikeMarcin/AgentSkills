@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0079"
 title: "Render personal native roles and integrate MASK readiness"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0076"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC09","RFC-ASK-0013-AC11"]}
