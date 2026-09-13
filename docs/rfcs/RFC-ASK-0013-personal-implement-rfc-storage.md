@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0013"
 title: "Optional personal storage for the shared implement-rfc workflow"
-status: "Implementing"
+status: "Auto-Verified"
 ---
 
 # RFC-ASK-0013: Optional personal storage for implement-rfc
@@ -40,3 +40,7 @@ Install the canonical skill and generic roles at personal scope. Render personal
 - **RFC-ASK-0013-AC12 — Bounded adoption and closeout.** MASK handoff is recorded at actual revisions; selected personal deployment is reviewed at a safe boundary; every criterion links direct evidence and unresolved native/human checks remain open.
 
 The accepted mandate's detailed behavior and test cases remain binding when a card abbreviates them. This RFC does not supersede RFC-ASK-0012 or reopen its parked native acceptance.
+
+## Closeout
+
+ASK-0075 through ASK-0082 are Done. The [ASK-0082 closeout](../issues/60-done/ASK-0082-close-personal-implement-rfc.md) reconciles all twelve criteria to source and MASK revisions and direct evidence. Fresh signed-in Codex and Claude Code personal roles loaded and performed bounded source/external-state work. Selected user-scope MASK adoption occurred after those sessions stopped and converged without role rewrites. Opaque binary and unsupported encodings refuse privacy-sensitive finish/adopt; native remote execution, signed-commit adoption, Windows locking and power-loss recovery were not qualified. No push, publication, credential or persistent permission change was performed.
