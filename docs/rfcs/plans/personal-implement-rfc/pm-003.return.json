@@ -1,0 +1,107 @@
+{
+  "schema": "implement-rfc.milestone-return.v2",
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-003",
+  "producer_id": "/root/personal_host_integrator",
+  "mandate_revision": "1",
+  "milestone": "personal-host-integration",
+  "disposition": "milestone-complete",
+  "summary": "AgentSkills source 9b47f12861c33f1f02b3aa4aaa7d848e37c2b094 and MASK program 78cc57cdac4ea493a3e0ba38ca0e51218af7991a integrate canonical personal roles, scope-specific readiness, external companions and paired Git handoff/refusal. ASK-0079/0080 and MASK-0098/0099 are Done; MASK RFC-MASK-0020 is Auto-Verified for file readiness. Native Codex and Claude personal-role loading is pending later qualification.",
+  "candidate_revision": "f1809f40aaf312b06db1a1d0422238432d5c40c0",
+  "handoff_ref": "docs/issues/10-backlog/ASK-0082-close-personal-implement-rfc.md",
+  "ownership": "quiescent",
+  "next_objective": "Qualify a full private workflow and actual Codex and Claude Code personal-role loading with bounded source/external-state courses under ASK-0081; then reconcile native/human evidence and selected adoption in ASK-0082. Retain honest binary/unsupported-encoding refusal and unexercised native signed-commit/Windows/power-loss limits.",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0079.acceptance.json",
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json",
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0080.acceptance.json",
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"
+  ],
+  "binding": {
+    "plan_id": "personal-implement-rfc",
+    "plan_path": "docs/rfcs/plans/personal-implement-rfc/milestone-plan.json",
+    "milestone_id": "personal-host-integration",
+    "definition_fingerprint": "sha256:392c882d767f330efde7545004930eca5e385fca8f81f94fb10903c06f9bf0ce",
+    "obligations": [
+      {
+        "id": "ASK-0079:*",
+        "source": "ASK-0079",
+        "selector": null,
+        "source_fingerprint": "sha256:539b3bd8794c90370cc959f4499736f4f4fbceaf879a4597d58bbc448492f043"
+      },
+      {
+        "id": "ASK-0080:*",
+        "source": "ASK-0080",
+        "selector": null,
+        "source_fingerprint": "sha256:00669d63d0166884a47fe469d917b14ffbbad42540313375b875223581519eff"
+      }
+    ],
+    "obligation_fingerprint": "sha256:975dd389355d56dadb0852470a2d95c1a94402efd65138929f09c490fd54723e",
+    "exit_criteria": [
+      {
+        "id": "personal-host-integration:exit:1",
+        "text": "The canonical role definitions render at personal scope with assignment-provided project facts; MASK personal readiness is integrated at its actual program revision without persistent approval."
+      },
+      {
+        "id": "personal-host-integration:exit:2",
+        "text": "Attended-review, wizard and compatible remote handoffs route runtime state externally and protect source candidates; incompatible adapters refuse before writes."
+      },
+      {
+        "id": "personal-host-integration:exit:3",
+        "text": "Instruction tabletop and disposable scope tests cover first use, resume, small fix, status-only and paired worktrees in both modes."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:87f65de502e8621005559fb8ae4a548c3faddcedf18cabbb9f2368ec748da6c8",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "continuation": {
+    "intent": "fresh",
+    "next_milestone": "qualification-and-closeout",
+    "reason": "integrated-boundary",
+    "detail": "Host integration and cross-repository MASK readiness are source-committed and accepted; all children and test commands are quiescent. Fresh context should qualify actual personal native roles and complete the pack without treating file readiness as host loading."
+  },
+  "acceptance_records": [
+    {
+      "id": "ASK-0079:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0079.acceptance.json",
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"
+      ]
+    },
+    {
+      "id": "ASK-0080:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0080.acceptance.json",
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"
+      ]
+    },
+    {
+      "id": "personal-host-integration:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"
+      ]
+    },
+    {
+      "id": "personal-host-integration:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"
+      ]
+    },
+    {
+      "id": "personal-host-integration:exit:3",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"
+      ]
+    }
+  ]
+}
