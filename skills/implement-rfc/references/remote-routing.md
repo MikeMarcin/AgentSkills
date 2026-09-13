@@ -1,5 +1,10 @@
 # Remote Routing
 
+## Personal mode compatibility
+
+The legacy remote station launcher, Codex station transport and companion lane launcher refuse personal mode before launch or source-local metadata writes. Their single-checkout station contract does not carry paired tracker identity. Do not use them for a personal run. A compatible replacement must validate both repository identities, roots, branches and revisions before dispatch and preserve those identities on return; installing roles does not establish that capability. Paired repository synchronization alone does not establish remote adapter support.
+
+
 How RFC work is routed across machines, sessions, and runtimes without mixing
 project, workstream, or branch context. Read this before dispatching work to a
 remote station, before accepting work on one, and before launching a station

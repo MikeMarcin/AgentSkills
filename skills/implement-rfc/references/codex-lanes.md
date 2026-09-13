@@ -1,5 +1,10 @@
 # Codex Delegated Lanes
 
+## Personal mode
+
+The companion lane launcher currently refuses personal mode before dispatch: its role and lane metadata contract assumes one project checkout. Use the shared native personal workflow; do not bypass the refusal or create source-local lane metadata.
+
+
 Read this before launching any delegated lane on the Codex runtime from a
 Claude Code primary session. A Codex lane satisfies the same delegation
 contract as a native Claude lane — role identity, mutation limits, single

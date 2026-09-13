@@ -406,7 +406,12 @@ def synchronize_pair(context, *, authorized: bool = False, source_remote: str | 
             raise state.PersonalStateError('synchronization requires exactly one push destination per repository')
     if destinations['source'] == destinations['tracker']:
         raise state.PersonalStateError('source and tracker require separate remote destinations')
-    receipt = {'status': 'pending', 'portable': pair['portable'], 'completed': []}
+    # This receipt is machine-local. Carry both checkout roots and exact paired
+    # revisions across a Git synchronization handoff without recording URLs that
+    # might contain credentials.
+    receipt = {'status': 'pending', 'portable': pair['portable'],
+               'local': pair['local'], 'remote_names': remotes,
+               'branches': branches, 'completed': []}
     receipt_path = _path(Path(context.source_root)).with_suffix('.sync.json')
     _write(receipt_path, receipt)
     for side, root in roots.items():

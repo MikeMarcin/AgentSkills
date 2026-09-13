@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "ac1ed531a29d3254de6a6f459eacad31afd02fbb50741fde02d5b6885131dab4"
+      "sha256": "2d8852df3f5cbc8cc4063b628b86da722d6ee1e0526b007a814cd1444190c68a"
     },
     {
       "path": "SKILL.md",
-      "sha256": "a7605748899e2fe7c39f216df48f17862cfab59a5d3d5967ad9e604568d26bc1"
+      "sha256": "d5f8e0544a172b7ae45753122c476612364a0db64bd1c48dbffe03b30f02e5ea"
     },
     {
       "path": "agents/openai.yaml",
@@ -62,11 +62,11 @@
     },
     {
       "path": "mask-workflow.json",
-      "sha256": "9575dc4fa8a69900236bd8d68634fdca5759124d91acf3cf8c22c6e83e4d70f1"
+      "sha256": "6f5e8a030fa9b4fe094e42daa35a96822cc0134804777ea9a65b43440660c83e"
     },
     {
       "path": "references/attendance.md",
-      "sha256": "bc0ff56ca6d813bed4d950b6b1ef0b91035f83a70277d613cbb7c2fa4927a20b"
+      "sha256": "211b4f57a1a5f8ef4cbf432667b8908c43fda73666e1d3cb5fe419ee072e4bfb"
     },
     {
       "path": "references/bookkeeping.md",
@@ -74,11 +74,11 @@
     },
     {
       "path": "references/bounded-execution.md",
-      "sha256": "59ab2f26ca8073db31b67b9a823e680b29deb7e7f4943fdec632502a73e73443"
+      "sha256": "85674a85f7de14f7aeea47ca9b17e132a14e03a12bc06799222639bd7bda6992"
     },
     {
       "path": "references/codex-lanes.md",
-      "sha256": "fe8fd68dcc630e4df415db30c26e06bad3fbc39b7feb49c61bcc2a60d01d91be"
+      "sha256": "f24e9d5197f6f34ce8e02bd91e7f2132a7530a8c7bcf13a75d5a49267d088a57"
     },
     {
       "path": "references/coordination-handoff.md",
@@ -114,11 +114,11 @@
     },
     {
       "path": "references/personal-lanes.md",
-      "sha256": "6c063a487d79e0d488945f54c243b158f1902c484377b7128596a136c0da1eec"
+      "sha256": "075426ca1e44deeb050b8e880aed9bc6a51d53808fb72f0b083b88e617703e01"
     },
     {
       "path": "references/personal-storage.md",
-      "sha256": "e4a0b14ec986573692e176115f007136f0b2949c72335176f4587433cbd6f2f1"
+      "sha256": "4e6f884a2d21abddeb9eba53e495b8bcab7a67569444d3d307073e117707147d"
     },
     {
       "path": "references/progress-relay.md",
@@ -130,7 +130,7 @@
     },
     {
       "path": "references/remote-routing.md",
-      "sha256": "00a0ba7c77317dba61df640f6f847f2390e6309ddb06d616c992d6082581911e"
+      "sha256": "c4d8136332e0ff63af8ff228b50ac5a043778a64c99995c14f9a512acddb55b9"
     },
     {
       "path": "references/role-adoption.md",
@@ -206,11 +206,11 @@
     },
     {
       "path": "scripts/codex_lane.py",
-      "sha256": "89d7a587657e29623783c434044c8b2f36d4a596156a460a6674ec6ed5907fdf"
+      "sha256": "ed7af60de48638c61749000695c486e341e569a4a2a92c307dfd153c2cd02783"
     },
     {
       "path": "scripts/codex_station.py",
-      "sha256": "f773b527ebe66fea3c3a3dd71c0d9c801e5a0ad545c75cffcb554ffe245a2dfd"
+      "sha256": "f03bb110e43cb8d50c1a9972759529e5bcdbf85e2633bae1341c7427f91c3e8f"
     },
     {
       "path": "scripts/coordinator_handoff.py",
@@ -222,7 +222,7 @@
     },
     {
       "path": "scripts/launch_remote_station.py",
-      "sha256": "f1f785f09dee72e93773c03f499a69ef7a60e5a349d447b658a628a2d00278db"
+      "sha256": "1c1fc654194cf9d9d074ac521038b9475f1d8312bb6499dec4afe5e9419a0441"
     },
     {
       "path": "scripts/milestone_continuation.py",
@@ -242,7 +242,7 @@
     },
     {
       "path": "scripts/personal_lanes.py",
-      "sha256": "15770bec5dcaa32b846b0788b39d4d6c85fc3781a58bb78c2361b08d3be2ac5b"
+      "sha256": "10579c5afd0b42d4f6ef04e51f5b72c2de248a332474574baa30a2067b954327"
     },
     {
       "path": "scripts/personal_privacy.py",
@@ -258,11 +258,11 @@
     },
     {
       "path": "scripts/prepare_mask_roles.py",
-      "sha256": "8122dbabf344aa0b50de98d40b91d78d832c8e4095fea8b70deca8564f7fd24d"
+      "sha256": "dd807a6f0d60b23056c9d139af4c97efacfdba7e26834e07a574e99066d6dd91"
     },
     {
       "path": "scripts/progress_trail.py",
-      "sha256": "18cce5b33ac7b1e627568f66cbe44987dc918495c2c149c8db6ec2cfa8af5786"
+      "sha256": "1f58388900150992c788eb7e4401b31cd705e3d82eec9c77e1350c4eedffa108"
     },
     {
       "path": "scripts/project_config.py",
@@ -282,7 +282,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "bbcd420b8135329d1469e3798c120fc4cbe83988430b3036c68867fdc51abbab"
+      "sha256": "3eebea3a117fa56144bc83e4fe9a4e21a65efe055c62aa1e5159a9e17256dc85"
     },
     {
       "path": "scripts/role_usage.py",
@@ -290,7 +290,7 @@
     },
     {
       "path": "scripts/run_slice.py",
-      "sha256": "f022b9e224eb3544936714493fa29e267c276369d1a4e04fe44bb5fba684c014"
+      "sha256": "bf2f170039eb731fc150b4a2565608262d240abaed0a25f8fc1f712e02a52009"
     },
     {
       "path": "scripts/slice_claude.py",
@@ -314,7 +314,7 @@
     },
     {
       "path": "scripts/station_lease.py",
-      "sha256": "b5ffeb248648958d8dfcc4835987c5cd62fdc396ac7ecae38c7a3dd27611a8d3"
+      "sha256": "ba1c047369eb372b20107135b3e60a1e08d4162d6ef7b4ecc3a050fda1a26782"
     },
     {
       "path": "scripts/usage.py",
@@ -350,7 +350,7 @@
     },
     {
       "path": "scripts/workflow_preflight.py",
-      "sha256": "d6a7c3a7c41e6badc6b2f1ee620cd27c534c8bc595a4ef6f8e70ba2020cedba1"
+      "sha256": "3d2f256d9b7e5eb24f131b94e3bace7f42a904a6ff1e64c5068260d38fc160a7"
     },
     {
       "path": "tests/project_fixtures.py",
@@ -390,7 +390,7 @@
     },
     {
       "path": "tests/test_mask_workflow.py",
-      "sha256": "007292bd9cab24b9f6bb3109efc3a3cb8b46c8b94d8d37f6de041fc58cec615d"
+      "sha256": "d82eedf6c8ae115dd87104fd7f96a690cc3040def3ed7d80602459ea84d6b746"
     },
     {
       "path": "tests/test_milestone_adaptive.py",
@@ -433,8 +433,12 @@
       "sha256": "65fe72fda2c92bc2368ccbf5c3d4817417b8f103683132a2f3d552727a80230b"
     },
     {
+      "path": "tests/test_personal_companion_state.py",
+      "sha256": "869d4d7e778db07517a126408a16f518ae5cbb1aa4ed9670f12dd6f06bbdb7d9"
+    },
+    {
       "path": "tests/test_personal_lanes.py",
-      "sha256": "696d151f8ed94cd366e76c40653b32c070a7aca95d4e5ee18d5b46c35f478997"
+      "sha256": "c1f3d4163c2d204f8b0776fe160a0862d4101f3ed697f09c26043f311eb48968"
     },
     {
       "path": "tests/test_personal_lifecycle_public.py",
@@ -454,7 +458,7 @@
     },
     {
       "path": "tests/test_remote_station_guard.py",
-      "sha256": "fa9e08ea6dc135684abf8c32269aececd714ea0d043b0fc10928f18ec390b480"
+      "sha256": "8e1f7b40e9cb44b920a9a4bb3de2aded78ac3afb0fee7b85cfcb4f73e9abc5ea"
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
@@ -478,7 +482,7 @@
     },
     {
       "path": "tests/test_slice_commands.py",
-      "sha256": "8c30ed536a608eada8478117ed9ef29e7a2dae147c5dae12373431b70922e199"
+      "sha256": "57346d837643a58245a475bbc9fede6270977478c7921ec0e5e366412e165f7b"
     },
     {
       "path": "tests/test_slice_integration.py",
@@ -529,6 +533,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "031a6815f2729701",
+  "portable_digest": "1c36f861bdcdfc92",
   "schema": "implement-rfc.portable-manifest.v1"
 }

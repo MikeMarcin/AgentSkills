@@ -204,13 +204,29 @@ def manifest(value):
 
 
 class Session:
-    def __init__(self, root, registry=None):
+    def __init__(self, root, registry=None, state=None):
         self.root = Path(root).resolve()
         if not self.root.is_dir():
             raise ReviewError("checkout root must exist")
-        self.directory = self.root / ".mask" / "attended-review"
+        self.directory = Path(state).expanduser().resolve() if state else self.root / ".mask" / "attended-review"
         self.path = self.directory / "session.json"
         self.registry = Path(registry or os.environ.get("ATTENDED_REVIEW_REGISTRY", Path.home() / ".mask" / "attended-review-resources")).resolve()
+        if state:
+            protected = [self.root]
+            common = subprocess.run(["git", "-C", str(self.root), "rev-parse", "--git-common-dir"],
+                                    capture_output=True, text=True)
+            if common.returncode == 0:
+                common_path = Path(common.stdout.strip())
+                protected.append((common_path if common_path.is_absolute() else self.root / common_path).resolve())
+                worktrees = subprocess.run(["git", "-C", str(self.root), "worktree", "list", "--porcelain"],
+                                           capture_output=True, text=True)
+                if worktrees.returncode != 0:
+                    raise ReviewError("cannot inspect source worktrees for external state")
+                protected.extend(Path(line.removeprefix("worktree ")).resolve() for line in worktrees.stdout.splitlines()
+                                 if line.startswith("worktree "))
+            for location in (self.directory, self.registry):
+                if any(location == root or location in root.parents or root in location.parents for root in protected):
+                    raise ReviewError("explicit state and registry must be separate from the source repository")
 
     @contextmanager
     def transaction(self):
@@ -218,6 +234,8 @@ class Session:
         with lock(self.registry / ".lock"):
             with lock(self.directory / ".lock"):
                 state = read_json(self.path)
+                if state is not None and state.get("checkout") != str(self.root):
+                    raise ReviewError("session state belongs to another source checkout")
                 resources = read_json(self.registry / "resources.json", {})
                 before_state = json.dumps(state, sort_keys=True)
                 before_resources = json.dumps(resources, sort_keys=True)
@@ -241,6 +259,8 @@ class Session:
             state = read_json(self.path)
             if state is None:
                 raise ReviewError("No attended session; run init with a manifest")
+            if state.get("checkout") != str(self.root):
+                raise ReviewError("session state belongs to another source checkout")
             return state
 
     @staticmethod
@@ -280,6 +300,8 @@ class Session:
         with lock(self.registry / ".lock"):
             with lock(self.directory / ".lock"):
                 state = read_json(self.path)
+                if state is not None and state.get("checkout") != str(self.root):
+                    raise ReviewError("session state belongs to another source checkout")
                 if state is None:
                     state = {"schema_version": VERSION, "id": secrets.token_hex(16), "checkout": str(self.root), "sequence": 0, "events": [], "candidates": {}, "history": [], "paused": False, "host": None}
                 for candidate in value["candidates"]:
@@ -700,6 +722,7 @@ def serve(session):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", default=os.getcwd())
+    parser.add_argument("--state", help="External session directory; source checks and preparation retain --repo-root")
     parser.add_argument("--registry", help="Shared resource registry; all drivers using a resource must use the same registry")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("init").add_argument("--manifest", required=True)
@@ -718,7 +741,7 @@ def main(argv=None):
     sub.add_parser("serve"); sub.add_parser("stop")
     args = parser.parse_args(argv)
     try:
-        session = Session(args.repo_root, args.registry)
+        session = Session(args.repo_root, args.registry, args.state)
         command = args.command
         if command == "init": result = session.initialize(read_json(Path(args.manifest)))
         elif command == "status": result = session.status(args.after, args.full)

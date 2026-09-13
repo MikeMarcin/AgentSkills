@@ -1,5 +1,14 @@
 # Personal storage
 
+For explicit first-use setup, select the shared skill at personal scope with
+`mask install implement-rfc --user --json`, then preview `mask ensure --user
+--check --json`. If role setup is required, use MASK's explicit setup
+authorization for that scope; a readiness check never grants it. Personal role
+files are rendered from the canonical roles and routes with no project addenda.
+A native assignment supplies the selected source root, tracker root, runtime
+root, project facts and addenda. Restart a host after role installation and
+distinguish its actual loading from MASK's file readiness.
+
 Personal mode keeps the source checkout and the workflow tracker distinct. Use
 `scripts/personal_tracker.py --repo-root SOURCE --json init` only after the user
 explicitly selects personal mode. Add `--workflow-root TRACKER` to bind an
@@ -16,6 +25,11 @@ It reads the remembered mode and creates nothing. `--mode project` or
 explicit `--mode personal --workflow-root TRACKER` can inspect an already
 configured tracker without a binding, but must agree with one if present; it
 never writes a new binding.
+Run `scripts/workflow_preflight.py --repo-root SOURCE --mode personal --json`
+for the selected source. It checks the bound tracker and MASK's user-scope
+native role files without initializing either. Its `host_load` field remains
+`not_verified` until a fresh Codex or Claude Code session actually loads and
+uses the personal role.
 
 For another source worktree, a branch switch or an authorized source/tracker
 handoff, follow [Paired personal lanes](personal-lanes.md) before mutation.

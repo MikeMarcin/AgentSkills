@@ -148,6 +148,8 @@ def compose_prompt(role_name: str, role: dict, route: dict, lane_name: str, task
 
 def cmd_launch(args: argparse.Namespace) -> int:
     context = getattr(args, "context", None) or project_config.resolve_context(repo_root=args.repo_root)
+    if context.mode == "personal":
+        raise LaunchError("adapter does not support paired source/tracker handoffs; personal mode refused before launch")
     pending = context.repo_root / ".mask/generated/implement-rfc/runtime-adapters.pending.json"
     if pending.exists() or pending.is_symlink():
         raise LaunchError("interrupted adapter publication; finish regeneration before launch")

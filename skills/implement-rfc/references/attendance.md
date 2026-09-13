@@ -1,5 +1,10 @@
 # Attendance
 
+## Personal sessions
+
+When invoking attended-review in personal mode, pass the source root as `--repo-root` and an explicit session directory under the resolved runtime root as `--state`. Pass wizard both `--state` there and `--source-root SOURCE`. Candidate protection and preparation remain on the source checkout; keep the same external session path for resume, verdict import and wait.
+
+
 Use the existing attended-review skill for explicit human acceptance and attended
 preparation; use wizard for genuinely required guided manual steps. These are
 conditional workflows, not mandatory stages for every implementation or UI change.

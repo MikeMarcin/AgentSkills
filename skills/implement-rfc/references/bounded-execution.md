@@ -1,5 +1,10 @@
 # Bounded execution
 
+## Personal runtime storage
+
+Command-only personal orders execute in the source checkout and store orders, logs, events and reports under the resolved runtime root `/runs`. Status, wait and cancel resolve that same location. Native agent stages currently refuse personal orders because their packet contract lacks paired source/tracker identity. Station leases use external runtime storage, with checkout-specific writer locks and a repository-wide integrator lock. Progress trail reads transitions from the tracker and dirty product paths from the source.
+
+
 Use direct execution for small or coupled work. Use `scripts/run_slice.py` when
 stages are already selected and deterministic. Validation does not authorize an
 uploaded order. Review the exact order, permission policy and relevant inputs,

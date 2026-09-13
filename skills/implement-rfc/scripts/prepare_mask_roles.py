@@ -40,6 +40,8 @@ def load_request(path: Path) -> dict:
         raise RequestError("unsupported request schema")
     if request.get("action") != ACTION:
         raise RequestError(f"unsupported action: {request.get('action')!r}")
+    if request.get("scope", "project") not in ("project", "user"):
+        raise RequestError("request scope must be project or user")
     roles = request.get("native_roles")
     if not isinstance(roles, list) or not roles or any(
             not isinstance(row, dict) or row.get("agent") not in renderer.ROLE_SUFFIX
@@ -47,6 +49,8 @@ def load_request(path: Path) -> dict:
         raise RequestError("request needs supported agent/name role pairs")
     if not isinstance(request.get("inputs"), list) or not isinstance(request.get("parameters", {}), dict):
         raise RequestError("request inputs and parameters have the wrong shape")
+    if request.get("scope", "project") == "user" and request["inputs"]:
+        raise RequestError("personal role setup has no consumer inputs")
     if request.get("parameters"):
         raise RequestError("this action declares no parameters")
     return request
@@ -57,7 +61,12 @@ def verify_inputs(root: Path, inputs: list) -> None:
     for row in inputs:
         if not isinstance(row, dict) or not isinstance(row.get("path"), str):
             raise RequestError("malformed request input")
-        path = root / row["path"]
+        relative = Path(row["path"])
+        if relative.is_absolute() or ".." in relative.parts or "\\" in row["path"]:
+            raise RequestError("request input escapes the selected consumer")
+        path = root / relative
+        if not path.resolve().is_relative_to(root):
+            raise RequestError("request input escapes the selected consumer")
         expected = row.get("sha256")
         if expected is None:
             if path.exists():
@@ -79,8 +88,9 @@ def main() -> int:
     request = load_request(args.request_file)
     root = args.repo_root.resolve()
     verify_inputs(root, request["inputs"])
-    context = project_config.resolve_context(repo_root=root)
-    generated, _ = renderer.generate_roles(context)
+    scope = request.get("scope", "project")
+    context = project_config.resolve_context(repo_root=root, mode="project") if scope == "project" else None
+    generated, _ = renderer.generate_roles(context, scope=scope)
     stage = args.output_root
     if not stage.is_dir() or stage.is_symlink():
         raise RequestError(f"output root is not a directory: {stage}")

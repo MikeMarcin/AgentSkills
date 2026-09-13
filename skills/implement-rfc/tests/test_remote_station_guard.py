@@ -17,6 +17,7 @@ PACK = Path(__file__).resolve().parent.parent
 GUARD = PACK / "scripts" / "remote_station_guard.py"
 LEASE = PACK / "scripts" / "station_lease.py"
 PROJECT_CONFIG_MODULE = PACK / "scripts" / "project_config.py"
+PERSONAL_STATE_MODULE = PACK / "scripts" / "personal_state.py"
 from project_fixtures import CONFIG
 
 FIXTURE_PROJECT = {
@@ -61,6 +62,7 @@ class RemoteStationGuardTests(unittest.TestCase):
         lease_target.parent.mkdir(parents=True)
         shutil.copy2(LEASE, lease_target)
         shutil.copy2(PROJECT_CONFIG_MODULE, lease_target.with_name("project_config.py"))
+        shutil.copy2(PERSONAL_STATE_MODULE, lease_target.with_name("personal_state.py"))
         config_dir = self.repo / ".mask/skill-config/implement-rfc"
         config_dir.mkdir(parents=True)
         (config_dir / "project.md").write_text("Fixture rules")

@@ -20,11 +20,12 @@ For explicit personal mode or a remembered external tracker, read
 Project mode continues with the existing consumer files.
 
 Resolve the consumer with `scripts/project_config.py --repo-root ROOT` using an
-absolute root. Resolve helper paths from the selected installed skill asset root.
-Keep the consumer root explicit on helper calls; a shared skill link never
-selects its consumer. Read its `.mask/skill-config/implement-rfc/project.json` and
-`project.md`, applicable instructions, and the user's selected scope. Preserve
-unrelated work and existing approval boundaries.
+absolute source checkout root. Resolve helper paths from the selected installed
+skill asset root. Keep the source root explicit on helper calls; a shared skill
+link never selects its consumer. Read the resolved workflow root's
+`.mask/skill-config/implement-rfc/project.json` and `project.md`, applicable
+instructions, and the user's selected scope. Preserve unrelated work and
+existing approval boundaries.
 
 **Before dispatch or resume**, read [Coordination handoff](references/coordination-handoff.md).
 Record whether this host exposes `SendMessage` or an equivalent native
@@ -36,10 +37,12 @@ For setup, unavailable roles or model/effort conflicts, read the installed
 `references/model-routing.md` and `references/runtime-compatibility.md`.
 
 Before the first native dispatch, check the required native role set with
-`scripts/workflow_preflight.py --repo-root ROOT --json`. It accepts only a MASK
+`scripts/workflow_preflight.py --repo-root ROOT --json` (with `--mode personal`
+for an explicit personal selection). It accepts only a MASK
 program that implements `workflow_readiness_v1` and reports complete declared
 readiness; `unsupported`, `incomplete` or `error` is a setup problem to report
-(`mask ensure --project ROOT` deploys or sets up the roles), never permission to
+(`mask ensure --user` for personal scope, or `mask ensure --project ROOT` for
+project scope, deploys or sets up the roles), never permission to
 spawn a default agent as an integrator.
 
 For **status only**, inspect the scoped live queue/closeout with existing helpers

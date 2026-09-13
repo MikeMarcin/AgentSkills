@@ -19,6 +19,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import project_config  # noqa: E402
+
 sys.dont_write_bytecode = True
 
 SCHEMA = "implement-rfc.workflow-preflight.v1"
@@ -52,8 +55,30 @@ def run(command: list[str], *args: str, cwd: Path | None = None) -> tuple[int, d
         return completed.returncode, None, (completed.stderr or completed.stdout).strip()[:2000]
 
 
-def preflight(root: Path, command: list[str]) -> dict:
+def preflight(root: Path, command: list[str], *, mode: str | None = None,
+              workflow_root: Path | None = None) -> dict:
     result = dict(schema=SCHEMA, state="error", root=str(root), program=command, detail=None, roles=[], host_load="not_verified")
+    try:
+        context = project_config.resolve_context(repo_root=root, mode=mode, workflow_root=workflow_root)
+    except project_config.ProjectConfigError as exc:
+        result.update(state="incomplete", detail=f"source/tracker binding: {exc}")
+        return result
+    result.update(mode=context.mode, source_root=str(context.source_root),
+                  workflow_root=str(context.workflow_root),
+                  runtime_root=str(context.runtime_root) if context.runtime_root else None)
+    if context.mode == "personal":
+        import personal_lanes
+        import personal_state
+        try:
+            binding = personal_state.read_binding(personal_state.home_for(context.source_root), context.source_root)
+            if binding is None:
+                result.update(state="incomplete", detail="source/tracker binding is missing; select personal mode explicitly")
+                return result
+            if personal_lanes._read(context.source_root) is not None:
+                personal_lanes.validate_pair(context)
+        except personal_state.PersonalStateError as exc:
+            result.update(state="incomplete", detail=f"source/tracker lane: {exc}")
+            return result
     code, caps, text = run(command, "capabilities")
     if caps is None or not caps.get("ok"):
         result["detail"] = f"MASK capabilities unavailable (exit {code}): {text}"
@@ -63,13 +88,19 @@ def preflight(root: Path, command: list[str]) -> dict:
         result.update(state="unsupported", detail="the selected MASK program does not implement workflow_readiness_v1 typed native roles; "
                       "its link-only success is not workflow readiness")
         return result
-    code, ensure, text = run(command, "ensure", "--project", str(root), "--check")
+    selected = ("--user",) if context.mode == "personal" else ("--project", str(root))
+    code, ensure, text = run(command, "ensure", *selected, "--check")
     if ensure is None:
         result["detail"] = f"MASK ensure --check returned no JSON result (exit {code}): {text}"
         return result
     data = ensure.get("data") or {}
-    scope = next((row for row in data.get("scope_readiness") or [] if Path(row.get("root", "")).resolve() == root), None)
-    report = next((skill for entry in data.get("workflow_readiness") or [] if Path(entry.get("root", "")).resolve() == root
+    entries = data.get("workflow_readiness") or []
+    selected_entry = next((entry for entry in entries if entry.get("scope") == "user"), None) if context.mode == "personal" else next(
+        (entry for entry in entries if Path(entry.get("root", "")).resolve() == root), None)
+    selected_root = Path(selected_entry["root"]).resolve() if selected_entry is not None else None
+    scope = next((row for row in data.get("scope_readiness") or []
+                  if selected_root is not None and Path(row.get("root", "")).resolve() == selected_root), None)
+    report = next((skill for entry in entries if entry is selected_entry
                    for skill in entry.get("skills") or [] if skill.get("skill") == SKILL), None)
     if report is not None:
         result["roles"] = [dict(agent=row["agent"], name=row["name"], state=row["state"], route=row.get("route") or {})
@@ -86,7 +117,7 @@ def preflight(root: Path, command: list[str]) -> dict:
                       "link-only success is not workflow readiness")
         return result
     if ensure.get("ok") and scope.get("workflow") == "complete" and report.get("complete") and data.get("readiness") in ("ready_pinned", "ready_legacy_unpinned"):
-        result.update(state="ready", detail="declared native roles and inputs match; host loading is not verified by this check")
+        result.update(state="ready", detail="declared native roles and inputs match the selected scope and source/tracker binding; host loading is not verified by this check")
         return result
     rows = (error.get("details") or {}).get("workflow") or []
     result.update(state="incomplete", detail=error.get("message") or f"workflow {scope.get('workflow')}; readiness {data.get('readiness')}",
@@ -97,6 +128,8 @@ def preflight(root: Path, command: list[str]) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, required=True, help="Absolute consumer root")
+    parser.add_argument("--mode", choices=("project", "personal"), help="Explicit storage selection; absent uses the remembered binding")
+    parser.add_argument("--workflow-root", type=Path, help="Explicit external tracker worktree for personal mode")
     parser.add_argument("--mask", help="MASK launcher on PATH or an absolute mask.py; default MASK_PROGRAM or 'mask'")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -105,7 +138,7 @@ def main() -> int:
     if command is None:
         result = dict(schema=SCHEMA, state="error", root=str(root), program=None, detail="no MASK program found; pass --mask or set MASK_PROGRAM", roles=[])
     else:
-        result = preflight(root, command)
+        result = preflight(root, command, mode=args.mode, workflow_root=args.workflow_root)
     if args.json:
         print(json.dumps(result, sort_keys=True))
     else:

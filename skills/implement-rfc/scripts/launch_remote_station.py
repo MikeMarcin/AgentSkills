@@ -204,6 +204,8 @@ def station_lease_path(context: StationContext) -> pathlib.Path:
 
 def resolve_context(arguments: argparse.Namespace) -> StationContext:
     selected = project_config.resolve_context(repo_root=getattr(arguments, "repo_root", None))
+    if selected.mode == "personal":
+        raise LaunchRefusal("adapter does not support paired source/tracker handoffs; personal mode refused before launch")
     root = selected.repo_root
     config = selected.config
     workstreams = config["workstreams"]

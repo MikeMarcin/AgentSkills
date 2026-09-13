@@ -1,7 +1,8 @@
 # Portable `implement-rfc`
 
-This directory is shared RFC workflow source. Each consumer keeps its own
-project facts and rules outside the skill. A single local agent can use
+This directory is shared RFC workflow source. Project mode keeps facts and
+rules in the source repository; personal mode keeps them in its paired external
+tracker. A single local agent can use
 `SKILL.md`; native role adapters and remote station helpers are optional.
 
 ## Policy
@@ -30,14 +31,16 @@ formats.
 ## MASK workflow readiness
 
 `mask-workflow.json` is the passive descriptor MASK (RFC-MASK-0019) reads
-beside `SKILL.md`. It declares the consumer inputs (`project.json`,
+beside `SKILL.md`. Its project contract declares the consumer inputs (`project.json`,
 `project.md`, the optional execution selection) and every current role from
 `config/roles.json` for Codex and Claude, all produced by the setup action
-`prepare-roles`. Rendered roles carry consumer addenda and explicit routing
-profiles, so they are generated per consumer rather than shipped as universal
-static files. MASK runs `scripts/prepare_mask_roles.py` only under explicit
+`prepare-roles`. The user contract declares the same roles without project
+inputs. Both scopes render from the same canonical roles and routes; project
+roles carry consumer addenda, while personal roles receive project facts through
+the assignment. MASK runs `scripts/prepare_mask_roles.py` only under explicit
 `package.setup` consent (`mask ensure --project ROOT`, answering yes in a
-terminal, or `--expect-plan-hash` with `--allow-setup SOURCE/implement-rfc:prepare-roles`);
+terminal, or the corresponding `--user` command, or `--expect-plan-hash` with
+`--allow-setup SOURCE/implement-rfc:prepare-roles`);
 the script writes the requested `STAGE/AGENT/NAME.ext` files through the same
 `generate_roles` path as the standalone renderer and nothing else. MASK
 validates the stage, writes the portable
@@ -50,7 +53,8 @@ matching roles deliberately.
 
 `scripts/workflow_preflight.py --repo-root ROOT --json` is the startup check:
 it requires the program's `workflow_readiness_v1` capability and a complete
-`ensure --check` result. An older MASK's link-only success is reported as
+`ensure --check` result. Personal mode checks the selected source/tracker
+binding and user-scope roles. An older MASK's link-only success is reported as
 `unsupported`. Filesystem readiness is not host loading. The standalone
 renderer (`render_runtime_adapters.py --repo-root ROOT`) remains available for
 authoring and consumers that do not use MASK; its outputs are a distinct owner
@@ -74,7 +78,8 @@ for this adoption; future MASK-only layout moves require no renderer edit.
 
 ## What is project-specific
 
-Exactly two files under each consumer repository:
+Exactly two files under each project-mode consumer repository or personal-mode
+tracker:
 
 - `.mask/skill-config/implement-rfc/project.json` — machine-read facts: project tokens, tracker paths,
   lane names and their status words, single/per-area counters, sequencing, the structure-gate commands, the attended-review skill (or
@@ -85,8 +90,9 @@ Exactly two files under each consumer repository:
   first, the side-effect boundary, what counts as a direct surface, the
   closeout-card contract, attended integration and platform eligibility.
 
-The routine worker inherits the `rfc-worker` project addenda, followed by any
-`rfc-worker-routine` addenda. Its cheaper route does not relax project boundaries.
+The routine project worker inherits the `rfc-worker` project addenda, followed
+by any `rfc-worker-routine` addenda. Personal assignments supply those addenda
+for the selected source project. Its cheaper route does not relax project boundaries.
 
 Everything else is the portable set. `generated/portable-manifest.json`
 records its files and digests, and
@@ -152,8 +158,15 @@ and Git worktrees are supported. Explicit roots must name the worktree root;
 invalid roots never fall through. Origin repository-name mismatches refuse.
 Fixtures may use explicit identities without an origin remote.
 
-`resolve_context()` returns `asset_root`, `repo_root`, `project_config_path`,
-`project_rules_path`, and validated `config`. Read the selected project rules
+For personal mode, follow [Personal storage](references/personal-storage.md)
+to bind the source Git common repository to an external tracker and select
+the skill at user scope. `--repo-root` still names the source checkout;
+`--mode personal` makes the selection explicit and observational commands
+never initialize a missing binding.
+
+`resolve_context()` returns `asset_root`, `source_root`, `workflow_root`,
+`runtime_root`, `mode`, `project_config_path`, `project_rules_path`, and
+validated `config`. Read the selected workflow rules
 before editing. Keep this object or pass its root explicitly after changing
 CWD. No helper selects a consumer when imported. Hidden config overrides are
 validated inputs inside the selected consumer; they cannot redirect output.

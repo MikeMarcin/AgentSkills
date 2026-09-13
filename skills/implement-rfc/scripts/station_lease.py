@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import json
+import hashlib
 import os
 import socket
 import subprocess
@@ -81,6 +82,13 @@ def _git_dir(role: str, repo: Path) -> Path:
 
 
 def _lock_path(role: str, repo: Path, config: dict) -> Path:
+    context = project_config.resolve_context(repo_root=repo)
+    if context.mode == "personal":
+        scope = "common" if role == "project-integrator" else hashlib.sha256(str(repo.resolve()).encode()).hexdigest()
+        from slice_model import inside
+        path = inside(context.runtime_root, f"leases/{scope}-{role}.lock")
+        inside(context.runtime_root, str(path.with_suffix(".holder.json").relative_to(context.runtime_root)))
+        return path
     return _git_dir(role, repo) / f"{config['project']}-{role}.lock"
 
 
@@ -117,6 +125,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 2
     path = _lock_path(args.role, args.repo, args.context.config)
     holder_path = _holder_path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
     fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
     if not _try_lock(fd):
         sys.stderr.write(
@@ -183,7 +192,7 @@ def main(argv: list[str] | None = None) -> int:
         args.context = project_config.resolve_context(repo_root=args.repo)
     except project_config.ProjectConfigError as error:
         parser.error(str(error))
-    args.repo = args.context.repo_root
+    args.repo = args.context.source_root
     if args.mode == "run":
         if args.command and args.command[0] == "--":
             args.command = args.command[1:]

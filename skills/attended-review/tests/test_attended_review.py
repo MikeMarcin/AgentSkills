@@ -61,6 +61,44 @@ class ReviewTests(unittest.TestCase):
         path.write_text(json.dumps({"schema_version": 1, "candidates": list(candidates)}))
         return self.cli("init", "--manifest", str(path), root=root)
 
+    def test_external_state_keeps_preparation_and_protection_on_source(self):
+        state = self.base / "external"
+        manifest = self.base / "external-manifest.json"
+        candidate = self.candidate(paths=["product.txt"], prepare={"argv": [sys.executable, "-c", "from pathlib import Path; assert Path('product.txt').read_text() == 'source'"]})
+        (self.root / "product.txt").write_text("source")
+        manifest.write_text(json.dumps({"schema_version": 1, "candidates": [candidate]}))
+        self.cli("--state", str(state), "init", "--manifest", str(manifest))
+        self.cli("--state", str(state), "prepare")
+        conflicts = self.cli("--state", str(state), "conflicts", "--paths", "product.txt")
+        self.assertIn("protected paths", json.dumps(conflicts))
+        self.assertTrue((state / "session.json").exists())
+        self.assertEqual(sorted(p.name for p in self.root.iterdir()), ["product.txt"])
+        other = self.base / "other"; other.mkdir()
+        result = self.cli("--state", str(state), "init", "--manifest", str(manifest), root=other, success=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("another source checkout", result.stderr)
+        result = self.cli("--state", str(self.root / "state"), "status", success=False)
+        self.assertNotEqual(result.returncode, 0)
+
+    def test_external_state_rejects_other_source_worktree_and_git_metadata(self):
+        main = self.base / "git-main"
+        lane = self.base / "git-lane"
+        main.mkdir()
+        for args in (("init", "-b", "main"), ("config", "user.name", "fixture"),
+                     ("config", "user.email", "fixture@example.invalid")):
+            subprocess.run(["git", "-C", str(main), *args], check=True, capture_output=True)
+        (main / "README.md").write_text("source\n")
+        subprocess.run(["git", "-C", str(main), "add", "README.md"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", str(main), "commit", "-m", "source"], check=True, capture_output=True)
+        subprocess.run(["git", "-C", str(main), "worktree", "add", "-b", "lane", str(lane)], check=True, capture_output=True)
+        manifest = self.base / "worktree-manifest.json"
+        manifest.write_text(json.dumps({"schema_version": 1, "candidates": [self.candidate()]}))
+        for location in (main / ".git" / "private-review-state", main / "review-state"):
+            result = self.cli("--state", str(location), "--registry", str(self.base / "registry"),
+                              "init", "--manifest", str(manifest), root=lane, success=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse(location.exists())
+
     def decision(self, state, cid="A", **fields):
         candidate = next(c for c in state["candidates"] if c["id"] == cid)
         return {"schema_version": 1, "session": state["session"], "decisions": [{"candidate": cid, "fingerprint": candidate["fingerprint"], "decision_id": "verdict-"+cid, "outcome": "accept", **fields}]}

@@ -14,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 SKILL_DIR = Path(__file__).resolve().parents[1]
 SCRIPTS = SKILL_DIR / "scripts"
@@ -24,6 +25,8 @@ sys.path.insert(0, str(SCRIPTS))
 from project_fixtures import init_repo  # noqa: E402
 import project_config  # noqa: E402
 import render_runtime_adapters as renderer  # noqa: E402
+import personal_state  # noqa: E402
+import personal_lanes  # noqa: E402
 
 
 def sha(path: Path) -> str:
@@ -46,6 +49,10 @@ class DescriptorTests(unittest.TestCase):
         self.assertEqual(action["effects"], "staged-native-roles")
         self.assertTrue(1 <= action["timeout_seconds"] <= 120)
         self.assertEqual(action["parameters"], {})
+        personal = value["scopes"]["user"]
+        self.assertEqual(personal["inputs"], [])
+        self.assertEqual({(row["agent"], row["name"]) for row in personal["native_roles"]}, declared)
+        self.assertEqual(personal["setup"][0]["inputs"], [])
 
 
 class StagingEntrypointTests(unittest.TestCase):
@@ -115,6 +122,34 @@ class StagingEntrypointTests(unittest.TestCase):
             self.assertEqual(result.returncode, 2, result.stderr)
             self.assertEqual(self.staged(), [])
 
+    def test_personal_roles_render_without_a_git_consumer_or_project_addenda(self) -> None:
+        roles = [dict(agent="codex", name="rfc-integrator"), dict(agent="claude", name="rfc-worker")]
+        for source in (self.base / "home-a", self.base / "home-b"):
+            source.mkdir()
+            request = self.base / f"request-{source.name}.json"
+            request.write_text(json.dumps(dict(schema="mask.setup-request.v1", scope="user", action="prepare-roles",
+                                               native_roles=roles, inputs=[], parameters={})), encoding="utf-8")
+            result = subprocess.run([sys.executable, "-B", str(ENTRYPOINT), "--repo-root", str(source),
+                                     "--output-root", str(self.stage), "--request-file", str(request)],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse((source / ".git").exists())
+        generated, _ = renderer.generate_roles(None, scope="user")
+        for role in roles:
+            path = self.stage / role["agent"] / f"{role['name']}.{renderer.ROLE_SUFFIX[role['agent']]}"
+            self.assertEqual(path.read_text(), generated[(role["agent"], role["name"])])
+            self.assertNotIn("AgentSkills", path.read_text())
+            self.assertNotIn("{attended_review_skill}", path.read_text())
+
+    def test_explicit_project_setup_survives_remembered_personal_binding(self) -> None:
+        with patch.dict(os.environ, {"IMPLEMENT_RFC_HOME": str(self.base / "personal-state")}):
+            personal_state.initialize(self.consumer)
+            role = dict(agent="codex", name="rfc-integrator")
+            result = self.run_entrypoint(self.request([role]))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        expected, _ = renderer.generate_roles(project_config.resolve_context(repo_root=self.consumer, mode="project"))
+        self.assertEqual((self.stage / "codex/rfc-integrator.toml").read_text(), expected[("codex", "rfc-integrator")])
+
 
 STUB = '''#!/usr/bin/env python3
 import json, sys
@@ -125,15 +160,17 @@ if args[0] == "capabilities":
     data = {{"workflow": workflow}} if mode != "old" else {{}}
     print(json.dumps({{"ok": True, "schema_version": 1, "data": data, "error": None}}))
     raise SystemExit(0)
-root = args[args.index("--project") + 1]
+user = "--user" in args
+root = "personal-user" if user else args[args.index("--project") + 1]
+scope = "user" if user else "project"
 if mode == "old":
     print(json.dumps({{"ok": True, "schema_version": 1, "data": {{"readiness": "ready_pinned"}}, "error": None}}))
     raise SystemExit(0)
 roles = [dict(agent="codex", name="rfc-integrator", state="ok" if mode == "ready" else "missing", route={{"model": "m"}}, host_load="not_verified")]
 report = dict(skill="implement-rfc", workflow="declared", complete=mode == "ready", roles=roles)
 data = dict(readiness="ready_pinned" if mode == "ready" else "workflow_incomplete",
-            scope_readiness=[dict(root=root, readiness="ready_pinned", workflow="complete" if mode == "ready" else "incomplete")],
-            workflow_readiness=[dict(root=root, complete=mode == "ready", skills=[report])])
+            scope_readiness=[dict(root=root, scope=scope, readiness="ready_pinned", workflow="complete" if mode == "ready" else "incomplete")],
+            workflow_readiness=[dict(root=root, scope=scope, complete=mode == "ready", skills=[report])])
 error = None if mode == "ready" else dict(code="workflow.incomplete", message="incomplete", details=dict(workflow=["implement-rfc codex/rfc-integrator: missing"]))
 print(json.dumps({{"ok": mode == "ready", "schema_version": 1, "data": data, "error": error}}))
 raise SystemExit(0 if mode == "ready" else 4)
@@ -145,12 +182,15 @@ class PreflightTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix="mask-preflight-")
         self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name).resolve()
+        init_repo(self.base, token="alpha")
 
-    def preflight(self, mode: str) -> tuple[int, dict]:
+    def preflight(self, mode: str, *, root: Path | None = None,
+                  extra: tuple[str, ...] = (), env: dict | None = None) -> tuple[int, dict]:
         stub = self.base / f"{mode}-mask.py"
         stub.write_text(STUB.format(mode=mode), encoding="utf-8")
-        result = subprocess.run([sys.executable, "-B", str(PREFLIGHT), "--repo-root", str(self.base), "--mask", str(stub), "--json"],
-                                capture_output=True, text=True)
+        result = subprocess.run([sys.executable, "-B", str(PREFLIGHT), "--repo-root", str(root or self.base),
+                                 "--mask", str(stub), "--json", *extra],
+                                capture_output=True, text=True, env=env)
         return result.returncode, json.loads(result.stdout)
 
     def test_old_program_link_only_success_is_unsupported(self) -> None:
@@ -172,6 +212,52 @@ class PreflightTests(unittest.TestCase):
         result = subprocess.run([sys.executable, "-B", str(PREFLIGHT), "--repo-root", str(self.base), "--mask", "no-such-mask-program", "--json"],
                                 capture_output=True, text=True)
         self.assertEqual((result.returncode, json.loads(result.stdout)["state"]), (2, "error"))
+
+    def test_personal_preflight_requires_binding_then_checks_user_roles(self) -> None:
+        source = self.base / "source"
+        init_repo(source, token="alpha")
+        private_home = self.base / "private-home"
+        env = dict(os.environ, IMPLEMENT_RFC_HOME=str(private_home))
+        code, result = self.preflight("ready", root=source, extra=("--mode", "personal"), env=env)
+        self.assertEqual((code, result["state"]), (1, "incomplete"))
+        self.assertIn("binding", result["detail"])
+        self.assertFalse(private_home.exists())
+        prior = os.environ.get("IMPLEMENT_RFC_HOME")
+        os.environ["IMPLEMENT_RFC_HOME"] = str(private_home)
+        try:
+            personal_state.initialize(source)
+        finally:
+            if prior is None:
+                os.environ.pop("IMPLEMENT_RFC_HOME", None)
+            else:
+                os.environ["IMPLEMENT_RFC_HOME"] = prior
+        code, result = self.preflight("ready", root=source, env=env)
+        self.assertEqual((code, result["state"], result["mode"], result["host_load"]),
+                         (0, "ready", "personal", "not_verified"))
+        self.assertNotEqual(result["workflow_root"], result["source_root"])
+        tracker = Path(result["workflow_root"])
+        binding = personal_state.binding_path(private_home, source)
+        hidden = binding.with_suffix(".hidden")
+        binding.rename(hidden)
+        try:
+            code, result = self.preflight("ready", root=source, extra=("--mode", "personal", "--workflow-root", str(tracker)), env=env)
+            self.assertEqual((code, result["state"]), (1, "incomplete"))
+            self.assertIn("binding is missing", result["detail"])
+        finally:
+            hidden.rename(binding)
+        prior = os.environ.get("IMPLEMENT_RFC_HOME")
+        os.environ["IMPLEMENT_RFC_HOME"] = str(private_home)
+        try:
+            personal_lanes.bind_pair(source)
+        finally:
+            if prior is None:
+                os.environ.pop("IMPLEMENT_RFC_HOME", None)
+            else:
+                os.environ["IMPLEMENT_RFC_HOME"] = prior
+        subprocess.run(["git", "-C", str(source), "switch", "-c", "other"], check=True, capture_output=True)
+        code, result = self.preflight("ready", root=source, extra=("--mode", "personal"), env=env)
+        self.assertEqual((code, result["state"]), (1, "incomplete"))
+        self.assertIn("explicit rebind", result["detail"])
 
 
 if __name__ == "__main__":

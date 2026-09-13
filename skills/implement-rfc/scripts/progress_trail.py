@@ -62,7 +62,8 @@ class Trail:
             context = project_config.resolve_context(repo_root=repo_root)
         except project_config.ProjectConfigError as exc:
             raise TrailError(str(exc)) from exc
-        self.root, self.config = context.repo_root, context.config
+        self.root, self.config = context.workflow_root, context.config
+        self.source_root = context.source_root
         self.issue_root = PurePosixPath(self.config["issue_root"])
         self.lane_keys = {lane: key for key, lane in self.config["lanes"].items()}
         try:
@@ -132,6 +133,9 @@ class Trail:
                 paths.add(path)
             elif entry[:2] != " D" and entry[:2] != "D ":
                 pending[card[1]] = card[0]
+        if self.source_root != self.root:
+            raw = git(self.source_root, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--no-renames")
+            paths = {entry[3:] for entry in raw.split("\0") if entry}
         return pending, paths
 
     def committed_lanes(self) -> dict[str, str]:

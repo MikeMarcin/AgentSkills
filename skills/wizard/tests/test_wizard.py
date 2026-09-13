@@ -34,6 +34,44 @@ class WizardTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0 if success else 1, result.stdout + result.stderr)
         return json.loads(result.stdout)
 
+    def test_external_state_from_source_checkout_leaves_source_empty(self):
+        source = self.root / "source"
+        source.mkdir()
+        external = self.root / "runtime" / "wizard"
+        for command, extra in (("init", ["--definition", str(self.definition_file)]), ("status", [])):
+            result = subprocess.run([sys.executable, "-B", str(SCRIPT), command, "--state", str(external),
+                                     "--source-root", str(source), *extra], cwd=source, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((external / "state.json").exists())
+        self.assertEqual(list(source.iterdir()), [])
+
+    def test_linked_external_state_refuses_source_write(self):
+        source = self.root / "source"
+        source.mkdir()
+        runtime = self.root / "runtime" / "wizard"
+        runtime.mkdir(parents=True)
+        linked = runtime / "linked-session"
+        linked.symlink_to(source, target_is_directory=True)
+        result = subprocess.run([sys.executable, "-B", str(SCRIPT), "init", "--state", str(linked),
+                                 "--source-root", str(source), "--definition", str(self.definition_file)],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("symlinks", result.stdout)
+        self.assertEqual(list(source.iterdir()), [])
+
+    def test_linked_external_lock_refuses_source_write(self):
+        source = self.root / "source"
+        source.mkdir()
+        external = self.root / "runtime" / "wizard" / "session"
+        external.mkdir(parents=True)
+        (external / "state.lock").symlink_to(source / "state.lock")
+        result = subprocess.run([sys.executable, "-B", str(SCRIPT), "init", "--state", str(external),
+                                 "--source-root", str(source), "--definition", str(self.definition_file)],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("wizard lock path cannot be a symlink", result.stdout)
+        self.assertEqual(list(source.iterdir()), [])
+
     def record(self, step, value, actor="human", **kwargs):
         return self.run_cli("record", "--step", step, "--actor", actor, "--value", json.dumps(value), **kwargs)
 

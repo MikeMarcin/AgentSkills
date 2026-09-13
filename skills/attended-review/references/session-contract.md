@@ -1,5 +1,10 @@
 # Session contract, version 1
 
+## External runtime state
+
+For personal workflows, pass `--repo-root SOURCE --state RUNTIME/attended-review` on every command. The explicit state directory must be outside the source checkout; symlink resolution applies before this check. Session reuse refuses a different source checkout. Candidate path protection and preparation command working directories remain anchored to SOURCE. Use the same external `--registry` across cooperating drivers.
+
+
 All commands print JSON. Errors print JSON to stderr and return 1. Supply `--repo-root ABSOLUTE_CHECKOUT` before the subcommand. The root is resolved, so both drivers pointing at the same checkout share its `.mask/attended-review/session.json`; separate Git worktrees resolve to distinct roots. The tool does not infer roots from installed skill links.
 
 ## Manifest

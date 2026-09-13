@@ -57,6 +57,16 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(data['tasks']['gate']['event'],'awaiting_integration')
         self.assertEqual(data['semantic_acceptance'],'not_decided_by_runner')
 
+    def test_personal_public_command_stores_logs_externally(self):
+        import os
+        from unittest.mock import patch
+        import personal_state
+        with tempfile.TemporaryDirectory() as home, patch.dict(os.environ, {"IMPLEMENT_RFC_HOME": home}):
+            personal_state.initialize(self.root)
+            self.test_public_cli_reaches_only_integration_gate()
+            self.assertTrue((runner.run_path(self.root, self.order['run_id']) / 'events.jsonl').exists())
+            self.assertFalse((self.root / '.mask/generated/implement-rfc/runs').exists())
+
     def test_pending_adapter_publication_refuses_new_run(self):
         pending = self.root / '.mask/generated/implement-rfc/runtime-adapters.pending.json'
         pending.parent.mkdir(parents=True)

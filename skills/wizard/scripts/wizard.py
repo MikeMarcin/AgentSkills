@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import subprocess
 import sys
 import tempfile
 import threading
@@ -57,7 +58,11 @@ def atomic_json(path, value):
 @contextlib.contextmanager
 def file_lock(path, blocking=True):
     """Kernel-owned locks release on exit/crash on both native Windows and Unix."""
-    with path.open("a+b") as stream:
+    require(not path.is_symlink(), "wizard lock path cannot be a symlink")
+    flags = os.O_RDWR | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0)
+    # O_NOFOLLOW closes the check/open race on hosts that provide it. The
+    # explicit check also gives a clear refusal on other hosts.
+    with os.fdopen(os.open(path, flags, 0o600), "a+b") as stream:
         stream.seek(0, 2)
         if stream.tell() == 0:
             stream.write(b"0")
@@ -165,8 +170,35 @@ def apply_answer(state, step_id, value, actor):
 
 
 class Store:
-    def __init__(self, directory):
-        self.directory = Path(directory).resolve()
+    def __init__(self, directory, source_root=None):
+        selected = Path(directory).expanduser()
+        require(".." not in selected.parts, "state path cannot traverse parents")
+        selected = selected if selected.is_absolute() else Path.cwd() / selected
+        cursor = selected
+        while cursor != cursor.parent:
+            # Root-level aliases such as macOS /var -> /private/var are part of
+            # the host path layout. Reject links below that boundary, including
+            # links hidden in an otherwise external state directory.
+            require(not cursor.is_symlink() or cursor.parent == Path(cursor.anchor),
+                    "state path cannot traverse symlinks")
+            cursor = cursor.parent
+        self.directory = selected.resolve()
+        if source_root is not None:
+            source = Path(source_root).expanduser().resolve()
+            require(source.is_dir(), "source root must be an existing directory")
+            protected = [source]
+            common = subprocess.run(["git", "-C", str(source), "rev-parse", "--git-common-dir"],
+                                    capture_output=True, text=True)
+            if common.returncode == 0:
+                common_path = Path(common.stdout.strip())
+                protected.append((common_path if common_path.is_absolute() else source / common_path).resolve())
+                worktrees = subprocess.run(["git", "-C", str(source), "worktree", "list", "--porcelain"],
+                                           capture_output=True, text=True)
+                require(worktrees.returncode == 0, "cannot inspect source worktrees for external state")
+                protected.extend(Path(line.removeprefix("worktree ")).resolve() for line in worktrees.stdout.splitlines()
+                                 if line.startswith("worktree "))
+            require(all(self.directory != root and self.directory not in root.parents and root not in self.directory.parents
+                        for root in protected), "state must be separate from the source repository")
         self.path = self.directory / "state.json"
 
     def load(self, locked=False):
@@ -388,7 +420,8 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("init", "status", "record", "pause", "resume", "html", "import", "serve", "stop", "cli"):
         sub = commands.add_parser(name)
-        sub.add_argument("--state", required=True, help="Consumer-local durable state directory")
+        sub.add_argument("--state", required=True, help="Explicit durable state directory (use external runtime storage in personal mode)")
+        sub.add_argument("--source-root", help="Source checkout to protect from state writes in personal mode")
         if name == "init":
             sub.add_argument("--definition", required=True)
         elif name == "status":
@@ -406,8 +439,8 @@ def main(argv=None):
         elif name == "serve":
             sub.add_argument("--open", action="store_true")
     args = parser.parse_args(argv)
-    store = Store(args.state)
     try:
+        store = Store(args.state, args.source_root)
         if args.command == "init":
             result = store.init(read_json(args.definition))
         elif args.command == "status":

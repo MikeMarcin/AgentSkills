@@ -1,5 +1,14 @@
 # Portable wizard interface
 
+## External runtime state
+
+In personal workflows, supply `--state RUNTIME/wizard/SESSION --source-root SOURCE`
+on every command, including resume and import. The state path must be external to
+all worktrees of the selected source Git repository and its Git metadata; linked
+state paths refuse. Wizard does not execute source commands; the driving agent
+performs authorized checks in the source checkout and records observations.
+
+
 Requires Python 3.11+ and its standard library on Windows, macOS or Linux. Native
 Windows can use `py -3`; no Bash, WSL, PowerShell script or installed web package
 is required. Commands emit one JSON result; interactive CLI prompts go to

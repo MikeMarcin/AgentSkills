@@ -39,6 +39,12 @@ ATTENDED_FALLBACK_INSTRUCTION = (
     "fabricate it, or placeholder it: record the pending checkpoint and its exact ask in "
     "your report, and complete the slice's remaining unattended work."
 )
+ATTENDED_PERSONAL_INSTRUCTION = (
+    "When the slice's remaining evidence is an attended human verdict, build the "
+    "review artifact with the attended-review skill named in the bound assignment. "
+    "Attempt that skill invocation before reading its installed SKILL.md directly; "
+    "record the pending checkpoint and complete the remaining unattended work."
+)
 # Paths inside the skill directory that are project-specific or generated, and
 # therefore outside the portable set.
 NON_PORTABLE = {
@@ -285,7 +291,9 @@ def project_instructions(role: dict[str, Any], project: dict[str, Any]) -> list[
     rendered: list[str] = []
     for line in role["instructions"]:
         if ATTENDED_PLACEHOLDER in line:
-            if attended is None:
+            if project.get("_personal_scope"):
+                rendered.append(ATTENDED_PERSONAL_INSTRUCTION)
+            elif attended is None:
                 rendered.append(ATTENDED_FALLBACK_INSTRUCTION)
             else:
                 rendered.append(line.replace(ATTENDED_PLACEHOLDER, attended))
@@ -318,9 +326,17 @@ def rendered_role_instructions(
         *project_instructions(role, project),
         *addenda,
     ]
+    if project.get("_personal_scope"):
+        instructions.append(
+            "For an assignment in personal mode, use its source root, tracker root, "
+            "runtime root and project facts. Read the tracker project.json/project.md "
+            "and the shared personal-storage reference before acting. Project-specific "
+            "addenda come from the assignment, not this personal role file."
+        )
     if role.get("entrypoint"):
         discovery = ".claude" if provider == "claude" else ".agents"
-        instructions.append(f"Read the assigned integrator entrypoint {discovery}/skills/implement-rfc/{role['entrypoint']} before engineering; do not restart the outer coordinator loop.")
+        prefix = "~/" if project.get("_personal_scope") else ""
+        instructions.append(f"Read the assigned integrator entrypoint {prefix}{discovery}/skills/implement-rfc/{role['entrypoint']} before engineering; do not restart the outer coordinator loop.")
     children = role.get("delegation", {}).get("allowed_roles", [])
     if children:
         instructions.append("Delegate only to these leaf roles: " + ", ".join(children) +
@@ -799,10 +815,10 @@ def role_relative(provider: str, name: str) -> str:
 
 
 def generate_roles(
-    context: "project_config.ProjectContext", *, profile: str | None = None,
+    context: "project_config.ProjectContext | None", *, profile: str | None = None,
     routing_override: Path | None = None, capabilities_path: Path | None = None,
     integrator_route_path: Path | None = None, preserved_route_path: Path | None = None,
-    skill_dir: Path | None = None,
+    skill_dir: Path | None = None, scope: str = "project",
 ) -> tuple[dict[tuple[str, str], str], dict[str, Any]]:
     """Pure generation: every (provider, role) -> rendered content for the selected consumer.
 
@@ -813,12 +829,17 @@ def generate_roles(
     skill_dir = (skill_dir or script_path.parents[1]).resolve()
     roles_path = skill_dir / "config" / "roles.json"
     routing_path = skill_dir / "config" / "routing.json"
-    project_path = context.project_config_path
+    if scope not in ("project", "user") or (scope == "project" and context is None):
+        raise ValueError("project rendering needs a consumer; scope must be project or user")
+    project_path = context.project_config_path if context is not None and scope == "project" else None
     skill_path = skill_dir / "SKILL.md"
     roles_data = load_json(roles_path)
     routing_data = load_json(routing_path)
-    project = context.config
-    digest_paths = [script_path, skill_path, roles_path, routing_path, project_path]
+    project = (context.config if scope == "project" else
+               {"attended_review_skill": None, "role_addenda": {}, "_personal_scope": True})
+    digest_paths = [script_path, skill_path, roles_path, routing_path]
+    if project_path is not None:
+        digest_paths.append(project_path)
     original_routing = routing_data
     if routing_override:
         override_path = routing_override.resolve()
@@ -834,8 +855,9 @@ def generate_roles(
 
     profiles_path = skill_dir / "config/routing-profiles.json"
     digest_paths.append(profiles_path)
-    selection_path = context.repo_root / ".mask/generated/implement-rfc/execution-selection.json"
-    if profile is None and selection_path.exists():
+    selection_path = (context.repo_root / ".mask/generated/implement-rfc/execution-selection.json"
+                      if scope == "project" else None)
+    if selection_path is not None and profile is None and selection_path.exists():
         safe_destination(context.repo_root, selection_path)
         selection = load_json(selection_path)
         if selection.get("schema") != "implement-rfc.execution-selection.v1":

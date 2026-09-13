@@ -20,14 +20,16 @@ OUTPUT_LIMIT = 4 * 1024 * 1024
 
 def runs_root(root):
     from project_config import resolve_context
-    root = resolve_context(repo_root=root).repo_root
-    return inside(root, '.mask/generated/implement-rfc/runs')
+    context = resolve_context(repo_root=root)
+    if context.mode == 'personal':
+        return inside(context.runtime_root, 'runs')
+    return inside(context.source_root, '.mask/generated/implement-rfc/runs')
 
 
 def run_path(root, run):
     if not TOKEN.fullmatch(run):
         raise ValueError('Invalid run ID')
-    return runs_root(root) / run
+    return inside(runs_root(root), run)
 
 
 def event(path, task, state, **fields):
@@ -191,6 +193,10 @@ def agent(path, task, root, order):
 
 def start(order, approval):
     root = validate(order)
+    from project_config import resolve_context
+    context = resolve_context(repo_root=root)
+    if context.mode == "personal" and any(task["kind"] == "agent" for task in order["tasks"]):
+        raise ValueError("native slice adapters do not support paired source/tracker handoffs")
     if any(task.get('route', {}).get('role') in ('rfc-worker-routine', 'rfc-critical-reviewer')
            for task in order['tasks']):
         raise ValueError('Retired role selector: explicitly reissue new work using current roles; retained admitted orders remain unchanged')

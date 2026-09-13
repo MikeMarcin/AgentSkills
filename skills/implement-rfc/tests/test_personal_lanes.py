@@ -80,7 +80,13 @@ class PersonalLaneTests(unittest.TestCase):
             lanes.synchronize_pair(self.context, **kwargs)
         with self.assertRaisesRegex(state.PersonalStateError, 'branches'):
             lanes.synchronize_pair(self.context, **{**kwargs, 'source_branch': 'wrong'}, authorized=True)
-        self.assertEqual(lanes.synchronize_pair(self.context, **kwargs, authorized=True)['completed'], ['source', 'tracker'])
+        handoff = lanes.synchronize_pair(self.context, **kwargs, authorized=True)
+        self.assertEqual(handoff['completed'], ['source', 'tracker'])
+        self.assertEqual(handoff['local'], {'source_root': str(self.source_root),
+                                           'workflow_root': str(self.tracker)})
+        self.assertEqual(handoff['portable']['source']['revision'], git(self.source_root, 'rev-parse', 'HEAD'))
+        self.assertEqual(handoff['portable']['tracker']['revision'], git(self.tracker, 'rev-parse', 'HEAD'))
+        self.assertEqual(handoff['remote_names'], {'source': 'sync', 'tracker': 'sync'})
         other = self.base / 'other'
         subprocess.run(['git', 'clone', '-q', str(self.base / 'tracker.git'), str(other)], check=True)
         git(other, 'config', 'user.name', 'fixture')

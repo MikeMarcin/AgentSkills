@@ -2,7 +2,8 @@
 
 Before mutating an active personal lane, validate its pair through
 `scripts/personal_lanes.py status --repo-root SOURCE`. Personal tracker `init`
-binds the initial checkout. For another source worktree, run `bind --repo-root
+establishes the common-repository binding; `personal_lanes.py bind --repo-root
+SOURCE` pairs the initial checkout. For another source worktree, run `bind --repo-root
 SOURCE --tracker-branch TRACKER_BRANCH` to create a tracker worktree from committed
 tracker main. Use `--tracker-root TRACKER_WORKTREE` to bind an existing worktree.
 Independent clones first require explicit `personal_tracker.py init --workflow-root
@@ -34,6 +35,11 @@ a rejection retains history and a local receipt naming completed sides. Inspect
 that receipt and reconcile the rejected repository before retrying. Without remote
 arguments, `sync` reports local-only and performs no remote operation. It never
 creates remotes or starts background synchronization.
+The local synchronization receipt carries both checkout roots, repository IDs,
+branches and exact revisions plus selected remote names. It records each
+completed side before the next push. This is a paired Git handoff record, not a
+remote agent execution permit; the legacy station adapters have their own
+compatibility guard in [Remote routing](remote-routing.md#personal-mode-compatibility).
 
 After a rebase, cherry-pick or amended commit replaces recorded source or tracker history,
 `reconcile` and `rebind` scan current committed tracker files for references to
