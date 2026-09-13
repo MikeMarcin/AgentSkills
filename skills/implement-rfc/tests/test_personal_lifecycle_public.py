@@ -17,6 +17,64 @@ SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 
 
 class PersonalLifecyclePublicTests(unittest.TestCase):
+    def test_paired_lane_board_refuses_switched_source_before_mutation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory).resolve()
+            source = base / "source"
+            source.mkdir()
+            git(source, "init", "-b", "main")
+            git(source, "config", "user.name", "fixture")
+            git(source, "config", "user.email", "fixture@example.invalid")
+            (source / "product.txt").write_text("product\n")
+            git(source, "add", "product.txt")
+            git(source, "commit", "-m", "Initial product")
+            env = {**os.environ, "IMPLEMENT_RFC_HOME": str(base / "home")}
+
+            def run(script, root, *args, expected=0):
+                result = subprocess.run([sys.executable, "-B", str(SCRIPTS / script),
+                    "--repo-root", str(root), *args], env=env, capture_output=True, text=True)
+                self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+                return json.loads(result.stdout)
+
+            bound = run("personal_tracker.py", source, "--json", "init")
+            tracker = Path(bound["workflow_root"])
+            rfc = tracker / "docs/rfcs/RFC-PRS-0001-demo.md"
+            card = tracker / "docs/issues/10-backlog/PRS-0001-demo.md"
+            card.parent.mkdir(parents=True)
+            rfc.write_text('---\nid: "RFC-PRS-0001"\ntitle: "Demo"\nstatus: "Accepted"\n---\n')
+            card.write_text('---\nschema: "implement-rfc.card.v1"\nid: "PRS-0001"\n'
+                'title: "Demo"\nstatus: "Backlog"\nrfcs: ["RFC-PRS-0001"]\n'
+                'depends_on: []\n---\n\n## Acceptance\n\n- Demonstrate a paired lane.\n')
+            (tracker / "docs/issues/NEXT_ID").write_text("PRS-0002\n")
+            git(tracker, "add", "docs")
+            git(tracker, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+                "commit", "-m", "Private intake")
+            lane = base / "lane"
+            git(source, "worktree", "add", "-b", "feature", str(lane))
+            pair = run("personal_lanes.py", lane, "bind", "--tracker-branch", "records-feature")
+            tracker_lane = Path(pair["local"]["workflow_root"])
+            self.assertEqual(run("issue_board.py", lane, "queue", "--rfc", "RFC-PRS-0001",
+                "--json")["cards"][0]["disposition"], "backlog_candidate")
+
+            git(lane, "branch", "-m", "renamed")
+            refused = run("issue_board.py", lane, "move", "PRS-0001", "--to", "20-ready",
+                "--json", expected=1)
+            self.assertIn("branch changed", refused["errors"][0]["reason"])
+            self.assertTrue((tracker_lane / "docs/issues/10-backlog/PRS-0001-demo.md").exists())
+            source_revision = git(lane, "rev-parse", "HEAD")
+            tracker_revision = git(tracker_lane, "rev-parse", "HEAD")
+            run("personal_lanes.py", lane, "rebind", "--source-branch", "renamed",
+                "--tracker-branch", "records-feature", "--source-revision", source_revision,
+                "--tracker-revision", tracker_revision)
+            run("issue_board.py", lane, "move", "PRS-0001", "--to", "20-ready", "--json")
+            git(tracker_lane, "add", "docs/issues")
+            git(tracker_lane, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+                "commit", "-m", "Promote private work")
+            claimed = run("issue_board.py", lane, "claim", "PRS-0001", "--json")
+            self.assertEqual(claimed["lane"], "30-in-progress")
+            self.assertTrue((tracker / "docs/issues/10-backlog/PRS-0001-demo.md").exists())
+            self.assertEqual(git(lane, "status", "--porcelain=v1", "--untracked-files=all"), "")
+
     def test_plan_claim_evidence_and_resume_keep_source_clean(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory).resolve()
