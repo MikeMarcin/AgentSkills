@@ -132,6 +132,12 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
             self.assertEqual(finished["lane"], "60-done")
             self.assertEqual(cli("issue_board.py", "queue", "--rfc", "RFC-PRS-0001",
                 "--history", "--json")["done_count"], 1)
+            tracked = git(tracker, "ls-files").splitlines()
+            self.assertFalse(any(path.endswith((".lock", ".log")) or "runtime/" in path
+                for path in tracked))
+            for relative in tracked:
+                content = (tracker / relative).read_text()
+                self.assertNotIn(str(base), content)
             self.assertEqual(git(source, "status", "--porcelain=v1", "--untracked-files=all"), "")
 
 
