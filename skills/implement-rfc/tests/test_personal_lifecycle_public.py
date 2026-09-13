@@ -112,14 +112,20 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
 
             acceptance = runtime / "acceptance.json"
             acceptance.write_text(json.dumps({"approved": True, "decision": "human-pending",
-                "records": [{"criterion": "product-work", "outcome": "pending",
+                "records": [{"criterion": "source-footprint", "outcome": "pass",
+                    "revision": source_revision, "evidence": {"kind": "observation",
+                        "detail": "Source remained clean after claim"}},
+                    {"criterion": "product-work", "outcome": "pending",
                     "revision": source_revision, "evidence": {"kind": "observation",
                         "detail": "Attended judgment remains open"}}]}))
             parked = cli("issue_board.py", "finish", "PRS-0001", "--acceptance", str(acceptance), "--json")
             self.assertEqual(parked["lane"], "40-parked")
             self.assertEqual(cli("issue_board.py", "queue", "--human-waiting", "--json")["cards"][0]["id"], "PRS-0001")
             acceptance.write_text(json.dumps({"approved": True, "decision": "done",
-                "records": [{"criterion": "product-work", "outcome": "pass",
+                "records": [{"criterion": "source-footprint", "outcome": "pass",
+                    "revision": source_revision, "evidence": {"kind": "observation",
+                        "detail": "Source remained clean after claim"}},
+                    {"criterion": "product-work", "outcome": "pass",
                     "revision": source_revision, "evidence": {"kind": "observation",
                         "detail": "Accepted fixture result"}}]}))
             finished = cli("issue_board.py", "finish", "PRS-0001", "--acceptance", str(acceptance), "--json")
