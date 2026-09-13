@@ -435,6 +435,25 @@ class PersonalCommitTests(unittest.TestCase):
         (self.source / 'product.txt').write_bytes('Ordinary product improvement\n'.encode('utf-16'))
         self.assertEqual(self.finish(operation)['status'], 'complete')
 
+    def test_opaque_binary_product_refuses_without_committing_either_side(self):
+        operation = self.start()
+        (self.source / 'product.txt').write_bytes(b'\x89PNG\r\n\x1a\n')
+        refusal = self.finish(operation, expected=2)
+        self.assertIn('unsupported text encoding', refusal['error'])
+        self.assertEqual(git(self.source, 'rev-parse', 'HEAD'), self.source_base)
+        self.assertEqual(git(self.tracker, 'rev-parse', 'HEAD'), self.tracker_base)
+
+    def test_opaque_binary_normal_commit_cannot_be_adopted(self):
+        operation = self.start()
+        (self.source / 'product.txt').write_bytes(b'\x89PNG\r\n\x1a\n')
+        git(self.source, 'add', '--', 'product.txt')
+        git(self.source, 'commit', '-m', 'Improve product normally')
+        revision = git(self.source, 'rev-parse', 'HEAD')
+        refusal = self.adopt(operation, revision, expected=2)
+        self.assertIn('unsupported text encoding', refusal['error'])
+        self.assertEqual(git(self.source, 'rev-parse', 'HEAD'), revision)
+        self.assertEqual(git(self.tracker, 'rev-parse', 'HEAD'), self.tracker_base)
+
 
 if __name__ == '__main__':
     unittest.main()
