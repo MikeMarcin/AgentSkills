@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0080"
 title: "Route attended, wizard and remote runtime state externally"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0076", "ASK-0077"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC10"]}
