@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0079"
 title: "Render personal native roles and integrate MASK readiness"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0076"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC09","RFC-ASK-0013-AC11"]}
+acceptance: [{"criterion":"Canonical personal roles retain provider routes and use assignment-provided project facts without changing project role addenda","outcome":"pass","revision":"9b47f12861c33f1f02b3aa4aaa7d848e37c2b094","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"}},{"criterion":"Selected personal preflight verifies role files and source/tracker binding while keeping native host loading unverified","outcome":"pass","revision":"9b47f12861c33f1f02b3aa4aaa7d848e37c2b094","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"}},{"criterion":"Fresh-agent instruction tabletop reaches one shared milestone path for first use, resume, small fix, status-only and paired worktrees in both modes","outcome":"pass","revision":"9b47f12861c33f1f02b3aa4aaa7d848e37c2b094","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"}}]
 ---
 
 # ASK-0079: Render personal native roles and integrate MASK readiness
