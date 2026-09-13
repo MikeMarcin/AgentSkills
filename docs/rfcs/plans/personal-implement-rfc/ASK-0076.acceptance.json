@@ -1,0 +1,24 @@
+{
+  "approved": true,
+  "decision": "done",
+  "records": [
+    {
+      "criterion": "Shared plan and board route documents to the external tracker while evidence targets the source",
+      "outcome": "pass",
+      "revision": "190892f77e8b51ee592c6ad62c5d3cf528354ff5",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0076.public.json"}
+    },
+    {
+      "criterion": "Public plan intake, claim, partial acceptance, stale return, human pending, resume and closeout work in both modes",
+      "outcome": "pass",
+      "revision": "190892f77e8b51ee592c6ad62c5d3cf528354ff5",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0076.public.json"}
+    },
+    {
+      "criterion": "Portable tracker records exclude local paths, process state, locks and logs",
+      "outcome": "pass",
+      "revision": "190892f77e8b51ee592c6ad62c5d3cf528354ff5",
+      "evidence": {"kind": "observation", "detail": "Public disposable path wrote plan/card only to tracker, kept assignment/return and board lock under runtime, and left source HEAD/status unchanged; see ASK-0076.public.json."}
+    }
+  ]
+}

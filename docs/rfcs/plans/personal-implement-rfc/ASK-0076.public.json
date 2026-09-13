@@ -1,0 +1,25 @@
+{
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-002",
+  "card": "ASK-0076",
+  "source_revision": "190892f77e8b51ee592c6ad62c5d3cf528354ff5",
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s skills/implement-rfc/tests -p 'test_personal_lifecycle_public.py' -q",
+      "result": "1 passed",
+      "observation": "Disposable unconfigured source and external tracker: public setup, plan adoption, tracker queue/claim, source-root evidence, local assignment/return, stale-result refusal, partial human-pending acceptance, and Done transition. Source HEAD and porcelain status stayed unchanged."
+    },
+    {
+      "command": "python3 -m unittest discover -s skills/implement-rfc/tests -p 'test_milestone_*.py' -q",
+      "result": "38 passed, 4 skipped",
+      "observation": "Project-mode plan, binding, partial progress, continuation and closeout regression paths."
+    },
+    {
+      "command": "python3 -m unittest discover -s skills/implement-rfc/tests -p 'test_issue_board.py' -q",
+      "result": "32 passed",
+      "observation": "Existing project-mode board moves, claims, acceptance and guards."
+    }
+  ],
+  "portable_boundary": "The personal plan and card remain in the tracker. Assignment/return files and board lock live under IMPLEMENT_RFC_HOME/runtime; source-root verification runs against the source checkout.",
+  "remaining_milestone_work": "ASK-0078 source-only product commit and dual-repository recovery remain pending."
+}
