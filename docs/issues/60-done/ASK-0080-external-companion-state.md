@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0080"
 title: "Route attended, wizard and remote runtime state externally"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0076", "ASK-0077"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC10"]}
+acceptance: [{"criterion":"Attended-review, wizard, command execution, progress and leases route personal runtime state externally while protecting source candidates","outcome":"pass","revision":"9b47f12861c33f1f02b3aa4aaa7d848e37c2b094","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"}},{"criterion":"Paired Git synchronization handoff carries both roots and repository/branch/revision identities through success and partial rejection","outcome":"pass","revision":"9b47f12861c33f1f02b3aa4aaa7d848e37c2b094","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"}},{"criterion":"Incompatible native remote station and lane adapters refuse personal mode before source-local metadata writes","outcome":"pass","revision":"9b47f12861c33f1f02b3aa4aaa7d848e37c2b094","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"}}]
 ---
 
 # ASK-0080: Route attended, wizard and remote runtime state externally
