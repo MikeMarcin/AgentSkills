@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0075"
 title: "Bind personal mode and external tracker"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0013"]
 depends_on: []
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC01","RFC-ASK-0013-AC02"]}
