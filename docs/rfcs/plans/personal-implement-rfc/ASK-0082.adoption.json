@@ -1,0 +1,48 @@
+{
+  "schema": "implement-rfc.personal-adoption.v1",
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-004",
+  "producer_id": "/root/personal_qualification_integrator",
+  "mandate_revision": "1",
+  "selected_source": {
+    "repository": "/Users/jaeger/Documents/GitHub/AgentSkills",
+    "branch": "main",
+    "qualification_revision": "6c9c611d885926c3cff719a70a85fbb402b9073c",
+    "qualification_acceptance_revision": "a3dcc20cedcd41a63712e407ce0a4c99d6f78612"
+  },
+  "mask_program": {
+    "repository": "/Users/jaeger/Documents/GitHub/ManageAgentSkills",
+    "branch": "main",
+    "current_revision": "95ac0e88501016c8da137935ac74798f4781e41e",
+    "accepted_personal_readiness_source_revision": "78cc57cdac4ea493a3e0ba38ca0e51218af7991a"
+  },
+  "initial_selected_install": {
+    "scope": "user",
+    "skill": "implement-rfc",
+    "reviewed_setup_hash": "sha256:b14fb720d35c3f0a78b2a3fee69b09ee0ec5fd3a53bf4fdf550c558d3481f061",
+    "receipt": "/tmp/implement-rfc-personal-2026-09-13/pm-004.ensure-apply.json",
+    "result": "The selected personal skill links and 16 generated user-scope role files were installed with an exact one-time setup allowance. No project-scope MASK readiness approval was granted."
+  },
+  "final_safe_boundary": {
+    "condition": "Both fresh native host courses, nested leaves and CLI sessions had stopped; AgentSkills had committed ASK-0081 qualification and acceptance; ManageAgentSkills remained clean.",
+    "preview": "/tmp/implement-rfc-personal-2026-09-13/pm-004.ensure-final-preview.json",
+    "plan_hash": "sha256:c0f80171cf9f1c6125ec4996a7c4f773efc4fa5f32ee12df4f06795e60482017",
+    "planned_actions": ["state.record"],
+    "blockers": [],
+    "apply": "/tmp/implement-rfc-personal-2026-09-13/pm-004.ensure-final-apply.json",
+    "applied_actions": ["state.record"],
+    "convergence_preview": "/tmp/implement-rfc-personal-2026-09-13/pm-004.ensure-final-converged.json",
+    "convergence_result": "ok=true; would_change=false; no actions",
+    "personal_preflights": {
+      "codex_fixture": "/tmp/implement-rfc-personal-2026-09-13/pm-004.codex-final-preflight.json",
+      "claude_fixture": "/tmp/implement-rfc-personal-2026-09-13/pm-004.claude-final-preflight.json",
+      "result": "Both state=ready with 16 role rows; both host_load=not_verified by file preflight. Direct interactive host loading is separately evidenced by ASK-0081.native.json."
+    }
+  },
+  "integrity_and_scope": {
+    "before_native_snapshot": "/tmp/implement-rfc-personal-2026-09-13/native/live-snapshot.json",
+    "after_adoption_selected_file_comparison": "All 24 selected user role, lock, selection and live project declaration files remained byte-identical.",
+    "source_working_state": "Only pre-existing unrelated untracked skills/sprite-sheet-animation-updater.zip remained in AgentSkills after ASK-0081; ManageAgentSkills was clean.",
+    "out_of_scope_actions": "No push, publication, credential change, persistent permission change, live MASK project readiness approval, unrelated consumer migration or role rewrite during an active native course."
+  }
+}
