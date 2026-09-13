@@ -1,0 +1,60 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "personal-implement-rfc",
+  "scope": {
+    "rfcs": ["RFC-ASK-0013"],
+    "issues": ["ASK-0075", "ASK-0076", "ASK-0077", "ASK-0078", "ASK-0079", "ASK-0080", "ASK-0081", "ASK-0082"]
+  },
+  "coverage": "complete",
+  "unplanned_work": [],
+  "milestones": [
+    {
+      "id": "personal-binding",
+      "outcome": "An unconfigured source Git repository can explicitly bind a managed or supplied external tracker, then resolve that binding through an observational public command while leaving the source untouched.",
+      "work": [{"issue": "ASK-0075"}],
+      "depends_on": [],
+      "exit_criteria": [
+        "Public setup and status paths bind the same Git common repository across worktrees, preserve explicit mode precedence, and refuse absent or unsafe bindings.",
+        "Disposable source repositories show zero workflow-generated source and Git-directory changes after setup and observation; supplied and managed tracker cases pass.",
+        "Existing project-mode context and two linked consumer paths still resolve their original project facts."
+      ],
+      "boundary": "The first usable personal selection and read path proves the storage boundary before relocating the full board and commit lifecycle."
+    },
+    {
+      "id": "private-workflow-lifecycle",
+      "outcome": "The shared public RFC lifecycle runs through paired tracker records and source commits, with privacy and crash recovery enforced.",
+      "work": [{"issue": "ASK-0076"}, {"issue": "ASK-0077"}, {"issue": "ASK-0078"}],
+      "depends_on": ["personal-binding"],
+      "exit_criteria": [
+        "Plan intake, claim, verify, source commit, interrupt, resume and closeout use the shared public helpers with portable tracker records and local runtime receipts.",
+        "Paired lanes, reservations, source/tracker revision handoff, source-message and publication privacy, and pre/post commit failure recovery pass direct disposable tests.",
+        "Project-mode planning, board, partial acceptance, stale return, human-pending and closeout regressions remain passing."
+      ],
+      "boundary": "Private records and product effects become one recoverable user workflow rather than isolated storage primitives."
+    },
+    {
+      "id": "personal-host-integration",
+      "outcome": "Personal native roles, MASK scope-specific readiness and companion workflows use the same bound external state.",
+      "work": [{"issue": "ASK-0079"}, {"issue": "ASK-0080"}],
+      "depends_on": ["private-workflow-lifecycle"],
+      "exit_criteria": [
+        "The canonical role definitions render at personal scope with assignment-provided project facts; MASK personal readiness is integrated at its actual program revision without persistent approval.",
+        "Attended-review, wizard and compatible remote handoffs route runtime state externally and protect source candidates; incompatible adapters refuse before writes.",
+        "Instruction tabletop and disposable scope tests cover first use, resume, small fix, status-only and paired worktrees in both modes."
+      ],
+      "boundary": "The personal workflow becomes usable by the selected hosts and companion procedures without a second orchestration fork."
+    },
+    {
+      "id": "qualification-and-closeout",
+      "outcome": "The complete private workflow is qualified across offline/native paths and truthfully closed at the selected adoption boundary.",
+      "work": [{"issue": "ASK-0081"}, {"issue": "ASK-0082"}],
+      "depends_on": ["personal-host-integration"],
+      "exit_criteria": [
+        "Complete private run, footprint, paired lanes, recovery, synchronization and behavior parity satisfy the original mandate with direct evidence.",
+        "Actual Codex and Claude Code personal-role loading and bounded source/external-state operation are evidenced, or required criteria remain explicitly pending.",
+        "Every RFC criterion has actual revision/evidence on the closeout, selected adoption is ownership-safe, and no unrelated consumer or private product metadata is changed."
+      ],
+      "boundary": "Final acceptance needs the composed offline and native behavior, with unresolved requirements kept open."
+    }
+  ]
+}

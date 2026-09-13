@@ -34,3 +34,4 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0011 | Auto-Verified | Declared MASK workflow readiness for implement-rfc |
 
 | RFC-ASK-0012 | Implementing | Authored milestone plans and outcome-bound continuation |
+| RFC-ASK-0013 | Implementing | Optional personal storage for the shared implement-rfc workflow |
