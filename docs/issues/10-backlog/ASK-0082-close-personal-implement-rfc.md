@@ -37,7 +37,7 @@ Planned cards: ASK-0075, ASK-0076, ASK-0077, ASK-0078, ASK-0079, ASK-0080, ASK-0
 
 Current milestone plan: [personal-implement-rfc](../../rfcs/plans/personal-implement-rfc/milestone-plan.json).
 
-Current frontier — initial intake: run personal-mode-20260913, dispatch pm-001, producer /root/personal_mode_integrator, mandate revision 1. Reservation c0ab9cd; accepted RFC/card/plan preparation in progress. No active delegated writer or task command. Next: bind and exercise the first personal public path through ASK-0075.
+Current frontier — September 12, first milestone claimed: run personal-mode-20260913, dispatch pm-001, producer /root/personal_mode_integrator, mandate revision 1. Reservation c0ab9cd, live intake f02a8af, MASK intake 0d0e692. [Bound assignment](../../rfcs/plans/personal-implement-rfc/pm-001.assignment.json) retains ASK-0075 and all three `personal-binding` exits. ASK-0075 claim baacfc5 precedes source edits. Owned source paths for this boundary: shared context resolver, personal setup/status helper, focused tests and conditional skill guidance; no child writer or task command is active. Next: implement managed/supplied tracker binding and observational resolution through the public helper, then test source footprint and project-mode compatibility. Required Codex and Claude Code native qualification remains a later open criterion; it cannot establish pack completion by omission.
 
 ## Closeout checklist
 
