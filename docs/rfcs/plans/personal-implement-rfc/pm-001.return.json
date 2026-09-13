@@ -1,0 +1,93 @@
+{
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-001",
+  "producer_id": "/root/personal_mode_integrator",
+  "mandate_revision": "1",
+  "milestone": "personal-binding",
+  "schema": "implement-rfc.milestone-return.v2",
+  "disposition": "milestone-complete",
+  "summary": "Explicit personal tracker setup/status works with managed or supplied external storage; source footprint is unchanged and project mode remains compatible.",
+  "candidate_revision": "9ad89cc4bd2854557b210787943557e50541dbfb",
+  "handoff_ref": "docs/issues/10-backlog/ASK-0082-close-personal-implement-rfc.md",
+  "ownership": "quiescent",
+  "next_objective": "Adapt public board and plan helpers across source/tracker roots, paired lanes and private crash-safe commits under ASK-0076\u20130078.",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0075.acceptance.json",
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0075.personal.json",
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0075.project.json",
+    "docs/rfcs/plans/personal-implement-rfc/ASK-0075.linked.json"
+  ],
+  "binding": {
+    "plan_id": "personal-implement-rfc",
+    "plan_path": "docs/rfcs/plans/personal-implement-rfc/milestone-plan.json",
+    "milestone_id": "personal-binding",
+    "definition_fingerprint": "sha256:04d81f2e64ac8b0e858a4186253e49864ec0daea6b2e76755576961c8fceaae9",
+    "obligations": [
+      {
+        "id": "ASK-0075:*",
+        "source": "ASK-0075",
+        "selector": null,
+        "source_fingerprint": "sha256:d625c1de495d7526e7b42cb42ebee0f6435db6cbef069214366fbccbf43ef14f"
+      }
+    ],
+    "obligation_fingerprint": "sha256:1f17eb1fd78886d3a84ab9a6eae199445d5887022c955c2d37cc406bb39d3e56",
+    "exit_criteria": [
+      {
+        "id": "personal-binding:exit:1",
+        "text": "Public setup and status paths bind the same Git common repository across worktrees, preserve explicit mode precedence, and refuse absent or unsafe bindings."
+      },
+      {
+        "id": "personal-binding:exit:2",
+        "text": "Disposable source repositories show zero workflow-generated source and Git-directory changes after setup and observation; supplied and managed tracker cases pass."
+      },
+      {
+        "id": "personal-binding:exit:3",
+        "text": "Existing project-mode context and two linked consumer paths still resolve their original project facts."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "continuation": {
+    "intent": "fresh",
+    "next_milestone": "private-workflow-lifecycle",
+    "reason": "integrated-boundary",
+    "detail": "Personal binding is accepted at source revision 9ad89cc and board finish c2daebc; full private lifecycle is a distinct substantial outcome."
+  },
+  "acceptance_records": [
+    {
+      "id": "ASK-0075:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0075.acceptance.json"
+      ]
+    },
+    {
+      "id": "personal-binding:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0075.personal.json"
+      ]
+    },
+    {
+      "id": "personal-binding:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0075.personal.json"
+      ]
+    },
+    {
+      "id": "personal-binding:exit:3",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0075.project.json",
+        "docs/rfcs/plans/personal-implement-rfc/ASK-0075.linked.json"
+      ]
+    }
+  ]
+}
