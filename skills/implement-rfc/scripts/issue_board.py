@@ -428,6 +428,8 @@ def main(argv: list[str] | None = None) -> int:
         if context.mode == 'personal' and args.command in {'move', 'claim', 'finish', 'allocate'}:
             import personal_lanes
             personal_lanes.validate_pair(context)
+            if args.command == 'finish' and args.paths:
+                raise ValueError('personal product paths require personal_commit.py begin/finish; tracker-only finish omits --paths')
             if args.command == 'allocate':
                 personal_lanes.assert_reservation_authority(context)
         if args.command == 'validate':

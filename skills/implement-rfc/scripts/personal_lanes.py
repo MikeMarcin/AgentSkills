@@ -6,16 +6,22 @@ import argparse
 import hashlib
 import json
 import os
+import re
+import uuid
 from pathlib import Path
 import tempfile
 
 import personal_state as state
 
 
+def _lane_token(source: Path) -> str:
+    return hashlib.sha256(str(source.absolute()).encode()).hexdigest()[:24]
+
+
 def _path(source: Path) -> Path:
     home = state.home_for(source)
     state.ensure_home_separate(home, source)
-    token = hashlib.sha256(str(source.absolute()).encode()).hexdigest()[:24]
+    token = _lane_token(source)
     path = home / 'runtime' / state.binding_key(source) / 'pairs' / (token + '.json')
     state._check_local_path(home, path)
     return path
@@ -88,6 +94,16 @@ def _identity(root: Path) -> dict:
             'revision': state.git(root, 'rev-parse', 'HEAD')}
 
 
+def _private_branch_guard(source: Path, tracker: Path) -> None:
+    from types import SimpleNamespace
+    import personal_privacy
+    import project_config
+    context = SimpleNamespace(source_root=source, workflow_root=tracker,
+        runtime_root=state.home_for(source) / 'runtime' / state.binding_key(source),
+        config=project_config.load(tracker / project_config.CONTEXT_DIR / 'project.json'))
+    personal_privacy.validate_branch(context, _identity(source)['branch'])
+
+
 def paired_root(source_root: Path, default_tracker: Path) -> Path:
     """Observational root lookup; validation is required before mutation."""
     record = _read(source_root)
@@ -152,6 +168,7 @@ def _bind_pair(source_root: Path, tracker_root: Path | None,
     existing = _read(source)
     if existing:
         tracker = Path(existing['local']['workflow_root'])
+        _private_branch_guard(source, tracker)
         if tracker_root is not None and state.git_root(tracker_root) != tracker:
             raise state.PersonalStateError('lane already paired to another worktree')
         _assert_available(source, tracker)
@@ -160,6 +177,7 @@ def _bind_pair(source_root: Path, tracker_root: Path | None,
             raise state.PersonalStateError('lane already paired to another branch')
         return result
     primary = Path(binding['tracker_root'])
+    _private_branch_guard(source, primary)
     if tracker_root is None and tracker_branch is not None:
         state.git(primary, 'check-ref-format', '--branch', tracker_branch)
         if tracker_branch == 'main':
@@ -178,12 +196,33 @@ def _bind_pair(source_root: Path, tracker_root: Path | None,
     if state.common_dir(tracker) != Path(binding['tracker_common_dir']):
         raise state.PersonalStateError('tracker belongs to another repository')
     state.ensure_separate(source, tracker)
+    _private_branch_guard(source, tracker)
     _assert_available(source, tracker)
     record = {'schema': 'implement-rfc.pair.v1',
               'portable': {'source': _identity(source), 'tracker': _identity(tracker)},
               'local': {'source_root': str(source), 'workflow_root': str(tracker)}}
     _write(_path(source), record, create=True)
     return _current(record, source, tracker, revisions=True)
+
+
+def _check_reconciled_references(source: Path, tracker: Path, old_revision: str,
+                                 new_revision: str, side: str = 'source') -> None:
+    if old_revision == new_revision:
+        return
+    try:
+        state.git(source, 'merge-base', '--is-ancestor', old_revision, new_revision)
+        return
+    except state.PersonalStateError:
+        pass
+    if state.git(tracker, 'status', '--porcelain', '--untracked-files=all'):
+        raise state.PersonalStateError('commit reconciled tracker records before acknowledging rewritten history')
+    # Retired commits from either repository can appear in evidence or handoffs.
+    retired = state.git(source, 'rev-list', old_revision, '--not', new_revision).splitlines()
+    for filename in state.git(tracker, 'ls-tree', '-r', '--name-only', 'HEAD').splitlines():
+        content = state.git(tracker, 'show', 'HEAD:' + filename)
+        references = re.findall(r'(?<![0-9a-f])[0-9a-f]{7,64}(?![0-9a-f])', content)
+        if any(revision.startswith(reference) for revision in retired for reference in references):
+            raise state.PersonalStateError(f'stale {side} revision reference in tracked tracker record: ' + filename)
 
 
 def reconcile_pair(context, expected_source_revision: str, expected_tracker_revision: str) -> dict:
@@ -197,6 +236,10 @@ def reconcile_pair(context, expected_source_revision: str, expected_tracker_revi
             or result['portable']['tracker']['revision'] != expected_tracker_revision):
         raise state.PersonalStateError('reconciliation revisions do not match current heads')
     _assert_available(source, tracker)
+    _check_reconciled_references(source, tracker, record['portable']['source']['revision'],
+                                 result['portable']['source']['revision'])
+    _check_reconciled_references(tracker, tracker, record['portable']['tracker']['revision'],
+                                 result['portable']['tracker']['revision'], 'tracker')
     record['portable'] = result['portable']
     _write(_path(source), record)
     return validate_pair(context)
@@ -210,6 +253,7 @@ def rebind_pair(context, expected_source_branch: str, expected_tracker_branch: s
     if record is None or record['local'] != {'source_root': str(source), 'workflow_root': str(tracker)}:
         raise state.PersonalStateError('no matching checkout pair to rebind')
     actual = {'source': _identity(source), 'tracker': _identity(tracker)}
+    _private_branch_guard(source, tracker)
     for side in actual:
         if actual[side]['repository_id'] != record['portable'][side]['repository_id']:
             raise state.PersonalStateError('repository identity changed; rebind refused')
@@ -219,9 +263,116 @@ def rebind_pair(context, expected_source_branch: str, expected_tracker_branch: s
          expected_source_revision, expected_tracker_revision)):
         raise state.PersonalStateError('explicit rebind branches and revisions must match current state')
     _assert_available(source, tracker)
+    _check_reconciled_references(source, tracker, record['portable']['source']['revision'],
+                                 actual['source']['revision'])
+    _check_reconciled_references(tracker, tracker, record['portable']['tracker']['revision'],
+                                 actual['tracker']['revision'], 'tracker')
     record['portable'] = actual
     _write(_path(source), record)
     return validate_pair(context)
+
+
+def release_pair(source_repository_root: Path, pair_record: Path, expected_pair: dict,
+                 *, remove_source: bool = False, remove_tracker: bool = False,
+                 task_owned_source: bool = False, task_owned_tracker: bool = False) -> dict:
+    from types import SimpleNamespace
+    from personal_commit import operation_lock
+    anchor = state.git_root(source_repository_root)
+    home = state.home_for(anchor)
+    state.ensure_home_separate(home, anchor)
+    context = SimpleNamespace(source_root=anchor,
+        runtime_root=home / 'runtime' / state.binding_key(anchor))
+    # Serialize receipt inspection/removal with product start, finish and recovery.
+    with operation_lock(context):
+        return _release_pair(anchor, pair_record, expected_pair, remove_source=remove_source,
+            remove_tracker=remove_tracker, task_owned_source=task_owned_source,
+            task_owned_tracker=task_owned_tracker)
+
+
+def _release_pair(source_repository_root: Path, pair_record: Path, expected_pair: dict,
+                 *, remove_source: bool = False, remove_tracker: bool = False,
+                 task_owned_source: bool = False, task_owned_tracker: bool = False) -> dict:
+    """Release an integrated pair; optional removal requires explicit task ownership."""
+    anchor = state.git_root(source_repository_root)
+    home = state.home_for(anchor)
+    directory = home / 'runtime' / state.binding_key(anchor) / 'pairs'
+    pair_record = pair_record.absolute()
+    state._check_local_path(home, pair_record)
+    if pair_record.parent != directory or pair_record.name.endswith('.sync.json'):
+        raise state.PersonalStateError('release record must belong to the selected source repository')
+    lock = home / 'runtime' / 'pair-binding.lock'
+    state._check_local_path(home, lock)
+    try:
+        lock.mkdir()
+    except FileExistsError as exc:
+        raise state.PersonalStateError('pair binding is locked') from exc
+    try:
+        record = _load_record(pair_record)
+        canonical = directory / (_lane_token(Path(record['local']['source_root'])) + '.json')
+        if pair_record != canonical:
+            raise state.PersonalStateError('release requires the canonical pair-record path')
+        if expected_pair != record['portable']:
+            raise state.PersonalStateError('release requires exact recorded pair identities and revisions')
+        binding = state.read_binding(home, anchor)
+        if binding is None:
+            raise state.PersonalStateError('missing source binding')
+        roots = {'source': anchor, 'tracker': Path(binding['tracker_root'])}
+        remove = {'source': remove_source, 'tracker': remove_tracker}
+        owned = {'source': task_owned_source, 'tracker': task_owned_tracker}
+        for side, root in roots.items():
+            identity = record['portable'][side]
+            checkout = Path(record['local']['source_root' if side == 'source' else 'workflow_root'])
+            if state.binding_key(root) != identity['repository_id']:
+                raise state.PersonalStateError('release repository identity mismatch')
+            if state.git(root, 'rev-parse', 'refs/heads/' + identity['branch']) != identity['revision']:
+                raise state.PersonalStateError('release branch revision changed; reconcile pair first')
+            state.git(root, 'merge-base', '--is-ancestor', identity['revision'], 'refs/heads/main')
+            if checkout.exists():
+                if _identity(checkout) != identity:
+                    raise state.PersonalStateError('release checkout identity changed')
+                if state.git(checkout, 'status', '--porcelain', '--untracked-files=all', '--ignored'):
+                    raise state.PersonalStateError('release requires clean worktrees')
+                if remove[side] and (not owned[side] or state.common_dir(checkout) == checkout / '.git'
+                                     or checkout == anchor):
+                    raise state.PersonalStateError('removal requires an explicitly task-owned secondary worktree')
+            elif remove[side]:
+                raise state.PersonalStateError('worktree already removed; release without removal flags')
+        for receipt_path in (home / 'runtime').glob('*/product-commits/*.json'):
+            state._check_local_path(home, receipt_path)
+            try:
+                receipt = json.loads(receipt_path.read_text())
+                if (not isinstance(receipt, dict) or receipt.get('schema') != 'implement-rfc.personal-commit.v1'
+                        or receipt.get('status') not in {'editing', 'prepared', 'source-committed', 'tracker-committed', 'complete'}
+                        or 'pair' not in receipt):
+                    raise ValueError('invalid receipt')
+                if receipt['pair']['local'] == record['local'] and receipt['status'] != 'complete':
+                    raise state.PersonalStateError('pending product receipt prevents release')
+            except (ValueError, KeyError, TypeError) as exc:
+                raise state.PersonalStateError('pending or invalid product receipt prevents release') from exc
+        sync = pair_record.with_suffix('.sync.json')
+        state._check_local_path(home, sync)
+        if sync.exists():
+            try:
+                sync_receipt = json.loads(sync.read_text())
+                if not isinstance(sync_receipt, dict) or sync_receipt.get('status') != 'synchronized':
+                    raise ValueError('pending synchronization')
+            except (ValueError, OSError) as exc:
+                raise state.PersonalStateError('pending or invalid synchronization prevents release') from exc
+        # All checks precede effects. Git refuses changed/locked worktrees without force.
+        for side, root in roots.items():
+            if remove[side]:
+                checkout = record['local']['source_root' if side == 'source' else 'workflow_root']
+                state.git(root, 'worktree', 'remove', checkout)
+        archive = directory.parent / 'released-pairs' / pair_record.name
+        state._check_local_path(home, archive)
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        if archive.exists():
+            archive = archive.with_name(archive.stem + '-' + uuid.uuid4().hex + '.json')
+        _write(archive, record, create=True)
+        pair_record.unlink()
+        return {'status': 'released', 'portable': record['portable']}
+    finally:
+        lock.rmdir()
 
 
 def assert_reservation_authority(context) -> None:
@@ -276,7 +427,7 @@ def synchronize_pair(context, *, authorized: bool = False, source_remote: str | 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('bind', 'status', 'reconcile', 'rebind', 'sync'))
+    parser.add_argument('command', choices=('bind', 'status', 'reconcile', 'rebind', 'sync', 'release'))
     parser.add_argument('--repo-root', required=True, type=Path)
     parser.add_argument('--tracker-root', type=Path)
     parser.add_argument('--tracker-branch')
@@ -286,9 +437,21 @@ def main() -> int:
     parser.add_argument('--source-remote')
     parser.add_argument('--tracker-remote')
     parser.add_argument('--authorize-push', action='store_true')
+    parser.add_argument('--pair-record', type=Path)
+    parser.add_argument('--expected-pair', type=Path, help='JSON containing exact portable pair identities')
+    parser.add_argument('--remove-source', action='store_true')
+    parser.add_argument('--remove-tracker', action='store_true')
+    parser.add_argument('--task-owned-source', action='store_true')
+    parser.add_argument('--task-owned-tracker', action='store_true')
     args = parser.parse_args()
     try:
-        if args.command == 'bind':
+        if args.command == 'release':
+            if args.pair_record is None or args.expected_pair is None:
+                raise state.PersonalStateError('release requires --pair-record and --expected-pair')
+            result = release_pair(args.repo_root, args.pair_record, json.loads(args.expected_pair.read_text()),
+                remove_source=args.remove_source, remove_tracker=args.remove_tracker,
+                task_owned_source=args.task_owned_source, task_owned_tracker=args.task_owned_tracker)
+        elif args.command == 'bind':
             result = bind_pair(args.repo_root, args.tracker_root, args.tracker_branch)
         else:
             import project_config

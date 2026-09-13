@@ -109,8 +109,16 @@
       "sha256": "390074a5acdf5edc80eadc5c334a95d4d742df06ad1da684a3868587bafc8717"
     },
     {
+      "path": "references/personal-commit.md",
+      "sha256": "733ed4344a8a47d7f2209fbd04fb93df7455c2aa9ede427f8bd55f43a376509c"
+    },
+    {
+      "path": "references/personal-lanes.md",
+      "sha256": "6c063a487d79e0d488945f54c243b158f1902c484377b7128596a136c0da1eec"
+    },
+    {
       "path": "references/personal-storage.md",
-      "sha256": "6126357483f4cde4769e430d0ac90153fb97ec5374598bd51a8c79ad36103e6a"
+      "sha256": "e4a0b14ec986573692e176115f007136f0b2949c72335176f4587433cbd6f2f1"
     },
     {
       "path": "references/progress-relay.md",
@@ -150,7 +158,7 @@
     },
     {
       "path": "schemas/milestone-assignment.schema.json",
-      "sha256": "d2965f38a62863bd96d68b5b068b3994c03a0eeb985372e11b52654292ed69f1"
+      "sha256": "73b91c21e3a0cd38a74273181b4d0cbbf75960fc8b2a34dd6b40a1e1fc5c8c58"
     },
     {
       "path": "schemas/milestone-plan.schema.json",
@@ -158,7 +166,7 @@
     },
     {
       "path": "schemas/milestone-return-v2.schema.json",
-      "sha256": "4ff8dc2d285649fe95f33afc7896180f17bb1b97c1b246d087c2ae94c1c44be0"
+      "sha256": "4703f06da21007f2c184677bff4bc119661101ed3cbcbfd76c99e56e3ac37a0e"
     },
     {
       "path": "schemas/milestone-return.schema.json",
@@ -190,7 +198,7 @@
     },
     {
       "path": "scripts/audit_board.py",
-      "sha256": "4830bf51daa7a9a70ae57a880865df8cdcc99d5f9b73f8fac299bab0928c0534"
+      "sha256": "aa6e500919c9421164c354e90d23981bfa4702ef8e5bbe727c28cd6a00e76514"
     },
     {
       "path": "scripts/board_model.py",
@@ -206,11 +214,11 @@
     },
     {
       "path": "scripts/coordinator_handoff.py",
-      "sha256": "7f7f16fab49fbfa011cce9b313f915fd65a6c6d23cf95d8eebc266cf5840c8a9"
+      "sha256": "cc03401e63b9a2f9aeb28e696d729c73b5374a27e8ac08ffcbe90a2443487308"
     },
     {
       "path": "scripts/issue_board.py",
-      "sha256": "b812b745431df751534be8572655a89860e715213afb2d84d72223030fc677cb"
+      "sha256": "a09c629e12e69e182f70ee8d84b9382f3988b0eaefdd092b27ea6ab016d4ea49"
     },
     {
       "path": "scripts/launch_remote_station.py",
@@ -218,23 +226,35 @@
     },
     {
       "path": "scripts/milestone_continuation.py",
-      "sha256": "5369b571b912731c0a8e24602d8b4422724c745ded2860aa0e6bba590568a8ed"
+      "sha256": "b8fd0395752198b707e771837cf533f55e1b3a124dfbc1da72c952f974fb26b4"
     },
     {
       "path": "scripts/milestone_plan.py",
-      "sha256": "0eab825e238593d78bd3b647b39f3a1ab9c16dde7b4c6d7eab2e880b8b7a03f4"
+      "sha256": "d9bf23345d0cef68de0236e3b5f300a36e307fec8b6bb94bed5a665b9355fa17"
     },
     {
       "path": "scripts/milestone_plan_contract.py",
       "sha256": "34f000169e748ea52abcfcb1ab897431d3ffae9581d29d3c409cd526ba242bff"
     },
     {
+      "path": "scripts/personal_commit.py",
+      "sha256": "e50165876ac7406bb49d5bcba6acda7d5cd24f6268705068b7e22f2def688c9c"
+    },
+    {
+      "path": "scripts/personal_lanes.py",
+      "sha256": "15770bec5dcaa32b846b0788b39d4d6c85fc3781a58bb78c2361b08d3be2ac5b"
+    },
+    {
+      "path": "scripts/personal_privacy.py",
+      "sha256": "b362128452c41ff30342292a8ba6fc02daf6ee7289a4ce2ab3d22933e354ae6f"
+    },
+    {
       "path": "scripts/personal_state.py",
-      "sha256": "6e8d372ae4c4e0da7f6ac55277a3fccb5f85f2896e2bc9de456fd993ed5e3f11"
+      "sha256": "fe998a870b6f3397cd599c6c309f4a7eed9b483c61b89aa584f9cb252e47931d"
     },
     {
       "path": "scripts/personal_tracker.py",
-      "sha256": "b4deaa3c80e1d5e004425812280bbc9914738162ab6b9b1af0bc13f31e569fcd"
+      "sha256": "a87ae08e000712f34769ce0443d78d6656d12c377a0f3feb50473898a2528682"
     },
     {
       "path": "scripts/prepare_mask_roles.py",
@@ -246,7 +266,7 @@
     },
     {
       "path": "scripts/project_config.py",
-      "sha256": "c97e8e0d8e4dbe2a95ffa5685b7d3a698571fd7dd1355b2997a4787875c0b64d"
+      "sha256": "068cc8f2db3b138660481e0c61887185f41255c406c265e84371ed96deac91c0"
     },
     {
       "path": "scripts/qualification_guard.py",
@@ -254,7 +274,7 @@
     },
     {
       "path": "scripts/record_evidence.py",
-      "sha256": "a88c189a46099793d74b4f7b7ad7c045e0ebe6863807b282ca174c16cb3280fa"
+      "sha256": "bcc8188e90e6c6eef1da6e9a2e1266a8cca7d631b927852754acf6f791440970"
     },
     {
       "path": "scripts/remote_station_guard.py",
@@ -406,7 +426,19 @@
     },
     {
       "path": "tests/test_personal_binding.py",
-      "sha256": "e3a8e57f5b1378aa9e38022aad7245b0a9a20bb0a21993fce0dbb518f4f7d991"
+      "sha256": "3fe999d831969e7e9e1ef9b379ee1242208880d2fa78b02067d4c294a57da7bf"
+    },
+    {
+      "path": "tests/test_personal_commit.py",
+      "sha256": "65fe72fda2c92bc2368ccbf5c3d4817417b8f103683132a2f3d552727a80230b"
+    },
+    {
+      "path": "tests/test_personal_lanes.py",
+      "sha256": "696d151f8ed94cd366e76c40653b32c070a7aca95d4e5ee18d5b46c35f478997"
+    },
+    {
+      "path": "tests/test_personal_lifecycle_public.py",
+      "sha256": "db504b81974f1582eb11e3361fadd77e1bf335ec94333b0b65a3ed59f86f9809"
     },
     {
       "path": "tests/test_progress_trail.py",
@@ -497,6 +529,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "0a97e868ebb0acdd",
+  "portable_digest": "031a6815f2729701",
   "schema": "implement-rfc.portable-manifest.v1"
 }

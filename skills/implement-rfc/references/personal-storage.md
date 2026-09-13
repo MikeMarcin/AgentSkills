@@ -24,7 +24,7 @@ Project mode uses the consumer's `.mask/skill-config/implement-rfc/` files as
 before. Personal mode reads them from the tracker. The shared board and plan
 helpers use the tracker for workflow documents and source checkout for product
 evidence. Keep assignments and native return files under the reported runtime
-root; they contain machine-local checkout paths. Claim the tracker card before
-editing product files. The coordinated product-commit and recovery path remains
-pending under RFC-ASK-0013, so do not finish a personal product change with a
-standalone source commit.
+root; they contain machine-local checkout paths. Before editing product files,
+finishing their acceptance, or resuming an interrupted source/tracker commit,
+follow [Personal product commits](personal-commit.md). Its committed-claim and
+before-edit receipt are required before product changes begin.

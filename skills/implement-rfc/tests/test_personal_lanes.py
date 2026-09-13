@@ -153,6 +153,191 @@ class PersonalLaneTests(unittest.TestCase):
         lanes.validate_pair(self.context)
         self.assertNotEqual(context.workflow_root, self.tracker)
 
+    def test_rewritten_references_require_committed_replacement(self):
+        git(self.source_root, 'commit', '--allow-empty', '-m', 'original work')
+        old = git(self.source_root, 'rev-parse', 'HEAD')
+        evidence = self.tracker / 'docs/issues/evidence.txt'
+        evidence.write_text(old + '\n')
+        def commit_evidence():
+            git(self.tracker, 'add', 'docs/issues/evidence.txt')
+            git(self.tracker, '-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid',
+                'commit', '-m', 'Record revision')
+        commit_evidence()
+        lanes.reconcile_pair(self.context, old, git(self.tracker, 'rev-parse', 'HEAD'))
+        # Rebase/cherry-pick shape: retain base, replay the work as a new commit.
+        git(self.source_root, 'checkout', '-b', 'replayed', 'HEAD^')
+        git(self.source_root, 'commit', '--allow-empty', '-m', 'new base')
+        git(self.source_root, 'cherry-pick', '--allow-empty', old)
+        new = git(self.source_root, 'rev-parse', 'HEAD')
+        with self.assertRaisesRegex(state.PersonalStateError, 'stale source revision'):
+            lanes.rebind_pair(self.context, 'replayed', 'main', new, git(self.tracker, 'rev-parse', 'HEAD'))
+        evidence.write_text(new + '\n')
+        with self.assertRaisesRegex(state.PersonalStateError, 'commit reconciled'):
+            lanes.rebind_pair(self.context, 'replayed', 'main', new, git(self.tracker, 'rev-parse', 'HEAD'))
+        commit_evidence()
+        lanes.rebind_pair(self.context, 'replayed', 'main', new, git(self.tracker, 'rev-parse', 'HEAD'))
+        git(self.source_root, 'commit', '--amend', '--allow-empty', '-m', 'rewritten again')
+        newest = git(self.source_root, 'rev-parse', 'HEAD')
+        with self.assertRaisesRegex(state.PersonalStateError, 'stale source revision'):
+            lanes.reconcile_pair(self.context, newest, git(self.tracker, 'rev-parse', 'HEAD'))
+        evidence.write_text(newest + '\n')
+        commit_evidence()
+        lanes.reconcile_pair(self.context, newest, git(self.tracker, 'rev-parse', 'HEAD'))
+
+    def test_consumed_release_reuse_dirty_pending_and_removed_worktrees(self):
+        source_lane = self.base / 'release-source'
+        git(self.source_root, 'worktree', 'add', '-b', 'consumed', str(source_lane))
+        pair = lanes.bind_pair(source_lane, tracker_branch='consumed-records')
+        tracker_lane = Path(pair['local']['workflow_root'])
+        record = lanes._path(source_lane)
+        expected = pair['portable']
+        from personal_commit import operation_lock
+        lock_context = SimpleNamespace(source_root=self.source_root, runtime_root=record.parent.parent)
+        with operation_lock(lock_context):
+            with self.assertRaisesRegex(state.PersonalStateError, 'operation is active'):
+                lanes.release_pair(self.source_root, record, expected)
+        (source_lane / 'untracked').write_text('preserve')
+        with self.assertRaisesRegex(state.PersonalStateError, 'clean'):
+            lanes.release_pair(self.source_root, record, expected)
+        (source_lane / 'untracked').unlink()
+        receipts = record.parent.parent / 'product-commits'
+        receipts.mkdir(exist_ok=True)
+        pending = receipts / 'pending.json'
+        pending.write_text(json.dumps({'schema': 'implement-rfc.personal-commit.v1', 'status': 'editing', 'pair': pair}))
+        with self.assertRaisesRegex(state.PersonalStateError, 'receipt'):
+            lanes.release_pair(self.source_root, record, expected)
+        pending.write_text(json.dumps({'schema': 'implement-rfc.personal-commit.v1', 'status': 'complete', 'pair': pair}))
+        with self.assertRaisesRegex(state.PersonalStateError, 'task-owned'):
+            lanes.release_pair(self.source_root, record, expected, remove_tracker=True)
+        sync = record.with_suffix('.sync.json')
+        sync.write_text('[]')
+        with self.assertRaisesRegex(state.PersonalStateError, 'synchronization'):
+            lanes.release_pair(self.source_root, record, expected)
+        sync.unlink()
+        expected_file = self.base / 'expected-pair.json'
+        expected_file.write_text(json.dumps(expected))
+        released = subprocess.run([sys.executable, str(SCRIPT.with_name('personal_lanes.py')),
+            'release', '--repo-root', str(self.source_root), '--pair-record', str(record),
+            '--expected-pair', str(expected_file)], capture_output=True, text=True, env=self.env)
+        self.assertEqual(released.returncode, 0, released.stdout)
+        self.assertEqual(json.loads(released.stdout)['status'], 'released')
+        self.assertTrue(source_lane.exists())
+        self.assertTrue(tracker_lane.exists())
+        lanes.bind_pair(source_lane, tracker_root=tracker_lane)
+        lanes.release_pair(self.source_root, record, expected, remove_source=True, remove_tracker=True,
+                           task_owned_source=True, task_owned_tracker=True)
+        self.assertFalse(source_lane.exists())
+        self.assertFalse(tracker_lane.exists())
+        self.assertEqual(git(self.tracker, 'rev-parse', 'consumed-records'), expected['tracker']['revision'])
+        replacement = self.base / 'removed-source'
+        git(self.source_root, 'worktree', 'add', '-b', 'already-removed', str(replacement))
+        removed_pair = lanes.bind_pair(replacement, tracker_branch='removed-records')
+        removed_record = lanes._path(replacement)
+        git(self.source_root, 'worktree', 'remove', str(replacement))
+        with self.assertRaisesRegex(state.PersonalStateError, 'already removed'):
+            lanes.release_pair(self.source_root, removed_record, removed_pair['portable'],
+                               remove_source=True, task_owned_source=True)
+        lanes.release_pair(self.source_root, removed_record, removed_pair['portable'])
+        self.assertFalse(removed_record.exists())
+
+    def test_release_rejects_primary_removal_and_unintegrated_revision(self):
+        record = lanes._path(self.source_root)
+        expected = lanes.validate_pair(self.context)['recorded']
+        with patch.dict(os.environ, {'IMPLEMENT_RFC_HOME': str(self.source_root)}):
+            with self.assertRaisesRegex(state.PersonalStateError, 'overlaps'):
+                lanes.release_pair(self.source_root, record, expected)
+        self.assertFalse((self.source_root / 'runtime').exists())
+        with self.assertRaisesRegex(state.PersonalStateError, 'task-owned'):
+            lanes.release_pair(self.source_root, record, expected, remove_source=True,
+                               task_owned_source=True)
+        with self.assertRaisesRegex(state.PersonalStateError, 'exact recorded'):
+            lanes.release_pair(self.source_root, record, {})
+        source_lane = self.base / 'unintegrated'
+        git(self.source_root, 'worktree', 'add', '-b', 'unintegrated', str(source_lane))
+        pair = lanes.bind_pair(source_lane, tracker_branch='unintegrated-records')
+        git(source_lane, 'commit', '--allow-empty', '-m', 'unintegrated work')
+        context = SimpleNamespace(mode='personal', source_root=source_lane,
+                                  workflow_root=Path(pair['local']['workflow_root']))
+        pair = lanes.reconcile_pair(context, git(source_lane, 'rev-parse', 'HEAD'),
+                                    git(context.workflow_root, 'rev-parse', 'HEAD'))
+        with self.assertRaises(state.PersonalStateError):
+            lanes.release_pair(self.source_root, lanes._path(source_lane), pair['portable'])
+        self.assertTrue(lanes._path(source_lane).exists())
+        self.assertTrue(source_lane.exists())
+
+    def test_tracker_rewrite_requires_reconciled_tracker_references(self):
+        git(self.tracker, 'config', 'user.name', 'fixture')
+        git(self.tracker, 'config', 'user.email', 'fixture@example.invalid')
+        git(self.tracker, 'commit', '--allow-empty', '-m', 'tracker progress')
+        retired = git(self.tracker, 'rev-parse', 'HEAD')
+        evidence = self.tracker / 'docs/issues/handoff.txt'
+        evidence.write_text(retired + '\n')
+        git(self.tracker, 'add', 'docs/issues/handoff.txt')
+        git(self.tracker, 'commit', '-m', 'Record handoff')
+        handoff_commit = git(self.tracker, 'rev-parse', 'HEAD')
+        source_revision = git(self.source_root, 'rev-parse', 'HEAD')
+        lanes.reconcile_pair(self.context, source_revision, handoff_commit)
+        git(self.tracker, 'checkout', '-b', 'rewritten-records', 'HEAD~2')
+        git(self.tracker, 'cherry-pick', handoff_commit)
+        with self.assertRaisesRegex(state.PersonalStateError, 'stale tracker revision'):
+            lanes.rebind_pair(self.context, 'main', 'rewritten-records', source_revision,
+                              git(self.tracker, 'rev-parse', 'HEAD'))
+        evidence.write_text(git(self.tracker, 'rev-parse', 'HEAD') + '\n')
+        git(self.tracker, 'add', 'docs/issues/handoff.txt')
+        git(self.tracker, 'commit', '-m', 'Reconcile handoff')
+        lanes.rebind_pair(self.context, 'main', 'rewritten-records', source_revision,
+                          git(self.tracker, 'rev-parse', 'HEAD'))
+
+    def test_partial_removal_keeps_active_pair_until_retry(self):
+        source_lane = self.base / 'partial-removal'
+        git(self.source_root, 'worktree', 'add', '-b', 'partial-removal', str(source_lane))
+        pair = lanes.bind_pair(source_lane, tracker_branch='partial-records')
+        tracker_lane = Path(pair['local']['workflow_root'])
+        record = lanes._path(source_lane)
+        original_git = state.git
+        def fail_tracker_removal(root, *args):
+            if args == ('worktree', 'remove', str(tracker_lane)):
+                raise state.PersonalStateError('injected tracker removal failure')
+            return original_git(root, *args)
+        with patch.object(state, 'git', side_effect=fail_tracker_removal):
+            with self.assertRaisesRegex(state.PersonalStateError, 'injected'):
+                lanes.release_pair(self.source_root, record, pair['portable'],
+                    remove_source=True, remove_tracker=True, task_owned_source=True, task_owned_tracker=True)
+        self.assertFalse(source_lane.exists())
+        self.assertTrue(tracker_lane.exists())
+        self.assertTrue(record.exists())
+        other = self.base / 'other-release'
+        git(self.source_root, 'worktree', 'add', '-b', 'other-release', str(other))
+        with self.assertRaises(lanes.PairOccupiedError):
+            lanes.bind_pair(other, tracker_root=tracker_lane)
+        lanes.release_pair(self.source_root, record, pair['portable'],
+                           remove_tracker=True, task_owned_tracker=True)
+        self.assertFalse(record.exists())
+        self.assertFalse(tracker_lane.exists())
+
+    def test_full_sha256_reference_refuses_reconciliation(self):
+        retired = 'a' * 64
+        replacement = 'b' * 64
+        def fake_git(root, *args):
+            if args[0] == 'merge-base':
+                raise state.PersonalStateError('rewritten history')
+            return {'status': '', 'rev-list': retired, 'ls-tree': 'evidence.md',
+                    'show': 'Verified revision: ' + retired}[args[0]]
+        with patch.object(state, 'git', side_effect=fake_git):
+            with self.assertRaisesRegex(state.PersonalStateError, 'stale source revision'):
+                lanes._check_reconciled_references(self.source_root, self.tracker, retired, replacement)
+
+    def test_release_refuses_record_under_another_lane_filename(self):
+        record = lanes._path(self.source_root)
+        wrong = record.with_name('0' * 24 + '.json')
+        wrong.write_bytes(record.read_bytes())
+        expected = json.loads(record.read_text())['portable']
+        with self.assertRaisesRegex(state.PersonalStateError, 'canonical pair-record path'):
+            lanes.release_pair(self.source_root, wrong, expected)
+        self.assertTrue(wrong.exists())
+        self.assertTrue(record.exists())
+        self.assertFalse((record.parent.parent / 'released-pairs').exists())
+
     def test_public_lane_cli(self):
         result = subprocess.run([sys.executable, str(SCRIPT.with_name('personal_lanes.py')),
                                  'status', '--repo-root', str(self.source_root)],

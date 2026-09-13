@@ -17,6 +17,93 @@ SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 
 
 class PersonalLifecyclePublicTests(unittest.TestCase):
+    def test_public_plan_to_recovered_product_closeout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory).resolve()
+            source = base / "source"
+            source.mkdir()
+            git(source, "init", "-b", "main")
+            git(source, "config", "user.name", "fixture")
+            git(source, "config", "user.email", "fixture@example.invalid")
+            (source / "product.txt").write_text("old product\n")
+            git(source, "add", "product.txt")
+            git(source, "commit", "-m", "Initial product")
+            initial = git(source, "rev-parse", "HEAD")
+            env = {**os.environ, "IMPLEMENT_RFC_HOME": str(base / "home")}
+
+            def cli(script, *args, expected=0):
+                result = subprocess.run([sys.executable, "-B", str(SCRIPTS / script),
+                    "--repo-root", str(source), *args], env=env, capture_output=True, text=True)
+                self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+                return json.loads(result.stdout)
+
+            bound = cli("personal_tracker.py", "--json", "init")
+            tracker = Path(bound["workflow_root"])
+            rfc = tracker / "docs/rfcs/RFC-PRS-0001-demo.md"
+            card = tracker / "docs/issues/10-backlog/PRS-0001-demo.md"
+            card.parent.mkdir(parents=True)
+            rfc.write_text('---\nid: "RFC-PRS-0001"\ntitle: "Demo"\nstatus: "Accepted"\n---\n')
+            card.write_text('---\nschema: "implement-rfc.card.v1"\nid: "PRS-0001"\n'
+                'title: "Demo"\nstatus: "Backlog"\nrfcs: ["RFC-PRS-0001"]\n'
+                'depends_on: []\n---\n\n## Acceptance\n\n- Product improves.\n')
+            (tracker / "docs/issues/NEXT_ID").write_text("PRS-0002\n")
+            git(tracker, "add", "docs")
+            git(tracker, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+                "commit", "-m", "Private intake")
+            raw = base / "raw"
+            raw.mkdir()
+            (raw / "milestone-plan.json").write_text(json.dumps({
+                "schema": "implement-rfc.milestone-plan.v1", "id": "demo-personal",
+                "scope": {"rfcs": ["RFC-PRS-0001"], "issues": ["PRS-0001"]},
+                "milestones": [{"id": "first", "outcome": "Product improves",
+                    "work": [{"issue": "PRS-0001"}], "depends_on": [],
+                    "exit_criteria": ["Product commit and acceptance are recorded"],
+                    "boundary": "One source and tracker completion"}]}, indent=2) + "\n")
+            self.assertEqual(cli("milestone_plan.py", "adopt", "--source-root", str(raw),
+                "--json")["state"], "adopted")
+            git(tracker, "add", "docs")
+            git(tracker, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+                "commit", "-m", "Adopt plan")
+            cli("issue_board.py", "move", "PRS-0001", "--to", "20-ready", "--json")
+            git(tracker, "add", "docs/issues")
+            git(tracker, "-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid",
+                "commit", "-m", "Promote work")
+            self.assertEqual(cli("issue_board.py", "claim", "PRS-0001", "--json")["lane"],
+                "30-in-progress")
+            self.assertEqual(git(source, "rev-parse", "HEAD"), initial)
+            operation = cli("personal_commit.py", "begin", "--id", "PRS-0001",
+                "--paths", "product.txt")["operation"]
+            (source / "product.txt").write_text("improved product\n")
+            verification = cli("record_evidence.py", "--criterion", "product-improves",
+                "--output", "verification.json", "--", "git", "diff", "--check")
+            self.assertEqual(verification["evidence"]["exit_code"], 0)
+            self.assertTrue((Path(bound["runtime_root"]) / "verification.json").is_file())
+            acceptance = base / "acceptance.json"
+            acceptance.write_text(json.dumps({"approved": True, "decision": "done",
+                "records": [{"criterion": "product-improves", "outcome": "pass",
+                    "revision": "superseded-by-product-revision",
+                    "evidence": {"kind": "observation", "detail": "Product diff checked"}}]}))
+            interrupted = cli("personal_commit.py", "finish", "--operation", operation,
+                "--message", "Improve product", "--acceptance", str(acceptance),
+                "--inject-failure", "after-source-commit", expected=2)
+            self.assertIn("injected failure", interrupted["error"])
+            pending = cli("personal_commit.py", "status", "--operation", operation)
+            self.assertEqual(pending["status"], "prepared")
+            self.assertEqual(git(source, "rev-parse", "HEAD"), pending["source"]["revision"])
+            self.assertTrue((tracker / "docs/issues/30-in-progress/PRS-0001-demo.md").exists())
+            completed = cli("personal_commit.py", "resume", "--operation", operation)
+            self.assertEqual(completed["status"], "complete")
+            self.assertEqual(cli("issue_board.py", "inspect", "PRS-0001", "--json")
+                ["fields"]["acceptance"][0]["revision"], completed["source"]["revision"])
+            self.assertEqual(cli("issue_board.py", "queue", "--rfc", "RFC-PRS-0001",
+                "--history", "--json")["done_count"], 1)
+            self.assertEqual(git(source, "rev-list", "--count", initial + "..HEAD"), "1")
+            self.assertEqual(git(source, "status", "--porcelain"), "")
+            self.assertEqual(git(tracker, "status", "--porcelain"), "")
+            self.assertEqual(git(source, "diff-tree", "--no-commit-id", "--name-only", "-r",
+                "HEAD"), "product.txt")
+            self.assertNotIn("PRS-0001", git(source, "log", "-1", "-p"))
+
     def test_paired_lane_board_refuses_switched_source_before_mutation(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory).resolve()
