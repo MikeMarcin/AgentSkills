@@ -157,6 +157,12 @@ def _tracker_config(name: str) -> dict:
         "attended_review_skill": "attended-review",
         "station_registry_doc": "docs/development/remote-stations.md",
         "workstreams": {"main": {"branch": "main"}}, "role_addenda": {},
+        "bookkeeping": {
+            "deferring_lanes": ["00-inbox", "10-backlog", "50-blocked"],
+            "parked_on": ["human-review"], "blocked_by_forbidden_prefixes": [],
+            "link_roots": ["docs/issues", "docs/rfcs"],
+            "protected_globs": [], "editable_globs": [],
+        },
     }
 
 

@@ -131,6 +131,9 @@
         }
       }
     },
+    "repository_state": {
+      "$ref": "milestone-assignment.schema.json#/properties/repository_state"
+    },
     "binding": {
       "$ref": "milestone-assignment.schema.json#/$defs/binding"
     },

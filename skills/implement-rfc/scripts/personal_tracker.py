@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import personal_state
+import personal_lanes
 import project_config
 
 
@@ -29,6 +30,12 @@ def main() -> int:
                 raise personal_state.PersonalStateError("init selects personal mode")
             source = personal_state.git_root(args.repo_root)
             personal_state.initialize(source, args.workflow_root)
+            try:
+                personal_lanes.bind_pair(source)
+            except personal_lanes.PairOccupiedError:
+                # Association remains useful for observation; mutation needs a separate lane.
+                if args.workflow_root is None:
+                    raise
             selected = project_config.resolve_context(repo_root=source, mode="personal")
         else:
             selected = project_config.resolve_context(repo_root=args.repo_root, mode=args.mode,

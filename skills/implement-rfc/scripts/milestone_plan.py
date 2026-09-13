@@ -273,7 +273,10 @@ def check_amendment(before, after, reason, source_basis):
 
 def resolve_binding(repo_root, plan_path, milestone_id, projection=None):
     ctx = project_config.resolve_context(repo_root=repo_root)
-    root = ctx.repo_root
+    if ctx.mode == 'personal':
+        import personal_lanes
+        personal_lanes.validate_pair(ctx)
+    root = ctx.workflow_root
     path = safe_path(root, str(plan_path))
     plan = load_plan(path)
     milestones = {m['id']: m for m in plan['milestones']}
@@ -407,6 +410,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=['discover', 'check', 'adopt', 'render', 'bind', 'inspect', 'prepare', 'check-amendment'])
     parser.add_argument('--repo-root', required=True)
+    parser.add_argument('--mode', choices=('project', 'personal'))
+    parser.add_argument('--workflow-root')
     parser.add_argument('--source-root')
     parser.add_argument('--plan')
     parser.add_argument('--target', action='append', default=[])
@@ -421,13 +426,18 @@ def main(argv=None):
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
     try:
-        ctx = project_config.resolve_context(repo_root=args.repo_root)
-        result = discover(ctx.repo_root, ctx.config, source_root=args.source_root,
+        ctx = project_config.resolve_context(repo_root=args.repo_root, mode=args.mode,
+                                             workflow_root=args.workflow_root)
+        root = ctx.workflow_root
+        if ctx.mode == 'personal' and args.operation == 'adopt':
+            import personal_lanes
+            personal_lanes.assert_reservation_authority(ctx)
+        result = discover(root, ctx.config, source_root=args.source_root,
                           plan=args.plan, targets=args.target)
         if args.operation in ('prepare', 'check-amendment'):
             if not args.proposal:
                 raise PlanError('preparation/amendment requires an engineer-authored --proposal')
-            source = Path(args.source_root or ctx.repo_root).resolve()
+            source = Path(args.source_root or root).resolve()
             proposal = load_plan(safe_path(source, args.proposal))
             if result['state'] == 'found':
                 result = check_amendment(load_plan(Path(result['path'])), proposal, args.reason, args.source_basis)
@@ -455,17 +465,17 @@ def main(argv=None):
             result.update(plan_id=plan['id'], structural='valid', semantic_coverage='unknown',
                           milestone_ids=[m['id'] for m in plan['milestones']])
             if args.operation == 'adopt':
-                mapping = load_json(safe_path(Path(args.source_root or ctx.repo_root).resolve(), args.id_map)) if args.id_map else {}
-                result = adopt(ctx.repo_root, ctx.config, path, mapping)
+                mapping = load_json(safe_path(Path(args.source_root or root).resolve(), args.id_map)) if args.id_map else {}
+                result = adopt(root, ctx.config, path, mapping)
             elif args.operation in ('bind', 'inspect'):
                 selected = next((m for m in plan['milestones'] if m['id'] == args.milestone), None) if args.milestone else select_milestone(plan, args.accepted_milestone)
                 if selected is None:
                     raise PlanError('no eligible milestone or unknown selected milestone', 'unresolved')
-                result = resolve_binding(ctx.repo_root, path.relative_to(ctx.repo_root).as_posix(),
-                                         selected['id'], load_json(safe_path(ctx.repo_root, args.projection)) if args.projection else None)
+                result = resolve_binding(ctx.source_root, path.relative_to(root).as_posix(),
+                                         selected['id'], load_json(safe_path(root, args.projection)) if args.projection else None)
                 result['work'] = result.get('projection', selected['work'])
                 if args.operation == 'inspect':
-                    result['planning'] = planning_observations(ctx.repo_root, ctx.config, plan, result['work'])
+                    result['planning'] = planning_observations(root, ctx.config, plan, result['work'])
             elif args.operation == 'render':
                 view = render(plan)
                 if not args.json:

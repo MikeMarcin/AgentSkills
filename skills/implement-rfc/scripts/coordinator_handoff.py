@@ -26,7 +26,7 @@ def validate_return(value: object) -> list[str]:
     if not isinstance(value, dict) or not required <= value.keys():
         return ["missing required return fields"]
     errors = []
-    extension = {"binding", "continuation", "acceptance_records"} if value["schema"] == V2 else set()
+    extension = {"binding", "continuation", "acceptance_records", "repository_state"} if value["schema"] == V2 else set()
     if value.keys() - required - {"review_request"} - extension:
         errors.append("unknown return fields")
     if value["schema"] not in (SCHEMA, V2):
@@ -77,6 +77,16 @@ def validate_return(value: object) -> list[str]:
         errors.append("unexpected review request")
     if value["schema"] == V2 and not errors:
         errors.extend(v2_errors(value))
+    state = value.get('repository_state')
+    if state is not None:
+        fields = {'source_root', 'workflow_root', 'source_common_dir', 'workflow_common_dir',
+                  'source_branch', 'source_revision', 'workflow_branch', 'workflow_revision'}
+        if not isinstance(state, dict) or set(state) != fields or any(
+                not isinstance(state.get(key), str) or not state[key].strip() for key in fields):
+            errors.append('invalid paired return state')
+        elif not all(re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', state[key])
+                     for key in ('source_revision', 'workflow_revision')):
+            errors.append('invalid paired return revisions')
     return errors
 
 
@@ -154,19 +164,43 @@ def bind_assignment(root, plan_path, milestone, *, run_id, dispatch_id, producer
     """Compute scope identity from current consumer requirements, without writing."""
     import subprocess
     import milestone_plan as plans
+    import project_config
+    context = project_config.resolve_context(repo_root=root)
     binding = plans.resolve_binding(root, plan_path, milestone, projection=projection)
-    plan = plans.load_plan(plans.safe_path(root, plan_path))
+    plan = plans.load_plan(plans.safe_path(context.workflow_root, plan_path))
     if binding['references'] != 'resolved' or binding['diagnostics_truncated']:
         raise ValueError('assignment has unresolved requirements: ' + '; '.join(binding['diagnostics']))
     identity = dict(run_id=run_id, dispatch_id=dispatch_id, producer_id=producer_id,
                     mandate_revision=mandate_revision, milestone=milestone)
     if any(not isinstance(value, str) or not value.strip() for value in identity.values()):
         raise ValueError('assignment requires exact native and mandate identities')
-    branch = subprocess.check_output(['git', '-C', str(root), 'branch', '--show-current'], text=True).strip()
-    return dict(schema='implement-rfc.milestone-assignment.v1', **identity,
+    branch = subprocess.check_output(['git', '-C', str(root), 'branch', '--show-current'],
+                                     text=True, env=project_config.git_environment()).strip()
+    result = dict(schema='implement-rfc.milestone-assignment.v1', **identity,
                 consumer_root=str(root), branch=branch, binding=binding,
                 target_milestones=([milestone] if binding.get('projection') else
                                    [item['id'] for item in plan['milestones']]))
+    if context.mode == 'personal':
+        result['repository_state'] = repository_state(context)
+    return result
+
+
+def repository_state(context):
+    """Local handoff identity; personal callers store it under runtime_root."""
+    import subprocess
+    import project_config
+    def git(root, *args):
+        return subprocess.check_output(['git', '-C', str(root), *args], text=True,
+                                       env=project_config.git_environment()).strip()
+    return {
+        'source_root': str(context.source_root), 'workflow_root': str(context.workflow_root),
+        'source_common_dir': str(context.source_common_dir),
+        'workflow_common_dir': str(context.workflow_common_dir),
+        'source_branch': git(context.source_root, 'branch', '--show-current'),
+        'source_revision': git(context.source_root, 'rev-parse', 'HEAD'),
+        'workflow_branch': git(context.workflow_root, 'branch', '--show-current'),
+        'workflow_revision': git(context.workflow_root, 'rev-parse', 'HEAD'),
+    }
 
 
 def select_scope(plan, accepted, requested=None):
@@ -241,6 +275,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('assign', 'check'))
     parser.add_argument('--repo-root', required=True)
+    parser.add_argument('--mode', choices=('project', 'personal'))
+    parser.add_argument('--workflow-root')
     parser.add_argument('--plan')
     parser.add_argument('--target', action='append', default=[])
     parser.add_argument('--milestone')
@@ -257,10 +293,14 @@ def main(argv=None):
     args = parser.parse_args(argv)
     outcome = None
     try:
-        ctx = project_config.resolve_context(repo_root=args.repo_root)
-        root = ctx.repo_root
-        def read(relative):
+        ctx = project_config.resolve_context(repo_root=args.repo_root, mode=args.mode,
+                                             workflow_root=args.workflow_root)
+        root = ctx.workflow_root
+        def read_workflow(relative):
             return plans.load_json(plans.safe_path(root, relative))
+        def read_runtime(relative):
+            return plans.load_json(plans.safe_path(
+                ctx.runtime_root if ctx.mode == 'personal' else root, relative))
         if args.operation == 'assign':
             found = plans.discover(root, ctx.config, plan=args.plan, targets=args.target)
             if found['state'] != 'found':
@@ -271,20 +311,32 @@ def main(argv=None):
             if selected is None:
                 raise ValueError('no eligible milestone; reconcile required accepted evidence')
             outcome = selected['outcome']
-            result = bind_assignment(root, path.relative_to(root).as_posix(), selected['id'],
+            result = bind_assignment(ctx.source_root, path.relative_to(root).as_posix(), selected['id'],
                 run_id=args.run_id, dispatch_id=args.dispatch_id, producer_id=args.producer_id,
                 mandate_revision=args.mandate_revision,
-                projection=read(args.projection) if args.projection else None)
+                projection=read_workflow(args.projection) if args.projection else None)
         else:
-            assignment, returned = read(args.assignment), read(args.return_file)
+            assignment, returned = read_runtime(args.assignment), read_runtime(args.return_file)
             errors = assignment_errors(assignment)
             if errors:
                 raise ValueError('; '.join(errors))
-            branch = subprocess.check_output(['git', '-C', str(root), 'branch', '--show-current'], text=True).strip()
-            if assignment.get('consumer_root') != str(root) or assignment.get('branch') != branch:
+            branch = subprocess.check_output(['git', '-C', str(ctx.source_root), 'branch', '--show-current'],
+                                             text=True, env=project_config.git_environment()).strip()
+            if assignment.get('consumer_root') != str(ctx.source_root) or assignment.get('branch') != branch:
                 raise ValueError('assignment consumer or branch differs')
+            state = assignment.get('repository_state')
+            if ctx.mode == 'personal' and (not isinstance(state, dict) or
+                state.get('workflow_root') != str(ctx.workflow_root) or
+                state.get('source_common_dir') != str(ctx.source_common_dir) or
+                state.get('workflow_common_dir') != str(ctx.workflow_common_dir) or
+                state.get('workflow_branch') != subprocess.check_output(
+                    ['git', '-C', str(root), 'branch', '--show-current'], text=True,
+                    env=project_config.git_environment()).strip()):
+                raise ValueError('paired repository identity or branch differs')
+            if ctx.mode == 'personal' and returned.get('repository_state') != repository_state(ctx):
+                raise ValueError('returned paired repository state differs from current checkout revisions')
             binding = assignment.get('binding', {})
-            current = plans.resolve_binding(root, binding.get('plan_path'), binding.get('milestone_id'),
+            current = plans.resolve_binding(ctx.source_root, binding.get('plan_path'), binding.get('milestone_id'),
                                             projection=binding.get('projection'))
             current_plan = plans.load_plan(plans.safe_path(root, binding['plan_path']))
             outcome = next(item['outcome'] for item in current_plan['milestones']
@@ -296,14 +348,14 @@ def main(argv=None):
             if isinstance(returned, dict) and returned.get('disposition') == 'pack-complete' and current_plan.get('unplanned_work'):
                 raise ValueError('partial plan still has required unplanned work; complete its formation before closeout')
             result = continuation(returned, assignment, execution=args.execution, current_binding=current,
-                consumed=read(args.consumed) if args.consumed else (), cancelled=args.cancelled,
+                consumed=read_runtime(args.consumed) if args.consumed else (), cancelled=args.cancelled,
                 accepted_milestones=accepted_target,
                 current_target_milestones=([binding['milestone_id']] if binding.get('projection') else
                                           [item['id'] for item in current_plan['milestones']]),
                 eligible_milestones=independent_milestones(root, ctx.config, current_plan,
                                                          args.accepted_milestone),
                 review_relay=args.review_relay,
-                prior_partial=read(args.prior_partial) if args.prior_partial else None)
+                prior_partial=read_runtime(args.prior_partial) if args.prior_partial else None)
             if result['action'] in ('fresh-integrator', 'resume-integrator'):
                 request = returned['continuation']
                 if binding.get('projection') and request['next_milestone'] != binding['milestone_id']:

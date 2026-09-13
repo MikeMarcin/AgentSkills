@@ -275,12 +275,19 @@ def resolve_context(*, repo_root: Path | str | None = None,
             personal_state.ensure_home_separate(home, root)
             if workflow_root is not None:
                 workflow = personal_state.git_root(Path(workflow_root))
-                if binding and workflow != Path(binding["tracker_root"]):
+                if binding and personal_state.common_dir(workflow) != Path(binding["tracker_common_dir"]):
                     raise ProjectConfigError("explicit workflow root conflicts with the personal binding")
             elif binding:
                 workflow = Path(binding["tracker_root"])
             else:
                 raise ProjectConfigError("personal mode has no binding; run personal_tracker.py init explicitly")
+            import personal_lanes
+            paired = personal_lanes.paired_root(root, workflow)
+            if workflow_root is not None and paired != workflow:
+                raise ProjectConfigError("explicit workflow root conflicts with the paired source lane")
+            workflow = personal_state.git_root(paired)
+            if binding and personal_state.common_dir(workflow) != Path(binding["tracker_common_dir"]):
+                raise ProjectConfigError("paired worktree differs from the bound tracker repository")
             personal_state.ensure_separate(root, workflow)
             personal_state.ensure_local_state_separate(home, workflow)
         else:

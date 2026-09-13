@@ -64,6 +64,22 @@
       "minLength": 1,
       "pattern": "\\S"
     },
+    "repository_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_root", "workflow_root", "source_common_dir", "workflow_common_dir",
+                   "source_branch", "source_revision", "workflow_branch", "workflow_revision"],
+      "properties": {
+        "source_root": {"type": "string", "minLength": 1},
+        "workflow_root": {"type": "string", "minLength": 1},
+        "source_common_dir": {"type": "string", "minLength": 1},
+        "workflow_common_dir": {"type": "string", "minLength": 1},
+        "source_branch": {"type": "string", "minLength": 1},
+        "workflow_branch": {"type": "string", "minLength": 1},
+        "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "workflow_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
     "binding": {
       "$ref": "#/$defs/binding"
     }

@@ -8,7 +8,7 @@ BINDING_FIELDS = ('plan_id', 'plan_path', 'milestone_id', 'definition_fingerprin
 def assignment_errors(value):
     required = {'schema','run_id','dispatch_id','producer_id','mandate_revision','milestone',
                 'consumer_root','branch','binding','target_milestones'}
-    if not isinstance(value, dict) or set(value) != required:
+    if not isinstance(value, dict) or not required <= set(value) or set(value) - required - {'repository_state'}:
         return ['invalid assignment fields']
     if value['schema'] != 'implement-rfc.milestone-assignment.v1':
         return ['unsupported assignment schema']
@@ -22,6 +22,16 @@ def assignment_errors(value):
         errors.append('invalid target milestone set')
     if not errors and value['milestone'] != value['binding']['milestone_id']:
         errors.append('assignment milestone differs from binding')
+    if 'repository_state' in value:
+        state = value['repository_state']
+        fields = {'source_root', 'workflow_root', 'source_common_dir', 'workflow_common_dir',
+                  'source_branch', 'source_revision', 'workflow_branch', 'workflow_revision'}
+        if not isinstance(state, dict) or set(state) != fields or any(
+                not isinstance(state.get(key), str) or not state[key].strip() for key in fields):
+            errors.append('invalid paired repository state')
+        elif not all(re.fullmatch(r'[0-9a-f]{40}|[0-9a-f]{64}', state[key])
+                     for key in ('source_revision', 'workflow_revision')):
+            errors.append('invalid paired repository revisions')
     return errors
 
 def binding_errors(binding):

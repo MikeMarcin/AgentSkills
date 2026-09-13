@@ -191,19 +191,21 @@ class PersonalBindingTests(unittest.TestCase):
         self.assertNotEqual((saved / ".git").stat().st_ino, (source / ".git").stat().st_ino)
         self.assertEqual(replacement["workflow_root"], original["workflow_root"])
 
-    def test_unadapted_board_allocation_refuses_without_source_records(self):
+    def test_board_allocation_uses_tracker_without_source_records(self):
         source = self.source("legacy", configured=True)
         (source / "docs/issues").mkdir(parents=True)
         (source / "docs/issues/NEXT_ID").write_text("SRC-0001\n")
         git(source, "add", "--", "docs/issues/NEXT_ID")
         git(source, "commit", "-m", "Seed board")
-        self.run_cli(source, "init")
+        _, binding = self.run_cli(source, "init")
         before = snapshot(source)
         result = subprocess.run([sys.executable, str(BOARD), "--repo-root", str(source),
                                  "allocate", "--reserve-for", "private-work", "--json"],
                                 env=self.env, capture_output=True, text=True)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("not yet personal-mode aware", result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        allocated = json.loads(result.stdout)
+        self.assertEqual(allocated["ids"], ["PRS-0001"])
+        self.assertTrue((Path(binding["workflow_root"]) / "docs/issues/_reservations").is_dir())
         self.assertEqual(snapshot(source), before)
 
     def test_linked_local_state_external_git_dir_and_staged_content_refuse(self):

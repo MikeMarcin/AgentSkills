@@ -221,10 +221,14 @@ def plan_move(root: Path, config: dict, card_id: str, lane: str,
 
 
 @contextmanager
-def board_lock(root: Path):
-    result = subprocess.run(['git', '-C', str(root), 'rev-parse', '--absolute-git-dir'],
-                            capture_output=True, text=True, check=True, env=project_config.git_environment())
-    path = Path(result.stdout.strip()) / 'implement-rfc-board.lock'
+def board_lock(root: Path, runtime_root: Path | None = None):
+    if runtime_root is None:
+        result = subprocess.run(['git', '-C', str(root), 'rev-parse', '--absolute-git-dir'],
+                                capture_output=True, text=True, check=True, env=project_config.git_environment())
+        path = Path(result.stdout.strip()) / 'implement-rfc-board.lock'
+    else:
+        runtime_root.mkdir(parents=True, exist_ok=True)
+        path = runtime_root / 'board.lock'
     try:
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError:
@@ -301,7 +305,7 @@ def apply_changes(changes: dict, originals: dict) -> None:
         raise
 
 
-def move(root: Path, config: dict, args) -> dict:
+def move(root: Path, config: dict, args, runtime_root: Path | None = None) -> dict:
     def perform() -> dict:
         changes, originals = plan_move(root, config, args.id, args.to, args.parked_on, args.blocked_by)
         if not args.dry_run:
@@ -310,14 +314,14 @@ def move(root: Path, config: dict, args) -> dict:
                 'dry_run': args.dry_run, 'changed_paths': sorted(p.relative_to(root).as_posix() for p in changes)}
     if args.dry_run:
         return perform()
-    with board_lock(root):
+    with board_lock(root, runtime_root):
         return perform()
 
 
-def commit_transition(root: Path, config: dict, args) -> dict:
+def commit_transition(root: Path, config: dict, args, runtime_root: Path | None = None) -> dict:
     """Agent selects acceptance; this command owns only the explicit Git slice."""
     from allocation import git
-    with board_lock(root):
+    with board_lock(root, runtime_root):
         if git(root, 'diff', '--cached', '--name-only').stdout.strip():
             raise board.BoardError(root, 'git', 'index must be empty; preserve or commit existing staged work first')
         revision = git(root, 'rev-parse', 'HEAD').stdout.strip()
@@ -374,7 +378,8 @@ def commit_transition(root: Path, config: dict, args) -> dict:
             apply_changes(changes, originals)
             git(root, 'add', '--', *commit_paths)
             # --only protects against an unrelated index addition by another process.
-            git(root, 'commit', '--only', '-m', args.message or f'{args.command.title()} {args.id}', '--', *commit_paths)
+            identity = ('-c', 'user.name=implement-rfc', '-c', 'user.email=implement-rfc@localhost') if runtime_root else ()
+            git(root, *identity, 'commit', '--only', '-m', args.message or f'{args.command.title()} {args.id}', '--', *commit_paths)
         return {'schema': f'implement-rfc.{args.command}.v1', 'id': args.id, 'lane': lane,
                 'changed_paths': commit_paths, 'dry_run': args.dry_run,
                 'commit': None if args.dry_run else git(root, 'rev-parse', 'HEAD').stdout.strip()}
@@ -383,6 +388,8 @@ def commit_transition(root: Path, config: dict, args) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo-root', type=Path)
+    parser.add_argument('--mode', choices=('project', 'personal'))
+    parser.add_argument('--workflow-root', type=Path)
     parser.add_argument('--project-config', type=Path, help=argparse.SUPPRESS)
     commands = parser.add_subparsers(dest='command', required=True)
     vp = commands.add_parser('validate', help='Check structure globally and workflow in selected dependency closure')
@@ -415,8 +422,14 @@ def main(argv: list[str] | None = None) -> int:
         sub.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
     try:
-        context = project_config.resolve_context(repo_root=args.repo_root, project_config_path=args.project_config)
-        root, config = context.repo_root, context.config
+        context = project_config.resolve_context(repo_root=args.repo_root, project_config_path=args.project_config,
+                                                 mode=args.mode, workflow_root=args.workflow_root)
+        root, config = context.workflow_root, context.config
+        if context.mode == 'personal' and args.command in {'move', 'claim', 'finish', 'allocate'}:
+            import personal_lanes
+            personal_lanes.validate_pair(context)
+            if args.command == 'allocate':
+                personal_lanes.assert_reservation_authority(context)
         if args.command == 'validate':
             scope = None
             if args.rfc or args.area or args.include:
@@ -442,9 +455,11 @@ def main(argv: list[str] | None = None) -> int:
             result = allocation.allocate(root, config, area=args.area, count=args.count, reserve_for=args.reserve_for, purpose=args.purpose, dry_run=args.dry_run)
             code = 0
         elif args.command in {'claim', 'finish'}:
-            result = commit_transition(root, config, args); code = 0
+            result = commit_transition(root, config, args,
+                context.runtime_root if context.mode == 'personal' else None); code = 0
         else:
-            result = move(root, config, args); code = 0
+            result = move(root, config, args,
+                context.runtime_root if context.mode == 'personal' else None); code = 0
     except (board.BoardError, project_config.ProjectConfigError, OSError, subprocess.SubprocessError, ValueError) as exc:
         diagnostics = [asdict(e) for e in exc.diagnostics] if isinstance(exc, board.ValidationError) else [asdict(exc.diagnostic)] if isinstance(exc, board.BoardError) else [{'path':'','field':'command','reason':str(exc)}]
         result = {'schema':f'implement-rfc.{args.command}.v1', 'errors':diagnostics}
