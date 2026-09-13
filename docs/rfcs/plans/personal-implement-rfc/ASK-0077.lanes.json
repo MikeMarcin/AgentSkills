@@ -28,8 +28,20 @@
       "command": "python3 -m unittest discover -s skills/implement-rfc/tests -p 'test_personal_lifecycle_public.py' -q",
       "result": "1 passed",
       "observation": "Public tracker operations and local paired-state assignment/return execute together."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_personal_lanes.py -q",
+      "result": "13 passed",
+      "observation": "Rewritten source/tracker revision references refuse until committed tracker correction; consumed-pair release requires integrated exact refs, clean task-owned worktrees and no pending receipts; partial removal preserves active pair and retry."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_personal_binding.py -q",
+      "result": "9 passed",
+      "observation": "Binding and cross-clone association remain passing after final lane/commit integration."
     }
   ],
   "synchronization": "Disposable separate local bare remotes: no-remotes reports local-only; explicit authorized exact-branch pushes succeed; a divergent tracker ref rejects without force and the local receipt records the already successful source side. No live remote push occurred.",
-  "ownership": "Initial worker and same-owner cross-clone correction returned quiescent; no descendants or task commands remain."
+  "ownership": "Initial worker and same-owner cross-clone correction returned quiescent; no descendants or task commands remain.",
+  "supplemental_revision": "f15b8cc390e74ed5288536b1ee454985a3c5dcaf",
+  "supplemental_ownership": "Same paired-lane worker returned quiescent after reconciliation, release and SHA-256/canonical-record corrections; no commits or descendants."
 }
