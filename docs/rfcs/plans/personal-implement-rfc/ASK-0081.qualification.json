@@ -1,0 +1,55 @@
+{
+  "schema": "implement-rfc.personal-qualification.v1",
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-004",
+  "producer_id": "/root/personal_qualification_integrator",
+  "mandate_revision": "1",
+  "card": "ASK-0081",
+  "implementation_revision": "f15b8cc390e74ed5288536b1ee454985a3c5dcaf",
+  "offline_course": {
+    "command": "python3 -m unittest discover -s skills/implement-rfc/tests -p test_personal_qualification_course.py -v",
+    "final_log": "/tmp/implement-rfc-personal-2026-09-13/pm-004-offline-final.log",
+    "result": "3 passed in 66.200s, exit 0",
+    "first_fixture_run": "The first parity fixture failed because its queue call omitted the required scope selector. The fixture was corrected to select its RFC; its independent parity rerun passed. The original failure remains in /tmp/implement-rfc-personal-2026-09-13/pm-004-offline-course-negative-fixture.log.",
+    "private_run": {
+      "unconfigured_source": "A disposable Git source was initialized and observed through public personal_tracker, project_config and lane status helpers; byte snapshot of 43 source and Git entries was unchanged by setup, observation and plan intake.",
+      "public_lifecycle": "Private ID reservation, RFC/card intake and plan adoption, claim, verify, product commit, four injected interruption points, resume, queue and completion all ran through public helpers. Each claim was committed to the external tracker before its product edit.",
+      "source_commits_all": [
+        {"revision": "2ca497bc210e250f80e8f40047ff6db581888e20", "message": "Improve product step 1", "paths": ["product.txt"]},
+        {"revision": "77dcbe981d5a55351aeec4c99174483106112892", "message": "Improve product step 2", "paths": ["product.txt"]},
+        {"revision": "5ed843dcee9f3c794608dfa0f7061fa7a11179e9", "message": "Improve product step 3", "paths": ["product.txt"]},
+        {"revision": "f74825e9d44edb5c59363122b83f8eea0a5109b8", "message": "Improve product step 4", "paths": ["product.txt"]}
+      ],
+      "privacy_footprint": "The course compared the complete revision list to these four commits, inspected every commit message and tree and each selected changed path, and scanned non-object source Git metadata for private identifiers, tracker/runtime paths and bookkeeping tokens. Unrelated staged and unstaged edits survived each recovery; the deliberate fixture edits were then restored before paired-lane operations. The source ended clean.",
+      "recovery_points": ["before-source-commit", "after-source-commit", "before-tracker-commit", "after-tracker-commit"],
+      "paired_lanes": "Two distinct source/tracker branch-worktree pairs were bound. Branch rename refused until explicit rebind. A second clone with a matching remote refused implicit association and required explicit tracker association.",
+      "synchronization": "Local-only sync had no remote effects. Two separate disposable bare remotes rejected push without explicit authorization, then received the corresponding source and tracker refs with authorization. A divergent tracker remote refused later sync while preserving local tracker HEAD. No live remote was used.",
+      "literal_rebase": {
+        "source_commits_all": [
+          {"revision": "bcf231366ab27842f5f0c3713fe91e76bac73911", "message": "Add feature behavior", "note": "retired original feature commit"},
+          {"revision": "8394d761b8afcae4a67dee37397dab885b0b7d3d", "message": "Add foundation behavior"},
+          {"revision": "7f88e0c7e3d0c34ba6ec53cbb6dbc466b667c3fa", "message": "Add feature behavior", "note": "rebased feature commit"}
+        ],
+        "result": "A literal git rebase changed the feature revision. Lane status and reconciliation refused stale evidence; a committed tracker-evidence rewrite to the new revision was required before reconciliation succeeded."
+      }
+    },
+    "parity": {
+      "modes": ["project", "personal"],
+      "identical_actions": ["resume-integrator", "ignore-stale", "40-parked", "PRS-0001", "60-done", 1],
+      "scenarios": ["shared plan assignment", "partial return", "stale dispatch rejection", "human-pending park", "completed acceptance", "closeout queue"]
+    },
+    "focused_existing_regressions": [
+      "Paired-lane suite: 13 passed in 50.207s; /tmp/implement-rfc-personal-2026-09-13/pm-004-offline-lanes.log",
+      "Recovery selection: 3 passed in 23.037s; /tmp/implement-rfc-personal-2026-09-13/pm-004-offline-recovery.log"
+    ]
+  },
+  "binary_disposition": {
+    "decision": "precisely bounded supported-path limitation",
+    "reason": "Opaque binary blobs and unsupported encodings cannot be inspected for embedded private references with the current privacy validator. The mandate does not establish a safe exemption policy for uninspectable content, so the public helpers fail closed rather than silently weakening the privacy boundary. This is not a claim of universal source-file support.",
+    "prepared_finish": "An opaque binary selected for a prepared operation refuses before either the source or tracker commit.",
+    "existing_commit_adopt": "Adoption of an already-created contributor commit containing opaque binary refuses before tracker acceptance. The existing source commit remains in history; no rollback or clean-history claim applies.",
+    "focused_test": "Two negative tests passed in 11.266s; the test definitions are committed at a8ae2726b7af5621131099b2588d2c050c4e3404.",
+    "other_limits": "Normal hook adoption passed previously; actual signed adoption, Windows locking and power-loss behavior remain unexercised. Native remote agent execution remains unqualified; incompatible legacy adapters refuse personal mode before writes."
+  },
+  "native_course": "Recorded separately in ASK-0081.native.json after both fresh signed-in hosts finish."
+}

@@ -1,0 +1,105 @@
+{
+  "schema": "implement-rfc.personal-native-qualification.v1",
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-004",
+  "producer_id": "/root/personal_qualification_integrator",
+  "mandate_revision": "1",
+  "user_trust_decision": {
+    "answer": "Approve both disposable repositories.",
+    "receipt": "/tmp/implement-rfc-personal-2026-09-13/native/trust-decision.json",
+    "scope": "Only Codex 'Yes, continue' for the disposable Codex source and Claude Code 'Yes, I trust this folder' for the separate disposable Claude source. No persistent or unrelated permission was granted."
+  },
+  "codex": {
+    "host": "Codex CLI 0.154.0, fresh normal signed-in interactive session; PTY 63846, exited 0",
+    "source_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/codex/consumer",
+    "source_revision_unchanged": "8af85e18076cc6145c751a1982897d4588c9de3e",
+    "tracker_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/codex/state/trackers/c6cefef47c40d6a210038159",
+    "tracker_revision_unchanged": "df76ff5d03604e28ec80780f9d4396487ee93758",
+    "runtime_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/codex/state/runtime/c6cefef47c40d6a210038159",
+    "qualifying_dispatch": {
+      "parent_session_id": "01a0997d-e4f1-7021-bbd2-e44546657367",
+      "tool": "collaboration.spawn_agent",
+      "task_name": "qualification_integrator_fresh",
+      "agent_type": "rfc-integrator",
+      "fork_turns": "none",
+      "model_override": "omitted",
+      "reasoning_effort_override": "omitted",
+      "integrator_session_id": "01a0998c-d664-7461-8b9e-0bd62be901b4",
+      "leaf": {
+        "agent_type": "rfc-utility",
+        "task_name": "rfc_utility_personal_binding_verification",
+        "fork_turns": "none",
+        "model_override": "omitted",
+        "reasoning_effort_override": "omitted",
+        "session_id": "01a0998e-28c4-7721-8535-049f997725fb",
+        "result": "completed, independent read-only check, no descendants or active commands"
+      }
+    },
+    "route_comparison": {
+      "generated_integrator": "rfc-integrator, gpt-5.6-sol, xhigh in user-scope Codex role file",
+      "observed_integrator": "session_meta agent_role=rfc-integrator; turn_context model=gpt-5.6-sol, effort=xhigh",
+      "generated_leaf": "rfc-utility, gpt-5.6-luna, xhigh in user-scope Codex role file",
+      "observed_leaf": "session_meta agent_role=rfc-utility; turn_context model=gpt-5.6-luna, effort=xhigh",
+      "interpretation": "The native host session metadata and turn contexts, not generated files or banners alone, establish this role loading and effective route."
+    },
+    "bounded_course": {
+      "public_helpers": ["personal_tracker.py --json status: exit 0", "project_config.py --json: exit 0"],
+      "result": "Both helpers resolved personal mode and the same source, external tracker and runtime roots. Integrator and leaf each read source/product.txt and the external tracker .mask/skill-config/implement-rfc/project.md; the leaf independently confirmed exact content. No setup, source/tracker mutation or external runtime write occurred in the qualifying course.",
+      "source_and_tracker_git_status": "Both clean at their initial revisions after the course."
+    },
+    "retained_transcripts": [
+      "/Users/jaeger/.codex/sessions/2026/09/12/rollout-2026-09-12T23-39-19-01a0997d-e4f1-7021-bbd2-e44546657367.jsonl",
+      "/Users/jaeger/.codex/sessions/2026/09/12/rollout-2026-09-12T23-55-39-01a0998c-d664-7461-8b9e-0bd62be901b4.jsonl",
+      "/Users/jaeger/.codex/sessions/2026/09/12/rollout-2026-09-12T23-57-05-01a0998e-28c4-7721-8535-049f997725fb.jsonl"
+    ],
+    "prior_attempts": "The first role and leaf loaded and read both roots, but an external artifact patch tool stalled and that turn was interrupted; no artifact was written. A second history-copying dispatch attempted unrelated computer UI access; Codex-app access was denied and Sublime Text was not approved, without granting permission. Its child completed and the parent was interrupted. A queued third non-history-copying dispatch was interrupted before a leaf. None of these attempts is used as the corrected-course acceptance proof; all descendants were accounted for."
+  },
+  "claude_code": {
+    "host": "Claude Code 2.1.270, fresh normal signed-in interactive session; PTY 80616, ended after native course",
+    "source_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/claude/consumer",
+    "source_revision_unchanged": "b3515b9a63c80c9ab8feef8c761264394a612069",
+    "tracker_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/claude/state/trackers/951970666a451c41d79f2e91",
+    "tracker_revision_unchanged": "1d780e0223ea148a7e07a114ac031e9648133aa1",
+    "runtime_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/claude/state/runtime/951970666a451c41d79f2e91",
+    "qualifying_dispatch": {
+      "parent_session_id": "99fc3e94-a035-4f8b-84e4-d766215ac020",
+      "tool": "Agent",
+      "subagent_type": "rfc-integrator",
+      "model_override": "omitted",
+      "effort_override": "omitted",
+      "integrator_transcript": "subagents/agent-a5573d9fa5a166859.jsonl",
+      "leaf": {
+        "subagent_type": "rfc-utility",
+        "description": "rfc-utility: read-only inventory of source and tracker roots",
+        "model_override": "omitted",
+        "effort_override": "omitted",
+        "transcript": "subagents/agent-a7e84d4dd68e143dd.jsonl",
+        "result": "completed and collected, independent source/tracker reads, no writes or descendants"
+      }
+    },
+    "route_comparison": {
+      "generated_integrator": "rfc-integrator, claude-opus-5, xhigh in user-scope Claude role file",
+      "observed_integrator": "native transcript message.model=claude-opus-5; named effort not independently exposed",
+      "generated_leaf": "rfc-utility, claude-haiku-4-5 with no effort field in user-scope Claude role file",
+      "observed_leaf": "native transcript message.model=claude-haiku-4-5-20251001; named effort not independently exposed",
+      "alias_evidence": "Anthropic model-ID documentation identifies claude-haiku-4-5 as an alias for claude-haiku-4-5-20251001: https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
+      "interpretation": "Native provider model fields and actual Agent dispatch establish loading; the configured xhigh effort is not claimed as observed."
+    },
+    "bounded_course": {
+      "public_helpers": ["personal_tracker.py --json status: exit 0", "project_config.py --json: exit 0"],
+      "result": "Both helpers resolved the assigned personal source, external tracker and runtime. Integrator and leaf read source/product.txt and external tracker .mask/skill-config/implement-rfc/project.md. The integrator wrote only an external runtime native-course.json; source and tracker Git roots remained clean at their initial revisions.",
+      "external_artifact": "/tmp/implement-rfc-personal-2026-09-13/native/claude/state/runtime/951970666a451c41d79f2e91/native-course.json",
+      "external_artifact_sha256": "ec14779f3cd55c9da43d1b310a4a0f4e4be77ae2785309006165eb64ebcdecf1"
+    },
+    "retained_parent_transcript": "/Users/jaeger/.claude/projects/-private-tmp-implement-rfc-personal-2026-09-13-native-claude-consumer/99fc3e94-a035-4f8b-84e4-d766215ac020.jsonl",
+    "prior_attempts": "Two earlier interactive sessions canceled read-outside-working-directories prompts without approval. The qualifying session used Claude Code's session-scoped --add-dir for the selected skill symlink, its source target and disposable state root; no persistent permission setting changed."
+  },
+  "selected_live_state": {
+    "before_snapshot": "/tmp/implement-rfc-personal-2026-09-13/native/live-snapshot.json",
+    "snapshot_sha256": "b9eb59a30ef600ec63e0096a7ef4ad0a59ce91856aea952ca1a73e46f5d25496",
+    "after_comparison": "All 24 selected user role, skill/lock and declaration files matched the before snapshot byte for byte; both fixture source and tracker Git roots remained clean at their initial heads.",
+    "native_sessions_and_children": "Codex qualifying parent/integrator/utility completed and CLI exited 0. Claude qualifying parent/integrator/utility completed and CLI was then closed. Prior interrupted Codex/Claude attempts were not accepted as substitutes and have no active descendants.",
+    "permission_result": "Only the user's two exact disposable folder-trust choices were selected. No native permission prompt was approved by an agent."
+  },
+  "scope_limit": "The courses demonstrate personal role loading and bounded local source/external-state operation in both supported signed-in hosts. They do not qualify native remote agent execution, persistent permission changes or a platform matrix."
+}

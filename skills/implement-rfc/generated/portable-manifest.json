@@ -430,7 +430,7 @@
     },
     {
       "path": "tests/test_personal_commit.py",
-      "sha256": "65fe72fda2c92bc2368ccbf5c3d4817417b8f103683132a2f3d552727a80230b"
+      "sha256": "4fbc940048d3f0e780185464a70a6d230811ee2bac778ad964688c8387972cd9"
     },
     {
       "path": "tests/test_personal_companion_state.py",
@@ -443,6 +443,10 @@
     {
       "path": "tests/test_personal_lifecycle_public.py",
       "sha256": "db504b81974f1582eb11e3361fadd77e1bf335ec94333b0b65a3ed59f86f9809"
+    },
+    {
+      "path": "tests/test_personal_qualification_course.py",
+      "sha256": "7ea097d3b34bf19aebaa429b3fc7116fe0aec5a3b99f91302ce916e4d619d432"
     },
     {
       "path": "tests/test_progress_trail.py",
@@ -533,6 +537,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "1c36f861bdcdfc92",
+  "portable_digest": "87540b02bbd332ab",
   "schema": "implement-rfc.portable-manifest.v1"
 }
