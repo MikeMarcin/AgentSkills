@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0081"
 title: "Qualify full private workflow and native hosts"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0078", "ASK-0079", "ASK-0080"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC03","RFC-ASK-0013-AC04","RFC-ASK-0013-AC05","RFC-ASK-0013-AC06","RFC-ASK-0013-AC07","RFC-ASK-0013-AC08","RFC-ASK-0013-AC09"]}
+acceptance: [{"criterion":"Public complete private run and every new product commit/message satisfy the bounded source and Git footprint","outcome":"pass","revision":"6c9c611d885926c3cff719a70a85fbb402b9073c","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0081.qualification.json"}},{"criterion":"Paired lanes, literal rebase repair, crash recovery, two local bare remotes and shared-mode parity pass direct disposable courses","outcome":"pass","revision":"6c9c611d885926c3cff719a70a85fbb402b9073c","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0081.qualification.json"}},{"criterion":"Fresh signed-in Codex and Claude Code hosts load personal integrator and utility roles and operate against source plus external state","outcome":"pass","revision":"6c9c611d885926c3cff719a70a85fbb402b9073c","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0081.native.json"}},{"criterion":"Opaque binary and unsupported-encoding paths fail closed with distinct prepared-finish and existing-commit-adopt effects","outcome":"pass","revision":"a8ae2726b7af5621131099b2588d2c050c4e3404","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0081.qualification.json"}}]
 ---
 
 # ASK-0081: Qualify full private workflow and native hosts
