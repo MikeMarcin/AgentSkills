@@ -162,6 +162,14 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
             checked = cli("coordinator_handoff.py", "check", "--assignment", "assignment.json",
                 "--return-file", "return.json", "--execution", "quiescent", "--json")
             self.assertEqual(checked["action"], "resume-integrator")
+            incorrect = json.loads((runtime / "return.json").read_text())
+            incorrect["repository_state"]["workflow_revision"] = "0" * 40
+            (runtime / "return.json").write_text(json.dumps(incorrect))
+            self.assertEqual(cli("coordinator_handoff.py", "check", "--assignment", "assignment.json",
+                "--return-file", "return.json", "--execution", "quiescent", "--json",
+                expected=2)["action"], "reconcile")
+            incorrect["repository_state"] = assigned["repository_state"]
+            (runtime / "return.json").write_text(json.dumps(incorrect))
             stale = json.loads((runtime / "return.json").read_text())
             stale["dispatch_id"] = "another-dispatch"
             (runtime / "return.json").write_text(json.dumps(stale))
