@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0081"
 title: "Qualify full private workflow and native hosts"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0078", "ASK-0079", "ASK-0080"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC03","RFC-ASK-0013-AC04","RFC-ASK-0013-AC05","RFC-ASK-0013-AC06","RFC-ASK-0013-AC07","RFC-ASK-0013-AC08","RFC-ASK-0013-AC09"]}
