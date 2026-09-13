@@ -1,0 +1,35 @@
+{
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-002",
+  "card": "ASK-0077",
+  "source_revision": "190892f77e8b51ee592c6ad62c5d3cf528354ff5",
+  "dispatch": {
+    "role": "rfc-worker",
+    "task": "rfc_worker_paired_lanes",
+    "fork_turns": "none",
+    "model_override": null,
+    "effort_override": null,
+    "generated_route": "gpt-6-astra low",
+    "banner": "Role: rfc-worker | Model: gpt-6-astra | Effort: low",
+    "observed_serving": "unavailable"
+  },
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_personal_lanes.py",
+      "result": "6 passed",
+      "observation": "Concurrent source/tracker worktrees; inherited committed reservation; exact repository/branch/revision state; switch, rename, rewritten history and removed-worktree refusal; explicit clone association with distinct lane; local fast-forward integration."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_personal_binding.py",
+      "result": "9 passed",
+      "observation": "Previously accepted managed/supplied binding and source-footprint behavior remains passing, including explicit association."
+    },
+    {
+      "command": "python3 -m unittest discover -s skills/implement-rfc/tests -p 'test_personal_lifecycle_public.py' -q",
+      "result": "1 passed",
+      "observation": "Public tracker operations and local paired-state assignment/return execute together."
+    }
+  ],
+  "synchronization": "Disposable separate local bare remotes: no-remotes reports local-only; explicit authorized exact-branch pushes succeed; a divergent tracker ref rejects without force and the local receipt records the already successful source side. No live remote push occurred.",
+  "ownership": "Initial worker and same-owner cross-clone correction returned quiescent; no descendants or task commands remain."
+}
