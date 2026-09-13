@@ -1,0 +1,17 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0075",
+    "ASK-0076",
+    "ASK-0077",
+    "ASK-0078",
+    "ASK-0079",
+    "ASK-0080",
+    "ASK-0081",
+    "ASK-0082"
+  ],
+  "reserve_for": "personal-mode-20260913",
+  "purpose": "",
+  "created": "2026-09-13T04:14:13.195173+00:00",
+  "base": "16192b76ec1bbaee001c718d3e82d447db4f25c5"
+}
