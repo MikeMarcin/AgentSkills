@@ -110,6 +110,14 @@ class PersonalBindingTests(unittest.TestCase):
         self.assertEqual(associated.returncode, 0, associated.stderr)
         self.assertEqual(second["workflow_root"], first["workflow_root"])
         self.assertNotEqual(second["source_common_dir"], first["source_common_dir"])
+        tracker = Path(first["workflow_root"])
+        before = snapshot(tracker)
+        refused = subprocess.run([sys.executable, str(BOARD), "--repo-root", str(clone),
+            "allocate", "--reserve-for", "unbound-clone", "--json"],
+            env=self.env, capture_output=True, text=True)
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("no tracker pair", refused.stdout)
+        self.assertEqual(snapshot(tracker), before)
 
     def test_explicit_project_override_and_unsafe_paths(self):
         source = self.source("configured", configured=True)
