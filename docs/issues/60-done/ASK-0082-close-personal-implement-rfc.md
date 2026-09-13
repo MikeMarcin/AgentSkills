@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0082"
 title: "Close personal implement-rfc at selected adoption boundary"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0081"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC01","RFC-ASK-0013-AC02","RFC-ASK-0013-AC03","RFC-ASK-0013-AC04","RFC-ASK-0013-AC05","RFC-ASK-0013-AC06","RFC-ASK-0013-AC07","RFC-ASK-0013-AC08","RFC-ASK-0013-AC09","RFC-ASK-0013-AC10","RFC-ASK-0013-AC11","RFC-ASK-0013-AC12"]}
 closeout_for: ["RFC-ASK-0013"]
+acceptance: [{"criterion":"All twelve acceptance criteria reconcile with actual integrated revisions and direct evidence","outcome":"pass","revision":"4a086b102ddf76bbc2e9a4f9a1f5707d207b5f2a","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0082.adoption.json"}},{"criterion":"Selected personal adoption occurs at an ownership-safe boundary; active consumers and unrelated work remain intact","outcome":"pass","revision":"4a086b102ddf76bbc2e9a4f9a1f5707d207b5f2a","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0082.adoption.json"}},{"criterion":"Actual native and human evidence is present for required criteria with no criterion silently waived","outcome":"pass","revision":"4a086b102ddf76bbc2e9a4f9a1f5707d207b5f2a","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0081.native.json"}}]
 ---
 
 # ASK-0082: Close personal implement-rfc at selected adoption boundary

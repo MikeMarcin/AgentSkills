@@ -1,0 +1,33 @@
+{
+  "approved": true,
+  "decision": "done",
+  "records": [
+    {
+      "criterion": "All twelve acceptance criteria reconcile with actual integrated revisions and direct evidence",
+      "outcome": "pass",
+      "revision": "4a086b102ddf76bbc2e9a4f9a1f5707d207b5f2a",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0082.adoption.json"
+      }
+    },
+    {
+      "criterion": "Selected personal adoption occurs at an ownership-safe boundary; active consumers and unrelated work remain intact",
+      "outcome": "pass",
+      "revision": "4a086b102ddf76bbc2e9a4f9a1f5707d207b5f2a",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0082.adoption.json"
+      }
+    },
+    {
+      "criterion": "Actual native and human evidence is present for required criteria with no criterion silently waived",
+      "outcome": "pass",
+      "revision": "4a086b102ddf76bbc2e9a4f9a1f5707d207b5f2a",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0081.native.json"
+      }
+    }
+  ]
+}

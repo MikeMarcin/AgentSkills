@@ -6,7 +6,7 @@ status: "Implementing"
 
 # RFC-ASK-0013: Optional personal storage for implement-rfc
 
-Accepted user mandate: `/tmp/implement-rfc-personal-2026-09-13/mandate.md`, revision 1, run `personal-mode-20260913`. The [authored plan](plans/personal-implement-rfc/milestone-plan.json) governs integration. [ASK-0082](../issues/30-in-progress/ASK-0082-close-personal-implement-rfc.md) holds the immutable baseline, criterion results, and current frontier.
+Accepted user mandate: `/tmp/implement-rfc-personal-2026-09-13/mandate.md`, revision 1, run `personal-mode-20260913`. The [authored plan](plans/personal-implement-rfc/milestone-plan.json) governs integration. [ASK-0082](../issues/60-done/ASK-0082-close-personal-implement-rfc.md) holds the immutable baseline, criterion results, and current frontier.
 
 ## Decision and authority
 
