@@ -15,6 +15,10 @@ than this coordinator loop.
 
 ## 1. Bind the run
 
+For explicit personal mode or a remembered external tracker, read
+[Personal storage](references/personal-storage.md) before resolving context.
+Project mode continues with the existing consumer files.
+
 Resolve the consumer with `scripts/project_config.py --repo-root ROOT` using an
 absolute root. Resolve helper paths from the selected installed skill asset root.
 Keep the consumer root explicit on helper calls; a shared skill link never

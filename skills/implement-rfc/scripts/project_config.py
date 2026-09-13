@@ -14,8 +14,11 @@ import json
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 SKILL_DIR = Path(__file__).resolve().parents[1]
 CONTEXT_DIR = Path(".mask/skill-config/implement-rfc")
@@ -199,13 +202,28 @@ class ProjectContext:
     """One invocation's assets and consumer facts; never cached globally."""
 
     def __init__(self, asset_root: Path, repo_root: Path, project_config_path: Path,
-                 project_rules_path: Path, config: dict[str, Any], *, legacy: bool = False):
+                 project_rules_path: Path, config: dict[str, Any], *, legacy: bool = False,
+                 mode: str = "project", workflow_root: Path | None = None,
+                 runtime_root: Path | None = None, source_common_dir: Path | None = None,
+                 workflow_common_dir: Path | None = None):
         self.asset_root = asset_root
-        self.repo_root = repo_root
+        self.source_root = repo_root
+        self.workflow_root = workflow_root or repo_root
+        self.runtime_root = runtime_root
+        self.mode = mode
+        self.source_common_dir = source_common_dir
+        self.workflow_common_dir = workflow_common_dir
         self.project_config_path = project_config_path
         self.project_rules_path = project_rules_path
         self.config = config
         self.legacy = legacy
+
+    @property
+    def repo_root(self) -> Path:
+        """Compatibility accessor for helpers not yet routed through both roots."""
+        if self.mode == "personal":
+            raise ProjectConfigError("helper is not yet personal-mode aware; use source_root and workflow_root explicitly")
+        return self.source_root
 
 
 def git_environment() -> dict[str, str]:
@@ -224,7 +242,9 @@ def _origin_name(origin: str) -> str:
 
 def resolve_context(*, repo_root: Path | str | None = None,
                     cwd: Path | str | None = None,
-                    project_config_path: Path | str | None = None) -> ProjectContext:
+                    project_config_path: Path | str | None = None,
+                    mode: str | None = None,
+                    workflow_root: Path | str | None = None) -> ProjectContext:
     """Select explicit root, environment, or invocation Git root, in that order.
 
     Explicit config overrides are fixture/authoring inputs beneath the selected
@@ -244,27 +264,60 @@ def resolve_context(*, repo_root: Path | str | None = None,
     root = Path(top).resolve()
     if selected is not None and candidate != root:
         raise ProjectConfigError(f"selected --repo-root must be the Git worktree root: {root}")
+    if mode not in (None, "project", "personal"):
+        raise ProjectConfigError("mode must be project or personal")
+    import personal_state
+    try:
+        home = personal_state.home_for(root) if mode != "project" else None
+        binding = personal_state.read_binding(home, root) if home is not None else None
+        chosen_mode = mode or ("personal" if binding else "project")
+        if chosen_mode == "personal":
+            personal_state.ensure_home_separate(home, root)
+            if workflow_root is not None:
+                workflow = personal_state.git_root(Path(workflow_root))
+                if binding and workflow != Path(binding["tracker_root"]):
+                    raise ProjectConfigError("explicit workflow root conflicts with the personal binding")
+            elif binding:
+                workflow = Path(binding["tracker_root"])
+            else:
+                raise ProjectConfigError("personal mode has no binding; run personal_tracker.py init explicitly")
+            personal_state.ensure_separate(root, workflow)
+            personal_state.ensure_local_state_separate(home, workflow)
+        else:
+            workflow = root
+            if workflow_root is not None and Path(workflow_root).expanduser().resolve() != root:
+                raise ProjectConfigError("project mode workflow root must equal the source root")
+        source_common = personal_state.common_dir(root)
+        workflow_common = personal_state.common_dir(workflow)
+        runtime = home / "runtime" / personal_state.binding_key(root) if chosen_mode == "personal" else root
+        if chosen_mode == "personal":
+            personal_state._check_local_path(home, runtime)
+    except personal_state.PersonalStateError as exc:
+        raise ProjectConfigError(str(exc)) from exc
     assets = SKILL_DIR.resolve()
-    context_dir = root / CONTEXT_DIR
+    context_dir = workflow / CONTEXT_DIR
     config_path = context_dir / "project.json"
     rules_path = context_dir / "project.md"
     legacy = False
     if project_config_path is not None:
         config_path = Path(project_config_path).expanduser()
         if not config_path.is_absolute():
-            config_path = root / config_path
+            config_path = workflow / config_path
     for path in (config_path, rules_path):
-        if not path.resolve().is_relative_to(root):
-            raise ProjectConfigError(f"project context escapes selected consumer {root}: {path}")
+        if not path.resolve().is_relative_to(workflow):
+            raise ProjectConfigError(f"project context escapes selected consumer {workflow}: {path}")
     config = load(config_path)
     if not rules_path.is_file():
         raise ProjectConfigError(f"missing project rules: {rules_path}; create both files under {context_dir}")
-    origin = _git(root, "remote", "get-url", "origin")
+    origin = _git(workflow, "remote", "get-url", "origin")
     if origin and _origin_name(origin) != config["origin_repo_name"]:
         raise ProjectConfigError(f"project identity mismatch: origin does not name configured repository {config['origin_repo_name']!r}")
     if legacy and not origin and root.name not in (config["origin_repo_name"], config["project"]):
         raise ProjectConfigError(f"legacy project identity mismatch for {root}")
-    return ProjectContext(assets, root, config_path.resolve(), rules_path.resolve(), config, legacy=legacy)
+    return ProjectContext(assets, root, config_path.resolve(), rules_path.resolve(), config,
+                          legacy=legacy, mode=chosen_mode, workflow_root=workflow,
+                          runtime_root=runtime, source_common_dir=source_common,
+                          workflow_common_dir=workflow_common)
 
 
 def repo_root() -> Path:
@@ -305,11 +358,24 @@ if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description=__doc__)
         parser.add_argument("--repo-root", type=Path)
+        parser.add_argument("--mode", choices=("project", "personal"))
+        parser.add_argument("--workflow-root", type=Path)
+        parser.add_argument("--json", action="store_true")
         args = parser.parse_args()
-        context = resolve_context(repo_root=args.repo_root)
+        context = resolve_context(repo_root=args.repo_root, mode=args.mode,
+                                  workflow_root=args.workflow_root)
         loaded = context.config
     except ProjectConfigError as error:
         print(f"error: {error}", file=sys.stderr)
         raise SystemExit(2)
-    print(f"consumer: {context.repo_root}")
-    print(f"project.json valid: {loaded['project']} ({loaded['display_name']})")
+    if args.json:
+        print(json.dumps({"mode": context.mode, "source_root": str(context.source_root),
+                          "source_common_dir": str(context.source_common_dir),
+                          "workflow_root": str(context.workflow_root),
+                          "workflow_common_dir": str(context.workflow_common_dir),
+                          "runtime_root": str(context.runtime_root) if context.runtime_root else None,
+                          "project": loaded["project"]}))
+    else:
+        print(f"consumer: {context.source_root}")
+        print(f"workflow: {context.workflow_root} ({context.mode})")
+        print(f"project.json valid: {loaded['project']} ({loaded['display_name']})")

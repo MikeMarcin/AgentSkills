@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "41b65a6a52a12d4ef0de7734e6c184b1614fc3e47602577868aecc29291e80af"
+      "sha256": "a7605748899e2fe7c39f216df48f17862cfab59a5d3d5967ad9e604568d26bc1"
     },
     {
       "path": "agents/openai.yaml",
@@ -107,6 +107,10 @@
     {
       "path": "references/pack-lifecycle.md",
       "sha256": "390074a5acdf5edc80eadc5c334a95d4d742df06ad1da684a3868587bafc8717"
+    },
+    {
+      "path": "references/personal-storage.md",
+      "sha256": "6126357483f4cde4769e430d0ac90153fb97ec5374598bd51a8c79ad36103e6a"
     },
     {
       "path": "references/progress-relay.md",
@@ -225,6 +229,14 @@
       "sha256": "34f000169e748ea52abcfcb1ab897431d3ffae9581d29d3c409cd526ba242bff"
     },
     {
+      "path": "scripts/personal_state.py",
+      "sha256": "6e8d372ae4c4e0da7f6ac55277a3fccb5f85f2896e2bc9de456fd993ed5e3f11"
+    },
+    {
+      "path": "scripts/personal_tracker.py",
+      "sha256": "b4deaa3c80e1d5e004425812280bbc9914738162ab6b9b1af0bc13f31e569fcd"
+    },
+    {
       "path": "scripts/prepare_mask_roles.py",
       "sha256": "8122dbabf344aa0b50de98d40b91d78d832c8e4095fea8b70deca8564f7fd24d"
     },
@@ -234,7 +246,7 @@
     },
     {
       "path": "scripts/project_config.py",
-      "sha256": "5f379659c5bf7a8a43c54a4f665eade8fbd44b4fb253982e0fb7b5b4ed4d5809"
+      "sha256": "c97e8e0d8e4dbe2a95ffa5685b7d3a698571fd7dd1355b2997a4787875c0b64d"
     },
     {
       "path": "scripts/qualification_guard.py",
@@ -393,6 +405,10 @@
       "sha256": "c3336f71b3fa273a73038feb8a08d7c55dda21f832b29da2627447d89e0d2bec"
     },
     {
+      "path": "tests/test_personal_binding.py",
+      "sha256": "e3a8e57f5b1378aa9e38022aad7245b0a9a20bb0a21993fce0dbb518f4f7d991"
+    },
+    {
       "path": "tests/test_progress_trail.py",
       "sha256": "bdf180003dd1829830e1559eee8a35317b7831a5de343ab50ffc04797a4088bd"
     },
@@ -481,6 +497,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "cef3f91811cc7422",
+  "portable_digest": "0a97e868ebb0acdd",
   "schema": "implement-rfc.portable-manifest.v1"
 }
