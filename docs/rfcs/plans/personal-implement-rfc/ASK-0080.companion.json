@@ -1,0 +1,24 @@
+{
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-003",
+  "card": "ASK-0080",
+  "source_revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+  "observed": [
+    "Attended-review and wizard use explicit external session paths while protecting the source checkout and its Git metadata; public symlink and sibling-worktree Git metadata cases refuse before source writes.",
+    "Command-only execution orders, events, reports, progress and station leases use external runtime state while source commands and candidate checks still target the source checkout. Native agent stages with the old single-root packet refuse personal mode.",
+    "Paired Git synchronization writes a local runtime receipt with source and tracker checkout roots, repository identities, branches, exact revisions, selected remote names and each completed side. Disposable separate bare remotes passed; a rejected second push retained a pending-reconciliation receipt and source/tracker history.",
+    "Legacy remote station, Codex station transport and companion lane adapters refuse personal mode before their source-local station or lane metadata write. No native remote agent execution is claimed."
+  ],
+  "checks": [
+    {"command": "python3 -m unittest discover -s skills/attended-review/tests", "result": "24 passed"},
+    {"command": "python3 -m unittest discover -s skills/wizard/tests", "result": "11 passed"},
+    {"command": "python3 -m unittest discover -s skills/implement-rfc/tests -p test_personal_companion_state.py", "result": "5 passed"},
+    {"command": "python3 -m unittest discover -s skills/implement-rfc/tests -p test_personal_lanes.py", "result": "13 passed"},
+    {"command": "python3 -m unittest discover -s skills/implement-rfc/tests -p test_remote_station_guard.py", "result": "12 tests: 10 passed, 2 skipped after fixture dependency correction"}
+  ],
+  "independent_review": "Critical reviewer reproduced project-scope setup selection and three companion source-write counterexamples. Corrected public rechecks passed, including wizard directory and child lock links; final review reported no remaining AC10 blocker and quiescent commands.",
+  "limitations": [
+    "Paired Git synchronization is a compatible repository handoff, not a native remote agent execution permit; current native remote adapters remain incompatible and refuse.",
+    "macOS disposable paths and Git bare remotes were exercised; Windows and live remote hosts were not."
+  ]
+}

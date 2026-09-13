@@ -1,0 +1,24 @@
+{
+  "approved": true,
+  "decision": "done",
+  "records": [
+    {
+      "criterion": "Attended-review, wizard, command execution, progress and leases route personal runtime state externally while protecting source candidates",
+      "outcome": "pass",
+      "revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"}
+    },
+    {
+      "criterion": "Paired Git synchronization handoff carries both roots and repository/branch/revision identities through success and partial rejection",
+      "outcome": "pass",
+      "revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"}
+    },
+    {
+      "criterion": "Incompatible native remote station and lane adapters refuse personal mode before source-local metadata writes",
+      "outcome": "pass",
+      "revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0080.companion.json"}
+    }
+  ]
+}

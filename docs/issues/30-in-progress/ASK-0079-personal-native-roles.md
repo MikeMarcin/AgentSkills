@@ -26,4 +26,4 @@ Contributes to: RFC-ASK-0013-AC09, RFC-ASK-0013-AC11. The mandate remains bindin
 
 ## Verification and execution record
 
-Not started. No source or native acceptance asserted.
+AgentSkills source `9b47f12861c33f1f02b3aa4aaa7d848e37c2b094` and MASK program `78cc57cdac4ea493a3e0ba38ca0e51218af7991a` passed the [personal host evidence](../../rfcs/plans/personal-implement-rfc/ASK-0079.host.json): a fresh disposable public user setup and bound preflight reported 16 role files ready with `host_load=not_verified` and a clean source checkout. The independent instruction tabletop covered five paths in both modes, and focused rendering/preflight tests passed. This card accepts offline role and instruction integration only; RFC-ASK-0013-AC09 still requires actual fresh Codex and Claude Code personal-role loading and a bounded native course under ASK-0081.

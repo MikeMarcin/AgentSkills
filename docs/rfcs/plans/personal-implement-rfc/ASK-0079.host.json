@@ -1,0 +1,21 @@
+{
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-003",
+  "card": "ASK-0079",
+  "source_revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+  "mask_program_revision": "78cc57cdac4ea493a3e0ba38ca0e51218af7991a",
+  "observed": [
+    "Canonical shared definitions render 16 generic personal Codex and Claude role files, retaining each provider's configured route; project facts come from the bound assignment, not the user's home.",
+    "Fresh disposable committed-revision public CLI: mask init exit 0; install --user exit 4 workflow.incomplete pending setup; reviewed-hash ensure --user with exact setup consent exit 0; personal tracker bind exit 0; preflight exit 0 with state ready, 16 role rows and host_load not_verified; source Git status clean.",
+    "Changing an installed Codex role makes preflight incomplete; an unbound or switched source/tracker pair is not reported ready. Project setup with a remembered personal binding still selects project scope when explicitly requested.",
+    "Independent fresh-agent instruction tabletop traced first use, interrupted resume, small fix, status-only and paired worktrees in project and personal modes to the one shared milestone procedure. The two wording hazards it found were corrected."
+  ],
+  "checks": [
+    {"command": "python3 -m unittest discover -s skills/implement-rfc/tests -p test_mask_workflow.py", "result": "11 passed"},
+    {"command": "python3 -m unittest discover -s skills/implement-rfc/tests -p test_render_runtime_adapters.py", "result": "22 passed"},
+    {"command": "python3 skills/implement-rfc/scripts/validate_portable_agents.py --source-only", "result": "portable source valid"},
+    {"command": "python3 scripts/verify_documentation.py --root .", "result": "13 RFCs, 82 cards, 0 structural violations"}
+  ],
+  "native_loading": "pending: generated files and this task's existing project roles do not prove fresh Codex and Claude personal-role loading or a bounded native source/external-state course",
+  "scope": "Offline personal role rendering, two-scope readiness and instruction reachability; RFC-ASK-0013-AC09 native acceptance remains open for ASK-0081."
+}

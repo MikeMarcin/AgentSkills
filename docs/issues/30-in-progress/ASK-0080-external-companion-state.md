@@ -25,4 +25,4 @@ Contributes to: RFC-ASK-0013-AC10. The mandate remains binding beyond this card 
 
 ## Verification and execution record
 
-Not started. No source or native acceptance asserted.
+AgentSkills source `9b47f12861c33f1f02b3aa4aaa7d848e37c2b094` passed the [companion evidence](../../rfcs/plans/personal-implement-rfc/ASK-0080.companion.json): external attended/wizard/command/progress/lease state, source-root protection and paired Git synchronization with both identities were exercised in disposable roots. A critical reviewer reproduced and rechecked source-write counterexamples; its final review has no remaining AC10 blocker. Legacy native remote station/lane adapters refuse personal mode before source-local metadata writes. Paired Git synchronization is qualified; native remote agent execution has not been qualified.

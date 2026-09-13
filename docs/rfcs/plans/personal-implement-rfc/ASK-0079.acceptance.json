@@ -1,0 +1,24 @@
+{
+  "approved": true,
+  "decision": "done",
+  "records": [
+    {
+      "criterion": "Canonical personal roles retain provider routes and use assignment-provided project facts without changing project role addenda",
+      "outcome": "pass",
+      "revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"}
+    },
+    {
+      "criterion": "Selected personal preflight verifies role files and source/tracker binding while keeping native host loading unverified",
+      "outcome": "pass",
+      "revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"}
+    },
+    {
+      "criterion": "Fresh-agent instruction tabletop reaches one shared milestone path for first use, resume, small fix, status-only and paired worktrees in both modes",
+      "outcome": "pass",
+      "revision": "9b47f12861c33f1f02b3aa4aaa7d848e37c2b094",
+      "evidence": {"kind": "artifact", "detail": "docs/rfcs/plans/personal-implement-rfc/ASK-0079.host.json"}
+    }
+  ]
+}
