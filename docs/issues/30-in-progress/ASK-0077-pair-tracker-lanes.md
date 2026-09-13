@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0077"
 title: "Pair tracker lanes and reconcile repository identities"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0075"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC04","RFC-ASK-0013-AC07"]}
