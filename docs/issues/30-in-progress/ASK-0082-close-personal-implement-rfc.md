@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0082"
 title: "Close personal implement-rfc at selected adoption boundary"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0081"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC01","RFC-ASK-0013-AC02","RFC-ASK-0013-AC03","RFC-ASK-0013-AC04","RFC-ASK-0013-AC05","RFC-ASK-0013-AC06","RFC-ASK-0013-AC07","RFC-ASK-0013-AC08","RFC-ASK-0013-AC09","RFC-ASK-0013-AC10","RFC-ASK-0013-AC11","RFC-ASK-0013-AC12"]}
