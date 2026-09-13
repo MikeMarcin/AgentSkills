@@ -134,10 +134,12 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
             self.assertEqual(git(source, "rev-parse", "HEAD"), source_revision)
             self.assertEqual(git(source, "status", "--porcelain=v1", "--untracked-files=all"), "")
 
-            evidence = cli("record_evidence.py", "--criterion", "source-clean", "--",
+            evidence = cli("record_evidence.py", "--criterion", "source-clean",
+                "--output", "source-clean.json", "--",
                 "git", "status", "--porcelain=v1")
             self.assertEqual(evidence["revision"], source_revision)
             self.assertEqual(evidence["evidence"]["stdout_tail"], "")
+            self.assertTrue((Path(bound["runtime_root"]) / "source-clean.json").is_file())
             assigned = cli("coordinator_handoff.py", "assign", "--target", "RFC-PRS-0001",
                 "--run-id", "demo", "--dispatch-id", "first", "--producer-id", "native",
                 "--mandate-revision", "1", "--json")
