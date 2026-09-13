@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0078"
 title: "Commit product changes privately with crash recovery"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0013"]
 depends_on: ["ASK-0076", "ASK-0077"]
 metadata: {"milestone_plan":{"id":"personal-implement-rfc","path":"docs/rfcs/plans/personal-implement-rfc/milestone-plan.json"},"criterion_coverage":["RFC-ASK-0013-AC05","RFC-ASK-0013-AC06"]}
+acceptance: [{"criterion":"Private claim commits before edits; explicit product paths and ordinary message commit","outcome":"pass","revision":"f15b8cc390e74ed5288536b1ee454985a3c5dcaf","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0078.commit.json"}},{"criterion":"Known private references refuse in product commit messages, branch names, content and proposed PR text","outcome":"pass","revision":"f15b8cc390e74ed5288536b1ee454985a3c5dcaf","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0078.commit.json"}},{"criterion":"Durable external receipt reconciles pre/post source and tracker failures without reset, duplicate commit, unrelated edit loss or false completion","outcome":"pass","revision":"f15b8cc390e74ed5288536b1ee454985a3c5dcaf","evidence":{"kind":"artifact","detail":"docs/rfcs/plans/personal-implement-rfc/ASK-0078.commit.json"}}]
 ---
 
 # ASK-0078: Commit product changes privately with crash recovery

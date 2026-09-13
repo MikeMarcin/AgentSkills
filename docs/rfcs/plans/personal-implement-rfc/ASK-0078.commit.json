@@ -1,0 +1,76 @@
+{
+  "run_id": "personal-mode-20260913",
+  "dispatch_id": "pm-002",
+  "card": "ASK-0078",
+  "source_revision": "f15b8cc390e74ed5288536b1ee454985a3c5dcaf",
+  "dispatch": {
+    "role": "rfc-worker-deep",
+    "task": "rfc_worker_deep_private_commit_recovery",
+    "fork_turns": "none",
+    "model_override": null,
+    "effort_override": null,
+    "generated_route": "gpt-6-astra high",
+    "banner": "Role: rfc-worker-deep | Model: gpt-6-astra | Effort: high",
+    "observed_serving": "unavailable"
+  },
+  "public_behavior": [
+    "Committed private In Progress claim and external begin receipt precede product edits.",
+    "Explicit source files and ordinary message commit with an external expected-SHA receipt; tracker Done or Parked acceptance records the actual source revision.",
+    "Normal hooked or signed contributor commits may be made through the existing Git process and adopted by exact current SHA, parent, owned paths, committed content and message validation.",
+    "Six injected before/after source/tracker effects resume without reset, duplicate source commit or unrelated index/worktree edit loss; ambiguous history and corrupt receipts refuse.",
+    "Generated branch, source content/message/path and proposed PR text validate known private IDs, tracker paths and bookkeeping; unsupported binary or encodings refuse."
+  ],
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_personal_commit.py",
+      "result": "22 passed",
+      "observation": "Direct public two-repository commit, six crash boundaries, exact normal-commit adoption with active custom hook, preservation of unrelated staged/unstaged work, encoded privacy and corruption/concurrency negatives."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_personal_lifecycle_public.py -q",
+      "result": "3 passed",
+      "observation": "Combined public external setup, plan adoption, claim, runtime verification, source commit interruption/resume, actual-revision Done closeout; tracked tracker files exclude disposable checkout/runtime paths."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p 'test_milestone_*.py' -q",
+      "result": "38 passed, 4 skipped",
+      "observation": "Project planning and continuation regression."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_issue_board.py -q",
+      "result": "32 passed",
+      "observation": "Project board and acceptance regression."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s skills/implement-rfc/tests -p test_audit_board.py -q",
+      "result": "17 passed",
+      "observation": "External and project board audit regression."
+    },
+    {
+      "command": "python3 -B skills/implement-rfc/scripts/validate_portable_agents.py --source-only",
+      "result": "passed",
+      "observation": "Portable source digest refreshed at committed candidate."
+    },
+    {
+      "command": "python3 -B scripts/verify_documentation.py --root .",
+      "result": "13 RFCs, 82 cards, 0 structural violations"
+    }
+  ],
+  "independent_review": {
+    "role": "rfc-reviewer-critical",
+    "task": "rfc_reviewer_critical_commit",
+    "fork_turns": "none",
+    "model_override": null,
+    "effort_override": null,
+    "generated_route": "gpt-6-astra xhigh",
+    "observed_serving": "unavailable",
+    "initial": "Three P1 public-CLI counterexamples: concurrent old-tree/new-parent revert of unowned commit; corrupt tracker receipt false completion; UTF-16 private ID source disclosure.",
+    "correction_recheck": "All three no longer reproduce; direct before/after source receipt corruption, post-sync corruption, finish/adopt encoded privacy and ordinary UTF-16 positive probes passed; no additional blocker in narrow corrected-snapshot review.",
+    "quiescent": true
+  },
+  "limitations": [
+    "Opaque binary/unsupported text encodings refuse; no alternate binary receipt path is implemented.",
+    "Actual signed commit, Windows locking and power-loss behavior were not exercised; later native-host qualification remains required."
+  ],
+  "ownership": "Deep worker and critical reviewer returned quiescent; no descendants or task commands remain."
+}
