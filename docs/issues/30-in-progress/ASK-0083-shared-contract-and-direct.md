@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0083"
 title: "Shared contract, strategy selection and direct execution"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0014"]
 depends_on: []
 metadata: {"packet":"implement-rfc-execution-strategies-v2","milestone":"M1","milestone_plan":{"id":"execution-strategies-v2","path":"docs/rfcs/plans/execution-strategies-v2/milestone-plan.json"}}
