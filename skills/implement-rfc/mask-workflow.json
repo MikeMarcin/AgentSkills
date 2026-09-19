@@ -236,12 +236,18 @@
       "profiles": {
         "direct": {
           "native_roles": []
+        },
+        "native": {
+          "native_roles": []
         }
       }
     }
   },
   "profiles": {
     "direct": {
+      "native_roles": []
+    },
+    "native": {
       "native_roles": []
     }
   }

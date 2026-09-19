@@ -36,7 +36,7 @@ class StrategyMaskPublicTests(unittest.TestCase):
                 script=root/'.agents/skills/implement-rfc/scripts/workflow_preflight.py'
                 self.assertTrue(script.is_file())
                 before=(base/'machine/state.json').read_bytes()
-                for strategy in ('direct',):
+                for strategy in ('direct','native'):
                     done=subprocess.run([sys.executable,'-B',str(script),'--repo-root',str(root),'--mask',os.environ['MASK_TEST_PROGRAM'],
                                          '--strategy',strategy,'--json'],env=env,capture_output=True,text=True)
                     self.assertEqual(done.returncode,0,done.stdout+done.stderr)

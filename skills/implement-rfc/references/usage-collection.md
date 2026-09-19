@@ -132,3 +132,32 @@ Keep the workflow revision and comparable outcome scope beside the evidence. Der
 these events from existing closeouts rather than maintaining another mutable board.
 A small matched sample can inform a later decision; this workflow change alone
 establishes no savings, and absent outcome input remains missing rather than zero.
+
+## Selected execution strategies and multi-arm studies
+
+Ordinary capture remains unchanged and read-only. It retains Ultra effort and
+explicit native child-route ownership when supplied; missing route ownership is
+unknown. Join strategy/arm/attempt identity through exact outcome assignment session
+intervals, never role-name guesses. Optional assignment fields are `study_id`,
+`arm_id`, `strategy`, `topology_id`, `recipe_revision`, `phase` (initial/repair),
+`cost_bucket` (arm/shared_review/setup), `coverage`, `route_ownership` and `deviations`.
+Assignments preserve the originally selected strategy; actual drift is evidence.
+
+`usage_report.py --experiment FILE` also accepts `implement-rfc.experiment.v2` for
+an explicit variable list of arms. V1's historical single-dimension semantics remain
+unchanged. V2 calls the existing reconciler once across all captures for study totals,
+so duplicate native owning responses are not counted again. The ordinary per-capture
+views remain separate. Trial acceptance counts alternatives, not production delivery.
+
+A trustworthy native inclusive observation may be supplied with its exact provider,
+account/device, arm/attempt, interval, phase, normalized usage and evidence reference.
+Declare `semantics: inclusive` and `coverage: whole_attempt` only when that evidence
+establishes both. It replaces covered visible components; unknown/partial semantics,
+conflicting totals and multiple aggregate observations remain separate and prevent
+an exact claim. No role breakdown is inferred from an inclusive total. Incomplete
+lineage does not erase attributable response usage or prevent objective quality review.
+
+Study drafts stay unlaunchable until common inputs, routes, budgets and isolation are
+bound. This metadata grants no execution authority. Shared judging and one-time setup
+stay in distinct cost buckets. Tokens are not subscription debits; retain account-window
+observations and their existing contamination/lag limits separately.

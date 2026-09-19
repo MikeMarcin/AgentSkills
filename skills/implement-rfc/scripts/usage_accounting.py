@@ -17,7 +17,7 @@ def identity(event):
 
 
 def ledger_row(event,classification,counts=None,anomalies=(),basis=None):
-    return {**{k:event.get(k) for k in ('project','provider','provider_account_alias','device_alias','session','turn_id','response_id','task_id','attempt_id','model','effort','service_tier','timestamp')},
+    return {**{k:event.get(k) for k in ('project','provider','provider_account_alias','device_alias','session','turn_id','response_id','task_id','attempt_id','model','effort','service_tier','timestamp','event_id')},
             'classification':classification,'tokens':counts,'anomalies':list(anomalies),'basis':basis,
             'route_evidence':'configuration' if event.get('context_is_configuration_not_response') else 'runtime_response',
             'subscription_spend':None}
@@ -56,7 +56,11 @@ def reconcile(events,baselines=(),schema='rfc-usage-evidence.v2'):
         try:
             for event in baselines:
                 if event.get('cumulative') and event.get('session') and event.get('ownership') not in UNCERTAIN_OWNERSHIP:
-                    previous[identity(event)]={'counters':tokens(event['cumulative']),'epoch':0,'timestamp':event.get('timestamp')}
+                    baseline={'counters':tokens(event['cumulative']),'epoch':0,'timestamp':event.get('timestamp')}
+                    old=previous.get(identity(event))
+                    if old is not None and old!=baseline:
+                        yield ledger_row(event,'unknown',anomalies=['conflicting_capture_baselines'])
+                    previous[identity(event)]=baseline
             for event in events:
                 if not isinstance(event,dict):raise ValueError('Invalid event record')
                 when=dt(event.get('timestamp'))

@@ -40,8 +40,9 @@ known failures/limitations are explicitly classified against existing criteria.
 
 Use review when the user requires it or when it can discriminate a changed
 persistence/migration, protocol, authority, concurrency, lifetime or destructive
-risk. Choose the critical role for a named material risk instead of also running
-ordinary review. A second review requires a distinct unresolved material concern
+risk. For the coordinator-integrator recipe, choose its critical role for a named
+material risk instead of also running ordinary review. Other recipes use their
+permitted independent-review path; this common contract injects no custom roles. A second review requires a distinct unresolved material concern
 or an explicit request. Preserve existing route/fallback policy and use a native
 reviewer when cross-provider review is unavailable.
 

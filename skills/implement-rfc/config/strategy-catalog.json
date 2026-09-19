@@ -41,6 +41,23 @@
         "codex": "unverified",
         "claude": "unverified"
       }
+    },
+    {
+      "id": "native",
+      "revision": "1",
+      "common_contract": "implement-rfc.engineering.v1",
+      "entrypoint": "references/strategies/native.md",
+      "requirement_profile": "native",
+      "owners": {
+        "engineering": "primary",
+        "bookkeeping": "primary",
+        "product_edits": "native-system"
+      },
+      "delegation": "system",
+      "required_routes": [],
+      "hosts": {
+        "codex": "unverified"
+      }
     }
   ],
   "presets": [
@@ -57,6 +74,17 @@
           "provider": "codex",
           "model": "gpt-6-astra",
           "effort": "max"
+        }
+      }
+    },
+    {
+      "id": "native-astra-ultra",
+      "topology_id": "native",
+      "routing": {
+        "primary": {
+          "provider": "codex",
+          "model": "gpt-6-astra",
+          "effort": "ultra"
         }
       }
     }

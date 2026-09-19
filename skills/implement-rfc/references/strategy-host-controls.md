@@ -13,3 +13,18 @@ is also outside direct policy. Unsupported controls remain explicit limitations.
 [Official subagent controls](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 and [configuration precedence](https://learn.chatgpt.com/docs/config-file/config-reference)
 describe controls, not live qualification. No source check launches a model.
+
+`strategy_host.py render --selection FILE` prints requested Codex TOML to stdout;
+place it only in an explicitly task-owned scoped configuration. `inspect` accepts
+ordered `--config FILE` layers (low to high precedence), `--instructions FILE` and
+`--agent-root DIR` inputs. It reports route/control mismatches, custom agent files,
+inherited child defaults and possible coordination directives. `--complete-inputs`
+is an operator assertion about supplied layers, not observed host loading. Missing
+coverage and heuristic limitations remain visible even when no signal is found.
+
+Native rendering enables native delegation and requests the selected primary route.
+It sets no child-route defaults. Existing custom agents or global defaults must be
+excluded through supported scoped configuration or isolated task setup; this helper
+never deletes them. Rendered files cannot turn this already-loaded session into a
+clean native arm. Establish actual behavior during the owner-authorized run; no
+separate live qualification is required by the execution-strategies delivery mandate.

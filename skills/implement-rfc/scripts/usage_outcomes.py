@@ -7,6 +7,10 @@ STATES={'dispatched','execution_completed','report_ready','collected','accepted'
 
 
 def validate_experiment(value):
+    if isinstance(value,dict) and value.get('schema')=='implement-rfc.experiment.v2':
+        from usage_experiments import validate
+        validate(value)
+        return value
     required={'schema','treatment_id','dimension','comparison_basis','fixed','ceiling','acceptance_ref','decision'}
     if not isinstance(value,dict) or set(value)!=required or value['schema']!='implement-rfc.experiment.v1':
         raise ValueError('Explicit versioned experiment fields required')

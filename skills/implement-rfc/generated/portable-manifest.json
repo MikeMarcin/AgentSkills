@@ -34,7 +34,7 @@
     },
     {
       "path": "config/strategy-catalog.json",
-      "sha256": "2f038160a8ab669e8cab28c1b45f0b825759ed77c1d6578d1ed4e3b0e7bb60cf"
+      "sha256": "e98f5b8d75f8b5f0635f8c4c57605505216ec2cff7a0087330eb56550b27a224"
     },
     {
       "path": "examples/milestone-plans/IMPLEMENTATION_PROMPT.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "mask-workflow.json",
-      "sha256": "491ed6c3c36f28c842750b1e86c41a2b4eea5d7951be703b55ae676303adf85a"
+      "sha256": "6ce179fc17d7cbaefad6d95d518a66e2b80b72bf959522d2801d07de46e25548"
     },
     {
       "path": "references/attendance.md",
@@ -161,8 +161,12 @@
       "sha256": "34287ae027f3edc521d9417a7d3eb81760aac4c367d97a75a15e7268836dec52"
     },
     {
+      "path": "references/strategies/native.md",
+      "sha256": "f0272eed08182a08c02b1194bb018615020467ecaa1f73e42f5e1f38a1ea9166"
+    },
+    {
       "path": "references/strategy-host-controls.md",
-      "sha256": "f400878b0e30b25fb28fff9557b344af882d658e7a1b727fb3da42d3747368b2"
+      "sha256": "d4a2c2f3279d40abe7946e80e8bfbf292ce07de562865c85d6ddcf00e87d941d"
     },
     {
       "path": "references/strategy-selection.md",
@@ -170,11 +174,11 @@
     },
     {
       "path": "references/usage-collection.md",
-      "sha256": "52dbd9bbdbe6661f8689189d347c7dc428602cf43aa411a0b00f6b25073a690e"
+      "sha256": "d7c8f88339786a4fc5dc5301372e0f5a983a6d1f35fc432ab436058cba7119b9"
     },
     {
       "path": "references/verification-and-closeout.md",
-      "sha256": "a1bb12640083c2f01e8368fbc5fcaeae90a2cf6f5477e69fa10ea7a261c89442"
+      "sha256": "eed1a7d9476f5bf918b0f75d6c76ae5a601262239ed37681a507ca14229d433d"
     },
     {
       "path": "schemas/issue-card.schema.json",
@@ -353,20 +357,28 @@
       "sha256": "ba1c047369eb372b20107135b3e60a1e08d4162d6ef7b4ecc3a050fda1a26782"
     },
     {
+      "path": "scripts/strategy_host.py",
+      "sha256": "463aad0dff316468774601f98a9c891983663cec87882fe19225cb938a625c8b"
+    },
+    {
       "path": "scripts/usage.py",
       "sha256": "de02ea60f0d4daaf002733b51dd1c383da854b8fd2fdc7be0ef697f5627dffd3"
     },
     {
       "path": "scripts/usage_accounting.py",
-      "sha256": "bc9e3994a1292dda60e512c6f89c570135620ea5312b9eaec7740bf8c4793a3e"
+      "sha256": "3b15d25bbcb59caef094e4a840f289d56424ccfda2a7dd3d31882bdb72ff1d94"
     },
     {
       "path": "scripts/usage_capture.py",
-      "sha256": "6e98bf8919f21afd5ea1047bbbae0afc8589bdf36e68397c2e3285c2ed23db81"
+      "sha256": "818713b1c85857cf91d564e1fc44dad166787d5e9351057ce81968b103ecd13a"
+    },
+    {
+      "path": "scripts/usage_experiments.py",
+      "sha256": "4a932714de424ff4a942aa870ca46497f0531f0bd32df4614f342759058c9f02"
     },
     {
       "path": "scripts/usage_outcomes.py",
-      "sha256": "41659d114305f944b4fa3132ec5a44c726106f972f116769c23d76f8c90dba96"
+      "sha256": "29ddd067f271e141021a5548f28020a7a37ed34d493f175d27d1977fe9602f27"
     },
     {
       "path": "scripts/usage_quota.py",
@@ -374,7 +386,7 @@
     },
     {
       "path": "scripts/usage_report.py",
-      "sha256": "5936c417f695b35513ea84a8c90d4dea024f9d9bf26f5f714113b6155e6b641a"
+      "sha256": "a1868977b19ec23b053fa7f69bef741f1f1f9a8c3ca6dc68a1c5b760a8e1da02"
     },
     {
       "path": "scripts/usage_scope.py",
@@ -549,8 +561,12 @@
       "sha256": "8eb8d7ee1222b1c652f5b8631841f508e9757b7eb4f861f15a26c8201ce3e5ca"
     },
     {
+      "path": "tests/test_strategy_host.py",
+      "sha256": "37919629c7b32865d1411726ed97f29be2569362ba552e1ae698f979a9090c28"
+    },
+    {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "07926a33ebb8f1f0e4b408a6673c14d3b1b91f5179d3675d55632217bf6a6129"
+      "sha256": "42934edb1ef87594642ba0090ec58e2c3bb75f908944af7b94e83a2ef7be0bae"
     },
     {
       "path": "tests/test_unified_workflow.py",
@@ -569,6 +585,10 @@
       "sha256": "f5cee61615a349be62def16a9391bceedc9bd29bb7f5cf00c6529f58e2f1981d"
     },
     {
+      "path": "tests/test_usage_experiments.py",
+      "sha256": "63f453f28b66ba4cb18a41e955cba7b56cefcba0f28b6ff2fd355bcbf997e2cc"
+    },
+    {
       "path": "tests/test_usage_quota.py",
       "sha256": "a1040935e2a9331bd367379fa1ae4ae793313ee0816e2e7055bcf251057ffe93"
     },
@@ -585,6 +605,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "d473007c2bfa9d9d",
+  "portable_digest": "ac03e57e5539ce49",
   "schema": "implement-rfc.portable-manifest.v1"
 }

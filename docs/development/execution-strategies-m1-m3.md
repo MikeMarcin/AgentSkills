@@ -31,7 +31,25 @@ branch and ownership guards. Selection and checkpoint helpers are observational.
 Live model serving, host loading and delegation-control enforcement are unverified,
 by explicit owner amendment. Fixture success does not certify them.
 
+## M2 — native execution and measurement
+
+Native selection loads the common contract and native recipe, with no outer RFC
+coordinator and no custom-role requirement. Native chooses zero children legitimately.
+The host helper prints scoped settings or inspects supplied layers only; partial input
+coverage, inherited custom roles/routes and possible coordination directives stay visible.
+Two host fixtures pass; no live model or host setting was changed.
+
+Seven multi-arm fixtures cover open-ended topology IDs, draft/frozen validation,
+zero-child and hidden-child inclusive totals, partial/unknown/conflicting observations,
+repair/setup separation, route deviations and cross-capture deduplication. The existing
+16 accounting, 12 report and 38 capture tests pass. The real MASK two-consumer installed
+course passes both direct and native profiles without custom-role setup.
+
+Requested/effective/observed routes stay separate. Native host loading, serving and
+runtime behavior remain unverified by owner instruction. Study metadata grants no
+launch authority. Legacy v1 experiment semantics remain unchanged.
+
 ## Remaining scope
 
-M2 native recipe/measurement and M3 planner-worker/extensibility remain in progress
-until their recorded acceptance. M4 remains not run; no task is selected.
+M3 planner-worker/extensibility and the reusable M4 kit remain in progress until
+recorded acceptance. M4 remains not run; no task is selected.

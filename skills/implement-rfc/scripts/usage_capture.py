@@ -39,7 +39,7 @@ KNOWN_TOOLS = {'Agent', 'Task', 'SendMessage', 'TaskOutput', 'TaskStop', 'Read',
 AGENT_TOOLS = {'Agent', 'Task', 'spawn_agent'}
 CONTROL_TOOLS = {'SendMessage', 'send_input', 'resume_agent', 'wait', 'close_agent',
                  'TaskOutput', 'TaskStop', 'wait_agent', 'list_agents', 'send_message'}
-EFFORTS = {'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'unknown'}
+EFFORTS = {'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra', 'unknown'}
 LIMIT_RE = re.compile(r'(?:max(?:imum)?[ _-]?(?:turns?|iterations?)|turn[ -]limit|'
                       r'reached[^\n]{0,60}(?:turn|iteration)|exceeded[^\n]{0,60}(?:turn|iteration))', re.I)
 ROLE_RE = re.compile(r'\ARole:\s*(rfc-[a-z-]+)\s*\|')
@@ -318,7 +318,7 @@ class Collector:
             'parent_session': ident(provider + ':' + str(parent)) if provider == 'codex' and parent else (
                 ident(provider + ':' + str(native) + ':' + str(parent)) if agent and parent else None),
             'kind': 'subagent' if agent or parent else 'primary', 'role': atom(role),
-            'role_evidence': 'runtime_metadata' if role else 'unknown', 'events': 0,
+            'role_evidence': 'runtime_metadata' if role else 'unknown', 'route_ownership': 'unknown', 'events': 0,
             'source_ids': []})
         observed_parent = ident(parent)
         if observed_parent and not out.get('parent_conflict'):
@@ -496,6 +496,8 @@ class Collector:
         session = self.session('codex', native, None, project, p.get('agent_role') or spawn.get('agent_role'), parent, path)
         session['kind'] = 'subagent' if is_child else 'primary'
         session['harness_version'] = atom(p.get('cli_version'))
+        ownership = p.get('child_route_ownership')
+        session['route_ownership'] = ownership if ownership in ('system', 'custom') else 'unknown'
         session['forked_from'] = ident(p.get('forked_from_id'))
         owned_turns = DiskMap(); turn = None; contexts = DiskMap(); scope_changed = False
         for line, e in iterator:

@@ -12,6 +12,8 @@ import shutil
 import stat
 import sys
 import tempfile
+from itertools import chain
+import usage_experiments
 import zipfile
 sys.dont_write_bytecode=True
 from usage_accounting import reconcile,SCHEMAS,estimate
@@ -121,11 +123,11 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
     try:
         for path in paths:
             captures.append(Capture(path))
-        if compare and len(captures)!=2:raise ValueError('Comparison requires exactly two captures')
+        if compare and len(captures)!=2 and not (experiment and experiment['schema']==usage_experiments.SCHEMA):raise ValueError('Legacy comparison requires exactly two captures; v2 selects an explicit arm list')
         with tempfile.TemporaryDirectory(prefix='rfc-usage-report-') as tmp:
             root=Path(tmp);results=[];all_outcomes=Outcomes(outcomes)
             with (root/'ledger.csv').open('w',newline='',encoding='utf-8') as stream:
-                writer=csv.DictWriter(stream,fieldnames=['capture','project','provider','session','response','family_root','lineage_depth','lineage_status','task','classification','input_tokens','output_tokens','anomalies','role','session_kind','model','effort','price_equivalent','price_unit'])
+                writer=csv.DictWriter(stream,fieldnames=['capture','project','provider','session','response','family_root','lineage_depth','lineage_status','task','classification','input_tokens','output_tokens','anomalies','role','route_ownership','study_id','arm_id','attempt_id','strategy','topology_id','recipe_revision','phase','cost_bucket','session_kind','model','effort','price_equivalent','price_unit'])
                 writer.writeheader()
                 for index,capture in enumerate(captures):
                     all_outcomes=Outcomes(outcomes)
@@ -141,6 +143,9 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
                     for row in reconcile(capture.events(),capture.json('counter_baselines.json',[]),capture.manifest['schema']):
                         session=sessions.get(row.get('session'),{})
                         row['role']=session.get('role','unknown');row['session_kind']=session.get('kind','unknown')
+                        attribution=usage_experiments.assignment_for(row,all_outcomes.assignments) or {}
+                        provenance={key:attribution.get(key) for key in ('study_id','arm_id','attempt_id','strategy','topology_id','recipe_revision','phase','cost_bucket')}
+                        provenance['route_ownership']=session.get('route_ownership',attribution.get('route_ownership','unknown'))
                         row.update(lineage.get(row.get('session'),{'family_root':None,'lineage_depth':None,'lineage_status':'session_metadata_missing'}))
                         classification=row['classification'];buckets[classification]+=1;counts=row.get('tokens') or {}
                         key=(row.get('project') or 'unassigned',row.get('provider') or 'unknown',classification,row['role'],row['session_kind'],row.get('model'),row.get('effort'))
@@ -155,7 +160,7 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
                         price=estimate(row,rates,rate_mode)
                         rate_coverage['known' if price['amount'] is not None else 'unknown']+=1
                         csv_row(writer,{'capture':index,'project':row.get('project'),'provider':row.get('provider'),'session':row.get('session'),
-                                         'response':row.get('response_id'),**{k:row[k] for k in ('family_root','lineage_depth','lineage_status')},
+                                         'response':row.get('response_id'),**provenance,**{k:row[k] for k in ('family_root','lineage_depth','lineage_status')},
                                          'task':all_outcomes.assign(row),'classification':classification,'input_tokens':counts.get('input_tokens'),
                                          'output_tokens':counts.get('output_tokens'),'anomalies':';'.join(row['anomalies']),'role':row['role'],'session_kind':row['session_kind'],'model':row.get('model'),'effort':row.get('effort'),'price_equivalent':price['amount'],'price_unit':price.get('unit')})
                     results.append({'capture':index,'schema':capture.manifest['schema'],'classification_rows':dict(buckets),
@@ -174,6 +179,12 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
             summary={'schema':'implement-rfc.usage-report.v1','captures':results,'outcomes':all_outcomes.summary() if len(captures)==1 else {**Outcomes(outcomes).summary(),'all_assigned_attempt_tokens':None,'observed_tokens_per_accepted_task':None},
                      'experiment':experiment,'comparison':'observational_only' if compare and not experiment else 'configured' if experiment else 'none',
                      'subscription_spend':None,'account_attribution':'not_apportioned; overlapping account activity is uncontrolled'}
+            if experiment and experiment['schema']==usage_experiments.SCHEMA:
+                # Reconcile the combined evidence once, deduplicating cross-capture response identities.
+                combined=reconcile(chain.from_iterable(c.events() for c in captures),
+                                   chain.from_iterable(c.json('counter_baselines.json',[]) for c in captures))
+                summary['study']=usage_experiments.summarize(experiment,Outcomes(outcomes),combined)
+                summary['acceptance_unit']='experiment_alternative'
             with (root/'groups.csv').open('w',newline='',encoding='utf-8') as stream:
                 writer=csv.DictWriter(stream,fieldnames=['capture','project','provider','classification','observed_tokens','role','session_kind','model','effort'])
                 writer.writeheader()
@@ -182,7 +193,7 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
             (root/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
             accepted=summary['outcomes']['accepted_task_count']
             if accepted is None:accepted='unknown (outcome input missing)'
-            lines=['# Offline usage report','',f'Captures: {len(captures)}. Explicitly accepted tasks: {accepted}.',
+            lines=['# Offline usage report','',f"Captures: {len(captures)}. Explicitly accepted {('alternatives' if 'study' in summary else 'tasks')}: {accepted}.",
                    '', 'Reconciled requests, aggregate-only deltas and unknown observations are separate. Cache and reasoning subsets are not added twice.',
                    'No subscription spend, quota debit, quality improvement or experiment winner is inferred.',
                    'Copied history across captures is not summed into a comparison total. Account pools remain opaque; concurrent account activity prevents attribution.',
@@ -191,6 +202,7 @@ def report(paths,out,*,outcomes=None,experiment=None,compare=False,rates=(),rate
             for result in results:
                 lines += [f"Capture {result['capture']}: {result['coverage']}; ledger classes {result['classification_rows']}.",
                           f"Control activity: {result['activity']}."]
+            if 'study' in summary:lines += ['', 'Multi-arm accounting is in summary.json under study; inclusive totals replace their visible components. Production deliveries: 0.']
             if compare:lines += ['', 'Comparison is descriptive. Different real backlog tasks do not establish a causal routing or orchestration win.']
             (root/'REPORT.md').write_text('\n'.join(lines)+'\n')
             out.mkdir(parents=True,exist_ok=False)
