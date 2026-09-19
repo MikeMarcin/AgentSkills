@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0085"
 title: "Strict planner-worker recipe, conformance and M4 kit"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0014"]
 depends_on: ["ASK-0084"]
 metadata: {"packet":"implement-rfc-execution-strategies-v2","milestone":"M3","milestone_plan":{"id":"execution-strategies-v2","path":"docs/rfcs/plans/execution-strategies-v2/milestone-plan.json"}}
