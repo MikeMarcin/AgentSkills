@@ -29,6 +29,8 @@ def bind(root, target, selection, run_id, segment_id, mandate_revision, mileston
         raise ValueError('resolve/adopt the authored plan before binding')
     path = Path(found['path'])
     plan = plans.load_plan(path)
+    if set(accepted) - {item['id'] for item in plan['milestones']}:
+        raise ValueError('unknown accepted milestone')
     eligible = [item for item in plan['milestones'] if item['id'] not in accepted and set(item['depends_on']) <= set(accepted)]
     selected = next((item for item in eligible if item['id'] == milestone), None) if milestone else next(iter(eligible), None)
     if selected is None:

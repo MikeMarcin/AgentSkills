@@ -42,6 +42,8 @@ class StrategyMaskPublicTests(unittest.TestCase):
                     self.assertEqual(done.returncode,0,done.stdout+done.stderr)
                     result=json.loads(done.stdout)
                     self.assertEqual((result['state'],result['roles'],result['host_load']),('ready',[],'not_verified'))
+                selected_roles = mask('ensure', '--project', root, '--check', '--workflow-profile', 'implement-rfc=planner-worker')
+                self.assertTrue(selected_roles['ok'], selected_roles)
                 default=mask('ensure','--project',root,'--check')
                 self.assertFalse(default['ok'])
                 self.assertEqual((base/'machine/state.json').read_bytes(),before)

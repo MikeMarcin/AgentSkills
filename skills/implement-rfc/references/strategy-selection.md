@@ -25,3 +25,8 @@ only the selected custom-role requirements while retaining MASK's core checks.
 A topology switch during resume requires an explicit new segment after writer/effect
 reconciliation, with prior pending obligations and deviation history retained. The
 resolver only resolves inputs; it never authorizes or performs that transition.
+
+The [study kit](strategy-study/README.md) is loaded only for explicit experiment
+preparation or execution. Its v2 manifest validates selected arms without enumerating
+topologies in board, acceptance or usage schemas. Historical experiment.v1 retains
+its original one-dimension semantics. Neither format grants run authority.

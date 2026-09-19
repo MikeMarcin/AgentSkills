@@ -239,6 +239,9 @@
         },
         "native": {
           "native_roles": []
+        },
+        "planner-worker": {
+          "native_roles": []
         }
       }
     }
@@ -248,6 +251,9 @@
       "native_roles": []
     },
     "native": {
+      "native_roles": []
+    },
+    "planner-worker": {
       "native_roles": []
     }
   }

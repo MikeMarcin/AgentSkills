@@ -14,18 +14,30 @@ def render(selection):
     route = selection['routing'].get('primary')
     if not route or route['provider'] != 'codex':
         raise ValueError('scoped Codex settings require an exact primary Codex route')
-    if selection['delegation'] not in ('none', 'system'):
+    strict = selection['topology_id'] == 'planner-worker'
+    if strict and not selection['configuration_complete']:
+        raise ValueError('strict recipe requires exact primary and worker routes')
+    if selection['delegation'] not in ('none', 'system') and not strict:
         raise ValueError('recipe-specific roles use their own scoped renderer')
-    return '\n'.join(['# Requested settings only; inspect inherited layers before a new session.',
+    lines = ['# Requested settings only; inspect inherited layers before a new session.',
                       'model = ' + json.dumps(route['model']),
                       'model_reasoning_effort = ' + json.dumps(route['effort']), '', '[agents]',
-                      'enabled = ' + ('false' if selection['delegation'] == 'none' else 'true'), ''])
+                      'enabled = ' + ('false' if selection['delegation'] == 'none' else 'true')]
+    if strict:
+        worker = selection['routing']['worker']
+        lines.extend(['max_concurrent_threads_per_session = 1',
+                      'default_subagent_model = ' + json.dumps(worker['model']),
+                      'default_subagent_reasoning_effort = ' + json.dumps(worker['effort'])])
+    return '\n'.join([*lines, ''])
 
 
 def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_inputs=False):
     strategy.validate_selection(selection)
-    findings=[]; effective={}; observed=[]
-    native=selection['delegation']=='system'
+    findings = []
+    effective = {}
+    observed = []
+    native = selection['delegation'] == 'system'
+    strict = selection['topology_id'] == 'planner-worker'
     for path in configs:
         path=Path(path)
         data=tomllib.loads(path.read_text(encoding='utf-8'))
@@ -34,36 +46,51 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
             if key in data: effective[key]=data[key]
         agents=data.get('agents',{})
         if not isinstance(agents,dict): raise ValueError('invalid agents configuration')
-        for key in ('enabled','default_subagent_model','default_subagent_reasoning_effort'):
+        for key in ('enabled','default_subagent_model','default_subagent_reasoning_effort',
+                    'max_concurrent_threads_per_session','max_threads'):
             if key in agents: effective['agents.'+key]=agents[key]
-        if native and any(isinstance(value,dict) for value in agents.values()):
+        if (native or strict) and any(isinstance(value,dict) for value in agents.values()):
             findings.append(dict(path=str(path),kind='custom_agent_configuration'))
     for path in instructions:
         path=Path(path);text=path.read_text(encoding='utf-8');observed.append(str(path))
         # These are review signals, not a semantic proof that arbitrary prose is clean.
-        if native and re.search(r'(?:act as|you are|dispatch|spawn|must use)[^\n]{0,100}(?:coordinator|rfc-integrator|rfc-worker)',text,re.I):
+        if (native or strict) and re.search(r'(?:act as|you are|dispatch|spawn|must use)[^\n]{0,100}(?:coordinator|rfc-integrator|rfc-worker)',text,re.I):
             findings.append(dict(path=str(path),kind='possible_custom_coordination_instruction'))
     for root in agent_roots:
         root=Path(root); observed.append(str(root))
         if not root.is_dir(): raise ValueError('agent discovery root is unavailable')
         for path in sorted(root.iterdir()):
-            if native and path.suffix in ('.toml','.md'):
+            if (native or strict) and path.suffix in ('.toml','.md'):
                 findings.append(dict(path=str(path),kind='custom_agent_definition'))
     if native:
         for key in ('agents.default_subagent_model','agents.default_subagent_reasoning_effort'):
             if key in effective:
                 findings.append(dict(kind='inherited_child_route_override',key=key))
     enabled=effective.get('agents.enabled',True)
-    if (selection['delegation']=='none' and enabled is not False) or (native and enabled is not True):
+    if (selection['delegation']=='none' and enabled is not False) or ((native or strict) and enabled is not True):
         findings.append(dict(kind='delegation_control_mismatch'))
+    if strict:
+        worker = selection['routing'].get('worker', {})
+        if (not worker or effective.get('agents.default_subagent_model') != worker.get('model')
+                or effective.get('agents.default_subagent_reasoning_effort') != worker.get('effort')):
+            findings.append(dict(kind='worker_route_mismatch_or_unknown'))
+        limit = effective.get('agents.max_concurrent_threads_per_session', effective.get('agents.max_threads'))
+        if type(limit) is not int or limit != 1:
+            findings.append(dict(kind='worker_concurrency_mismatch_or_unknown'))
     route=selection['routing'].get('primary')
     if route:
         if effective.get('model')!=route['model'] or effective.get('model_reasoning_effort')!=route['effort']:
             findings.append(dict(kind='primary_route_mismatch_or_unknown'))
+    if findings:
+        state = 'needs_reconciliation'
+    elif complete_inputs:
+        state = 'configuration_consistent'
+    else:
+        state = 'incomplete'
     return dict(schema='implement-rfc.strategy-host-inspection.v1',strategy=selection['strategy'],
                 requested=selection['routing'],effective_configuration=effective,observed_inputs=observed,
                 input_coverage='operator_declared_complete' if complete_inputs else 'partial',
-                findings=findings,state='needs_reconciliation' if findings else 'configuration_consistent' if complete_inputs else 'incomplete',
+                findings=findings,state=state,
                 observed_serving=None,host_load='not_verified',
                 limitation='Supplied files and heuristic instruction signals cannot establish actual host loading or absence of undisclosed policy.')
 

@@ -49,7 +49,45 @@ Requested/effective/observed routes stay separate. Native host loading, serving 
 runtime behavior remain unverified by owner instruction. Study metadata grants no
 launch authority. Legacy v1 experiment semantics remain unchanged.
 
-## Remaining scope
+## M3 — strict planner-worker, extension and preparation kit
 
-M3 planner-worker/extensibility and the reusable M4 kit remain in progress until
-recorded acceptance. M4 remains not run; no task is selected.
+The strict recipe requires caller-supplied exact worker model/effort, uses one active
+built-in worker and leaves product edits with that worker. The primary owns decisions,
+feedback, evidence judgment and bookkeeping. No custom RFC role is needed. Scoped
+settings and supplied observation checks expose missing routes, concurrent workers,
+recursive delegation, planner takeovers, unexpected roles and route changes. These
+fixtures do not certify a live host's enforcement or serving.
+
+A fifth synthetic recipe registers in a disposable package and completes ordinary
+board/primary-checkpoint acceptance and usage accounting without changing those
+schemas. Registration tests reject unknown/duplicate IDs, incompatible contracts,
+malformed descriptors, unsafe paths, undeclared profiles and unsupported providers.
+Only selected recipe instruction bytes are loaded. Common plan instructions now
+keep coordinated handoff/context-renewal mechanics in the coordinator recipe.
+
+The [reusable M4 kit](../../skills/implement-rfc/references/strategy-study/README.md)
+includes a draft v2 study, common/strategy/judge/repair prompts, scoped configuration
+and validation commands, freeze/blinding procedures and a readout template. Synthetic
+records validate the draft/frozen boundary, registered routes and equal candidate sets
+for judges. The default three arms leave optional planner-worker unselected.
+
+## Verification and limits
+
+The integrated pass ran **148 tests, all passing**, across execution selection, host
+inspection, strict planner-worker, study extension, primary checkpoints, personal
+lifecycle, real MASK handoff, workflow readiness, coordinated handoffs/continuation,
+adapter rendering, usage capture/accounting/reporting and multi-arm experiments.
+The 42 earlier MASK profile/scope/readiness/role/deployment/protocol tests remain
+applicable to unchanged MASK source. Both repositories' documentation gates pass;
+portable source validation and whitespace checks pass.
+
+Closeout review runtime: primary-session self-review and code-simplifier pass; no
+independent agent or live qualification by owner instruction. Review found and fixed
+two accounting gaps with regression evidence: deltas spanning assignment boundaries
+cannot be attributed by their final timestamp, and an unobserved child session cannot
+leave an exact total unless a trustworthy inclusive aggregate covers all assigned work.
+
+M4 remains **not run**. Task, baselines, budgets, exact judge routes and worktree
+locations remain unset. No experiment worktrees, arm/judge sessions, comparative
+verdict, push, global configuration change or unrelated consumer migration occurred.
+RFC-ASK-0014 remains Implementing with AC04 and the full-pack closeout open.

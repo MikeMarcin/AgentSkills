@@ -39,9 +39,10 @@ class StrategyTests(unittest.TestCase):
             package = Path(directory)
             shutil.copytree(strategy.PACKAGE / 'config', package / 'config')
             shutil.copytree(strategy.PACKAGE / 'references', package / 'references')
+            shutil.copy(strategy.PACKAGE / 'mask-workflow.json', package / 'mask-workflow.json')
             path = package / 'config/strategy-catalog.json'
             original = json.loads(path.read_text())
-            for change in ('duplicate', 'escape', 'contract', 'unknown-default', 'symlink'):
+            for change in ('duplicate', 'escape', 'contract', 'unknown-default', 'profile', 'malformed', 'symlink'):
                 value = copy.deepcopy(original)
                 if change == 'duplicate':
                     value['recipes'].append(copy.deepcopy(value['recipes'][0]))
@@ -51,6 +52,10 @@ class StrategyTests(unittest.TestCase):
                     value['recipes'][0]['common_contract'] = 'future'
                 elif change == 'unknown-default':
                     value['default'] = 'missing'
+                elif change == 'profile':
+                    value['recipes'][0]['requirement_profile'] = 'missing'
+                elif change == 'malformed':
+                    value['recipes'][0]['unexpected'] = True
                 else:
                     (package / 'alias.md').symlink_to(package / 'references/engineering-contract.md')
                     value['recipes'][0]['entrypoint'] = 'alias.md'

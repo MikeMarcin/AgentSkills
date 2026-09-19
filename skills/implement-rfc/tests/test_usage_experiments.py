@@ -91,6 +91,29 @@ class ExperimentTests(unittest.TestCase):
         self.assertEqual(result['arms'][0]['attempts'][0]['deviations'],['planner_takeover'])
         self.assertEqual(result['arms'][1]['attempts'],[]);self.assertIsNone(result['total_exact_tokens'])
 
+    def test_missing_child_session_requires_covering_inclusive_total(self):
+        parent = assignment()
+        parent['coverage'] = 'complete'
+        child = assignment('invisible-child')
+        value = fixture()
+        result = study.summarize(value, outcomes(parent, child), reconcile([event()]))
+        self.assertIsNone(result['total_exact_tokens'])
+        value['inclusive_observations'] = [aggregate()]
+        self.assertEqual(study.summarize(value, outcomes(parent, child), reconcile([event()]))['total_exact_tokens'], 120)
+        child['until'] = '2026-09-21T00:00:00Z'
+        self.assertIsNone(study.summarize(value, outcomes(parent, child), reconcile([event()]))['total_exact_tokens'])
+
+    def test_cumulative_delta_must_fit_assignment_interval(self):
+        row = next(reconcile([event()]))
+        row.update(classification='aggregate_only', usage_since='2026-09-18T00:00:00Z', usage_until=row['timestamp'])
+        assigned = assignment()
+        assigned['coverage'] = 'complete'
+        result = study.summarize(fixture(), outcomes(assigned), [row])
+        self.assertEqual(result['unassigned_rows'], 1)
+        self.assertIsNone(result['total_exact_tokens'])
+        row['usage_since'] = assigned['since']
+        self.assertEqual(study.summarize(fixture(), outcomes(assigned), [row])['total_exact_tokens'], 15)
+
     def test_repairs_and_shared_setup_are_separate(self):
         initial=assignment();initial['coverage']='complete'
         repair=assignment('repair');repair.update(attempt_id='repair-1',phase='repair',coverage='complete')

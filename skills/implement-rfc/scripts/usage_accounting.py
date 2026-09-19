@@ -191,6 +191,7 @@ def reconcile(events,baselines=(),schema='rfc-usage-evidence.v2'):
                     corroborated=bool(last) and all(last.get(k)==v for k,v in delta.items())
                     classification='request_reconciled' if corroborated and event.get('response_id') else 'aggregate_only'
                     yield {**ledger_row(event,classification,counts,basis='monotonic_cumulative_delta'), 'usage_epoch':epoch,
+                           'usage_since':prior.get('timestamp'), 'usage_until':event['timestamp'],
                            'last_corrobates_delta':corroborated}
                 # Harness footprints, final inclusive aggregates and compaction are never additive requests.
             for group in native.values():

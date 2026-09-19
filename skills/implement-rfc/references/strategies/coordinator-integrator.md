@@ -1,5 +1,19 @@
 # Coordinator-integrator recipe
 
+Plan handoffs use `coordinator_handoff.py assign --repo-root ROOT --target ID` with
+exact run, dispatch, producer and mandate identities. Select an eligible milestone
+and retain the binding in existing continuation records. Check V2 returns with
+`coordinator_handoff.py check --repo-root ROOT --assignment FILE --return-file FILE
+--execution STATE` and actual consumed/partial/accepted observations. Files are
+consumer-relative. Preserve V1 historical interpretation; active plan-aware control
+needs scoped reconciliation. The shared plan rules do not dispatch on their own.
+
+Keep the same integrator through constituent work, corrections and useful partial
+invocations with renewed dispatch authority. Normally request fresh context at a
+substantial accepted boundary; a small related next outcome may continue with a
+related-continuation reason and renewed scope. Reconcile effects and obligations
+before replacing an unfinished producer. Never hot-upgrade an active assignment.
+
 Keep the authorized pack moving. In the native interactive session, act as its
 **coordinator**: preserve the user mandate, dispatch one milestone integrator,
 wait, then continue from its compact result. Engineering belongs to that integrator.

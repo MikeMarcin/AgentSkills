@@ -61,7 +61,8 @@ def routes(value):
     for slot, route in value.items():
         token(slot)
         if (not isinstance(route, dict) or set(route) != {'provider', 'model', 'effort'}
-                or any(not isinstance(route[k], str) or not route[k].strip() for k in route)):
+                or any(not isinstance(item, str) or not 1 <= len(item) <= 128
+                       or re.search(r'[\s<>${}]', item) for item in route.values())):
             raise ValueError('each selected route needs exact provider, model and effort')
     return value
 
@@ -75,6 +76,12 @@ def load_catalog(package=PACKAGE):
     if not isinstance(common, dict) or set(common) != {'id', 'entrypoint'} or common['id'] != CONTRACT:
         raise ValueError('incompatible common contract')
     package_file(package, common['entrypoint'])
+    workflow = read_json(Path(package) / 'mask-workflow.json')
+    if not isinstance(workflow, dict) or not isinstance(workflow.get('scopes', {}), dict):
+        raise ValueError('invalid workflow contract')
+    scopes = [workflow, *workflow.get('scopes', {}).values()]
+    if any(not isinstance(scope, dict) or not isinstance(scope.get('profiles', {}), dict) for scope in scopes):
+        raise ValueError('invalid workflow requirement profiles')
     found = {}
     if not isinstance(value['recipes'], list) or not 1 <= len(value['recipes']) <= 64:
         raise ValueError('catalog requires a bounded recipe list')
@@ -91,6 +98,8 @@ def load_catalog(package=PACKAGE):
         package_file(package, recipe['entrypoint'])  # Validate location without loading unselected text.
         if recipe['requirement_profile'] is not None:
             token(recipe['requirement_profile'])
+            if any(recipe['requirement_profile'] not in scope.get('profiles', {}) for scope in scopes):
+                raise ValueError('recipe requires an undeclared workflow profile')
         if recipe['delegation'] not in ('none', 'system', 'recipe'):
             raise ValueError('invalid delegation authority')
         if (not isinstance(recipe['owners'], dict) or set(recipe['owners']) != {'engineering', 'bookkeeping', 'product_edits'}
@@ -135,6 +144,8 @@ def resolve(explicit=None, *, preserved=None, preference=None, routing=None, pac
         selected_routes.update(preserved['routing'])
     if routing is not None:
         selected_routes.update(routes(routing))
+    if any(route['provider'] not in recipe['hosts'] for route in selected_routes.values()):
+        raise ValueError('selected route provider is unsupported by this recipe')
     paths = [catalog['common_contract']['entrypoint'], recipe['entrypoint']]
     source = {path: hashlib.sha256(package_file(package, path).read_bytes()).hexdigest() for path in paths}
     missing = sorted(set(recipe['required_routes']) - set(selected_routes))

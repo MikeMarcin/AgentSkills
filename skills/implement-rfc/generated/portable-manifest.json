@@ -34,7 +34,7 @@
     },
     {
       "path": "config/strategy-catalog.json",
-      "sha256": "e98f5b8d75f8b5f0635f8c4c57605505216ec2cff7a0087330eb56550b27a224"
+      "sha256": "091e1febbf23b1557e0efec52015cc7411f7d4119d78b39978abc9c04c68f9ed"
     },
     {
       "path": "examples/milestone-plans/IMPLEMENTATION_PROMPT.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "mask-workflow.json",
-      "sha256": "6ce179fc17d7cbaefad6d95d518a66e2b80b72bf959522d2801d07de46e25548"
+      "sha256": "8d22e4dc5da33109a3a3f68c53914d17d29e7c9872cac58d239ebc5ebad8edf7"
     },
     {
       "path": "references/attendance.md",
@@ -102,7 +102,7 @@
     },
     {
       "path": "references/milestone-plans.md",
-      "sha256": "992528818db986dd40e811ff07f0cf3970a2eabf77966cf960bf1070bee25a85"
+      "sha256": "c9cd61aa422c2f956cd92e6367cc9e7e082cf4d75b7db53fc4964a3c5c733606"
     },
     {
       "path": "references/model-routing.md",
@@ -154,7 +154,7 @@
     },
     {
       "path": "references/strategies/coordinator-integrator.md",
-      "sha256": "4d999c341dc76453aff611ce6d168fa864eae8ee4b179421472e53d254de69e4"
+      "sha256": "47646cf91525357e3af0f3b84b46fbf68081bf2e25c712786620b654e3256717"
     },
     {
       "path": "references/strategies/direct.md",
@@ -165,12 +165,32 @@
       "sha256": "f0272eed08182a08c02b1194bb018615020467ecaa1f73e42f5e1f38a1ea9166"
     },
     {
+      "path": "references/strategies/planner-worker.md",
+      "sha256": "67533675abcd0e087897321a6827f723905b25f20ca1de6fb6ef210802a47597"
+    },
+    {
       "path": "references/strategy-host-controls.md",
-      "sha256": "d4a2c2f3279d40abe7946e80e8bfbf292ce07de562865c85d6ddcf00e87d941d"
+      "sha256": "3d10f68876c88c14f7da1a95c95a18544724dbca1c0299c6573b74d67037f5d6"
     },
     {
       "path": "references/strategy-selection.md",
-      "sha256": "ce26ef1effb0a160da18c12a33406eb646e41749effe7a598091ff16b7ad64b1"
+      "sha256": "b361a1e7eca0a64953d9ef0ec8d4551ee19d832876a24cbb144ba3dae4f2a781"
+    },
+    {
+      "path": "references/strategy-study/README.md",
+      "sha256": "6c92a8c71b7c6ed531cd540c54b372ae78bf3bfe1886545b42d1fb05f26f08d2"
+    },
+    {
+      "path": "references/strategy-study/prompts.md",
+      "sha256": "10eac03908dfcdbec2e810b3b3634e65be9306672f55e7597fc907b2828479b4"
+    },
+    {
+      "path": "references/strategy-study/readout.md",
+      "sha256": "32f38d652e06be908eff9b6877111c5fde3857421e2af2e8d749c113c13209c7"
+    },
+    {
+      "path": "references/strategy-study/study.template.json",
+      "sha256": "65bd968afcd605d1c8f2a20a0c8e614c456c18f533025727dc85d1d8c3fa9f85"
     },
     {
       "path": "references/usage-collection.md",
@@ -246,7 +266,7 @@
     },
     {
       "path": "scripts/execution_strategy.py",
-      "sha256": "953a66e780dab5bfd03083979126fd5ffbbb522340ac7fe780cdf00c24f75f98"
+      "sha256": "d4fb3290c5f0a9dce59a83de07fdaf0acdd40b9feff7b91b60f605bf5c88a005"
     },
     {
       "path": "scripts/issue_board.py",
@@ -258,7 +278,7 @@
     },
     {
       "path": "scripts/milestone_checkpoint.py",
-      "sha256": "539fbfaa693ba8c12bb343f92278f4216a21809658c0c82deb5e63372c1dfabc"
+      "sha256": "9d78ac33d8c21be87928bcba3e5484bdbe12151eab60b05f1f4f1b6ecf49a19e"
     },
     {
       "path": "scripts/milestone_continuation.py",
@@ -295,6 +315,10 @@
     {
       "path": "scripts/personal_tracker.py",
       "sha256": "a87ae08e000712f34769ce0443d78d6656d12c377a0f3feb50473898a2528682"
+    },
+    {
+      "path": "scripts/planner_worker.py",
+      "sha256": "a15b855c2fb821ceb46293fde89669dfe13ca319fa00d1c2c02d2b4496ebad11"
     },
     {
       "path": "scripts/prepare_mask_roles.py",
@@ -358,7 +382,11 @@
     },
     {
       "path": "scripts/strategy_host.py",
-      "sha256": "463aad0dff316468774601f98a9c891983663cec87882fe19225cb938a625c8b"
+      "sha256": "99fc9add68ec9f761b6e866e3d2142e441b33db5e6b67722313d06283acf0801"
+    },
+    {
+      "path": "scripts/strategy_study.py",
+      "sha256": "6de25b463f11c8cd72aa1e1998a628960c4583ed722efe4cc687a837513cd730"
     },
     {
       "path": "scripts/usage.py",
@@ -366,7 +394,7 @@
     },
     {
       "path": "scripts/usage_accounting.py",
-      "sha256": "3b15d25bbcb59caef094e4a840f289d56424ccfda2a7dd3d31882bdb72ff1d94"
+      "sha256": "640b4ae4e6889504d918b458c0d529a498881bb54eee5faf697af73519aa0ca5"
     },
     {
       "path": "scripts/usage_capture.py",
@@ -374,7 +402,7 @@
     },
     {
       "path": "scripts/usage_experiments.py",
-      "sha256": "4a932714de424ff4a942aa870ca46497f0531f0bd32df4614f342759058c9f02"
+      "sha256": "77be5d44282a0e648b446f2a1cce5ae59c8abcac8cd4c9c6863614d5265ba48e"
     },
     {
       "path": "scripts/usage_outcomes.py",
@@ -422,7 +450,7 @@
     },
     {
       "path": "tests/test_execution_strategy.py",
-      "sha256": "91b7fead79704e4cb8b39231dccf7fbe03077f538ce6b4d096f1d3ff481adaf7"
+      "sha256": "a6d7e98f4aacc58bf42f3d4b155eb10996e11803683ea0d0df9aabc16945d02b"
     },
     {
       "path": "tests/test_instruction_paths.py",
@@ -501,6 +529,10 @@
       "sha256": "7ea097d3b34bf19aebaa429b3fc7116fe0aec5a3b99f91302ce916e4d619d432"
     },
     {
+      "path": "tests/test_planner_worker.py",
+      "sha256": "730f6234cf9c245539b5edbffda9df0f98ac53cb452ab4066cd194c833c80d40"
+    },
+    {
       "path": "tests/test_primary_checkpoint.py",
       "sha256": "f7505d69476a82cb8a7e1f608e9b9ed85eaf97276b6a52f1031807596021fb19"
     },
@@ -566,7 +598,11 @@
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "42934edb1ef87594642ba0090ec58e2c3bb75f908944af7b94e83a2ef7be0bae"
+      "sha256": "929e69e094e50b111c727d06a5ee7b879c79f6d254862cd8bab527d47d3320ed"
+    },
+    {
+      "path": "tests/test_strategy_study.py",
+      "sha256": "0c7bcd9093509944d94ed490ecb2263482b96b9d59c58aab40fc864e60578180"
     },
     {
       "path": "tests/test_unified_workflow.py",
@@ -586,7 +622,7 @@
     },
     {
       "path": "tests/test_usage_experiments.py",
-      "sha256": "63f453f28b66ba4cb18a41e955cba7b56cefcba0f28b6ff2fd355bcbf997e2cc"
+      "sha256": "1cf608356c1279b91cdded168a1a728494838f33060c62017d0551d1cea735de"
     },
     {
       "path": "tests/test_usage_quota.py",
@@ -605,6 +641,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "ac03e57e5539ce49",
+  "portable_digest": "6e19e4b5579c7ff0",
   "schema": "implement-rfc.portable-manifest.v1"
 }

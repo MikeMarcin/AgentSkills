@@ -56,6 +56,8 @@ def validate(value):
         if not isinstance(judge,dict) or set(judge)!= {'family','exact_model','effort'} or not text(judge['family']):
             raise ValueError('invalid judge route')
         if not text(judge['exact_model']) or not text(judge['effort']): missing.append('judge exact route')
+    if len({judge['family'] for judge in judges}) != len(judges):
+        raise ValueError('duplicate judge identity')
     order=value['order']
     if not isinstance(order,dict) or set(order)!= {'implementation','candidate_labels_private','judge_orders'}:
         raise ValueError('explicit order and blinding policy required')
@@ -68,9 +70,13 @@ def validate(value):
     elif set(order['judge_orders'])!={j['family'] for j in judges}:
         raise ValueError('presentation order required for every judge')
     else:
+        labels = None
         for sequence in order['judge_orders'].values():
-            if not isinstance(sequence,list) or len(sequence)!=len(ids) or len(set(sequence))!=len(ids) or any(not text(v) for v in sequence):
+            if not isinstance(sequence,list) or len(sequence)!=len(ids) or any(not text(v) for v in sequence) or len(set(sequence))!=len(ids):
                 raise ValueError('each judge needs one neutral label per candidate')
+            if labels is not None and labels != set(sequence):
+                raise ValueError('judges must see the same candidate label set')
+            labels = set(sequence)
     observations=value.get('inclusive_observations',[])
     if not isinstance(observations,list) or len(observations)>1000: raise ValueError('bounded aggregate observations required')
     seen=set()
@@ -103,6 +109,11 @@ def assignment_for(row, assignments):
              and dt(a['since'])<=moment<dt(a['until'])
              and (not row.get('task_id') or a['task_id']==row['task_id'])
              and (not row.get('attempt_id') or a['attempt_id']==row['attempt_id'])]
+    if row.get('classification') == 'aggregate_only':
+        since, until = dt(row.get('usage_since')), dt(row.get('usage_until'))
+        if since is None or until is None or since >= until:
+            return None
+        matches = [a for a in matches if dt(a['since']) <= since and until < dt(a['until'])]
     return matches[0] if len(matches)==1 else None
 
 
@@ -114,6 +125,7 @@ def summarize(experiment, outcomes, rows):
     buckets=defaultdict(lambda: {'input_tokens':0,'output_tokens':0,'unknown_rows':0,'rows':0,'since':None,'until':None,
                                  'coverage':set(),'route_ownership':set(),'deviations':set(),'phases':set()})
     unassigned=0
+    observed_assignments = set()
     for assignment in assignments:
         if assignment.get('study_id')!=experiment['study_id']:continue
         arm=assignment.get('arm_id')
@@ -132,6 +144,7 @@ def summarize(experiment, outcomes, rows):
         if assignment is None or assignment.get('study_id')!=experiment['study_id']:
             if row['classification']!='alternate_observation' or row['anomalies']:unassigned+=1
             continue
+        observed_assignments.add(id(assignment))
         cost=assignment.get('cost_bucket','arm')
         arm=assignment.get('arm_id') if cost=='arm' else None
         key=(cost,arm,assignment['attempt_id'],row.get('provider'),row.get('provider_account_alias'),row.get('device_alias'))
@@ -155,11 +168,22 @@ def summarize(experiment, outcomes, rows):
         buckets[key]['phases'].add(item['phase'])  # Inclusive totals can lack visible descendants.
     for assignment in assignments:
         if assignment.get('study_id')!=experiment['study_id']:continue
+        if id(assignment) in observed_assignments:continue
         cost=assignment.get('cost_bucket','arm');arm=assignment.get('arm_id') if cost=='arm' else None
         prefix=(cost,arm,assignment['attempt_id'])
-        if not any(key[:3]==prefix for key in buckets):
-            bucket=buckets[(*prefix,'unknown','unknown','unknown')]
-            bucket['unknown_rows']=1;bucket['coverage'].add('unavailable');bucket['phases'].add(assignment['phase'])
+        keys = [key for key in buckets if key[:3] == prefix]
+        if not keys:
+            keys = [(*prefix, 'unknown', 'unknown', 'unknown')]
+        for key in keys:
+            bucket = buckets[key]
+            bucket['unknown_rows'] += 1
+            bucket['coverage'].add('unavailable')
+            bucket['phases'].add(assignment['phase'])
+            bucket['route_ownership'].add(assignment.get('route_ownership', 'unknown'))
+            bucket['deviations'].update(assignment.get('deviations', []))
+            since, until = dt(assignment['since']), dt(assignment['until'])
+            bucket['since'] = min(bucket['since'], since) if bucket['since'] else since
+            bucket['until'] = max(bucket['until'], until) if bucket['until'] else until
     results=[]
     for key,bucket in buckets.items():
         observed={k:bucket[k] for k in ('input_tokens','output_tokens')}
@@ -168,7 +192,7 @@ def summarize(experiment, outcomes, rows):
         candidates=[v for v in aggregates[key] if v['semantics']=='inclusive' and v['coverage']=='whole_attempt']
         if len(candidates)==1:
             aggregate=candidates[0];counts=codex_counts(aggregate['usage'])
-            if not bucket['rows'] or (dt(aggregate['since'])<=bucket['since'] and bucket['until']<=dt(aggregate['until'])):
+            if bucket['since'] is None or (dt(aggregate['since'])<=bucket['since'] and bucket['until']<=dt(aggregate['until'])):
                 if all(counts[k]>=observed[k] for k in observed):
                     selected=aggregate['observation_id'];observed={k:counts[k] for k in observed};exact=True
                 else:notes.append('inclusive_total_smaller_than_visible_components');exact=False

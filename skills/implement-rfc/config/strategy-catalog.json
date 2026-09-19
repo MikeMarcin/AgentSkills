@@ -58,6 +58,26 @@
       "hosts": {
         "codex": "unverified"
       }
+    },
+    {
+      "id": "planner-worker",
+      "revision": "1",
+      "common_contract": "implement-rfc.engineering.v1",
+      "entrypoint": "references/strategies/planner-worker.md",
+      "requirement_profile": "planner-worker",
+      "owners": {
+        "engineering": "primary",
+        "bookkeeping": "primary",
+        "product_edits": "worker"
+      },
+      "delegation": "recipe",
+      "required_routes": [
+        "primary",
+        "worker"
+      ],
+      "hosts": {
+        "codex": "unverified"
+      }
     }
   ],
   "presets": [
@@ -85,6 +105,17 @@
           "provider": "codex",
           "model": "gpt-6-astra",
           "effort": "ultra"
+        }
+      }
+    },
+    {
+      "id": "planner-cheaper-worker-strict",
+      "topology_id": "planner-worker",
+      "routing": {
+        "primary": {
+          "provider": "codex",
+          "model": "gpt-6-astra",
+          "effort": "max"
         }
       }
     }

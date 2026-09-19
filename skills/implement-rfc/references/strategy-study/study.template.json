@@ -1,0 +1,95 @@
+{
+  "schema": "implement-rfc.experiment.v2",
+  "status": "draft_not_runnable",
+  "study_id": "future-matched-study",
+  "comparison_kind": "practical_strategy_comparison_not_topology_only",
+  "common_inputs": {
+    "acceptance_gate_reference": null,
+    "authored_plan_reference": null,
+    "budget_and_repair_policy_reference": null,
+    "environment_reference": null,
+    "isolation_reference": null,
+    "skill_revision": null,
+    "source_base": null,
+    "task_reference": null,
+    "tracker_base": null
+  },
+  "arms": [
+    {
+      "arm_id": "direct",
+      "strategy": "direct-astra-max",
+      "topology_id": "direct",
+      "recipe_revision": null,
+      "requested_routing": {
+        "primary": {
+          "provider": "codex",
+          "model": "gpt-6-astra",
+          "effort": "max"
+        }
+      },
+      "child_route_ownership": "disabled",
+      "effective_configuration_reference": null,
+      "observed_serving_reference": null,
+      "source_worktree": null,
+      "tracker_worktree": null
+    },
+    {
+      "arm_id": "native",
+      "strategy": "native-astra-ultra",
+      "topology_id": "native",
+      "recipe_revision": null,
+      "requested_routing": {
+        "primary": {
+          "provider": "codex",
+          "model": "gpt-6-astra",
+          "effort": "ultra"
+        }
+      },
+      "child_route_ownership": "native_system",
+      "effective_configuration_reference": null,
+      "observed_serving_reference": null,
+      "source_worktree": null,
+      "tracker_worktree": null
+    },
+    {
+      "arm_id": "coordinator-integrator",
+      "strategy": "coordinator-integrator-baseline",
+      "topology_id": "coordinator-integrator",
+      "recipe_revision": null,
+      "requested_routing": {},
+      "child_route_ownership": "recipe",
+      "effective_configuration_reference": null,
+      "observed_serving_reference": null,
+      "source_worktree": null,
+      "tracker_worktree": null
+    }
+  ],
+  "judges": [
+    {
+      "family": "Astra",
+      "exact_model": null,
+      "effort": null
+    },
+    {
+      "family": "Fable",
+      "exact_model": null,
+      "effort": null
+    }
+  ],
+  "order": {
+    "implementation": null,
+    "candidate_labels_private": true,
+    "judge_orders": {}
+  },
+  "available_additional_arms": [
+    "planner-cheaper-worker-strict"
+  ],
+  "measurement": {
+    "usage": "existing capture/reconciled ledger/outcomes",
+    "production_acceptance": "separate"
+  },
+  "notes": [
+    "Preparation only; no task, baselines, budget, exact judges or worktrees chosen.",
+    "Native runtime behavior is unverified; no live qualification has run."
+  ]
+}

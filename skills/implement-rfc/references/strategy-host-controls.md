@@ -28,3 +28,10 @@ excluded through supported scoped configuration or isolated task setup; this hel
 never deletes them. Rendered files cannot turn this already-loaded session into a
 clean native arm. Establish actual behavior during the owner-authorized run; no
 separate live qualification is required by the execution-strategies delivery mandate.
+
+Strict planner-worker rendering supplies the exact worker defaults and
+`agents.max_concurrent_threads_per_session = 1`. Also pass the exact worker route in
+the spawn request. Custom definitions can override it, so inspect inherited agent
+files before use. The one-child cap is a session control; the worker's no-delegation
+instruction and observed lifecycle still need checking. No custom RFC roles are
+required. MASK readiness remains separate from configuration and serving evidence.
