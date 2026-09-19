@@ -14,6 +14,8 @@ from project_fixtures import git
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))
+import execution_strategy
 
 
 class PersonalLifecyclePublicTests(unittest.TestCase):
@@ -71,6 +73,13 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
             self.assertEqual(cli("issue_board.py", "claim", "PRS-0001", "--json")["lane"],
                 "30-in-progress")
             self.assertEqual(git(source, "rev-parse", "HEAD"), initial)
+            selection = base / "selection.json"
+            selection.write_text(json.dumps(execution_strategy.resolve('direct')))
+            primary = cli('milestone_checkpoint.py', 'bind', '--target', 'PRS-0001',
+                '--selection', str(selection), '--run-id', 'personal', '--segment-id', 'one',
+                '--mandate-revision', '1', '--json')
+            self.assertEqual(primary['repository_state']['workflow_root'], str(tracker))
+            self.assertNotIn('dispatch_id', primary)
             operation = cli("personal_commit.py", "begin", "--id", "PRS-0001",
                 "--paths", "product.txt")["operation"]
             (source / "product.txt").write_text("improved product\n")
@@ -103,6 +112,20 @@ class PersonalLifecyclePublicTests(unittest.TestCase):
             self.assertEqual(git(source, "diff-tree", "--no-commit-id", "--name-only", "-r",
                 "HEAD"), "product.txt")
             self.assertNotIn("PRS-0001", git(source, "log", "-1", "-p"))
+            checkpoint_file = base / 'checkpoint.json'
+            checkpoint_file.write_text(json.dumps(primary))
+            observation = {key: primary[key] for key in ('run_id','segment_id','mandate_revision','selection','binding')}
+            observation.update(milestone='first', disposition='pack-complete',
+                candidate_revision=completed['source']['revision'], handoff_ref='verification.json',
+                required_pending=[], evidence_refs=['verification.json'], ownership='quiescent',
+                acceptance_records=[dict(id=item['id'], outcome='pass', evidence_refs=['verification.json'])
+                    for group in ('obligations','exit_criteria') for item in primary['binding'][group]],
+                continuation=dict(intent='stop', next_milestone=None, reason='target-complete', detail='Bound product and tracker work complete'))
+            observation_file=base/'observation.json'; observation_file.write_text(json.dumps(observation))
+            checked=cli('milestone_checkpoint.py','check','--checkpoint',str(checkpoint_file),
+                '--observation',str(observation_file),'--execution','quiescent','--json')
+            self.assertEqual(checked['action'],'report-closeout')
+
 
     def test_paired_lane_board_refuses_switched_source_before_mutation(self):
         with tempfile.TemporaryDirectory() as directory:

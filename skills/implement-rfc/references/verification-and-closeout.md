@@ -1,6 +1,6 @@
 # Verification and closeout
 
-The designated integrator judges what evidence proves. Commands, reviewers and
+The selected recipe's authorized engineering owner judges what evidence proves. Commands, reviewers and
 worker completion are inputs, not automatic acceptance. A delivered report or successful command never approves acceptance.
 
 ## Verify the behavior

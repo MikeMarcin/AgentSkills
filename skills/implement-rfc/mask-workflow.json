@@ -232,7 +232,17 @@
           "effects": "staged-native-roles"
         }
       ],
-      "inputs": []
+      "inputs": [],
+      "profiles": {
+        "direct": {
+          "native_roles": []
+        }
+      }
+    }
+  },
+  "profiles": {
+    "direct": {
+      "native_roles": []
     }
   }
 }

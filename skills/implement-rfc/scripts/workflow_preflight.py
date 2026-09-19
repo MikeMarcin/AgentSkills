@@ -56,8 +56,20 @@ def run(command: list[str], *args: str, cwd: Path | None = None) -> tuple[int, d
 
 
 def preflight(root: Path, command: list[str], *, mode: str | None = None,
-              workflow_root: Path | None = None) -> dict:
+              workflow_root: Path | None = None, strategy: str | None = None,
+              selection: dict | None = None) -> dict:
     result = dict(schema=SCHEMA, state="error", root=str(root), program=command, detail=None, roles=[], host_load="not_verified")
+    import execution_strategy
+    try:
+        chosen = execution_strategy.resolve(strategy, preserved=selection)
+        profile = chosen['requirement_profile']
+        result['selection'] = chosen
+        if not chosen['configuration_complete']:
+            result.update(state='incomplete', detail='selected recipe requires exact routing: ' + ', '.join(chosen['missing_routes']))
+            return result
+    except (ValueError, OSError, TypeError) as exc:
+        result.update(state='incomplete', detail=str(exc))
+        return result
     try:
         context = project_config.resolve_context(repo_root=root, mode=mode, workflow_root=workflow_root)
     except project_config.ProjectConfigError as exc:
@@ -88,8 +100,12 @@ def preflight(root: Path, command: list[str], *, mode: str | None = None,
         result.update(state="unsupported", detail="the selected MASK program does not implement workflow_readiness_v1 typed native roles; "
                       "its link-only success is not workflow readiness")
         return result
+    if profile is not None and workflow.get('requirement_profiles') != 'workflow_requirement_profiles_v1':
+        result.update(state='unsupported', detail='selected MASK does not support explicit requirement profiles; core failures cannot be filtered away')
+        return result
     selected = ("--user",) if context.mode == "personal" else ("--project", str(root))
-    code, ensure, text = run(command, "ensure", *selected, "--check")
+    profile_args = ('--workflow-profile', f'{SKILL}={profile}') if profile is not None else ()
+    code, ensure, text = run(command, "ensure", *selected, "--check", *profile_args)
     if ensure is None:
         result["detail"] = f"MASK ensure --check returned no JSON result (exit {code}): {text}"
         return result
@@ -107,6 +123,9 @@ def preflight(root: Path, command: list[str], *, mode: str | None = None,
                            for row in report.get("roles") or []]
         result["host_load"] = next((row.get("host_load") for row in report.get("roles") or [] if row.get("host_load")), "not_verified")
     error = ensure.get("error") or {}
+    if profile is not None and report is not None and report.get('selected_profile') != profile:
+        result.update(state='unsupported', detail='MASK did not examine the selected requirement profile')
+        return result
     if scope is None or report is None or report.get("workflow") != "declared":
         if error:
             # The program supports the contract but could not examine this consumer (unregistered, unapproved, drifted...).
@@ -117,7 +136,7 @@ def preflight(root: Path, command: list[str], *, mode: str | None = None,
                       "link-only success is not workflow readiness")
         return result
     if ensure.get("ok") and scope.get("workflow") == "complete" and report.get("complete") and data.get("readiness") in ("ready_pinned", "ready_legacy_unpinned"):
-        result.update(state="ready", detail="declared native roles and inputs match the selected scope and source/tracker binding; host loading is not verified by this check")
+        result.update(state="ready", detail="selected declared requirements and inputs match the scope and source/tracker binding; host loading is not verified by this check")
         return result
     rows = (error.get("details") or {}).get("workflow") or []
     result.update(state="incomplete", detail=error.get("message") or f"workflow {scope.get('workflow')}; readiness {data.get('readiness')}",
@@ -130,6 +149,8 @@ def main() -> int:
     parser.add_argument("--repo-root", type=Path, required=True, help="Absolute consumer root")
     parser.add_argument("--mode", choices=("project", "personal"), help="Explicit storage selection; absent uses the remembered binding")
     parser.add_argument("--workflow-root", type=Path, help="Explicit external tracker worktree for personal mode")
+    parser.add_argument('--strategy', help='Explicit registered strategy/preset; separate from storage --mode')
+    parser.add_argument('--selection', type=Path, help='Preserved resolved strategy snapshot')
     parser.add_argument("--mask", help="MASK launcher on PATH or an absolute mask.py; default MASK_PROGRAM or 'mask'")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -138,7 +159,13 @@ def main() -> int:
     if command is None:
         result = dict(schema=SCHEMA, state="error", root=str(root), program=None, detail="no MASK program found; pass --mask or set MASK_PROGRAM", roles=[])
     else:
-        result = preflight(root, command, mode=args.mode, workflow_root=args.workflow_root)
+        import execution_strategy
+        try:
+            selection = execution_strategy.read_json(args.selection) if args.selection else None
+            result = preflight(root, command, mode=args.mode, workflow_root=args.workflow_root,
+                               strategy=args.strategy, selection=selection)
+        except (ValueError, OSError) as exc:
+            result = dict(state='error', detail=str(exc), roles=[])
     if args.json:
         print(json.dumps(result, sort_keys=True))
     else:

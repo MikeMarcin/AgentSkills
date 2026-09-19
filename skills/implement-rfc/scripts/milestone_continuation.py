@@ -93,7 +93,7 @@ def binding_errors(binding):
                     errors.append('invalid source obligation')
     return errors
 
-def v2_errors(value):
+def completion_errors(value):
     errors = binding_errors(value.get('binding'))
     if not errors and value['milestone'] != value['binding']['milestone_id']:
         errors.append('return milestone differs from binding')
@@ -136,8 +136,8 @@ def v2_errors(value):
             errors.append('completion has required pending evidence')
     return errors
 
-def v2_action(returned, assignment, current_binding, accepted_milestones=(), current_target_milestones=None,
-              eligible_milestones=()):
+def bound_action(returned, assignment, current_binding, accepted_milestones=(), current_target_milestones=None,
+                 eligible_milestones=()):
     """Return action/reason, after common identity and execution guards."""
     binding = assignment.get('binding')
     if binding_errors(binding):
@@ -175,7 +175,7 @@ def v2_action(returned, assignment, current_binding, accepted_milestones=(), cur
             and reason == 'independent-work' and returned['required_pending']
             and returned['handoff_ref'] and next_id in eligible_milestones
             and next_id in assignment['target_milestones']):
-            return ('fresh-integrator' if intent == 'fresh' else 'resume-integrator'), request['detail']
+            return ('fresh-context' if intent == 'fresh' else 'continue-context'), request['detail']
         return 'reconcile', 'unfinished scope cannot silently transfer to another milestone'
     if intent == 'fresh':
         allowed = {'context-pressure', 'producer-unavailable', 'ownership-recovery', 'explicit-user-request'}
@@ -183,7 +183,17 @@ def v2_action(returned, assignment, current_binding, accepted_milestones=(), cur
             allowed.add('integrated-boundary')
         if reason not in allowed:
             return 'clarify', 'fresh context needs a concrete boundary or recovery reason'
-        return 'fresh-integrator', request['detail']
+        return 'fresh-context', request['detail']
     if complete and reason != 'related-continuation':
         return 'clarify', 'same-context next outcome needs related-continuation reason'
-    return 'resume-integrator', request['detail']
+    return 'continue-context', request['detail']
+
+
+def v2_errors(value):
+    """Historical coordinated adapter over common completion checks."""
+    return completion_errors(value)
+
+
+def v2_action(*args, **kwargs):
+    action, reason = bound_action(*args, **kwargs)
+    return {'fresh-context': 'fresh-integrator', 'continue-context': 'resume-integrator'}.get(action, action), reason

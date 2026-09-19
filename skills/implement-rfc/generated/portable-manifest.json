@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "d5f8e0544a172b7ae45753122c476612364a0db64bd1c48dbffe03b30f02e5ea"
+      "sha256": "da634931490800dfd4f898227aa2bfa34ff86e26c775a232060bdd83dfcffed5"
     },
     {
       "path": "agents/openai.yaml",
@@ -31,6 +31,10 @@
     {
       "path": "config/routing.json",
       "sha256": "aaca51aa8c29205bcdd5685dfa0f3d50607241a7dc5f69b6d532ac5041d658b3"
+    },
+    {
+      "path": "config/strategy-catalog.json",
+      "sha256": "2f038160a8ab669e8cab28c1b45f0b825759ed77c1d6578d1ed4e3b0e7bb60cf"
     },
     {
       "path": "examples/milestone-plans/IMPLEMENTATION_PROMPT.md",
@@ -62,7 +66,7 @@
     },
     {
       "path": "mask-workflow.json",
-      "sha256": "6f5e8a030fa9b4fe094e42daa35a96822cc0134804777ea9a65b43440660c83e"
+      "sha256": "491ed6c3c36f28c842750b1e86c41a2b4eea5d7951be703b55ae676303adf85a"
     },
     {
       "path": "references/attendance.md",
@@ -89,12 +93,16 @@
       "sha256": "d1bd6b2693f4f940c9d4c287b865bcbbfc1be1af341292340e5079cfd64026bd"
     },
     {
+      "path": "references/engineering-contract.md",
+      "sha256": "036f2c3a80482cf8d01195bb54c091d0c02edd19505b16bbe4db16003a2474e0"
+    },
+    {
       "path": "references/milestone-integration.md",
       "sha256": "0f9a31c67258a2a639125e89bd72ebfb84858e8a6ac7259cf5bbb190d7b2e0a0"
     },
     {
       "path": "references/milestone-plans.md",
-      "sha256": "edbbdd01f36983681185fb6f5a3ff9632627a1ac85ecd8cd6197563f082e13ea"
+      "sha256": "992528818db986dd40e811ff07f0cf3970a2eabf77966cf960bf1070bee25a85"
     },
     {
       "path": "references/model-routing.md",
@@ -145,12 +153,28 @@
       "sha256": "b7f2bf7471ea0ab774b4638d783e61defb818e5ba245e69446a0e5bac6faaebb"
     },
     {
+      "path": "references/strategies/coordinator-integrator.md",
+      "sha256": "4d999c341dc76453aff611ce6d168fa864eae8ee4b179421472e53d254de69e4"
+    },
+    {
+      "path": "references/strategies/direct.md",
+      "sha256": "34287ae027f3edc521d9417a7d3eb81760aac4c367d97a75a15e7268836dec52"
+    },
+    {
+      "path": "references/strategy-host-controls.md",
+      "sha256": "f400878b0e30b25fb28fff9557b344af882d658e7a1b727fb3da42d3747368b2"
+    },
+    {
+      "path": "references/strategy-selection.md",
+      "sha256": "ce26ef1effb0a160da18c12a33406eb646e41749effe7a598091ff16b7ad64b1"
+    },
+    {
       "path": "references/usage-collection.md",
       "sha256": "52dbd9bbdbe6661f8689189d347c7dc428602cf43aa411a0b00f6b25073a690e"
     },
     {
       "path": "references/verification-and-closeout.md",
-      "sha256": "a9e4eb2ddb5583de86739c8d3d0e0a4c5e74ced9e7f4f08423995c94fc62a504"
+      "sha256": "a1bb12640083c2f01e8368fbc5fcaeae90a2cf6f5477e69fa10ea7a261c89442"
     },
     {
       "path": "schemas/issue-card.schema.json",
@@ -214,7 +238,11 @@
     },
     {
       "path": "scripts/coordinator_handoff.py",
-      "sha256": "cc03401e63b9a2f9aeb28e696d729c73b5374a27e8ac08ffcbe90a2443487308"
+      "sha256": "3dec10c8bb2bf2330156121af4a3a257a6d138b54eb16e88a480c8100d0abfd6"
+    },
+    {
+      "path": "scripts/execution_strategy.py",
+      "sha256": "953a66e780dab5bfd03083979126fd5ffbbb522340ac7fe780cdf00c24f75f98"
     },
     {
       "path": "scripts/issue_board.py",
@@ -225,8 +253,12 @@
       "sha256": "1c1fc654194cf9d9d074ac521038b9475f1d8312bb6499dec4afe5e9419a0441"
     },
     {
+      "path": "scripts/milestone_checkpoint.py",
+      "sha256": "539fbfaa693ba8c12bb343f92278f4216a21809658c0c82deb5e63372c1dfabc"
+    },
+    {
       "path": "scripts/milestone_continuation.py",
-      "sha256": "b8fd0395752198b707e771837cf533f55e1b3a124dfbc1da72c952f974fb26b4"
+      "sha256": "e30aa4f1cc8dfddd272002123150fb0ed8ecd4d2fed08a0883535695c54fb7ad"
     },
     {
       "path": "scripts/milestone_plan.py",
@@ -235,6 +267,10 @@
     {
       "path": "scripts/milestone_plan_contract.py",
       "sha256": "34f000169e748ea52abcfcb1ab897431d3ffae9581d29d3c409cd526ba242bff"
+    },
+    {
+      "path": "scripts/milestone_state.py",
+      "sha256": "b696f721fb20bb0d5721ed81dfdc6682ae1f7204e1229f61178e3f9b4d44de6a"
     },
     {
       "path": "scripts/personal_commit.py",
@@ -350,7 +386,7 @@
     },
     {
       "path": "scripts/workflow_preflight.py",
-      "sha256": "3d2f256d9b7e5eb24f131b94e3bace7f42a904a6ff1e64c5068260d38fc160a7"
+      "sha256": "ffd66a667b3421175de945251d0032fd6ad84c0434b11e80da942a862117188f"
     },
     {
       "path": "tests/project_fixtures.py",
@@ -371,6 +407,10 @@
     {
       "path": "tests/test_coordinator_handoff.py",
       "sha256": "4b2fc53bce99ab08c2d354a6647d29a786b0af177d4dd78ebb5f6c2f601974ba"
+    },
+    {
+      "path": "tests/test_execution_strategy.py",
+      "sha256": "91b7fead79704e4cb8b39231dccf7fbe03077f538ce6b4d096f1d3ff481adaf7"
     },
     {
       "path": "tests/test_instruction_paths.py",
@@ -442,11 +482,15 @@
     },
     {
       "path": "tests/test_personal_lifecycle_public.py",
-      "sha256": "db504b81974f1582eb11e3361fadd77e1bf335ec94333b0b65a3ed59f86f9809"
+      "sha256": "31a087f3bee355cbbc4225d4f1c45bfda384f67d8c58ebb31d57343cab514fb3"
     },
     {
       "path": "tests/test_personal_qualification_course.py",
       "sha256": "7ea097d3b34bf19aebaa429b3fc7116fe0aec5a3b99f91302ce916e4d619d432"
+    },
+    {
+      "path": "tests/test_primary_checkpoint.py",
+      "sha256": "f7505d69476a82cb8a7e1f608e9b9ed85eaf97276b6a52f1031807596021fb19"
     },
     {
       "path": "tests/test_progress_trail.py",
@@ -505,6 +549,10 @@
       "sha256": "8eb8d7ee1222b1c652f5b8631841f508e9757b7eb4f861f15a26c8201ce3e5ca"
     },
     {
+      "path": "tests/test_strategy_mask_public.py",
+      "sha256": "07926a33ebb8f1f0e4b408a6673c14d3b1b91f5179d3675d55632217bf6a6129"
+    },
+    {
       "path": "tests/test_unified_workflow.py",
       "sha256": "08c5b1d8b9172e1d2a441f967e7cf3e30828781bee67aed1a387968d4685161c"
     },
@@ -537,6 +585,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "87540b02bbd332ab",
+  "portable_digest": "d473007c2bfa9d9d",
   "schema": "implement-rfc.portable-manifest.v1"
 }

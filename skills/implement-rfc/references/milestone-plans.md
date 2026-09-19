@@ -4,6 +4,17 @@ The mandate bounds authorization; live requirements determine acceptance. One
 adopted plan preserves grouping and default order. A card is an acceptance unit,
 a milestone is an integrated outcome, and a generation is a native context.
 
+## Execution owner
+
+The selected recipe supplies the execution owner. Direct/native primaries use
+`scripts/milestone_checkpoint.py bind/check` for shared obligation and exit checks;
+its checkpoint/observation carries run, segment and mandate identity, selection,
+repository state and plan binding, without a producer/dispatch identity. Preserve
+selection in the existing continuation location. Common acceptance below applies to
+all recipes; assignment/return, dispatch and integrator-renewal instructions apply
+only to the coordinator-integrator recipe. A primary continues its session unless
+interruption, an explicit request or its recipe requires recovery.
+
 ## Resolve and bind
 
 Before implementation dispatch, use installed `scripts/milestone_plan.py discover

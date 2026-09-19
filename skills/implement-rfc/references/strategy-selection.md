@@ -1,0 +1,27 @@
+# Strategy selection
+
+Use `execution_strategy.py resolve --strategy NAME --json` for explicit natural-language
+intent; names are helper selectors, not model-launch commands. `--preserved FILE`
+resumes the exact resolved snapshot. `--preference NAME` supplies an explicitly
+configured preference; no separate preference database is created. `--routing FILE`
+supplies exact named route pairs. Explicit selection wins preserved selection, then
+preference, then the existing coordinator-integrator default. Keep routing selections
+separate from topology and from `workflow_preflight.py --mode project|personal`.
+The older execution-selection.v1 direct/runner mode still means command execution.
+
+The catalog is trusted passive package data. A descriptor names ID/revision, compatible
+common contract, package-relative entrypoint, requirement profile, owners, delegation
+policy, required route slots and host support/qualification facts. Recipe IDs are not
+a closed enum. Register future recipes and pass common conformance tests; no executable
+plugin loading, downloaded code or external model scheduler is involved. Unknown IDs,
+invalid paths, duplicate names and incompatible versions refuse selection.
+
+The resolved snapshot names exactly the common contract and selected recipe instruction
+paths plus their fingerprints. Save it beside existing continuation evidence; do not
+load all recipes. `configuration_complete` describes routing inputs, never host loading.
+Capability, configured route and observed serving remain distinct. Preflight applies
+only the selected custom-role requirements while retaining MASK's core checks.
+
+A topology switch during resume requires an explicit new segment after writer/effect
+reconciliation, with prior pending obligations and deviation history retained. The
+resolver only resolves inputs; it never authorizes or performs that transition.

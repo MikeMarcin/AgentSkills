@@ -1,0 +1,64 @@
+{
+  "schema": "implement-rfc.strategy-catalog.v1",
+  "common_contract": {
+    "id": "implement-rfc.engineering.v1",
+    "entrypoint": "references/engineering-contract.md"
+  },
+  "default": "coordinator-integrator",
+  "recipes": [
+    {
+      "id": "coordinator-integrator",
+      "revision": "1",
+      "common_contract": "implement-rfc.engineering.v1",
+      "entrypoint": "references/strategies/coordinator-integrator.md",
+      "requirement_profile": null,
+      "owners": {
+        "engineering": "integrator",
+        "bookkeeping": "integrator",
+        "product_edits": "integrator-and-workers"
+      },
+      "delegation": "recipe",
+      "required_routes": [],
+      "hosts": {
+        "codex": "existing-baseline",
+        "claude": "existing-baseline"
+      }
+    },
+    {
+      "id": "direct",
+      "revision": "1",
+      "common_contract": "implement-rfc.engineering.v1",
+      "entrypoint": "references/strategies/direct.md",
+      "requirement_profile": "direct",
+      "owners": {
+        "engineering": "primary",
+        "bookkeeping": "primary",
+        "product_edits": "primary"
+      },
+      "delegation": "none",
+      "required_routes": [],
+      "hosts": {
+        "codex": "unverified",
+        "claude": "unverified"
+      }
+    }
+  ],
+  "presets": [
+    {
+      "id": "coordinator-integrator-baseline",
+      "topology_id": "coordinator-integrator",
+      "routing": {}
+    },
+    {
+      "id": "direct-astra-max",
+      "topology_id": "direct",
+      "routing": {
+        "primary": {
+          "provider": "codex",
+          "model": "gpt-6-astra",
+          "effort": "max"
+        }
+      }
+    }
+  ]
+}
