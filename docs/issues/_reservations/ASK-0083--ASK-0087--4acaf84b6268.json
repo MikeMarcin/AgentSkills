@@ -1,0 +1,14 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0083",
+    "ASK-0084",
+    "ASK-0085",
+    "ASK-0086",
+    "ASK-0087"
+  ],
+  "reserve_for": "execution-strategies-v2",
+  "purpose": "",
+  "created": "2026-09-19T17:21:34.312102+00:00",
+  "base": "940f2e937068689316b4ef4663c56fcbd3a27766"
+}
