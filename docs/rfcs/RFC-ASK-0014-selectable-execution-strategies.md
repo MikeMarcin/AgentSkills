@@ -21,3 +21,10 @@ Implement M1–M3 directly in the primary session, without subagents. Skip live 
 - **AC04 (M4):** One owner-selected real matched block and truthful separate quality, adherence, cost, burden and coverage readout. Not authorized to run in this delivery.
 
 The MASK capability handoff is [RFC-MASK-0023](https://github.com/MikeMarcin/ManageAgentSkills/blob/main/docs/rfcs/RFC-MASK-0023-selected-workflow-requirements.md). Source changes do not deploy other consumers.
+
+## Selected-scope acceptance
+
+M1–M3 pass under the recorded amendments; see [implementation evidence](../development/execution-strategies-m1-m3.md)
+and the closeout's criterion/commit rows. The [M4 kit](../../skills/implement-rfc/references/strategy-study/README.md)
+is prepared and synthetically validated. AC04 remains open, with no product task or
+experiment selected or run. This RFC remains Implementing, not Auto-Verified.
