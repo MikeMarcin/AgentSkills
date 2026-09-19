@@ -1,0 +1,29 @@
+{
+  "status": "illustrative_proposal_not_a_shipped_schema",
+  "topology_id": "planner-worker",
+  "revision": "draft-1",
+  "common_contract": "<compatible-common-contract-reference>",
+  "entrypoint": "<trusted-package-relative-recipe-path>",
+  "supports": [
+    {
+      "host": "codex",
+      "qualification": "not_run"
+    }
+  ],
+  "requires": {
+    "native_delegation": true,
+    "custom_roles": [
+      "<scoped-planner-worker-leaf-role>"
+    ]
+  },
+  "owners": {
+    "engineering_judgment": "primary_planner",
+    "bookkeeping": "primary_planner",
+    "product_edits": "worker"
+  },
+  "delegation_authority": "recipe",
+  "routing_reference": "<separately-bound-exact-routes>",
+  "policy_reference": "<feedback-concurrency-context-and-fallback-policy>",
+  "checkpoint_contract": "existing_live_continuation_and_evidence",
+  "notes": "Topology IDs resolve through registration, not a fixed enum in board or outcome schemas. This passive descriptor does not execute or authorize code."
+}

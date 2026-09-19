@@ -1,0 +1,75 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "execution-strategies-v2",
+  "scope": {
+    "rfcs": [
+      "RFC-ASK-0014"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "m1",
+      "outcome": "Shared contract, strategy selection and direct execution",
+      "work": [
+        {
+          "issue": "ASK-0083"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "Direct claim, change, check, evidence and permitted commit work in two disposable consumers without custom roles; resume and shared acceptance guards remain intact."
+      ],
+      "boundary": "Integrated milestone outcome; preserve remaining authored scope."
+    },
+    {
+      "id": "m2",
+      "outcome": "Native strategy and multi-arm measurement",
+      "work": [
+        {
+          "issue": "ASK-0084"
+        }
+      ],
+      "depends_on": [
+        "m1"
+      ],
+      "exit_criteria": [
+        "Native instructions exclude custom coordination; scoped configuration and partial/inclusive telemetry are fixture-verified. Live qualification is omitted by explicit owner amendment."
+      ],
+      "boundary": "Integrated milestone outcome; preserve remaining authored scope."
+    },
+    {
+      "id": "m3",
+      "outcome": "Strict planner-worker recipe, conformance and M4 kit",
+      "work": [
+        {
+          "issue": "ASK-0085"
+        }
+      ],
+      "depends_on": [
+        "m2"
+      ],
+      "exit_criteria": [
+        "Strict ownership and route policy, fifth-recipe conformance and a synthetic-validated reusable M4 kit work without live agents."
+      ],
+      "boundary": "Integrated milestone outcome; preserve remaining authored scope."
+    },
+    {
+      "id": "m4",
+      "outcome": "Run one real matched strategy block",
+      "work": [
+        {
+          "issue": "ASK-0086"
+        }
+      ],
+      "depends_on": [
+        "m2"
+      ],
+      "exit_criteria": [
+        "Owner selects task and budgets later; freeze candidates, independent blind judgments and repairs, and report quality, adherence, usage and coverage separately."
+      ],
+      "boundary": "Integrated milestone outcome; preserve remaining authored scope."
+    }
+  ],
+  "coverage": "complete",
+  "unplanned_work": []
+}

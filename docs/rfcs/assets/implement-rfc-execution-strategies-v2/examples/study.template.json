@@ -1,0 +1,114 @@
+{
+  "status": "draft_not_runnable",
+  "study_id": "<study-id>",
+  "comparison_kind": "practical_strategy_comparison_not_topology_only",
+  "common_inputs": {
+    "task_reference": null,
+    "source_base": null,
+    "tracker_base": null,
+    "authored_plan_reference": null,
+    "skill_revision": null,
+    "acceptance_gate_reference": null,
+    "environment_reference": null,
+    "isolation_reference": null,
+    "budget_and_repair_policy_reference": null
+  },
+  "arms": [
+    {
+      "arm_id": "direct-max",
+      "strategy": "direct-astra-max",
+      "topology_id": "direct",
+      "recipe_revision": null,
+      "requested_primary": {
+        "model": "gpt-6-astra",
+        "effort": "max"
+      },
+      "delegation": "disabled",
+      "requested_child_routes": [],
+      "effective_configuration_reference": null,
+      "observed_serving_reference": null,
+      "source_worktree": null,
+      "tracker_worktree": null
+    },
+    {
+      "arm_id": "native-ultra",
+      "strategy": "native-astra-ultra",
+      "topology_id": "native",
+      "recipe_revision": null,
+      "requested_primary": {
+        "model": "gpt-6-astra",
+        "effort": "ultra"
+      },
+      "delegation": "native_system_selected",
+      "requested_child_routes": null,
+      "child_route_ownership": "native_system",
+      "custom_rfc_role_policy": "excluded",
+      "effective_configuration_reference": null,
+      "observed_serving_reference": null,
+      "source_worktree": null,
+      "tracker_worktree": null
+    },
+    {
+      "arm_id": "coordinated",
+      "strategy": "coordinator-integrator-baseline",
+      "topology_id": "coordinator-integrator",
+      "recipe_revision": null,
+      "requested_routing_snapshot_reference": null,
+      "delegation": "existing_recipe_and_frozen_roles",
+      "effective_configuration_reference": null,
+      "observed_serving_reference": null,
+      "source_worktree": null,
+      "tracker_worktree": null
+    }
+  ],
+  "available_additional_arms": [
+    {
+      "arm_id": "planner-worker",
+      "strategy": "planner-cheaper-worker-strict",
+      "topology_id": "planner-worker",
+      "selected": false,
+      "recipe_revision": null,
+      "requested_primary": {
+        "model": "gpt-6-astra",
+        "effort": "max"
+      },
+      "requested_worker": {
+        "model": null,
+        "effort": null
+      },
+      "worker_concurrency": 1,
+      "planner_product_edits": "not_permitted",
+      "fallback_policy": "no_unplanned_takeover_or_model_upgrade",
+      "readiness": "requires_exact_worker_route_and_native_qualification"
+    }
+  ],
+  "judges": [
+    {
+      "family": "Astra",
+      "exact_model": null,
+      "effort": null
+    },
+    {
+      "family": "Fable",
+      "exact_model": null,
+      "effort": null
+    }
+  ],
+  "order": {
+    "implementation": null,
+    "candidate_labels_private": true,
+    "judge_orders": null
+  },
+  "measurement": {
+    "collector": "existing_usage_capture_and_reconciled_report",
+    "native_coverage": "observe_do_not_assume",
+    "outcomes": "existing_outcomes_contract_with_arm_scoped_task_ids",
+    "quality_before_usage_reveal": true
+  },
+  "notes": [
+    "Resolve exact supported host settings before execution; this JSON is a study sketch, not a Codex config or launcher.",
+    "Null means unresolved or system-owned where explicitly labeled, never zero.",
+    "Move an optional arm into the selected arms list and freeze its inputs before a block starts.",
+    "Study setup and task grants require explicit user authority; this file supplies neither."
+  ]
+}

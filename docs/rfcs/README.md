@@ -35,3 +35,5 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 
 | RFC-ASK-0012 | Implementing | Authored milestone plans and outcome-bound continuation |
 | RFC-ASK-0013 | Auto-Verified | Optional personal storage for the shared implement-rfc workflow |
+
+| RFC-ASK-0014 | Implementing | Selectable execution strategies and real-code experiments |
