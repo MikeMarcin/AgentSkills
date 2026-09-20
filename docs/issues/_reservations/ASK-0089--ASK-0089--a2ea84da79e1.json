@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0089"
+  ],
+  "reserve_for": "coordinator-implementer-review-cycle",
+  "purpose": "",
+  "created": "2026-09-20T05:17:25.550592+00:00",
+  "base": "c9975e02477542f455787262dd85b7d8e7ceb66f"
+}
