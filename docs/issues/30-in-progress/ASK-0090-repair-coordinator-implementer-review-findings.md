@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0090"
 title: "Repair coordinator-implementer review findings"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0014"]
 depends_on: ["ASK-0089"]
 ---
