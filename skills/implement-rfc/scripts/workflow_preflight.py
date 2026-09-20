@@ -105,9 +105,11 @@ def preflight(root: Path, command: list[str], *, mode: str | None = None,
         return result
     selected = ("--user",) if context.mode == "personal" else ("--project", str(root))
     profile_args = ('--workflow-profile', f'{SKILL}={profile}') if profile is not None else ()
-    code, ensure, text = run(command, "ensure", *selected, "--check", *profile_args)
+    commands = {entry.get("name") for entry in (caps.get("data") or {}).get("commands", [])}
+    inspection = "status" if "status" in commands else "ensure"
+    code, ensure, text = run(command, inspection, *selected, "--check", *profile_args)
     if ensure is None:
-        result["detail"] = f"MASK ensure --check returned no JSON result (exit {code}): {text}"
+        result["detail"] = f"MASK {inspection} --check returned no JSON result (exit {code}): {text}"
         return result
     data = ensure.get("data") or {}
     entries = data.get("workflow_readiness") or []

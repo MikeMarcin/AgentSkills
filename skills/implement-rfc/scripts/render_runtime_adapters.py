@@ -557,7 +557,7 @@ def check_locked_consumer(root: Path, generated: dict, manifest_path: Path, lock
     own lock; it never writes the renderer's publication manifest, so that
     manifest cannot be the verdict here. A file equal to the fresh render is
     current, one that differs is stale, and a lock that disagrees with the
-    files is drift for mask ensure to reconcile.
+    files is drift for mask repair to reconcile.
     """
     ok = True
     expected = {path.relative_to(root).as_posix(): hashlib.sha256(content.encode("utf-8")).hexdigest()
@@ -577,10 +577,10 @@ def check_locked_consumer(root: Path, generated: dict, manifest_path: Path, lock
             print(f"stale generated file: {path}", file=sys.stderr)
             ok = False
         if relative not in lock:
-            print(f"unlocked generated file: {path}; run mask ensure", file=sys.stderr)
+            print(f"unlocked generated file: {path}; run mask repair", file=sys.stderr)
             ok = False
         elif digest != lock[relative]:
-            print(f"lock drift: {path} differs from the MASK lock; run mask ensure", file=sys.stderr)
+            print(f"lock drift: {path} differs from the MASK lock; run mask repair", file=sys.stderr)
             ok = False
     for role in RETIRED_ROLES:
         for provider in ROLE_SUFFIX:
@@ -730,7 +730,7 @@ def publish_adapters(root, generated, manifest_path, manifest, check):
     lock = mask_lock_hashes(root)
     if lock is not None:
         if not check:
-            raise ValueError("consumer is MASK-managed (native role lock present); run mask ensure instead of rendering directly")
+            raise ValueError("consumer is MASK-managed (native role lock present); run mask repair instead of rendering directly")
         return check_locked_consumer(root, generated, manifest_path, lock)
     prior = load_json(manifest_path) if manifest_path.exists() else None
     pending = load_json(pending_path) if pending_path.exists() else None

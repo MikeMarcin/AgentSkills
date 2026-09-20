@@ -161,8 +161,13 @@ args = sys.argv[1:]
 if args[0] == "capabilities":
     workflow = {{"readiness": "workflow_readiness_v1", "native_roles": True, "staged_setup": True, "host_load": "not_verified"}}
     data = {{"workflow": workflow}} if mode != "old" else {{}}
+    if mode == "v2":
+        data["commands"] = [{{"name": "status"}}]
     print(json.dumps({{"ok": True, "schema_version": 1, "data": data, "error": None}}))
     raise SystemExit(0)
+if mode == "v2":
+    assert args[0] == "status", args
+    mode = "ready"
 user = "--user" in args
 root = "personal-user" if user else args[args.index("--project") + 1]
 scope = "user" if user else "project"
@@ -205,6 +210,10 @@ class PreflightTests(unittest.TestCase):
         code, result = self.preflight("ready")
         self.assertEqual((code, result["state"], result["host_load"]), (0, "ready", "not_verified"))
         self.assertEqual(result["roles"], [dict(agent="codex", name="rfc-integrator", state="ok", route={"model": "m"})])
+
+    def test_v2_program_uses_advertised_status(self) -> None:
+        code, result = self.preflight("v2")
+        self.assertEqual((code, result["state"]), (0, "ready"))
 
     def test_incomplete_readiness_reports_blockers(self) -> None:
         code, result = self.preflight("incomplete")

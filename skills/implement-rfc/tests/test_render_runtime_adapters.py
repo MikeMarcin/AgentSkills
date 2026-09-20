@@ -336,7 +336,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             # Direct rendering would publish beside MASK's record; it is refused.
             direct = self.run_renderer(root)
             self.assertEqual(direct.returncode, 2)
-            self.assertIn("run mask ensure", direct.stderr)
+            self.assertIn("run mask repair", direct.stderr)
             # A file that no longer equals the fresh render is stale, and it no longer matches the lock either.
             drifted = root / ".codex/agents/rfc-worker.toml"
             original = drifted.read_text(encoding="utf-8")
