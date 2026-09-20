@@ -2,9 +2,10 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0088"
 title: "Default to one fresh Astra Max implementer per milestone"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0014"]
 depends_on: ["ASK-0085"]
+acceptance: [{"criterion":"AC1: complete default selection, explicit/preserved precedence, no additional orchestration","outcome":"pass","revision":"5a40143","evidence":{"kind":"artifact","detail":"docs/development/simple-milestone-default.md: Resolver and scoped host tests pass; default selects Sol Low and a leaf Astra Max implementer without bespoke role requirements."}},{"criterion":"AC2: full-cycle milestone ownership and fresh boundary handoff","outcome":"pass","revision":"5a40143","evidence":{"kind":"artifact","detail":"docs/development/simple-milestone-default.md: Recipe inspected for complete planning/implementation/verification/upkeep ownership, same-milestone correction, fresh next-milestone context and existing independent acceptance boundaries. Native behavior is not claimed."}},{"criterion":"AC3: public installed surfaces and scoped local activation","outcome":"pass","revision":"5a40143","evidence":{"kind":"artifact","detail":"docs/development/simple-milestone-default.md: 26 AgentSkills and 32 MASK tests pass, including two disposable installed/development consumers. Guarded personal/AgentSkills/MASK/aito links activated. Personal, AgentSkills and aito readiness pass; MASK retains its pre-existing approval requirement. Frozen experiment candidates remain unchanged."}}]
 ---
 
 # ASK-0088: Simple milestone default

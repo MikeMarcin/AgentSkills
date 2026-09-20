@@ -16,7 +16,7 @@ Implement M1–M3 directly in the primary session, without subagents. Skip live 
 Subsequent owner instruction: make new runs use a low-effort coordinator and a fresh
 Astra Max implementer at every milestone boundary. The implementer owns the full
 engineering cycle and upkeep, with no additional agent orchestration. This preference
-is implemented in [ASK-0088](../issues/30-in-progress/ASK-0088-simple-milestone-default.md).
+is implemented in [ASK-0088](../issues/60-done/ASK-0088-simple-milestone-default.md).
 It does not change preserved run selections, rewrite the M4 evidence, or claim that
 the two-arm comparison established a general topology winner. Personal deployment
 and the named AgentSkills, MASK and aito source checkouts are in scope; frozen
