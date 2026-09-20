@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0088"
 title: "Default to one fresh Astra Max implementer per milestone"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0014"]
 depends_on: ["ASK-0085"]
 ---
