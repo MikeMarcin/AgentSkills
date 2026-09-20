@@ -29,7 +29,7 @@ The coordinator presents the loopback HTML flow and arms the durable hand-back w
 before yielding. [ASK-0089](../issues/60-done/ASK-0089-portable-coordinator-implementer.md)
 owns this correction.
 Independent critical review found descriptor, route-precedence, schema and hand-back
-watch defects in that first implementation. [ASK-0090](../issues/30-in-progress/ASK-0090-repair-coordinator-implementer-review-findings.md)
+watch defects in that first implementation. [ASK-0090](../issues/60-done/ASK-0090-repair-coordinator-implementer-review-findings.md)
 owns their verified repair.
 
 ## Acceptance
