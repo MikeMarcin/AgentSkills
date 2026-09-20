@@ -50,7 +50,7 @@ Before the first native dispatch, check the required native role set with
 for an explicit personal selection). It accepts only a MASK
 program that implements `workflow_readiness_v1` and reports complete declared
 readiness; `unsupported`, `incomplete` or `error` is a setup problem to report
-(`mask ensure --user` for personal scope, or `mask ensure --project ROOT` for
+(`mask repair --user` for personal scope, or `mask repair --project ROOT` for
 project scope, deploys or sets up the roles), never permission to
 spawn a default agent as an integrator.
 

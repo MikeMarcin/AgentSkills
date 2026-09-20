@@ -2,7 +2,7 @@
 """Startup preflight: is this consumer's implement-rfc native role set ready under MASK?
 
 Runs the selected MASK program read-only (``capabilities --json`` and
-``ensure --project ROOT --check --json``) with argv arrays, never a shell, and
+``status --project ROOT --check --json``, or an advertised older interface) with argv arrays, never a shell, and
 reports one of ``ready``, ``incomplete``, ``unsupported`` or ``error``.
 A program that does not advertise ``workflow_readiness_v1`` and typed native
 roles is ``unsupported``: an older MASK may ignore ``mask-workflow.json`` and

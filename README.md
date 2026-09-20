@@ -27,37 +27,34 @@ The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarci
 
 ## Use the skills in a project
 
-Clone this repository and install MASK using its [setup guide](https://github.com/MikeMarcin/ManageAgentSkills#install-and-select-a-source). MASK requires Python 3.11+, Git and native directory symlink support. If its launcher is unavailable, use a known supported interpreter with `/absolute/path/to/ManageAgentSkills/mask.py`.
+Clone this repository and install MASK using its [setup guide](https://github.com/MikeMarcin/ManageAgentSkills#install-once). MASK requires Python 3.11+, Git and native directory symlink support. If its launcher is unavailable, use a known supported interpreter with `/absolute/path/to/ManageAgentSkills/mask.py`.
 
-Select this checkout as the source, then initialize and register your project. Replace the example paths with your own:
-
-```sh
-mask init --source /absolute/path/to/AgentSkills --json
-mask skill list --json
-mask project init --project /absolute/path/to/project --json
-mask project register /absolute/path/to/project --json
-mask project require manage-agent-skills --project /absolute/path/to/project --apply --dry-run --json
-```
-
-Review the proposed actions and use the returned `data.plan_hash` for the matching apply:
+Approve the tap and preview the requested installation. Replace the project path
+with your own:
 
 ```sh
-mask project require manage-agent-skills --project /absolute/path/to/project --apply --expect-plan-hash RETURNED_HASH --json
-mask doctor --project /absolute/path/to/project --check --json
+mask tap agentskills https://github.com/MikeMarcin/AgentSkills.git --json
+mask search --json
+mask install manage-agent-skills --project /absolute/path/to/project --dry-run --json
 ```
 
-> [!TIP]
-> `require` and `unrequire` preserve unrelated requirements. Use `project set` only for a complete replacement.
+Review the proposed actions and use the returned `data.plan_hash`:
+
+```sh
+mask install manage-agent-skills --project /absolute/path/to/project --approve-plan RETURNED_HASH --json
+mask status --project /absolute/path/to/project --check --json
+```
+
+`install` and `uninstall` preserve unrelated selections. `register` prepares an
+existing declaration in a fresh clone or worktree.
 
 Commit `.mask.json` and consumer context; ignore generated entries under `.agents/skills/` and `.claude/skills/`. Preserve unrelated real skills.
 
 ## Personal selections and project context
 
-Use `mask user init`, guarded `mask user register`, and
-`mask user require ID --apply --dry-run --json` followed by the matching guarded
-apply to select personal skills. Inspect with `mask user show --json` and
-`mask doctor --user --check --json`. See MASK's personal-skill guide for pinned
-home selection, backups, ownership, and state compatibility.
+Use `mask install ID --user --dry-run --json`, followed by the same command with
+`--approve-plan HASH` instead of `--dry-run`, to select personal skills.
+Inspect with `mask list --user --json` and `mask status --user --check --json`.
 
 The initial personal selection is coauthoring, code-simplifier,
 technical-book-humanizer, instamat-image-to-pbr, and manage-agent-skills.
@@ -137,11 +134,16 @@ The example scenario uses disposable projects and local bare remotes. Run `pytho
 ## Updates and ownership
 
 > [!NOTE]
-> Shared links observe local edits immediately. Remote updates require a clean source and affect every registered consumer. Update between active tasks because hosts may cache skill content.
+> Development links observe local source edits. Normal installations use locked
+> artifacts; `mask upgrade` selects newer versions and prepares them. Running hosts
+> may need a restart to load changed skills.
 
-Use `source fetch`, `update --dry-run` and guarded `update` to review and activate source changes. Program updates are separate: `self update` targets ManageAgentSkills. See MASK's [update and recovery guide](https://github.com/MikeMarcin/ManageAgentSkills#update-skills-or-the-program) for the complete sequence.
+Use `mask update` to refresh MASK and tap catalogs. Preview `mask upgrade --dry-run`
+for the current checkout, then apply the reviewed plan with `--approve-plan HASH`.
+Add `--user` for personal skills or `--all` for every registered checkout plus
+personal skills. Version holds survive upgrade; required setup still reconciles.
 
-Do not edit MASK's internal registry or delete a real skill directory to bypass a collision. `project unregister PATH` removes only unchanged owned links and leaves the declaration and source intact. For interrupted operations, inspect `recover --inspect` before choosing a recovery action.
+Do not edit MASK's internal registry or delete a real skill directory to bypass a collision. `unregister PATH` removes only unchanged owned links and leaves the declaration and source intact. For interrupted operations, inspect `recover --inspect` before choosing a recovery action.
 
 ## Provenance and current deployment
 

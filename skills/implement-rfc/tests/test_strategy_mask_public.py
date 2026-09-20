@@ -28,17 +28,15 @@ class StrategyMaskPublicTests(unittest.TestCase):
                                     env=env,cwd=base,capture_output=True,text=True)
                 self.assertEqual(done.stderr,'',done.stderr)
                 return json.loads(done.stdout)
-            self.assertTrue(mask('tap','add','fixture',remote,'--checkout',source)['ok'])
+            self.assertTrue(mask('tap','fixture',remote,'--checkout',source)['ok'])
             for name in ('one','two'):
                 root=base/name;init_repo(root,token=name)
-                installed=mask('install','implement-rfc','--project',root)
-                self.assertEqual(installed['error']['code'],'workflow.incomplete',installed)
-                self.assertTrue(mask('integration','approve','--project',root)['ok'])
-                preview = mask('ensure', '--project', root)
-                self.assertEqual(preview['error']['code'], 'workflow.incomplete', preview)
-                setup = mask('ensure', '--project', root,
-                             '--expect-plan-hash', preview['data']['plan_hash'],
-                             '--allow-setup', 'fixture/implement-rfc:prepare-roles')
+                installed=mask('install','implement-rfc','--project',root,'--no-update')
+                self.assertEqual(installed['error']['code'],'confirmation.required',installed)
+                preview = mask('install', 'implement-rfc', '--project', root, '--dry-run')
+                self.assertTrue(preview['ok'], preview)
+                setup = mask('install', 'implement-rfc', '--project', root, '--no-update',
+                             '--approve-plan', preview['data']['plan_hash'])
                 self.assertTrue(setup['ok'], setup)
                 script=root/'.agents/skills/implement-rfc/scripts/workflow_preflight.py'
                 self.assertTrue(script.is_file())
@@ -60,9 +58,9 @@ class StrategyMaskPublicTests(unittest.TestCase):
                                          {'model': 'claude-opus-5', 'effort': 'xhigh'})
                     else:
                         self.assertEqual(result['roles'], [])
-                selected_roles = mask('ensure', '--project', root, '--check', '--workflow-profile', 'implement-rfc=planner-worker')
+                selected_roles = mask('status', '--project', root, '--check', '--workflow-profile', 'implement-rfc=planner-worker')
                 self.assertTrue(selected_roles['ok'], selected_roles)
-                default=mask('ensure','--project',root,'--check')
+                default=mask('status','--project',root,'--check')
                 self.assertTrue(default['ok'], default)
                 self.assertEqual((base/'machine/state.json').read_bytes(),before)
                 self.assertTrue((root/'.codex/agents/rfc-implementer.toml').is_file())
@@ -75,10 +73,10 @@ class StrategyMaskPublicTests(unittest.TestCase):
                 self.assertEqual(result['selection']['strategy'],'coordinator-implementer')
                 self.assertEqual(result['deployment_readiness'],'ready_pinned')
                 # Approved local authoring is explicitly unpinned, still observationally ready.
-                preview=mask('source','dev-link','fixture/implement-rfc','--project',root,'--authoring-root',source,'--dry-run')
+                preview=mask('skill','dev-link','fixture/implement-rfc','--project',root,'--authoring-root',source,'--dry-run')
                 self.assertTrue(preview['ok'],preview)
-                applied=mask('source','dev-link','fixture/implement-rfc','--project',root,'--authoring-root',source,
-                             '--expect-plan-hash',preview['data']['plan_hash'])
+                applied=mask('skill','dev-link','fixture/implement-rfc','--project',root,'--authoring-root',source,
+                             '--approve-plan',preview['data']['plan_hash'])
                 self.assertTrue(applied['ok'],applied)
                 before=(base/'machine/state.json').read_bytes()
                 done=subprocess.run(command,env=env,capture_output=True,text=True)
@@ -90,4 +88,4 @@ class StrategyMaskPublicTests(unittest.TestCase):
                                  {('codex', 'rfc-implementer'), ('claude', 'rfc-implementer')})
                 self.assertEqual((base/'machine/state.json').read_bytes(),before)
                 (root/'.mask/skill-config/implement-rfc/project.md').unlink()
-                self.assertFalse(mask('ensure','--project',root,'--check','--workflow-profile','implement-rfc=direct')['ok'])
+                self.assertFalse(mask('status','--project',root,'--check','--workflow-profile','implement-rfc=direct')['ok'])

@@ -1,9 +1,11 @@
 # Personal storage
 
 For explicit first-use setup, select the shared skill at personal scope with
-`mask install implement-rfc --user --json`, then preview `mask ensure --user
---check --json`. If role setup is required, use MASK's explicit setup
-authorization for that scope; a readiness check never grants it. Personal role
+`mask install implement-rfc --user --dry-run --json`, then apply the reviewed task
+with `mask install implement-rfc --user --approve-plan HASH --json`, using its
+`data.plan_hash`. Inspect readiness with `mask status --user --check --json`.
+For an existing selection, `mask repair --user` restores links and offers required
+setup without advancing versions; a readiness check never grants setup approval. Personal role
 files are rendered from the canonical roles and routes with no project addenda.
 A native assignment supplies the selected source root, tracker root, runtime
 root, project facts and addenda. Restart a host after role installation and

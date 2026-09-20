@@ -346,7 +346,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             self.assertIn("stale generated file", check.stderr)
             self.assertIn("lock drift", check.stderr)
             drifted.write_text(original, encoding="utf-8")
-            # Files current but the lock disagreeing is drift for mask ensure, not staleness.
+            # Files current but the lock disagreeing is drift for mask repair, not staleness.
             lock = json.loads(lock_path.read_text())
             lock["roles"][0]["sha256"] = "0" * 64
             lock_path.write_text(json.dumps(lock), encoding="utf-8")

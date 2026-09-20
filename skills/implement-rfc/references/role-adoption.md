@@ -24,8 +24,8 @@ Use the current manage-agent-skills skill and the public CLI:
 ```sh
 mask capabilities --json
 mask config show --json
-mask source status --json
-mask project show --project /absolute/selected-consumer --json
+mask tap --json
+mask list --project /absolute/selected-consumer --json
 ```
 
 Record the selected source revision/artifact, declaration and lock state, and the
@@ -35,16 +35,17 @@ and `--mask-projects` measurement do not authorize changing a consumer.
 
 Development directory links observe canonical source changes immediately after
 integration. An isolated authoring worktree protects them from intermediate edits.
-Pinned consumers retain their selected artifact: use an explicitly approved scoped
-MASK update/selection operation, preview it and apply its matching plan guard.
-Do not invoke unqualified `mask update` to adopt one consumer: it advances the
-legacy shared source for all legacy consumers. Do not mix a new canonical renderer
-with a consumer's older pin. Invoke the renderer from the selected skill artifact.
+Pinned consumers retain their selected artifact. To adopt newer package bytes,
+preview `mask upgrade implement-rfc --project ROOT --dry-run --json` and apply
+with the matching `--approve-plan HASH`. Version-held selections require an
+explicitly authorized `mask unpin implement-rfc --project ROOT` first.
+`mask update` refreshes the program and catalogs; it does not upgrade consumers.
+Invoke the renderer from the selected skill artifact so its source matches the
+consumer's locked version.
 
-For ordinary selected link reconciliation, use `mask plan --project ROOT --json`
-and `mask apply --project ROOT --expect-plan-hash HASH --json`. A pin update is a
-separate operation, not an ordinary link apply; consult the current capability and
-CLI contract for `update --project ROOT` and its revision intent.
+For ordinary link and setup restoration, preview `mask repair --project ROOT
+--dry-run --json`, then apply `mask repair --project ROOT --approve-plan HASH
+--json`. A fresh checkout/worktree uses `mask register --project ROOT`.
 
 ## Account for active work, then render
 

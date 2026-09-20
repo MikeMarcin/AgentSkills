@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "2d8852df3f5cbc8cc4063b628b86da722d6ee1e0526b007a814cd1444190c68a"
+      "sha256": "2737bf2cece60839971027183cb9d6041ef7921ab2ed02446457c4c7fe2052b2"
     },
     {
       "path": "SKILL.md",
@@ -126,7 +126,7 @@
     },
     {
       "path": "references/personal-storage.md",
-      "sha256": "4e6f884a2d21abddeb9eba53e495b8bcab7a67569444d3d307073e117707147d"
+      "sha256": "1d254dea26c373cf6f5895d339267222a878fa74eb58dd41e7dc7ab3d7cc6717"
     },
     {
       "path": "references/progress-relay.md",
@@ -142,7 +142,7 @@
     },
     {
       "path": "references/role-adoption.md",
-      "sha256": "785ef96d02207251e2f6358fa701dc79f63e36cc2d617ed6e56cc19f1e6d1e75"
+      "sha256": "8b5bb51b9eb7b1c078b4560f57d747c3ee78acae1709a8fe9a3dec7da894cf85"
     },
     {
       "path": "references/routing-audit.md",
@@ -158,7 +158,7 @@
     },
     {
       "path": "references/strategies/coordinator-integrator.md",
-      "sha256": "47646cf91525357e3af0f3b84b46fbf68081bf2e25c712786620b654e3256717"
+      "sha256": "81b42aa90d8873aced927c726a43f01f52bec37e122ecdfb8d1eaad35ca84e52"
     },
     {
       "path": "references/strategies/direct.md",
@@ -350,7 +350,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "5390ce1d80eb73737e564f7e5d40cfb039ae81537a182122613cf99422bc27f4"
+      "sha256": "a9d46e483a13832e1cedbfd1f38d020fc554b0c7ab15016adf3e31bc376bd8d2"
     },
     {
       "path": "scripts/role_usage.py",
@@ -430,7 +430,7 @@
     },
     {
       "path": "scripts/workflow_preflight.py",
-      "sha256": "67972a83b53b1e899292c72ca06f8a13b18421c7c22d9d48cab70d2e1545f2f9"
+      "sha256": "dee945f83fd36fcdea7e2995896ce2b1a4e0c2784b48d445be77ec5079346342"
     },
     {
       "path": "tests/project_fixtures.py",
@@ -474,7 +474,7 @@
     },
     {
       "path": "tests/test_mask_workflow.py",
-      "sha256": "1a2221e9d8c157436b77346ba20726244f0d8b9c93c4ee23d635b4ec7dbef398"
+      "sha256": "55f065253cfaebdfb1300a15d22d093bdbe1f030172993d0539fc45c4dccbf45"
     },
     {
       "path": "tests/test_milestone_adaptive.py",
@@ -558,7 +558,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "b5916862b996cd0994803c07fd053bdd69b3a66741fb83f072f19e74ed47df0f"
+      "sha256": "798cbcd90d8d3f74e72a8f6dda8b2d7732a5028aead887bdd78313207c8cc7f6"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -602,7 +602,7 @@
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "1830e2fdbfad80a4ac7282602cc784f207e4d463bb543e1f9726a3294e4661b5"
+      "sha256": "78a4b10c4932ca488487f2fbeb80d2d1c9523875364756709f6d468f61ec5694"
     },
     {
       "path": "tests/test_strategy_study.py",
@@ -645,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "2c61fcc0d7a55881",
+  "portable_digest": "d3240f05bb66689a",
   "schema": "implement-rfc.portable-manifest.v1"
 }

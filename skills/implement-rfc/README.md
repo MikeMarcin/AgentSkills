@@ -38,9 +38,12 @@ beside `SKILL.md`. Its project contract declares the consumer inputs (`project.j
 inputs. Both scopes render from the same canonical roles and routes; project
 roles carry consumer addenda, while personal roles receive project facts through
 the assignment. MASK runs `scripts/prepare_mask_roles.py` only under explicit
-`package.setup` consent (`mask ensure --project ROOT`, answering yes in a
-terminal, or the corresponding `--user` command, or `--expect-plan-hash` with
-`--allow-setup SOURCE/implement-rfc:prepare-roles`);
+approval of a reviewed `mask install`, `register`, `repair` or `upgrade` task.
+For an existing selection, preview `mask repair --project ROOT --dry-run --json`,
+then apply with `mask repair --project ROOT --approve-plan HASH --json`, using
+that result's `data.plan_hash`. A terminal invocation offers the same review;
+`--user` selects personal skills. The approval covers the shown setup and exact
+file replacements together;
 the script writes the requested `STAGE/AGENT/NAME.ext` files through the same
 `generate_roles` path as the standalone renderer and nothing else. MASK
 validates the stage, writes the portable
@@ -53,7 +56,7 @@ matching roles deliberately.
 
 `scripts/workflow_preflight.py --repo-root ROOT --json` is the startup check:
 it requires the program's `workflow_readiness_v1` capability and a complete
-`ensure --check` result. Personal mode checks the selected source/tracker
+`status --check` result (older advertised interfaces use their compatibility path). Personal mode checks the selected source/tracker
 binding and user-scope roles. An older MASK's link-only success is reported as
 `unsupported`. Filesystem readiness is not host loading. The standalone
 renderer (`render_runtime_adapters.py --repo-root ROOT`) remains available for
@@ -68,7 +71,7 @@ layout. Source-manifest generation and staged role generation do not need this
 lookup. Setup requests also publish these consumer-relative paths, but the
 staging entrypoint has no reason to open the lock: MASK owns publication.
 Canonical lookup precedes retired fallback lookup. Retired-file cleanup belongs
-to `mask ensure --repair`, with backups, never to the renderer.
+to reviewed `mask repair` and `mask cleanup` tasks, with backups, never to the renderer.
 
 MASK supports `compatible_locks` assertions for byte-identical package-input
 changes. This renderer refactor does not qualify: each role's generated header
@@ -177,7 +180,7 @@ Generate optional role adapters with `scripts/render_runtime_adapters.py --repo-
 /path/to/consumer`; pass `--check` for observational drift checking. A consumer
 that carries MASK's `native-roles.lock.json` is judged against the fresh render and
 that lock, its legacy publication manifest is ignored, and direct rendering into it
-is refused in favour of `mask ensure`. Without a lock the renderer writes
+is refused in favour of `mask repair`. Without a lock the renderer writes
 `.codex/agents/rfc-*.toml`, `.claude/agents/rfc-*.md`, and
 `.mask/generated/implement-rfc/runtime-adapters.json`. It never emits a Claude
 skill shim or writes through either skill link. Linked destination parents and
