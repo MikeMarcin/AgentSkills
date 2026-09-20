@@ -37,24 +37,29 @@ class StrategyMaskPublicTests(unittest.TestCase):
                 script=root/'.agents/skills/implement-rfc/scripts/workflow_preflight.py'
                 self.assertTrue(script.is_file())
                 before=(base/'machine/state.json').read_bytes()
-                for strategy in ('direct','native','coordinator-implementer-astra-max'):
+                for strategy in ('direct','native','coordinator-implementer'):
                     done=subprocess.run([sys.executable,'-B',str(script),'--repo-root',str(root),'--mask',os.environ['MASK_TEST_PROGRAM'],
                                          '--strategy',strategy,'--json'],env=env,capture_output=True,text=True)
                     self.assertEqual(done.returncode,0,done.stdout+done.stderr)
                     result=json.loads(done.stdout)
-                    self.assertEqual((result['state'],result['roles'],result['host_load']),('ready',[],'not_verified'))
+                    expected_roles = ([{'agent': 'codex', 'name': 'rfc-implementer', 'state': 'ok',
+                                        'route': {'model': 'gpt-6-astra', 'effort': 'max'}},
+                                       {'agent': 'claude', 'name': 'rfc-implementer', 'state': 'ok',
+                                        'route': {'model': 'claude-opus-5', 'effort': 'xhigh'}}]
+                                      if strategy == 'coordinator-implementer' else [])
+                    self.assertEqual((result['state'],result['roles'],result['host_load']),('ready',expected_roles,'not_verified'))
                 selected_roles = mask('ensure', '--project', root, '--check', '--workflow-profile', 'implement-rfc=planner-worker')
                 self.assertTrue(selected_roles['ok'], selected_roles)
                 default=mask('ensure','--project',root,'--check')
                 self.assertFalse(default['ok'])
                 self.assertEqual((base/'machine/state.json').read_bytes(),before)
                 self.assertFalse((root/'.codex/agents').exists())
-                # A plain invocation selects the complete default without custom roles.
+                # A plain invocation selects the provider-neutral default with its native role.
                 command=[sys.executable,'-B',str(script),'--repo-root',str(root),'--mask',os.environ['MASK_TEST_PROGRAM'],'--json']
                 done=subprocess.run(command,env=env,capture_output=True,text=True)
                 self.assertEqual(done.returncode,0,done.stdout+done.stderr)
                 result=json.loads(done.stdout)
-                self.assertEqual(result['selection']['strategy'],'coordinator-implementer-astra-max')
+                self.assertEqual(result['selection']['strategy'],'coordinator-implementer')
                 self.assertEqual(result['deployment_readiness'],'ready_pinned')
                 # Approved local authoring is explicitly unpinned, still observationally ready.
                 preview=mask('source','dev-link','fixture/implement-rfc','--project',root,'--authoring-root',source,'--dry-run')
@@ -66,7 +71,10 @@ class StrategyMaskPublicTests(unittest.TestCase):
                 done=subprocess.run(command,env=env,capture_output=True,text=True)
                 self.assertEqual(done.returncode,0,done.stdout+done.stderr)
                 result=json.loads(done.stdout)
-                self.assertEqual((result['state'],result['deployment_readiness'],result['roles']),('ready','ready_dev_link',[]))
+                self.assertEqual(result['state'], 'ready')
+                self.assertEqual(result['deployment_readiness'], 'ready_dev_link')
+                self.assertEqual({(row['agent'], row['name']) for row in result['roles']},
+                                 {('codex', 'rfc-implementer'), ('claude', 'rfc-implementer')})
                 self.assertEqual((base/'machine/state.json').read_bytes(),before)
                 (root/'.mask/skill-config/implement-rfc/project.md').unlink()
                 self.assertFalse(mask('ensure','--project',root,'--check','--workflow-profile','implement-rfc=direct')['ok'])

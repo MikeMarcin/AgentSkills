@@ -23,6 +23,7 @@
           "rfc-worker",
           "rfc-worker-deep",
           "rfc-reviewer-critical",
+          "rfc-implementer",
           "rfc-integrator"
         ]
       },
@@ -46,6 +47,9 @@
           "$ref": "#/$defs/leaf"
         },
         "rfc-reviewer-critical": {
+          "$ref": "#/$defs/leaf"
+        },
+        "rfc-implementer": {
           "$ref": "#/$defs/leaf"
         },
         "rfc-integrator": {
@@ -105,7 +109,8 @@
                   "rfc-reviewer",
                   "rfc-worker",
                   "rfc-worker-deep",
-                  "rfc-reviewer-critical"
+                  "rfc-reviewer-critical",
+                  "rfc-implementer"
                 ]
               }
             }

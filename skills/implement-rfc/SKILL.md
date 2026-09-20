@@ -26,9 +26,9 @@ For implementation, resume, closeout or attended preparation, read
 [Strategy selection](references/strategy-selection.md). Resolve natural-language intent
 with `scripts/execution_strategy.py resolve`; preserve its resolved JSON beside the
 existing continuation. Precedence is explicit invocation, preserved run selection,
-explicit configured preference, then one fresh Astra Max implementer per milestone
-under a lightweight coordinator. Topology, model routing and project/personal storage
-are separate choices.
+explicit configured preference, then one fresh routed `rfc-implementer` per milestone
+under a lightweight coordinator. Topology, provider-specific routing and
+project/personal storage are separate choices.
 
 Read the shared [Engineering contract](references/engineering-contract.md), then
 **only the selected recipe entrypoint** returned by the resolver. That recipe owns

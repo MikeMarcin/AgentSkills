@@ -2,6 +2,11 @@
 
 Owner-directed change, 2026-09-19, implemented at `5a40143` under ASK-0088.
 
+Historical note: ASK-0089 subsequently renamed the public strategy to the
+provider-neutral `coordinator-implementer` and moved the implementer route into the
+generated cross-host `rfc-implementer` role. The evidence below describes ASK-0088's
+original candidate.
+
 New unspecified Codex runs select `coordinator-implementer-astra-max`: a Sol Low
 coordinator dispatches one fresh Astra Max implementer per milestone. The implementer
 owns planning, implementation, tests, self-review, authorized integration and commits,

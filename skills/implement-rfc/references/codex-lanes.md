@@ -47,7 +47,7 @@ role prompt — including the startup identity line — to the assignment, and
 appends a launch record to the checkout's Codex lane log
 (`<git-common-dir>/<project>-codex-lanes.jsonl`, named from the selected consumer's `project.json`).
 
-Native adapters and plugin launches use the same routing source for all seven
+Native adapters and plugin launches use the same routing source for all eight
 roles, including `rfc-test-runner` and `rfc-worker-deep`. Model and effort are
 passed explicitly, so plugin defaults do not select a different route. The test
 runner remains limited to assigned disposable outputs even when `--write` is

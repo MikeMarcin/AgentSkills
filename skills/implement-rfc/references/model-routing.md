@@ -11,6 +11,7 @@ The coordinator's current route is never an implicit engineering override.
 | `rfc-utility`, `rfc-test-runner` | mechanical | Luna xhigh | Haiku 4.5 unsupported/null |
 | `rfc-scout` | balanced | Sol low | Opus 5 low |
 | `rfc-worker` | standard | Astra low | Opus 5 xhigh |
+| `rfc-implementer` | implementation | Astra max | Opus 5 xhigh |
 | `rfc-integrator` | integration | Sol xhigh | Opus 5 xhigh |
 | `rfc-worker-deep` | deep | Astra high | Fable 5.1 high |
 | `rfc-reviewer` | review | Astra medium | Fable 5.1 medium |

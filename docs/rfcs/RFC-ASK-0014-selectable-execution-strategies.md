@@ -22,6 +22,13 @@ the two-arm comparison established a general topology winner. Personal deploymen
 and the named AgentSkills, MASK and aito source checkouts are in scope; frozen
 experiment candidates remain untouched.
 
+Subsequent owner correction: expose the topology as `coordinator-implementer`,
+define and route a portable `rfc-implementer` role on Codex and Claude, and make an
+attended-review wait a fresh-implementer boundary when its hand-back leaves work.
+The coordinator presents the loopback HTML flow and arms the durable hand-back watch
+before yielding. [ASK-0089](../issues/30-in-progress/ASK-0089-portable-coordinator-implementer.md)
+owns this correction.
+
 ## Acceptance
 
 - **AC01 (M1):** One shared engineering/acceptance contract, passive recipe selection and direct public consumer paths with no bespoke roles; preserve recovery, authored grouping, storage and authority guards and coordinated defaults.

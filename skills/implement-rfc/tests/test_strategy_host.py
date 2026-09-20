@@ -27,8 +27,9 @@ class HostTests(unittest.TestCase):
             config.write_text(config.read_text().replace('"max"', '"low"'))
             kinds = [row['kind'] for row in host.inspect(selected, [config])['findings']]
             self.assertIn('implementer_route_mismatch_or_unknown', kinds)
+        self.assertEqual(tomllib.loads(host.render_implementer(strategy.resolve('coordinator-implementer')))['agents'], {'enabled': False})
         with self.assertRaises(ValueError):
-            host.render_implementer(strategy.resolve('coordinator-implementer'))
+            host.render_implementer(strategy.resolve('direct-astra-max'))
 
     def test_direct_native_controls_and_zero_child_is_not_an_error(self):
         direct=strategy.resolve('direct-astra-max');native=strategy.resolve('native-astra-ultra')

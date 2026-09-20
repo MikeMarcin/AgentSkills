@@ -7,13 +7,28 @@ from pathlib import Path
 import re
 import tomllib
 import execution_strategy as strategy
+import render_runtime_adapters as adapters
 
 CHILD_SLOTS = {'planner-worker': 'worker', 'coordinator-implementer': 'implementer'}
+
+
+def coordinator_implementer_routes():
+    package = Path(__file__).resolve().parents[1]
+    routing = adapters.load_json(package / 'config/routing.json')
+    roles = adapters.validate_roles(adapters.load_json(package / 'config/roles.json'))
+    selected, _ = adapters.select_routes(
+        routing, roles, adapters.load_json(package / 'config/routing-profiles.json'))
+    coordinator = {'provider': 'codex', **routing['session_routes']['rfc-coordinator']['codex']}
+    implementer = {'provider': 'codex', **selected['codex']['rfc-implementer']}
+    return coordinator, implementer
 
 
 def render(selection):
     strategy.validate_selection(selection)
     route = selection['routing'].get('primary')
+    canonical_child = None
+    if selection['topology_id'] == 'coordinator-implementer':
+        route, canonical_child = coordinator_implementer_routes()
     if not route or route['provider'] != 'codex':
         raise ValueError('scoped Codex settings require an exact primary Codex route')
     child_slot = CHILD_SLOTS.get(selection['topology_id'])
@@ -26,7 +41,7 @@ def render(selection):
                       'model_reasoning_effort = ' + json.dumps(route['effort']), '', '[agents]',
                       'enabled = ' + ('false' if selection['delegation'] == 'none' else 'true')]
     if child_slot:
-        worker = selection['routing'][child_slot]
+        worker = canonical_child or selection['routing'][child_slot]
         lines.extend(['max_concurrent_threads_per_session = 1',
                       'default_subagent_model = ' + json.dumps(worker['model']),
                       'default_subagent_reasoning_effort = ' + json.dumps(worker['effort'])])
@@ -37,7 +52,7 @@ def render_implementer(selection):
     strategy.validate_selection(selection)
     if selection['topology_id'] != 'coordinator-implementer' or not selection['configuration_complete']:
         raise ValueError('implementer settings require a complete coordinator-implementer selection')
-    route = selection['routing']['implementer']
+    _, route = coordinator_implementer_routes()
     return render(strategy.resolve('direct', routing={'primary': route}))
 
 
@@ -49,6 +64,9 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
     native = selection['delegation'] == 'system'
     strict = selection['topology_id'] == 'planner-worker'
     child_slot = CHILD_SLOTS.get(selection['topology_id'])
+    canonical_primary = canonical_child = None
+    if selection['topology_id'] == 'coordinator-implementer':
+        canonical_primary, canonical_child = coordinator_implementer_routes()
     for path in configs:
         path=Path(path)
         data=tomllib.loads(path.read_text(encoding='utf-8'))
@@ -81,14 +99,14 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
     if (selection['delegation']=='none' and enabled is not False) or ((native or child_slot) and enabled is not True):
         findings.append(dict(kind='delegation_control_mismatch'))
     if child_slot:
-        worker = selection['routing'].get(child_slot, {})
+        worker = canonical_child or selection['routing'].get(child_slot, {})
         if (not worker or effective.get('agents.default_subagent_model') != worker.get('model')
                 or effective.get('agents.default_subagent_reasoning_effort') != worker.get('effort')):
             findings.append(dict(kind=child_slot + '_route_mismatch_or_unknown'))
         limit = effective.get('agents.max_concurrent_threads_per_session', effective.get('agents.max_threads'))
         if type(limit) is not int or limit != 1:
             findings.append(dict(kind=child_slot + '_concurrency_mismatch_or_unknown'))
-    route=selection['routing'].get('primary')
+    route=canonical_primary or selection['routing'].get('primary')
     if route:
         if effective.get('model')!=route['model'] or effective.get('model_reasoning_effort')!=route['effort']:
             findings.append(dict(kind='primary_route_mismatch_or_unknown'))

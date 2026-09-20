@@ -305,13 +305,17 @@ class SchemaMigrationTests(unittest.TestCase):
         legacy = copy.deepcopy(original)
         legacy['schema'] = 'implement-rfc.roles.v1'
         del legacy['roles']['rfc-integrator']
+        del legacy['roles']['rfc-implementer']
         for role in legacy['roles'].values():
             del role['delegation']; role['may_spawn_utility'] = False
         roles = renderer.validate_roles(legacy)
         self.assertTrue(all(role['delegation'] == {'allowed_roles': []} for role in roles.values()))
         routing = copy.deepcopy(ROUTING); routing['schema'] = 'implement-rfc.routing.v1'
         del routing['assignments']['rfc-integrator']; del routing['session_routes']
-        for provider in routing['providers'].values(): del provider['classes']['integration']
+        del routing['assignments']['rfc-implementer']
+        for provider in routing['providers'].values():
+            del provider['classes']['integration']
+            del provider['classes']['implementation']
         renderer.validate_routing(routing, roles)
         bad = copy.deepcopy(legacy); bad['roles']['rfc-worker']['delegation'] = {'allowed_roles': ['rfc-utility']}
         with self.assertRaises(ValueError): renderer.validate_roles(bad)

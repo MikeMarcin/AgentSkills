@@ -93,6 +93,16 @@
     },
     {
       "agent": "codex",
+      "name": "rfc-implementer",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "claude",
+      "name": "rfc-implementer",
+      "setup": "prepare-roles"
+    },
+    {
+      "agent": "codex",
       "name": "rfc-integrator",
       "setup": "prepare-roles"
     },
@@ -202,6 +212,16 @@
         },
         {
           "agent": "codex",
+          "name": "rfc-implementer",
+          "setup": "prepare-roles"
+        },
+        {
+          "agent": "claude",
+          "name": "rfc-implementer",
+          "setup": "prepare-roles"
+        },
+        {
+          "agent": "codex",
           "name": "rfc-integrator",
           "setup": "prepare-roles"
         },
@@ -244,7 +264,16 @@
           "native_roles": []
         },
         "coordinator-implementer": {
-          "native_roles": []
+          "native_roles": [
+            {
+              "agent": "codex",
+              "name": "rfc-implementer"
+            },
+            {
+              "agent": "claude",
+              "name": "rfc-implementer"
+            }
+          ]
         }
       }
     }
@@ -260,7 +289,16 @@
       "native_roles": []
     },
     "coordinator-implementer": {
-      "native_roles": []
+      "native_roles": [
+        {
+          "agent": "codex",
+          "name": "rfc-implementer"
+        },
+        {
+          "agent": "claude",
+          "name": "rfc-implementer"
+        }
+      ]
     }
   }
 }

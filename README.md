@@ -72,9 +72,11 @@ installed skill, while consumer paths resolve relative to the consumer.
 
 ## Configure implement-rfc
 
-New Codex runs default to a Sol Low coordinator and one fresh Astra Max implementer
-per milestone. The implementer owns planning, coding, checks, integration and upkeep;
-the coordinator advances milestones. No additional agents are dispatched. Explicit
+New runs default to `coordinator-implementer`: a low-effort coordinator and one fresh
+provider-routed `rfc-implementer` per milestone or post-review engineering round.
+The implementer owns planning, coding, checks, integration and upkeep; the coordinator
+advances milestones and owns attended-review hand-back watches. No additional agents
+are dispatched. Explicit
 strategy choices and preserved runs retain their selection; see
 [strategy selection](skills/implement-rfc/references/strategy-selection.md).
 

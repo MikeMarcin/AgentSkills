@@ -36,11 +36,10 @@ files before use. The one-child cap is a session control; the worker's no-delega
 instruction and observed lifecycle still need checking. No custom RFC roles are
 required. MASK readiness remains separate from configuration and serving evidence.
 
-The coordinator-implementer default uses the same one-child cap, with Sol Low for
-the coordinator and Astra Max for its implementer. `render` prints the coordinator's
-scoped settings; `render-implementer` prints the implementer's exact route with
-delegation disabled. Use the generic native agent with explicit model/effort and a
-fresh context, never an inherited custom RFC role. Other installed RFC role names
-are not used by this recipe. A custom definition overriding the selected generic
-role still needs reconciliation. Do not change global settings or an active
-assignment to apply these task-scoped outputs.
+The coordinator-implementer default uses the same one-child cap. The coordinator
+session and generated `rfc-implementer` role have independent provider-specific
+routes. `render` prints the Codex coordinator's scoped settings;
+`render-implementer` prints the Codex implementer's exact generated route with
+delegation disabled. Claude selects the corresponding generated native role. Inspect
+the owned adapter before dispatch and use a fresh context. Do not change global
+settings or an active assignment to apply these task-scoped outputs.

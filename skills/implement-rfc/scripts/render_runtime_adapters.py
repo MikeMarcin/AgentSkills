@@ -25,7 +25,7 @@ import project_config  # noqa: E402
 import slice_events  # noqa: E402
 
 ROLE_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-MODEL_CLASSES = {"mechanical", "balanced", "standard", "deep", "review", "critical", "integration"}
+MODEL_CLASSES = {"mechanical", "balanced", "standard", "deep", "review", "critical", "implementation", "integration"}
 MUTATIONS = {"read-only", "build-write", "workspace-write"}
 PLACEHOLDER_RE = re.compile(r"^<[^>]+>$|\$\{")
 ROLES_SCHEMA = "implement-rfc.roles.v2"
@@ -76,7 +76,7 @@ def deep_merge(base: Any, override: Any) -> Any:
 
 
 LEAF_ROLES = {"rfc-utility", "rfc-scout", "rfc-test-runner", "rfc-worker",
-              "rfc-worker-deep", "rfc-reviewer", "rfc-reviewer-critical"}
+              "rfc-worker-deep", "rfc-reviewer", "rfc-reviewer-critical", "rfc-implementer"}
 INTEGRATOR = "rfc-integrator"
 # Resume, collect from and release delegated children. A delegating role cannot
 # reuse the same slice owner for correction without these.
@@ -175,12 +175,14 @@ def validate_routing(data, roles):
         raise ValueError("retired role selector in routing assignments; explicitly migrate to current roles")
     if set(assignments) != set(roles):
         raise ValueError(f"routing role mismatch; missing={sorted(set(roles) - set(assignments))}, extra={sorted(set(assignments) - set(roles))}")
-    classes_allowed = MODEL_CLASSES - {"integration"} if legacy else MODEL_CLASSES
+    classes_allowed = MODEL_CLASSES - {"implementation", "integration"} if legacy else MODEL_CLASSES
     for name, model_class in assignments.items():
         if not isinstance(model_class, str) or model_class not in classes_allowed:
             raise ValueError(f"routing assigns invalid class {model_class} to {name}")
         if (name == INTEGRATOR) != (model_class == "integration"):
             raise ValueError("integrator requires its independent integration class")
+        if (name == "rfc-implementer") != (model_class == "implementation"):
+            raise ValueError("implementer requires its independent implementation class")
     if not isinstance(providers, dict) or set(providers) != {"codex", "claude"}:
         raise ValueError("routing providers must contain codex and claude only")
     for provider, definition in providers.items():

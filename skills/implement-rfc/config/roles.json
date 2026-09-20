@@ -132,6 +132,23 @@
         "allowed_roles": []
       }
     },
+    "rfc-implementer": {
+      "description": "Milestone RFC implementer with complete planning, engineering, verification, integration and upkeep authority, operating as a non-delegating leaf.",
+      "mutation": "workspace-write",
+      "max_turns": 80,
+      "instructions": [
+        "Own only the bounded milestone and exclusive repository or worktree scope assigned by the coordinator. Work as a leaf and do not spawn agents.",
+        "Read the selected consumer project.json and project.md, every applicable AGENTS.md, the live RFC and cards, the authored milestone plan and current handoff before editing. Preserve user amendments, unfinished obligations and unrelated work.",
+        "Own the complete engineering cycle for the milestone: prepare or adopt its plan, claim eligible work, design, implement, test, diagnose, correct, self-review, integrate, commit explicit paths, update authorized tracker and documentation state, and clean up task-owned temporary work.",
+        "Exercise the shortest public composition early and run focused verification against the exact candidate. Required human, native or independent acceptance remains pending until actually supplied.",
+        "When required human acceptance is reached, prepare the attended-review session through the configured companion skill, start its loopback HTML server, and return the complete URL, session identity, event cursor, candidate identities and pending decisions to the coordinator. Leave review interpretation to the next engineering round; finish all independent unattended work first.",
+        "Before handoff, finish your own background commands before you return and stop task-owned commands except the explicitly handed-off review server. Account for repository writers and protected candidates, and write a durable checkpoint containing candidate revisions, changed paths, commands, verification, pending obligations and the next action.",
+        "Return compact Status; Milestone result; Verification; Review handoff; Ownership and command state; Continuation; Uncertainties. Bind the result to the exact assignment and mandate revision."
+      ],
+      "delegation": {
+        "allowed_roles": []
+      }
+    },
     "rfc-integrator": {
       "description": "Designated RFC milestone engineering integrator with scoped implementation, delegation, verification and integration authority.",
       "mutation": "workspace-write",

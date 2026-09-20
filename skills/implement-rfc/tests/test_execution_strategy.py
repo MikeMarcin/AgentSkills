@@ -17,11 +17,10 @@ class StrategyTests(unittest.TestCase):
     def test_selection_precedence_and_exact_resume(self):
         direct = strategy.resolve('direct-astra-max')
         default = strategy.resolve()
+        self.assertEqual(default['strategy'], 'coordinator-implementer')
         self.assertEqual(default['topology_id'], 'coordinator-implementer')
         self.assertTrue(default['configuration_complete'])
-        self.assertEqual(default['routing']['implementer'],
-                         {'provider': 'codex', 'model': 'gpt-6-astra', 'effort': 'max'})
-        self.assertEqual(default['routing']['primary']['effort'], 'low')
+        self.assertEqual(default['routing'], {})
         self.assertEqual(default['owners'], dict(engineering='implementer', bookkeeping='implementer', product_edits='implementer'))
         baseline = strategy.resolve('coordinator-integrator')
         self.assertEqual(strategy.resolve(preserved=baseline), baseline)
@@ -45,6 +44,13 @@ class StrategyTests(unittest.TestCase):
         with patch.object(Path, 'read_bytes', observe):
             strategy.resolve()
         self.assertEqual(read, ['engineering-contract.md', 'coordinator-implementer.md'])
+
+    def test_attended_review_is_a_watched_fresh_context_boundary(self):
+        recipe = (strategy.PACKAGE / 'references/strategies/coordinator-implementer.md').read_text()
+        self.assertLess(recipe.index('start its loopback HTML server'), recipe.index('arm `wait --after SEQUENCE`'))
+        self.assertLess(recipe.index('arm `wait --after SEQUENCE`'), recipe.index('before yielding to the user'))
+        self.assertIn('hand-back must not depend\n   on another user message', recipe)
+        self.assertIn('start a **fresh `rfc-implementer`**', recipe)
 
     def test_unknown_duplicate_escape_incompatible_and_stale(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "f2aa6dc803da38baffbce19acf11db5e63b79b89794ac3d88a4d82dd194111ad"
+      "sha256": "504e71dc8700b5eda4a8bf9f24fbd7a247c151e083e6bdaf0e9957758f2e24d8"
     },
     {
       "path": "agents/openai.yaml",
@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "921dfe68fba651597b7e19c9109340c6793a40356a1e7a41f422701d3616f248"
+      "sha256": "8a9190a114cf8af814e2ebe5c92748f280da348dfdcb2c6954e0b1f1ae209dd7"
     },
     {
       "path": "config/routing-profiles.json",
@@ -30,11 +30,11 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "aaca51aa8c29205bcdd5685dfa0f3d50607241a7dc5f69b6d532ac5041d658b3"
+      "sha256": "683f25e1583f9e48fce8fe7e63fd1f145b93f77d17cd8b6905061732f2a3f871"
     },
     {
       "path": "config/strategy-catalog.json",
-      "sha256": "bfc07a8da9769dc74973d1ef1508cd6045763a38dadf12db33005e6bb6b9bef7"
+      "sha256": "6cbbe7d4504fe1c0daacb3380274e34f37589b22b0263d0f61fcfa242d91b3be"
     },
     {
       "path": "examples/milestone-plans/IMPLEMENTATION_PROMPT.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "mask-workflow.json",
-      "sha256": "5e322a9697ea60115215c8ee52725ce5933ee04d08d32510dd4e08040d421837"
+      "sha256": "4074565bcb50ea10f225f5bdc866161f6d58c1ae104704639f6ac64a76ebc583"
     },
     {
       "path": "references/attendance.md",
@@ -82,7 +82,7 @@
     },
     {
       "path": "references/codex-lanes.md",
-      "sha256": "f24e9d5197f6f34ce8e02bd91e7f2132a7530a8c7bcf13a75d5a49267d088a57"
+      "sha256": "0366175512e8b8e1924db58daf2de025cf0543c792acd579f830c83799bd5935"
     },
     {
       "path": "references/coordination-handoff.md",
@@ -106,7 +106,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "4f78c1cf6462770c1087ced3ec388da9043404ed2f5cf407eef78f09468c1d2c"
+      "sha256": "15bd4efc37d390602668bbbdbdef2c364870ffe2a28d76b58a776746eab1e1c7"
     },
     {
       "path": "references/native-coordination.md",
@@ -142,7 +142,7 @@
     },
     {
       "path": "references/role-adoption.md",
-      "sha256": "07ef79fc47518543ddb135aacc864b4bf86f748e2783d7d9dd9f7ed171cce4ea"
+      "sha256": "785ef96d02207251e2f6358fa701dc79f63e36cc2d617ed6e56cc19f1e6d1e75"
     },
     {
       "path": "references/routing-audit.md",
@@ -154,7 +154,7 @@
     },
     {
       "path": "references/strategies/coordinator-implementer.md",
-      "sha256": "22dc2e53754ac493e5f9329afefce4d50dfd56a16a955d2493a59d854b14a504"
+      "sha256": "a6f01f1fc282b2c0d793ef0aed6f5b1795f563834a32083101ac2c7c6c25349d"
     },
     {
       "path": "references/strategies/coordinator-integrator.md",
@@ -174,11 +174,11 @@
     },
     {
       "path": "references/strategy-host-controls.md",
-      "sha256": "38c5e0a46e9e65362d92e406f0d24f4342579468cf7511590239e32c453316b9"
+      "sha256": "fdfa9a7b13a94f3568f8cbbeffdce2356693d5b5ad5df89d2cbcb7165cb61bab"
     },
     {
       "path": "references/strategy-selection.md",
-      "sha256": "28829e4c103b44a78021475fa57931baaa6bf8d7ec3d3c8480ccdcf7b9c35256"
+      "sha256": "166277c1dba4de2c7c202c1b152f27b2e7d4f9058f0bfae42d7c93c38a0f9592"
     },
     {
       "path": "references/strategy-study/README.md",
@@ -238,7 +238,7 @@
     },
     {
       "path": "schemas/roles.schema.json",
-      "sha256": "73522e75cec83e4432021cda0ce555cd15b3e3b6889b76e39fe7a3aa953b6234"
+      "sha256": "a79583b63efb60e9fe3ecb15fc79dac5a47e2e33a7978bb6c5c6f6aab532b898"
     },
     {
       "path": "schemas/routing.schema.json",
@@ -350,7 +350,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "3eebea3a117fa56144bc83e4fe9a4e21a65efe055c62aa1e5159a9e17256dc85"
+      "sha256": "5390ce1d80eb73737e564f7e5d40cfb039ae81537a182122613cf99422bc27f4"
     },
     {
       "path": "scripts/role_usage.py",
@@ -386,7 +386,7 @@
     },
     {
       "path": "scripts/strategy_host.py",
-      "sha256": "d02f0ea081ba08c8feef21590f04807240919d52a763b8a7dc0d511c5ffdcb16"
+      "sha256": "4130fa4f6d80d9acd298868cf64aac2b8c8181b8dd2bb5ab6621567d7db0fc4b"
     },
     {
       "path": "scripts/strategy_study.py",
@@ -454,7 +454,7 @@
     },
     {
       "path": "tests/test_execution_strategy.py",
-      "sha256": "e84e1494069aab6a3497a614d93ef170a2d0cff6a4ffd1520b7104758c76dc0a"
+      "sha256": "0de0d2849423e7645b98034710fcfb1ff8548edca640477a9a819706f1045534"
     },
     {
       "path": "tests/test_instruction_paths.py",
@@ -558,11 +558,11 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "c04db8edb19c2435fdab748ce6698ce45a43da598d37533d7f316cb99b0c2f2a"
+      "sha256": "324398d5d845f392c815580392e94ac7ea384809f41ff85bf70de976da0c39a5"
     },
     {
       "path": "tests/test_role_migration.py",
-      "sha256": "b9f965f6607bd3e571034bb4678638a6fd67f705a09627b8c8ad916d8bc5ac0b"
+      "sha256": "6c475ea89ee296fb1ddc2361cb887312b2208855387fd0f5d7a0801fbd477224"
     },
     {
       "path": "tests/test_role_usage.py",
@@ -590,7 +590,7 @@
     },
     {
       "path": "tests/test_standard_worker_target.py",
-      "sha256": "8b51eccaca25055792413a1f13f4a55958abea0e16ea83f2a734a5576e784851"
+      "sha256": "9a9f7b59ecd58b812e8028badcedd35f8e948749ed067066dfe55996b2593c50"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -598,11 +598,11 @@
     },
     {
       "path": "tests/test_strategy_host.py",
-      "sha256": "46fbc53bb8a0a8e8d30fd47a3b31e6007d9cac81182281ca0be76636c4425208"
+      "sha256": "3a2de64e5467ef3549a5b598a0e149fadd3fd4a57b377b2221e96851675e364b"
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "10fd0915abab6821d73064610ffdbc4634b0c57db0c7155f8febbe48db6f7f24"
+      "sha256": "2e9430ca1ceea44331b49eec0ed444c5d138b42da791dfc9982a63a58facc548"
     },
     {
       "path": "tests/test_strategy_study.py",
@@ -645,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "66b93787cd23676d",
+  "portable_digest": "9fdf82d92041c295",
   "schema": "implement-rfc.portable-manifest.v1"
 }

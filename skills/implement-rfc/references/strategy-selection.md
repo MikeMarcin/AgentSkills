@@ -5,9 +5,10 @@ intent; names are helper selectors, not model-launch commands. `--preserved FILE
 resumes the exact resolved snapshot. `--preference NAME` supplies an explicitly
 configured preference; no separate preference database is created. `--routing FILE`
 supplies exact named route pairs. Explicit selection wins preserved selection, then
-preference, then `coordinator-implementer-astra-max`. This owner-selected default uses
-a Sol Low coordinator and one fresh Astra Max implementer for each milestone, with
-no further model delegation. The earlier coordinator-integrator recipe remains an
+preference, then `coordinator-implementer`. This provider-neutral default uses the
+active host's independent `rfc-coordinator` session route and generated
+`rfc-implementer` route, with a fresh implementer for each milestone and each
+post-review engineering round. The earlier coordinator-integrator recipe remains an
 explicit choice, and preserved runs keep their original selection. Keep routing selections
 separate from topology and from `workflow_preflight.py --mode project|personal`.
 The older execution-selection.v1 direct/runner mode still means command execution.

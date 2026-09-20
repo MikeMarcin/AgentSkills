@@ -77,6 +77,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
             "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),
             "rfc-worker": ("gpt-6-astra", "low", "claude-opus-5", "xhigh", "workspace-write", False),
+            "rfc-implementer": ("gpt-6-astra", "max", "claude-opus-5", "xhigh", "workspace-write", False),
             "rfc-worker-deep": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", False),
             "rfc-reviewer": ("gpt-6-astra", "medium", "claude-fable-5-1", "medium", "read-only", False),
             "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "high", "read-only", False),
@@ -86,7 +87,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             root = Path(temp)
             first = self.run_renderer(root)
             self.assertEqual(first.returncode, 0, first.stderr)
-            self.assertIn("rendered 17 files", first.stdout)
+            self.assertIn("rendered 19 files", first.stdout)
 
             for role, (model, effort, claude_model, claude_effort, mutation, nested) in expected.items():
                 with self.subTest(role=role):
@@ -134,7 +135,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             manifest = json.loads((root / ".mask/generated/implement-rfc/runtime-adapters.json").read_text())
             self.assertEqual(manifest["schema"], "implement-rfc.runtime-adapters.v1")
             self.assertEqual(manifest["assignments"], ROUTING["assignments"])
-            self.assertEqual(len(manifest["files"]), 16)
+            self.assertEqual(len(manifest["files"]), 18)
             self.assertEqual(manifest["project"], PROJECT["project"])
 
             for worker in ("rfc-worker", "rfc-worker-deep"):

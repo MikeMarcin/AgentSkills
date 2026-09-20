@@ -3,7 +3,7 @@
 The interactive coordinator is a session route, not a generated subagent. Bind
 its low setting independently of the designated `rfc-integrator`: an explicit
 engineering pair wins, then a preserved owner-selected engineering pair, then
-the independent integration default. All seven leaf routes remain explicit.
+the independent integration default. All eight leaf routes remain explicit.
 Capture those choices before changing the coordinator setting; a requested pair
 or generated file is not an observation of a serving model or effort.
 

@@ -9,6 +9,7 @@
     "rfc-reviewer": "review",
     "rfc-worker-deep": "deep",
     "rfc-reviewer-critical": "critical",
+    "rfc-implementer": "implementation",
     "rfc-integrator": "integration"
   },
   "providers": {
@@ -41,6 +42,10 @@
         "integration": {
           "model": "gpt-5.6-sol",
           "effort": "xhigh"
+        },
+        "implementation": {
+          "model": "gpt-6-astra",
+          "effort": "max"
         }
       }
     },
@@ -72,6 +77,10 @@
           "effort": "medium"
         },
         "integration": {
+          "model": "claude-opus-5",
+          "effort": "xhigh"
+        },
+        "implementation": {
           "model": "claude-opus-5",
           "effort": "xhigh"
         }
