@@ -189,7 +189,7 @@ class PreflightTests(unittest.TestCase):
         stub = self.base / f"{mode}-mask.py"
         stub.write_text(STUB.format(mode=mode), encoding="utf-8")
         result = subprocess.run([sys.executable, "-B", str(PREFLIGHT), "--repo-root", str(root or self.base),
-                                 "--mask", str(stub), "--json", *extra],
+                                 "--mask", str(stub), "--strategy", "coordinator-integrator", "--json", *extra],
                                 capture_output=True, text=True, env=env)
         return result.returncode, json.loads(result.stdout)
 

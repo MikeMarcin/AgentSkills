@@ -242,6 +242,9 @@
         },
         "planner-worker": {
           "native_roles": []
+        },
+        "coordinator-implementer": {
+          "native_roles": []
         }
       }
     }
@@ -254,6 +257,9 @@
       "native_roles": []
     },
     "planner-worker": {
+      "native_roles": []
+    },
+    "coordinator-implementer": {
       "native_roles": []
     }
   }

@@ -53,14 +53,13 @@ class StrategyStudyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             strategy_study.check(value)
 
-    def test_fifth_recipe_uses_existing_board_acceptance_and_usage(self):
+    def test_additional_recipe_uses_existing_board_acceptance_and_usage(self):
         with tempfile.TemporaryDirectory() as directory:
             base = Path(directory).resolve()
             package = base / 'package'
             shutil.copytree(SKILL, package, ignore=shutil.ignore_patterns('__pycache__'))
             catalog_path = package / 'config/strategy-catalog.json'
             catalog = strategy.read_json(catalog_path)
-            self.assertEqual(len(catalog['recipes']), 4)
             recipe = copy.deepcopy(next(r for r in catalog['recipes'] if r['id'] == 'direct'))
             recipe.update(id='fifth-synthetic', entrypoint='references/strategies/fifth-synthetic.md')
             (package / recipe['entrypoint']).write_text('# Synthetic fixture\n\nPrimary owns engineering and bookkeeping under the common contract.\n')

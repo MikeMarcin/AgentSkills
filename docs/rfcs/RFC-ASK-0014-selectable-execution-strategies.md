@@ -13,6 +13,15 @@ Accepted from [the retained revision-2 packet](assets/implement-rfc-execution-st
 
 Implement M1–M3 directly in the primary session, without subagents. Skip live qualification entirely; M4 will establish actual native behavior. Prepare the reusable M4 kit, leaving task selection and budgets to the owner later. No experiment worktrees, arm/judge launches, verdict, push, global configuration edits or unrelated consumer migration.
 
+Subsequent owner instruction: make new runs use a low-effort coordinator and a fresh
+Astra Max implementer at every milestone boundary. The implementer owns the full
+engineering cycle and upkeep, with no additional agent orchestration. This preference
+is implemented in [ASK-0088](../issues/30-in-progress/ASK-0088-simple-milestone-default.md).
+It does not change preserved run selections, rewrite the M4 evidence, or claim that
+the two-arm comparison established a general topology winner. Personal deployment
+and the named AgentSkills, MASK and aito source checkouts are in scope; frozen
+experiment candidates remain untouched.
+
 ## Acceptance
 
 - **AC01 (M1):** One shared engineering/acceptance contract, passive recipe selection and direct public consumer paths with no bespoke roles; preserve recovery, authored grouping, storage and authority guards and coordinated defaults.

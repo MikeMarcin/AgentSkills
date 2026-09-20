@@ -11,6 +11,25 @@ import strategy_host as host
 
 
 class HostTests(unittest.TestCase):
+    def test_default_coordinator_and_leaf_implementer_controls(self):
+        selected = strategy.resolve()
+        parent = tomllib.loads(host.render(selected))
+        child = tomllib.loads(host.render_implementer(selected))
+        self.assertEqual((parent['model'], parent['model_reasoning_effort']), ('gpt-5.6-sol', 'low'))
+        self.assertEqual(parent['agents'], dict(enabled=True, max_concurrent_threads_per_session=1,
+                                              default_subagent_model='gpt-6-astra', default_subagent_reasoning_effort='max'))
+        self.assertEqual((child['model'], child['model_reasoning_effort']), ('gpt-6-astra', 'max'))
+        self.assertEqual(child['agents'], {'enabled': False})
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / 'coordinator.toml'
+            config.write_text(host.render(selected))
+            self.assertEqual(host.inspect(selected, [config], complete_inputs=True)['state'], 'configuration_consistent')
+            config.write_text(config.read_text().replace('"max"', '"low"'))
+            kinds = [row['kind'] for row in host.inspect(selected, [config])['findings']]
+            self.assertIn('implementer_route_mismatch_or_unknown', kinds)
+        with self.assertRaises(ValueError):
+            host.render_implementer(strategy.resolve('coordinator-implementer'))
+
     def test_direct_native_controls_and_zero_child_is_not_an_error(self):
         direct=strategy.resolve('direct-astra-max');native=strategy.resolve('native-astra-ultra')
         self.assertFalse(tomllib.loads(host.render(direct))['agents']['enabled'])

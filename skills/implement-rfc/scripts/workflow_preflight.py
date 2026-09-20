@@ -135,7 +135,8 @@ def preflight(root: Path, command: list[str], *, mode: str | None = None,
                       f"for this consumer (scope workflow: {scope.get('workflow') if scope else 'absent'}); "
                       "link-only success is not workflow readiness")
         return result
-    if ensure.get("ok") and scope.get("workflow") == "complete" and report.get("complete") and data.get("readiness") in ("ready_pinned", "ready_legacy_unpinned"):
+    if ensure.get("ok") and scope.get("workflow") == "complete" and report.get("complete") and data.get("readiness") in ("ready_pinned", "ready_legacy_unpinned", "ready_dev_link"):
+        result['deployment_readiness'] = data['readiness']
         result.update(state="ready", detail="selected declared requirements and inputs match the scope and source/tracker binding; host loading is not verified by this check")
         return result
     rows = (error.get("details") or {}).get("workflow") or []

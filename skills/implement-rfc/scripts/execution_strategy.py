@@ -114,8 +114,6 @@ def load_catalog(package=PACKAGE):
                 or any(not isinstance(k, str) or not isinstance(v, str) or not v for k, v in recipe['hosts'].items())):
             raise ValueError('explicit host qualification facts required')
         found[name] = recipe
-    if value['default'] not in found:
-        raise ValueError('unknown default recipe')
     presets = {}
     if not isinstance(value['presets'], list) or len(value['presets']) > 64:
         raise ValueError('invalid preset list')
@@ -127,6 +125,8 @@ def load_catalog(package=PACKAGE):
             raise ValueError('duplicate preset or unknown recipe')
         routes(preset['routing'])
         presets[name] = preset
+    if value['default'] not in found and value['default'] not in presets:
+        raise ValueError('unknown default recipe or preset')
     return value, found, presets
 
 

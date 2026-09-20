@@ -16,7 +16,15 @@ import execution_strategy as strategy
 class StrategyTests(unittest.TestCase):
     def test_selection_precedence_and_exact_resume(self):
         direct = strategy.resolve('direct-astra-max')
-        self.assertEqual(strategy.resolve()['topology_id'], 'coordinator-integrator')
+        default = strategy.resolve()
+        self.assertEqual(default['topology_id'], 'coordinator-implementer')
+        self.assertTrue(default['configuration_complete'])
+        self.assertEqual(default['routing']['implementer'],
+                         {'provider': 'codex', 'model': 'gpt-6-astra', 'effort': 'max'})
+        self.assertEqual(default['routing']['primary']['effort'], 'low')
+        self.assertEqual(default['owners'], dict(engineering='implementer', bookkeeping='implementer', product_edits='implementer'))
+        baseline = strategy.resolve('coordinator-integrator')
+        self.assertEqual(strategy.resolve(preserved=baseline), baseline)
         self.assertEqual(strategy.resolve(preserved=direct, preference='coordinator-integrator'), direct)
         self.assertEqual(strategy.resolve('coordinator-integrator', preserved=direct)['topology_id'], 'coordinator-integrator')
         self.assertEqual(strategy.resolve(preference='direct')['topology_id'], 'direct')
@@ -33,6 +41,10 @@ class StrategyTests(unittest.TestCase):
         with patch.object(Path, 'read_bytes', observe):
             strategy.resolve('direct')
         self.assertEqual(read, ['engineering-contract.md', 'direct.md'])
+        read.clear()
+        with patch.object(Path, 'read_bytes', observe):
+            strategy.resolve()
+        self.assertEqual(read, ['engineering-contract.md', 'coordinator-implementer.md'])
 
     def test_unknown_duplicate_escape_incompatible_and_stale(self):
         with tempfile.TemporaryDirectory() as directory:

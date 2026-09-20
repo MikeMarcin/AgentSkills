@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "da634931490800dfd4f898227aa2bfa34ff86e26c775a232060bdd83dfcffed5"
+      "sha256": "f2aa6dc803da38baffbce19acf11db5e63b79b89794ac3d88a4d82dd194111ad"
     },
     {
       "path": "agents/openai.yaml",
@@ -34,7 +34,7 @@
     },
     {
       "path": "config/strategy-catalog.json",
-      "sha256": "091e1febbf23b1557e0efec52015cc7411f7d4119d78b39978abc9c04c68f9ed"
+      "sha256": "bfc07a8da9769dc74973d1ef1508cd6045763a38dadf12db33005e6bb6b9bef7"
     },
     {
       "path": "examples/milestone-plans/IMPLEMENTATION_PROMPT.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "mask-workflow.json",
-      "sha256": "8d22e4dc5da33109a3a3f68c53914d17d29e7c9872cac58d239ebc5ebad8edf7"
+      "sha256": "5e322a9697ea60115215c8ee52725ce5933ee04d08d32510dd4e08040d421837"
     },
     {
       "path": "references/attendance.md",
@@ -153,6 +153,10 @@
       "sha256": "b7f2bf7471ea0ab774b4638d783e61defb818e5ba245e69446a0e5bac6faaebb"
     },
     {
+      "path": "references/strategies/coordinator-implementer.md",
+      "sha256": "22dc2e53754ac493e5f9329afefce4d50dfd56a16a955d2493a59d854b14a504"
+    },
+    {
       "path": "references/strategies/coordinator-integrator.md",
       "sha256": "47646cf91525357e3af0f3b84b46fbf68081bf2e25c712786620b654e3256717"
     },
@@ -170,11 +174,11 @@
     },
     {
       "path": "references/strategy-host-controls.md",
-      "sha256": "3d10f68876c88c14f7da1a95c95a18544724dbca1c0299c6573b74d67037f5d6"
+      "sha256": "38c5e0a46e9e65362d92e406f0d24f4342579468cf7511590239e32c453316b9"
     },
     {
       "path": "references/strategy-selection.md",
-      "sha256": "b361a1e7eca0a64953d9ef0ec8d4551ee19d832876a24cbb144ba3dae4f2a781"
+      "sha256": "28829e4c103b44a78021475fa57931baaa6bf8d7ec3d3c8480ccdcf7b9c35256"
     },
     {
       "path": "references/strategy-study/README.md",
@@ -266,7 +270,7 @@
     },
     {
       "path": "scripts/execution_strategy.py",
-      "sha256": "d4fb3290c5f0a9dce59a83de07fdaf0acdd40b9feff7b91b60f605bf5c88a005"
+      "sha256": "e08a5146f66b895c87af9c131aba46118e60cb5541f94136441ea29ffc75f69d"
     },
     {
       "path": "scripts/issue_board.py",
@@ -382,7 +386,7 @@
     },
     {
       "path": "scripts/strategy_host.py",
-      "sha256": "99fc9add68ec9f761b6e866e3d2142e441b33db5e6b67722313d06283acf0801"
+      "sha256": "d02f0ea081ba08c8feef21590f04807240919d52a763b8a7dc0d511c5ffdcb16"
     },
     {
       "path": "scripts/strategy_study.py",
@@ -426,7 +430,7 @@
     },
     {
       "path": "scripts/workflow_preflight.py",
-      "sha256": "ffd66a667b3421175de945251d0032fd6ad84c0434b11e80da942a862117188f"
+      "sha256": "67972a83b53b1e899292c72ca06f8a13b18421c7c22d9d48cab70d2e1545f2f9"
     },
     {
       "path": "tests/project_fixtures.py",
@@ -450,7 +454,7 @@
     },
     {
       "path": "tests/test_execution_strategy.py",
-      "sha256": "a6d7e98f4aacc58bf42f3d4b155eb10996e11803683ea0d0df9aabc16945d02b"
+      "sha256": "e84e1494069aab6a3497a614d93ef170a2d0cff6a4ffd1520b7104758c76dc0a"
     },
     {
       "path": "tests/test_instruction_paths.py",
@@ -470,7 +474,7 @@
     },
     {
       "path": "tests/test_mask_workflow.py",
-      "sha256": "d82eedf6c8ae115dd87104fd7f96a690cc3040def3ed7d80602459ea84d6b746"
+      "sha256": "b824a52ed818ed1e068ad30f40eb7d512e74868e3edb4d4582da2a5c7ee8b190"
     },
     {
       "path": "tests/test_milestone_adaptive.py",
@@ -594,15 +598,15 @@
     },
     {
       "path": "tests/test_strategy_host.py",
-      "sha256": "37919629c7b32865d1411726ed97f29be2569362ba552e1ae698f979a9090c28"
+      "sha256": "46fbc53bb8a0a8e8d30fd47a3b31e6007d9cac81182281ca0be76636c4425208"
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "929e69e094e50b111c727d06a5ee7b879c79f6d254862cd8bab527d47d3320ed"
+      "sha256": "10fd0915abab6821d73064610ffdbc4634b0c57db0c7155f8febbe48db6f7f24"
     },
     {
       "path": "tests/test_strategy_study.py",
-      "sha256": "0c7bcd9093509944d94ed490ecb2263482b96b9d59c58aab40fc864e60578180"
+      "sha256": "12ab96704e9a121c407a34a4cf3803044a5389e0b288aeffcf3b35b7d5e9c271"
     },
     {
       "path": "tests/test_unified_workflow.py",
@@ -641,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "6e19e4b5579c7ff0",
+  "portable_digest": "66b93787cd23676d",
   "schema": "implement-rfc.portable-manifest.v1"
 }

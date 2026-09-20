@@ -8,27 +8,37 @@ import re
 import tomllib
 import execution_strategy as strategy
 
+CHILD_SLOTS = {'planner-worker': 'worker', 'coordinator-implementer': 'implementer'}
+
 
 def render(selection):
     strategy.validate_selection(selection)
     route = selection['routing'].get('primary')
     if not route or route['provider'] != 'codex':
         raise ValueError('scoped Codex settings require an exact primary Codex route')
-    strict = selection['topology_id'] == 'planner-worker'
-    if strict and not selection['configuration_complete']:
-        raise ValueError('strict recipe requires exact primary and worker routes')
-    if selection['delegation'] not in ('none', 'system') and not strict:
+    child_slot = CHILD_SLOTS.get(selection['topology_id'])
+    if child_slot and not selection['configuration_complete']:
+        raise ValueError('recipe requires exact primary and ' + child_slot + ' routes')
+    if selection['delegation'] not in ('none', 'system') and not child_slot:
         raise ValueError('recipe-specific roles use their own scoped renderer')
     lines = ['# Requested settings only; inspect inherited layers before a new session.',
                       'model = ' + json.dumps(route['model']),
                       'model_reasoning_effort = ' + json.dumps(route['effort']), '', '[agents]',
                       'enabled = ' + ('false' if selection['delegation'] == 'none' else 'true')]
-    if strict:
-        worker = selection['routing']['worker']
+    if child_slot:
+        worker = selection['routing'][child_slot]
         lines.extend(['max_concurrent_threads_per_session = 1',
                       'default_subagent_model = ' + json.dumps(worker['model']),
                       'default_subagent_reasoning_effort = ' + json.dumps(worker['effort'])])
     return '\n'.join([*lines, ''])
+
+
+def render_implementer(selection):
+    strategy.validate_selection(selection)
+    if selection['topology_id'] != 'coordinator-implementer' or not selection['configuration_complete']:
+        raise ValueError('implementer settings require a complete coordinator-implementer selection')
+    route = selection['routing']['implementer']
+    return render(strategy.resolve('direct', routing={'primary': route}))
 
 
 def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_inputs=False):
@@ -38,6 +48,7 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
     observed = []
     native = selection['delegation'] == 'system'
     strict = selection['topology_id'] == 'planner-worker'
+    child_slot = CHILD_SLOTS.get(selection['topology_id'])
     for path in configs:
         path=Path(path)
         data=tomllib.loads(path.read_text(encoding='utf-8'))
@@ -67,16 +78,16 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
             if key in effective:
                 findings.append(dict(kind='inherited_child_route_override',key=key))
     enabled=effective.get('agents.enabled',True)
-    if (selection['delegation']=='none' and enabled is not False) or ((native or strict) and enabled is not True):
+    if (selection['delegation']=='none' and enabled is not False) or ((native or child_slot) and enabled is not True):
         findings.append(dict(kind='delegation_control_mismatch'))
-    if strict:
-        worker = selection['routing'].get('worker', {})
+    if child_slot:
+        worker = selection['routing'].get(child_slot, {})
         if (not worker or effective.get('agents.default_subagent_model') != worker.get('model')
                 or effective.get('agents.default_subagent_reasoning_effort') != worker.get('effort')):
-            findings.append(dict(kind='worker_route_mismatch_or_unknown'))
+            findings.append(dict(kind=child_slot + '_route_mismatch_or_unknown'))
         limit = effective.get('agents.max_concurrent_threads_per_session', effective.get('agents.max_threads'))
         if type(limit) is not int or limit != 1:
-            findings.append(dict(kind='worker_concurrency_mismatch_or_unknown'))
+            findings.append(dict(kind=child_slot + '_concurrency_mismatch_or_unknown'))
     route=selection['routing'].get('primary')
     if route:
         if effective.get('model')!=route['model'] or effective.get('model_reasoning_effort')!=route['effort']:
@@ -97,7 +108,7 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('operation',choices=['render','inspect'])
+    parser.add_argument('operation',choices=['render','render-implementer','inspect'])
     parser.add_argument('--selection',type=Path,required=True)
     parser.add_argument('--config',type=Path,action='append',default=[])
     parser.add_argument('--instructions',type=Path,action='append',default=[])
@@ -106,8 +117,13 @@ def main():
     args=parser.parse_args()
     try:
         selection=strategy.read_json(args.selection)
-        value=render(selection) if args.operation=='render' else json.dumps(inspect(selection,args.config,args.instructions,args.agent_root,complete_inputs=args.complete_inputs))
-        print(value,end='' if args.operation=='render' else '\n')
+        if args.operation == 'render':
+            value = render(selection)
+        elif args.operation == 'render-implementer':
+            value = render_implementer(selection)
+        else:
+            value = json.dumps(inspect(selection,args.config,args.instructions,args.agent_root,complete_inputs=args.complete_inputs))
+        print(value,end='\n' if args.operation=='inspect' else '')
         return 0
     except (ValueError,OSError,TypeError) as exc:
         print(json.dumps(dict(state='invalid',detail=str(exc))))

@@ -26,15 +26,17 @@ For implementation, resume, closeout or attended preparation, read
 [Strategy selection](references/strategy-selection.md). Resolve natural-language intent
 with `scripts/execution_strategy.py resolve`; preserve its resolved JSON beside the
 existing continuation. Precedence is explicit invocation, preserved run selection,
-explicit configured preference, then the backward-compatible coordinator-integrator
-recipe. Topology, model routing and project/personal storage are separate choices.
+explicit configured preference, then one fresh Astra Max implementer per milestone
+under a lightweight coordinator. Topology, model routing and project/personal storage
+are separate choices.
 
 Read the shared [Engineering contract](references/engineering-contract.md), then
 **only the selected recipe entrypoint** returned by the resolver. That recipe owns
 its execution procedure and custom-role readiness; the coordinator recipe is never
 an outer wrapper around direct, native or planner-worker execution. A designated
 coordinated `rfc-integrator` enters [Milestone integration](references/milestone-integration.md)
-under its existing assignment; leaf roles follow their bounded assignment.
+only under the explicitly selected coordinator-integrator recipe. The default
+implementer follows its milestone assignment and does the full work cycle itself.
 
 Preserve the user's mandate and amendments, current outcome, evidence, unresolved
 obligations and stop conditions. Continue the authorized scope until its acceptance

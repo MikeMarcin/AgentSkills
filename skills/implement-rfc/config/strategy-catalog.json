@@ -4,7 +4,7 @@
     "id": "implement-rfc.engineering.v1",
     "entrypoint": "references/engineering-contract.md"
   },
-  "default": "coordinator-integrator",
+  "default": "coordinator-implementer-astra-max",
   "recipes": [
     {
       "id": "coordinator-integrator",
@@ -78,6 +78,26 @@
       "hosts": {
         "codex": "unverified"
       }
+    },
+    {
+      "id": "coordinator-implementer",
+      "revision": "1",
+      "common_contract": "implement-rfc.engineering.v1",
+      "entrypoint": "references/strategies/coordinator-implementer.md",
+      "requirement_profile": "coordinator-implementer",
+      "owners": {
+        "engineering": "implementer",
+        "bookkeeping": "implementer",
+        "product_edits": "implementer"
+      },
+      "delegation": "recipe",
+      "required_routes": [
+        "primary",
+        "implementer"
+      ],
+      "hosts": {
+        "codex": "unverified"
+      }
     }
   ],
   "presets": [
@@ -113,6 +133,22 @@
       "topology_id": "planner-worker",
       "routing": {
         "primary": {
+          "provider": "codex",
+          "model": "gpt-6-astra",
+          "effort": "max"
+        }
+      }
+    },
+    {
+      "id": "coordinator-implementer-astra-max",
+      "topology_id": "coordinator-implementer",
+      "routing": {
+        "primary": {
+          "provider": "codex",
+          "model": "gpt-5.6-sol",
+          "effort": "low"
+        },
+        "implementer": {
           "provider": "codex",
           "model": "gpt-6-astra",
           "effort": "max"
