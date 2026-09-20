@@ -68,6 +68,16 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         effort = route["effort"] if route["effort"] is not None else "none (unsupported)"
         return f"Role: {role} | Model: {route['model']} | Effort: {effort}"
 
+    def test_published_routing_schema_matches_canonical_roles_and_classes(self) -> None:
+        schema = json.loads((SKILL_DIR / 'schemas/routing.schema.json').read_text())
+        assignments = schema['properties']['assignments']
+        self.assertEqual(set(assignments['propertyNames']['enum']), set(ROUTING['assignments']))
+        self.assertEqual(set(assignments['additionalProperties']['enum']),
+                         set(ROUTING['assignments'].values()) - {'integration'})
+        required = set(schema['$defs']['provider']['properties']['classes']['required'])
+        for provider in ROUTING['providers'].values():
+            self.assertEqual(required, set(provider['classes']))
+
     def test_renders_deterministic_native_agents_from_shared_assignments(self) -> None:
         # Approved role assignments are an independent expectation, not derived
         # from the routing file whose accidental edits this test should catch.

@@ -12,14 +12,16 @@ import render_runtime_adapters as adapters
 CHILD_SLOTS = {'planner-worker': 'worker', 'coordinator-implementer': 'implementer'}
 
 
-def coordinator_implementer_routes():
+def coordinator_implementer_routes(selection):
     package = Path(__file__).resolve().parents[1]
     routing = adapters.load_json(package / 'config/routing.json')
     roles = adapters.validate_roles(adapters.load_json(package / 'config/roles.json'))
     selected, _ = adapters.select_routes(
         routing, roles, adapters.load_json(package / 'config/routing-profiles.json'))
-    coordinator = {'provider': 'codex', **routing['session_routes']['rfc-coordinator']['codex']}
-    implementer = {'provider': 'codex', **selected['codex']['rfc-implementer']}
+    coordinator = {'provider': 'codex', **routing['session_routes']['rfc-coordinator']['codex'],
+                   **selection['routing'].get('primary', {})}
+    implementer = {'provider': 'codex', **selected['codex']['rfc-implementer'],
+                   **selection['routing'].get('implementer', {})}
     return coordinator, implementer
 
 
@@ -28,7 +30,7 @@ def render(selection):
     route = selection['routing'].get('primary')
     canonical_child = None
     if selection['topology_id'] == 'coordinator-implementer':
-        route, canonical_child = coordinator_implementer_routes()
+        route, canonical_child = coordinator_implementer_routes(selection)
     if not route or route['provider'] != 'codex':
         raise ValueError('scoped Codex settings require an exact primary Codex route')
     child_slot = CHILD_SLOTS.get(selection['topology_id'])
@@ -52,7 +54,7 @@ def render_implementer(selection):
     strategy.validate_selection(selection)
     if selection['topology_id'] != 'coordinator-implementer' or not selection['configuration_complete']:
         raise ValueError('implementer settings require a complete coordinator-implementer selection')
-    _, route = coordinator_implementer_routes()
+    _, route = coordinator_implementer_routes(selection)
     return render(strategy.resolve('direct', routing={'primary': route}))
 
 
@@ -66,7 +68,7 @@ def inspect(selection, configs=(), instructions=(), agent_roots=(), *, complete_
     child_slot = CHILD_SLOTS.get(selection['topology_id'])
     canonical_primary = canonical_child = None
     if selection['topology_id'] == 'coordinator-implementer':
-        canonical_primary, canonical_child = coordinator_implementer_routes()
+        canonical_primary, canonical_child = coordinator_implementer_routes(selection)
     for path in configs:
         path=Path(path)
         data=tomllib.loads(path.read_text(encoding='utf-8'))

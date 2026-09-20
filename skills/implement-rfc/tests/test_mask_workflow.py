@@ -53,6 +53,9 @@ class DescriptorTests(unittest.TestCase):
         self.assertEqual(personal["inputs"], [])
         self.assertEqual({(row["agent"], row["name"]) for row in personal["native_roles"]}, declared)
         self.assertEqual(personal["setup"][0]["inputs"], [])
+        expected_profile = ["codex/rfc-implementer", "claude/rfc-implementer"]
+        self.assertEqual(value["profiles"]["coordinator-implementer"]["native_roles"], expected_profile)
+        self.assertEqual(personal["profiles"]["coordinator-implementer"]["native_roles"], expected_profile)
 
 
 class StagingEntrypointTests(unittest.TestCase):

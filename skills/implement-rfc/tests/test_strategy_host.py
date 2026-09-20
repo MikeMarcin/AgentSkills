@@ -47,6 +47,25 @@ class HostTests(unittest.TestCase):
             self.assertEqual(config.read_bytes(),before)
             self.assertEqual(host.inspect(native,[config])['state'],'incomplete')
 
+    def test_explicit_coordinator_and_implementer_routes_override_defaults(self):
+        selected = strategy.resolve('coordinator-implementer', routing={
+            'primary': {'provider': 'codex', 'model': 'gpt-6-astra', 'effort': 'high'},
+            'implementer': {'provider': 'codex', 'model': 'gpt-5.6-terra', 'effort': 'medium'},
+        })
+        parent = tomllib.loads(host.render(selected))
+        child = tomllib.loads(host.render_implementer(selected))
+        self.assertEqual((parent['model'], parent['model_reasoning_effort']), ('gpt-6-astra', 'high'))
+        self.assertEqual((parent['agents']['default_subagent_model'],
+                          parent['agents']['default_subagent_reasoning_effort']),
+                         ('gpt-5.6-terra', 'medium'))
+        self.assertEqual((child['model'], child['model_reasoning_effort']), ('gpt-5.6-terra', 'medium'))
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / 'coordinator.toml'
+            config.write_text(host.render(selected))
+            result = host.inspect(selected, [config], complete_inputs=True)
+            self.assertEqual(result['state'], 'configuration_consistent')
+            self.assertEqual(result['requested'], selected['routing'])
+
     def test_inherited_roles_routes_and_directive_signals(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);inherited=root/'global.toml';scoped=root/'scoped.toml';instructions=root/'AGENTS.md';agents=root/'agents';agents.mkdir()

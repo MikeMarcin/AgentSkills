@@ -34,9 +34,10 @@ For each milestone:
    configured attended-review session and start its loopback HTML server. Present the
    complete URL. After the implementer has returned a durable checkpoint and released
    its writer ownership, arm `wait --after SEQUENCE` through the host's durable
-   background mechanism **before yielding to the user**. The coordinator owns that
-   watch and reads `status --after SEQUENCE` when it wakes; hand-back must not depend
-   on another user message.
+   background mechanism as `wait --after SEQUENCE --kind handed-back` **before yielding
+   to the user**. The coordinator owns that watch and reads `status --after SEQUENCE`
+   when it wakes; intermediate decisions stay durable without consuming the hand-back
+   watch, so hand-back never depends on another user message.
 5. Treat an attended-review wait as a context boundary. After hand-back, reconcile
    the recorded candidate, verdicts, protections and command state. If engineering,
    interpretation or upkeep remains, start a **fresh `rfc-implementer`** with the

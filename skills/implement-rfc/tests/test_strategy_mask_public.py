@@ -34,6 +34,12 @@ class StrategyMaskPublicTests(unittest.TestCase):
                 installed=mask('install','implement-rfc','--project',root)
                 self.assertEqual(installed['error']['code'],'workflow.incomplete',installed)
                 self.assertTrue(mask('integration','approve','--project',root)['ok'])
+                preview = mask('ensure', '--project', root)
+                self.assertEqual(preview['error']['code'], 'workflow.incomplete', preview)
+                setup = mask('ensure', '--project', root,
+                             '--expect-plan-hash', preview['data']['plan_hash'],
+                             '--allow-setup', 'fixture/implement-rfc:prepare-roles')
+                self.assertTrue(setup['ok'], setup)
                 script=root/'.agents/skills/implement-rfc/scripts/workflow_preflight.py'
                 self.assertTrue(script.is_file())
                 before=(base/'machine/state.json').read_bytes()
@@ -42,18 +48,25 @@ class StrategyMaskPublicTests(unittest.TestCase):
                                          '--strategy',strategy,'--json'],env=env,capture_output=True,text=True)
                     self.assertEqual(done.returncode,0,done.stdout+done.stderr)
                     result=json.loads(done.stdout)
-                    expected_roles = ([{'agent': 'codex', 'name': 'rfc-implementer', 'state': 'ok',
-                                        'route': {'model': 'gpt-6-astra', 'effort': 'max'}},
-                                       {'agent': 'claude', 'name': 'rfc-implementer', 'state': 'ok',
-                                        'route': {'model': 'claude-opus-5', 'effort': 'xhigh'}}]
-                                      if strategy == 'coordinator-implementer' else [])
-                    self.assertEqual((result['state'],result['roles'],result['host_load']),('ready',expected_roles,'not_verified'))
+                    self.assertEqual((result['state'], result['host_load']), ('ready', 'not_verified'))
+                    if strategy == 'coordinator-implementer':
+                        roles = {(row['agent'], row['name']): row for row in result['roles']}
+                        self.assertEqual(set(roles), {('codex', 'rfc-implementer'),
+                                                      ('claude', 'rfc-implementer')})
+                        self.assertTrue(all(row['state'] == 'ok' for row in roles.values()))
+                        self.assertEqual(roles[('codex', 'rfc-implementer')]['route'],
+                                         {'model': 'gpt-6-astra', 'model_reasoning_effort': 'max'})
+                        self.assertEqual(roles[('claude', 'rfc-implementer')]['route'],
+                                         {'model': 'claude-opus-5', 'effort': 'xhigh'})
+                    else:
+                        self.assertEqual(result['roles'], [])
                 selected_roles = mask('ensure', '--project', root, '--check', '--workflow-profile', 'implement-rfc=planner-worker')
                 self.assertTrue(selected_roles['ok'], selected_roles)
                 default=mask('ensure','--project',root,'--check')
-                self.assertFalse(default['ok'])
+                self.assertTrue(default['ok'], default)
                 self.assertEqual((base/'machine/state.json').read_bytes(),before)
-                self.assertFalse((root/'.codex/agents').exists())
+                self.assertTrue((root/'.codex/agents/rfc-implementer.toml').is_file())
+                self.assertTrue((root/'.claude/agents/rfc-implementer.md').is_file())
                 # A plain invocation selects the provider-neutral default with its native role.
                 command=[sys.executable,'-B',str(script),'--repo-root',str(root),'--mask',os.environ['MASK_TEST_PROGRAM'],'--json']
                 done=subprocess.run(command,env=env,capture_output=True,text=True)

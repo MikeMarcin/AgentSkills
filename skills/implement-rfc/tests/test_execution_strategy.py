@@ -47,9 +47,10 @@ class StrategyTests(unittest.TestCase):
 
     def test_attended_review_is_a_watched_fresh_context_boundary(self):
         recipe = (strategy.PACKAGE / 'references/strategies/coordinator-implementer.md').read_text()
-        self.assertLess(recipe.index('start its loopback HTML server'), recipe.index('arm `wait --after SEQUENCE`'))
-        self.assertLess(recipe.index('arm `wait --after SEQUENCE`'), recipe.index('before yielding to the user'))
-        self.assertIn('hand-back must not depend\n   on another user message', recipe)
+        wait = 'wait --after SEQUENCE --kind handed-back'
+        self.assertLess(recipe.index('start its loopback HTML server'), recipe.index(wait))
+        self.assertLess(recipe.index(wait), recipe.index('before yielding\n   to the user'))
+        self.assertIn('hand-back never depends on another user message', recipe)
         self.assertIn('start a **fresh `rfc-implementer`**', recipe)
 
     def test_unknown_duplicate_escape_incompatible_and_stale(self):

@@ -265,14 +265,8 @@
         },
         "coordinator-implementer": {
           "native_roles": [
-            {
-              "agent": "codex",
-              "name": "rfc-implementer"
-            },
-            {
-              "agent": "claude",
-              "name": "rfc-implementer"
-            }
+            "codex/rfc-implementer",
+            "claude/rfc-implementer"
           ]
         }
       }
@@ -290,14 +284,8 @@
     },
     "coordinator-implementer": {
       "native_roles": [
-        {
-          "agent": "codex",
-          "name": "rfc-implementer"
-        },
-        {
-          "agent": "claude",
-          "name": "rfc-implementer"
-        }
+        "codex/rfc-implementer",
+        "claude/rfc-implementer"
       ]
     }
   }
