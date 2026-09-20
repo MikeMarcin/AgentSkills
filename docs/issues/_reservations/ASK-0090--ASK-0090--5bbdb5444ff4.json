@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0090"
+  ],
+  "reserve_for": "ask-0089-review-repairs",
+  "purpose": "",
+  "created": "2026-09-20T05:44:55.576705+00:00",
+  "base": "a9f3367d489c87ab6819ab0e8f4a3add7fc64ccb"
+}
