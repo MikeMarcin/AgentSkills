@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0088"
+  ],
+  "reserve_for": "simple-milestone-default",
+  "purpose": "",
+  "created": "2026-09-20T01:09:32.480602+00:00",
+  "base": "f36b645c8c00e8b88225e51d446105ca912090ac"
+}
