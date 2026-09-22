@@ -132,7 +132,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
                     self.assertEqual(tools, expected_tools)
                     turns = configured.get("max_turns")
                     self.assertEqual(header.get("maxTurns"), None if turns is None else str(turns))
-                    self.assertEqual(turns is None, role == "rfc-integrator")
+                    self.assertEqual(turns is None, role in VALIDATOR_MODULE.renderer.UNCAPPED_ROLES)
                     body = claude.split(f"# {role}\n\n", 1)[1]
                     self.assertTrue(body.startswith("- Before any analysis or tool call"))
                     self.assertIn(self.expected_banner(role, "claude"), body)

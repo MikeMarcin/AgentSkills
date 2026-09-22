@@ -50,7 +50,7 @@
           "$ref": "#/$defs/leaf"
         },
         "rfc-implementer": {
-          "$ref": "#/$defs/leaf"
+          "$ref": "#/$defs/milestone-leaf"
         },
         "rfc-integrator": {
           "$ref": "#/$defs/role"
@@ -124,15 +124,12 @@
       },
       "additionalProperties": false
     },
-    "leaf": {
+    "milestone-leaf": {
       "allOf": [
         {
           "$ref": "#/$defs/role"
         },
         {
-          "required": [
-            "max_turns"
-          ],
           "properties": {
             "delegation": {
               "properties": {
@@ -142,6 +139,18 @@
               }
             }
           }
+        }
+      ]
+    },
+    "leaf": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/milestone-leaf"
+        },
+        {
+          "required": [
+            "max_turns"
+          ]
         }
       ]
     }

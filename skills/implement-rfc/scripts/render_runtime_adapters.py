@@ -78,6 +78,9 @@ def deep_merge(base: Any, override: Any) -> Any:
 LEAF_ROLES = {"rfc-utility", "rfc-scout", "rfc-test-runner", "rfc-worker",
               "rfc-worker-deep", "rfc-reviewer", "rfc-reviewer-critical", "rfc-implementer"}
 INTEGRATOR = "rfc-integrator"
+# Milestone owners run a complete engineering cycle; a host turn cap only
+# truncates them mid-milestone, so they may omit max_turns.
+UNCAPPED_ROLES = {INTEGRATOR, "rfc-implementer"}
 # Resume, collect from and release delegated children. A delegating role cannot
 # reuse the same slice owner for correction without these.
 # TaskOutput is stripped from every subagent, so granting it only misleads; see
@@ -127,7 +130,7 @@ def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise ValueError(f"role {name} needs a description")
         if role.get("mutation") not in MUTATIONS:
             raise ValueError(f"role {name} has invalid mutation")
-        if name != INTEGRATOR or "max_turns" in role:
+        if name not in UNCAPPED_ROLES or "max_turns" in role:
             if type(role.get("max_turns")) is not int or role["max_turns"] < 1:
                 raise ValueError(f"role {name} has invalid max_turns")
         instructions = role.get("instructions")

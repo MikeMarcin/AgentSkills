@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "8a9190a114cf8af814e2ebe5c92748f280da348dfdcb2c6954e0b1f1ae209dd7"
+      "sha256": "9214fe2eba0c2361babf35e0dad3056245e5de26068907ea0f82f7b2b0d67eb3"
     },
     {
       "path": "config/routing-profiles.json",
@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "683f25e1583f9e48fce8fe7e63fd1f145b93f77d17cd8b6905061732f2a3f871"
+      "sha256": "607b1aeaf5d341cbda6418178505809f6ae17588ce5d0005594f96e32e3c5ba2"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -238,7 +238,7 @@
     },
     {
       "path": "schemas/roles.schema.json",
-      "sha256": "a79583b63efb60e9fe3ecb15fc79dac5a47e2e33a7978bb6c5c6f6aab532b898"
+      "sha256": "143be198d5fc6fed1e1c8523f22b5175c6566894ccb85003650a2c333417d3f6"
     },
     {
       "path": "schemas/routing.schema.json",
@@ -350,7 +350,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "a9d46e483a13832e1cedbfd1f38d020fc554b0c7ab15016adf3e31bc376bd8d2"
+      "sha256": "03d2362aff293cd2fc9a36edf69333165a8e39e40e284dfc7b43d4a3fadc102a"
     },
     {
       "path": "scripts/role_usage.py",
@@ -558,7 +558,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "798cbcd90d8d3f74e72a8f6dda8b2d7732a5028aead887bdd78313207c8cc7f6"
+      "sha256": "02868c938209cb7f74b72fef30bec7d27123586f9e10e998a3c0223ee8c41105"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -645,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "d3240f05bb66689a",
+  "portable_digest": "0938a75c10e5282f",
   "schema": "implement-rfc.portable-manifest.v1"
 }
