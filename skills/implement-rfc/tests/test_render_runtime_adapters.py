@@ -87,10 +87,10 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
             "rfc-test-runner": ("gpt-5.6-luna", "xhigh", "claude-haiku-4-5", None, "build-write", False),
             "rfc-scout": ("gpt-5.6-sol", "low", "claude-opus-5", "low", "read-only", False),
             "rfc-worker": ("gpt-6-astra", "low", "claude-opus-5", "xhigh", "workspace-write", False),
-            "rfc-implementer": ("gpt-6-astra", "max", "claude-opus-5", "xhigh", "workspace-write", False),
+            "rfc-implementer": ("gpt-6-astra", "max", "claude-opus-5-5", "xhigh", "workspace-write", False),
             "rfc-worker-deep": ("gpt-6-astra", "high", "claude-fable-5-1", "high", "workspace-write", False),
             "rfc-reviewer": ("gpt-6-astra", "medium", "claude-fable-5-1", "medium", "read-only", False),
-            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "high", "read-only", False),
+            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "xhigh", "read-only", False),
         }
         self.assertEqual(set(ROUTING["assignments"]), set(expected))
         with tempfile.TemporaryDirectory() as temp:

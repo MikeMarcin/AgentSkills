@@ -1,4 +1,4 @@
-"""Run the retained packet checker with the owner's explicit role rename only."""
+"""Run the retained packet checker with the owner's explicit role rename and critical effort."""
 import importlib.util
 import json
 from pathlib import Path
@@ -18,6 +18,7 @@ class StandardWorkerTargetTests(unittest.TestCase):
         routing = json.loads((config / 'routing.json').read_text())
         target = json.loads((PACK / 'fixtures/target-routing.json').read_text().replace(
             'rfc-critical-reviewer', 'rfc-reviewer-critical'))
+        target['provider_classes']['claude']['critical']['effort'] = 'xhigh'
         integrator = roles['roles'].pop('rfc-integrator')
         implementer = roles['roles'].pop('rfc-implementer')
         self.assertEqual(set(integrator['delegation']['allowed_roles']), set(target['roles']))

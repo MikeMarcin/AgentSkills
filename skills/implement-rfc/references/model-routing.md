@@ -11,11 +11,11 @@ The coordinator's current route is never an implicit engineering override.
 | `rfc-utility`, `rfc-test-runner` | mechanical | Luna xhigh | Haiku 4.5 unsupported/null |
 | `rfc-scout` | balanced | Sol low | Opus 5 low |
 | `rfc-worker` | standard | Astra low | Opus 5 xhigh |
-| `rfc-implementer` | implementation | Astra max | Opus 5 xhigh |
+| `rfc-implementer` | implementation | Astra max | Opus 5.5 xhigh |
 | `rfc-integrator` | integration | Sol xhigh | Opus 5 xhigh |
 | `rfc-worker-deep` | deep | Astra high | Fable 5.1 high |
 | `rfc-reviewer` | review | Astra medium | Fable 5.1 medium |
-| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.1 high |
+| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.1 xhigh |
 
 Standard is broad engineering; deep addresses named unresolved difficulty.
 Review is independently configurable from deep implementation. Critical review
@@ -24,7 +24,8 @@ medium-then-critical pipeline. Effort does not change acceptance or authority.
 See [delegated execution](delegated-execution.md) for selection and contracts.
 
 This is the owner's 2026-09-08 allocation decision, with the integrator moved to Sol
-xhigh / Opus 5 xhigh on 2026-09-11, not measured quality equivalence or subscription
+xhigh / Opus 5 xhigh on 2026-09-11 and the Claude implementer moved to Opus 5.5
+xhigh on 2026-09-22, not measured quality equivalence or subscription
 savings. No live bakeoff is required for this promotion. Exact
 model IDs and requested effort live in configuration; requests do not prove serving.
 Claude's declared floor is 2.1.255; no automatic client upgrade, effort clamp,
