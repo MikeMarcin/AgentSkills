@@ -14,7 +14,7 @@
     },
     {
       "path": "config/claude-bedrock-model-overrides.example.json",
-      "sha256": "ae823248bbe25154311eb814c21b3424dc1c5b58caf74c8dff34c59e180fb4ed"
+      "sha256": "85c3de77f870ea9724d68838d723667c3e5503a2711eaf89b2c1ad7191bfa47f"
     },
     {
       "path": "config/codex-config.fragment.toml",
@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "607b1aeaf5d341cbda6418178505809f6ae17588ce5d0005594f96e32e3c5ba2"
+      "sha256": "3095b40d13c2151f108159b495e2e5d09c920aff3076a1ab5ae6b589fb64f90c"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -106,7 +106,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "15bd4efc37d390602668bbbdbdef2c364870ffe2a28d76b58a776746eab1e1c7"
+      "sha256": "f1ac4c8b7b96a024f63c624dca76a5202fa1abbdfd6cfc710c982b918e10cd07"
     },
     {
       "path": "references/native-coordination.md",
@@ -558,7 +558,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "02868c938209cb7f74b72fef30bec7d27123586f9e10e998a3c0223ee8c41105"
+      "sha256": "05b23f8fe2605e9165ce095661bc7d12821350ddda7d997f95adc43746682a92"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -590,7 +590,7 @@
     },
     {
       "path": "tests/test_standard_worker_target.py",
-      "sha256": "9a9f7b59ecd58b812e8028badcedd35f8e948749ed067066dfe55996b2593c50"
+      "sha256": "e3d35ca929910d993fd4bcfa47c2d97cd33d236a191f3d5aec8a6c729cf05c4f"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -598,11 +598,11 @@
     },
     {
       "path": "tests/test_strategy_host.py",
-      "sha256": "3aebede37000fd3a7be358abfb64d56fac733c333f7dcad9ad78678f20260dc0"
+      "sha256": "d327d1983491bc62c206bcbf7b01ee75b17d7e13d2dadc75715d99cb4a7962b1"
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "78a4b10c4932ca488487f2fbeb80d2d1c9523875364756709f6d468f61ec5694"
+      "sha256": "5de57dfd62d8252f23b141670bbdd78070ee7791c17fad88976a098c0de3ebdc"
     },
     {
       "path": "tests/test_strategy_study.py",
@@ -645,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "0938a75c10e5282f",
+  "portable_digest": "3f3ba31ffec88277",
   "schema": "implement-rfc.portable-manifest.v1"
 }

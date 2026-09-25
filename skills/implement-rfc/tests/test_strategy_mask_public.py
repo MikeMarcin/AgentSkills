@@ -53,7 +53,7 @@ class StrategyMaskPublicTests(unittest.TestCase):
                                                       ('claude', 'rfc-implementer')})
                         self.assertTrue(all(row['state'] == 'ok' for row in roles.values()))
                         self.assertEqual(roles[('codex', 'rfc-implementer')]['route'],
-                                         {'model': 'gpt-6-astra', 'model_reasoning_effort': 'max'})
+                                         {'model': 'gpt-6-astra', 'model_reasoning_effort': 'xhigh'})
                         self.assertEqual(roles[('claude', 'rfc-implementer')]['route'],
                                          {'model': 'claude-opus-5-5', 'effort': 'xhigh'})
                     else:
