@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0091"
 title: "Managed station local takeover"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P1"
 metadata: {"milestone_plan":{"id":"station-local-takeover","path":"docs/rfcs/plans/station-local-takeover/milestone-plan.json"}}
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"bf257dabf48dde0527dc8e92e012095d71e7126c","evidence":{"kind":"observation","detail":"Replacement prompts and exact bounded helper/inspection argv work; unbound second linked consumer permits ordinary mutations while managed/retired endpoints defer writes."}},{"criterion":"AC2","outcome":"pass","revision":"bf257dabf48dde0527dc8e92e012095d71e7126c","evidence":{"kind":"observation","detail":"Real disposable POSIX supervisor stop and dirty/checkpoint preservation, durable retired fencing, OS transfer serialization, interrupted receipt recovery and repeat idempotence pass."}},{"criterion":"AC3","outcome":"pass","revision":"bf257dabf48dde0527dc8e92e012095d71e7126c","evidence":{"kind":"observation","detail":"Project/branch/base/envelope/lease regression checks and fresh linked-consumer launcher composition pass; existing owner RPC adapter has exact task/cwd and complete terminal checks; unsupported hosts are manual and native unqualified status is recorded."}},{"criterion":"AC4","outcome":"pass","revision":"bf257dabf48dde0527dc8e92e012095d71e7126c","evidence":{"kind":"observation","detail":"28 control, 63 launcher, 39 Codex, 12 guard (2 optional schema skips), 4 lease cases passed; two consumer links, source manifest, raw exact-Git package validation and docs gates pass."}},{"criterion":"AC5","outcome":"pass","revision":"bf257dabf48dde0527dc8e92e012095d71e7126c","evidence":{"kind":"observation","detail":"MASK 2fcd627c6ef89b0bd0d722a8802adc0ec30485fa accepted in 189b218e8f1eaea74467203e4a8ddb2b3ad5f3f4; focused public normal import, approval-consent and integrity checks pass, actual consumer readiness restored with installed source/cache hashes unchanged."}}]
 ---
 
 # Managed station local takeover
