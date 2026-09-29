@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0091"
+  ],
+  "reserve_for": "station-local-takeover-20260929",
+  "purpose": "",
+  "created": "2026-09-29T21:09:34.511123+00:00",
+  "base": "acc7ac56a588e5b818ee99a117b6e917b07f1930"
+}
