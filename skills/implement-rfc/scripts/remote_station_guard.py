@@ -13,12 +13,14 @@ import json
 import os
 import pathlib
 import re
+import shlex
 import subprocess
 import sys
 from typing import Any
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import project_config  # noqa: E402
+import station_lifecycle as lifecycle  # noqa: E402
 
 STATION_SCHEMA = "implement-rfc.remote-station.v2"
 TASK_ENVELOPE = "implement-rfc.remote-task.v1"
@@ -431,11 +433,13 @@ def _handle_prompt(
     event: dict[str, Any],
 ) -> None:
     expected_thread = _codex_thread_id(station)
-    if event.get("session_id") != expected_thread:
-        _block(
-            f"checkout is bound to Codex task {expected_thread}; "
-            f"current task is {event.get('session_id')}"
-        )
+    if event.get('session_id') != expected_thread:
+        _hook_context('UserPromptSubmit',
+                      f'Managed station belongs to Codex task {expected_thread}. '
+                      'This replacement chat may inspect status and recover it; writes remain deferred. '
+                      'A human instruction to resume here authorizes station_control.py takeover '
+                      '--mode local --stop-previous without another confirmation. Use the exact helper '
+                      'and its reported stop/recovery steps; prompt text itself changes no ownership.')
         return
 
     envelope: dict[str, Any] | None = None
@@ -463,6 +467,57 @@ def _read_only_command_denied(command: str) -> bool:
     return any(pattern.search(command) for pattern in READ_ONLY_DENIED_COMMANDS)
 
 
+def _bounded_recovery_command(root, command):
+    try:
+        argv = shlex.split(command)
+    except ValueError:
+        return False
+    if not argv:
+        return False
+    # Exact argv only: shell suffixes, substitutions, environment assignments and
+    # interpreter -c commands never become recovery authority.
+    if any(any(token in word for token in (';', '|', '&', '`', '$', '<', '>', '\n')) for word in argv):
+        return False
+    if argv[0] in ('python', 'python3', 'py', sys.executable):
+        rest = argv[1:]
+        if argv[0] == 'py':
+            if rest[:1] != ['-3']:
+                return False
+            rest = rest[1:]
+        if rest[:1] == ['-B']:
+            rest = rest[1:]
+        if not rest or pathlib.Path(rest[0]).resolve() != pathlib.Path(__file__).with_name('station_control.py').resolve():
+            return False
+        rest = rest[1:]
+        if len(rest) >= 3 and rest[1] == '--repo-root':
+            rest[2] = str(pathlib.Path(rest[2]).resolve())
+        base = ['--repo-root', str(root), '--json']
+        return rest in ([ 'status', *base ], [ 'status', *base, '--observe-runtime' ],
+                        [ 'takeover', *base, '--mode', 'local', '--stop-previous' ],
+                        [ 'takeover', *base, '--mode', 'local', '--stop-previous', '--confirm-runtime-stopped' ])
+    if len(argv) >= 3 and argv[:2] == ['git', '-C'] and pathlib.Path(argv[2]).resolve() == root:
+        return argv[3:] in (['status', '--short'], ['diff', '--no-ext-diff', '--no-textconv', '--stat'],
+                            ['log', '-5', '--oneline'], ['rev-parse', 'HEAD'])
+    if argv[0] == 'cat' and 1 <= len(argv[1:]) <= 5:
+        for name in argv[1:]:
+            path = root / name
+            try:
+                if not path.resolve().is_relative_to(root) or path.is_symlink() or not path.is_file() or path.stat().st_size > 1024 * 1024:
+                    return False
+            except OSError:
+                return False
+        return True
+    return False
+
+
+def _replacement_tool(root, event, detail):
+    tool_input = event.get('tool_input')
+    command = str(tool_input.get('command', tool_input.get('cmd', ''))) if isinstance(tool_input, dict) else ''
+    if event.get('tool_name') == 'Bash' and _bounded_recovery_command(root, command):
+        return
+    _deny_tool(detail + ' Use exact station_control.py status/takeover or bounded Git inspection; defer other writes.')
+
+
 def _handle_tool(
     root: pathlib.Path,
     station: dict[str, Any],
@@ -471,10 +526,8 @@ def _handle_tool(
 ) -> None:
     try:
         if event.get("session_id") != _codex_thread_id(station):
-            raise GuardRefusal(
-                "authority-exceeded",
-                "tool call came from the wrong Codex task",
-            )
+            _replacement_tool(root, event, 'The previous managed writer has not been reconciled.')
+            return
         _validate_live_checkout(root, station, project)
         _lease_record(root, station)
         state = _read_turn_state(root, event)
@@ -514,15 +567,42 @@ def main() -> int:
     if root is None:
         return 0
     try:
+        state = lifecycle.load(root)
         station = _load_station(root)
-    except GuardRefusal as refusal:
-        _block(refusal.detail)
-        return 0
-    if station is None:
-        return 0
-    if station.get("codex") is None:
-        # Deprecated direct-Codex mode has no thread binding. Its lease wrapper
-        # and the portable skill guard remain authoritative.
+        session = event.get('session_id')
+        retired = lifecycle.retired(state, session)
+        if retired or (state and state['mode'] == 'transferring'):
+            detail = 'This endpoint is retired.' if retired else 'Station takeover is pending; ownership has not transferred.'
+            if event.get('hook_event_name') == 'UserPromptSubmit':
+                _hook_context('UserPromptSubmit', detail + ' Inspection and recovery remain available; mutation is deferred.')
+            elif event.get('hook_event_name') == 'PreToolUse':
+                _replacement_tool(root, event, detail)
+            elif event.get('hook_event_name') == 'Stop':
+                _clear_turn_state(root, event)
+            return 0
+        if state and state['mode'] == 'local':
+            return 0
+        if station is None:
+            if state:
+                raise lifecycle.LifecycleError('Managed station registry is missing; restore it before recovery.')
+            return 0
+        if state:
+            lifecycle.validate(root, station, state)
+        if station.get('codex') is None:
+            # Legacy direct/Claude-only registries still denote a managed checkout.
+            # Inspection and takeover are available; null never detaches ownership.
+            if event.get('hook_event_name') == 'UserPromptSubmit':
+                _hook_context('UserPromptSubmit', 'Managed station has no Codex endpoint. Inspect status or transfer it to local mode.')
+            elif event.get('hook_event_name') == 'PreToolUse':
+                _replacement_tool(root, event, 'Managed station has no accepted Codex writer.')
+            return 0
+        _codex_thread_id(station)
+    except (GuardRefusal, lifecycle.LifecycleError) as refusal:
+        detail = str(refusal)
+        if event.get('hook_event_name') == 'UserPromptSubmit':
+            _hook_context('UserPromptSubmit', detail + ' Inspection and recovery are permitted; writes remain deferred.')
+        elif event.get('hook_event_name') == 'PreToolUse':
+            _replacement_tool(root, event, detail)
         return 0
 
     try:

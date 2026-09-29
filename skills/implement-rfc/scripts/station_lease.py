@@ -25,6 +25,12 @@ import json
 import hashlib
 import os
 import socket
+import secrets
+import signal
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.request import Request, build_opener, ProxyHandler
 import subprocess
 import sys
 from pathlib import Path
@@ -119,6 +125,16 @@ def _read_holder(path: Path) -> str:
         return "(no holder record)"
 
 
+def _public_holder(text):
+    try:
+        holder = json.loads(text)
+    except ValueError:
+        return '(unreadable holder record)'
+    if isinstance(holder, dict) and isinstance(holder.get('control'), dict):
+        holder['control'] = dict(holder['control'], token='[redacted]')
+    return json.dumps(holder)
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     if not args.command:
         sys.stderr.write("run: missing command after --\n")
@@ -130,10 +146,12 @@ def cmd_run(args: argparse.Namespace) -> int:
     if not _try_lock(fd):
         sys.stderr.write(
             f"{args.role} lease is held; refusing a second writer.\n"
-            f"holder: {_read_holder(holder_path)}\n"
+            f"holder: {_public_holder(_read_holder(holder_path))}\n"
         )
         os.close(fd)
         return 75
+    if getattr(args, "controlled", False):
+        return _run_controlled(args, fd, holder_path)
     record = json.dumps(_holder_record(args, args.command), indent=2) + "\n"
     holder_path.write_text(record, encoding="utf-8")
     if os.name == "posix":
@@ -151,23 +169,138 @@ def cmd_run(args: argparse.Namespace) -> int:
     return proc.returncode
 
 
-def cmd_status(args: argparse.Namespace) -> int:
-    path = _lock_path(args.role, args.repo, args.context.config)
-    holder_path = _holder_path(path)
+def snapshot(repo, role, context):
+    path = _lock_path(role, repo, context.config)
     if not path.exists():
-        print(f"{args.role}: free")
-        return 0
-    fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
+        return dict(held=False, holder=None)
+    fd = os.open(path, os.O_RDWR | getattr(os, 'O_NOFOLLOW', 0))
     try:
-        if _try_lock(fd):
+        free = _try_lock(fd)
+        if free:
             _unlock(fd)
-            print(f"{args.role}: free")
-            return 0
-        print(f"{args.role}: held")
-        print(_read_holder(holder_path))
-        return 10
+        try:
+            holder = json.loads(_read_holder(_holder_path(path)))
+        except ValueError:
+            holder = None
+        return dict(held=not free, holder=holder, stale_holder=free and holder is not None)
     finally:
         os.close(fd)
+
+
+def _run_controlled(args, fd, holder_path):
+    """The lease owner stops only its own child process group, never a sidecar PID."""
+    if os.name != 'posix':
+        sys.stderr.write('Controlled supervisor stop is unavailable on this host; use the owning terminal.\n')
+        os.close(fd)
+        return 2
+    token = secrets.token_hex(32)
+    stopping = threading.Event()
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            if (self.path != '/stop' or self.headers.get('Authorization') != 'Bearer ' + token
+                    or self.headers.get('X-Station') != args.station):
+                self.send_error(403)
+                return
+            stopping.set()
+            self.send_response(202)
+            self.end_headers()
+        def log_message(self, *unused):
+            pass
+    server = HTTPServer(('127.0.0.1', 0), Handler)
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    record = _holder_record(args, args.command)
+    record['control'] = dict(port=server.server_port, token=token, protocol='implement-rfc.supervisor-stop.v1')
+    holder_path.write_text(json.dumps(record, indent=2) + '\n')
+    holder_path.chmod(0o600)
+    child = None
+    worker.start()
+    try:
+        child = subprocess.Popen(args.command, start_new_session=True, pass_fds=(fd,))
+        while child.poll() is None and not stopping.wait(0.1):
+            pass
+        # A completed parent may have left descendants. Reconcile its owned group
+        # on every exit, with the lease retained until that group has stopped.
+        try:
+            os.killpg(child.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        try:
+            child.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            os.killpg(child.pid, signal.SIGKILL)
+            child.wait()
+        try:
+            os.killpg(child.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        deadline = time.monotonic() + 4
+        while time.monotonic() < deadline:
+            try:
+                os.killpg(child.pid, 0)
+            except ProcessLookupError:
+                record['stop_result'] = dict(commands_stopped=True, child_group=child.pid)
+                holder_path.write_text(json.dumps(record, indent=2) + '\n')
+                break
+            time.sleep(0.1)
+        return 0 if stopping.is_set() else child.returncode
+    except KeyboardInterrupt:
+        if child is not None:
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            child.wait()
+        return 130
+    finally:
+        server.shutdown()
+        server.server_close()
+        worker.join()
+        _unlock(fd)
+        os.close(fd)
+
+
+def stop_supervisor(repo, role, context, station):
+    observed = snapshot(repo, role, context)
+    if not observed['held']:
+        return observed
+    holder = observed['holder']
+    control = holder.get('control') if isinstance(holder, dict) else None
+    if (holder is None or holder.get('station') != station or holder.get('project') != context.config['project']
+            or holder.get('role') != role or not isinstance(control, dict)
+            or control.get('protocol') != 'implement-rfc.supervisor-stop.v1'
+            or type(control.get('port')) is not int or not 1 <= control['port'] <= 65535
+            or not isinstance(control.get('token'), str) or len(control['token']) != 64):
+        raise ValueError('Stop the recorded station supervisor in its owning terminal (Ctrl+C), then rerun takeover; no trusted stop control is available.')
+    request = Request(f"http://127.0.0.1:{control['port']}/stop", data=b'',
+                      headers={'Authorization': 'Bearer ' + control['token'], 'X-Station': station}, method='POST')
+    with build_opener(ProxyHandler({})).open(request, timeout=3) as response:
+        if response.status != 202:
+            raise ValueError('Supervisor did not accept scoped stop; stop it in its owning terminal.')
+    deadline = time.monotonic() + 8
+    while time.monotonic() < deadline:
+        observed = snapshot(repo, role, context)
+        if not observed['held']:
+            final_holder = observed.get('holder')
+            stopped = (isinstance(final_holder, dict) and final_holder.get('control') == control
+                       and final_holder.get('stop_result', {}).get('commands_stopped') is True)
+            return dict(observed, controlled_stop=stopped)
+        time.sleep(0.1)
+    raise ValueError('Supervisor lease remains held after stop. Stop remaining commands in its owning terminal and retry; the lock is preserved.')
+
+
+def cmd_status(args):
+    observed = snapshot(args.repo, args.role, args.context)
+    if getattr(args, 'json', False):
+        # The stop token remains private to the helper, even in JSON status.
+        holder = dict(observed['holder']) if isinstance(observed['holder'], dict) else None
+        if holder and 'control' in holder:
+            holder['control'] = dict(holder['control'], token='[redacted]')
+        print(json.dumps(dict(observed, holder=holder)))
+    else:
+        print(f"{args.role}: {'held' if observed['held'] else 'free'}")
+        if observed['held']:
+            print(_public_holder(json.dumps(observed['holder'])))
+    return 10 if observed['held'] else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -181,10 +314,12 @@ def main(argv: list[str] | None = None) -> int:
     run_p = sub.add_parser("run", help="acquire the lease and run a command")
     common(run_p)
     run_p.add_argument("--station", default=None, help="station name for the holder record")
+    run_p.add_argument("--controlled", action="store_true", help="enable scoped stop of this supervisor on POSIX")
     run_p.add_argument("command", nargs=argparse.REMAINDER, help="-- command to wrap")
 
     status_p = sub.add_parser("status", help="report the lease state")
     common(status_p)
+    status_p.add_argument("--json", action="store_true")
     status_p.set_defaults(station=None)
 
     args = parser.parse_args(argv)

@@ -13,6 +13,8 @@ For explicit personal storage or a remembered external tracker, first read
 [Personal storage](references/personal-storage.md). Otherwise resolve project context
 with `scripts/project_config.py --repo-root ROOT` and read its `project.json`,
 `project.md` and applicable repository instructions.
+For managed-station status, takeover or an ownership guard message, read
+[Station control](references/station-control.md).
 
 For **status only**, inspect the selected live queue/closeout with existing helpers
 and report it without changing source, board or agents. For **usage only**, read

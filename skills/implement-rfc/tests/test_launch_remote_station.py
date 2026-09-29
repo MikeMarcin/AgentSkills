@@ -70,6 +70,10 @@ class LauncherTests(unittest.TestCase):
             "linux": {"branch": "linux-lane", "platform": "linux"},
         }
         self.project = {**CONFIG, "workstreams": workstreams}
+        self.enterContext(mock.patch.object(launcher.lifecycle, 'locked', side_effect=lambda root: contextlib.nullcontext()))
+        self.enterContext(mock.patch.object(launcher.lifecycle, 'load', side_effect=lambda root: {'mode': 'managed', 'endpoints': {}}))
+        self.enterContext(mock.patch.object(launcher.lifecycle, 'activate'))
+        self.enterContext(mock.patch.object(launcher.lifecycle, 'save'))
         self._temporary = tempfile.TemporaryDirectory()
         root = Path(self._temporary.name).resolve()
         self.selected = context_for(root, self.project)

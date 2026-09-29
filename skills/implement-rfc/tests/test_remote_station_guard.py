@@ -209,7 +209,7 @@ done_when: test the station guard
             "deny",
         )
 
-    def test_wrong_thread_is_blocked_before_prompt_submission(self) -> None:
+    def test_wrong_thread_accepts_prompt_for_bounded_recovery(self) -> None:
         result = self._run_guard(
             self._event(
                 "UserPromptSubmit",
@@ -219,8 +219,8 @@ done_when: test the station guard
         )
 
         output = json.loads(result.stdout)
-        self.assertEqual(output["decision"], "block")
-        self.assertIn("bound to Codex task", output["reason"])
+        self.assertNotIn('decision', output)
+        self.assertIn('replacement chat', output['hookSpecificOutput']['additionalContext'])
 
     def test_station_mismatch_yields_remote_refusal_context(self) -> None:
         result = self._run_guard(
@@ -324,7 +324,7 @@ done_when: test the station guard
         self.assertEqual(result.stdout, "")
         self.assertIn("guard inactive", result.stderr)
 
-    def test_legacy_direct_codex_mode_does_not_apply_thread_hooks(self) -> None:
+    def test_legacy_null_endpoint_requires_inspection_or_takeover(self) -> None:
         self.station["codex"] = None
         self._write_station()
 
@@ -336,7 +336,7 @@ done_when: test the station guard
             )
         )
 
-        self.assertEqual(result.stdout, "")
+        self.assertIn('no Codex endpoint', result.stdout)
 
 
 @unittest.skipIf(Draft202012Validator is None, "jsonschema is required for schema validation")

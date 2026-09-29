@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import json
+import os
 import pathlib
 import platform
 import re
@@ -40,6 +41,7 @@ from typing import Any
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import project_config  # noqa: E402
+import station_lifecycle as lifecycle  # noqa: E402
 from codex_station import (  # noqa: E402
     AppServerClient,
     CodexStationError,
@@ -949,6 +951,24 @@ def wait_for_station_stop() -> int:
 
 
 def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
+    try:
+        # Keep launch and transfer serialization separate from the indefinite station
+        # lifetime. The supervisor lease owns the lifetime; this lock owns publication.
+        with lifecycle.locked(context.root):
+            prior = lifecycle.load(context.root)
+            if prior and prior['mode'] == 'transferring':
+                print('station refused: finish pending local takeover before relaunch', file=sys.stderr)
+                return 2
+            if prior and prior['mode'] == 'local' and not (arguments.new_codex_session or arguments.fresh_station or arguments.no_codex):
+                print('station refused: local takeover retired the recorded endpoint; relaunch with --fresh', file=sys.stderr)
+                return 2
+        return _supervise(arguments, context)
+    except lifecycle.LifecycleError as refusal:
+        print(f'station refused: {refusal}', file=sys.stderr)
+        return 2
+
+
+def _supervise(arguments: argparse.Namespace, context: StationContext) -> int:
     existing = load_station_file(context.station_file)
     remembered = {} if arguments.fresh_station else existing
     station_id = durable_station_id(remembered)
@@ -969,19 +989,12 @@ def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
             )
         )
         with codex_session as codex:
-            atomic_write_json(
-                context.station_file,
-                station_document(
-                    context,
-                    station_id=station_id,
-                    codex=codex,
-                    claude=(
-                        {"session_id": claude_session_id}
-                        if claude_session_id is not None
-                        else None
-                    ),
-                ),
-            )
+            with lifecycle.locked(context.root):
+                document = station_document(
+                    context, station_id=station_id, codex=codex,
+                    claude={'session_id': claude_session_id} if claude_session_id is not None else None)
+                lifecycle.activate(context.root, document)
+                atomic_write_json(context.station_file, document)
             if arguments.no_codex:
                 print("Codex skipped; saved task binding retained.", flush=True)
             else:
@@ -1018,15 +1031,15 @@ def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
                 flush=True,
             )
             def record_claude_session(session_id: str) -> None:
-                atomic_write_json(
-                    context.station_file,
-                    station_document(
-                        context,
-                        station_id=station_id,
-                        codex=codex,
-                        claude={"session_id": session_id},
-                    ),
-                )
+                with lifecycle.locked(context.root):
+                    document = station_document(context, station_id=station_id, codex=codex,
+                                                claude={'session_id': session_id})
+                    state = lifecycle.load(context.root)
+                    if state is None or state['mode'] != 'managed':
+                        raise lifecycle.LifecycleError('Station ownership changed while recording Claude endpoint.')
+                    state['endpoints'] = lifecycle.endpoints(document)
+                    lifecycle.save(context.root, state)
+                    atomic_write_json(context.station_file, document)
 
             return run_claude(
                 arguments,
@@ -1034,7 +1047,7 @@ def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
                 session_id=claude_session_id,
                 record_session=record_claude_session,
             )
-    except (LaunchRefusal, project_config.ProjectConfigError) as refusal:
+    except (LaunchRefusal, project_config.ProjectConfigError, lifecycle.LifecycleError) as refusal:
         print(f"station refused: {refusal}", file=sys.stderr)
         return 2
     except OSError as error:
@@ -1088,6 +1101,7 @@ def run_under_lease(arguments: argparse.Namespace, context: StationContext) -> i
         context.name,
         "--repo-root",
         str(context.root),
+        *(['--controlled'] if os.name == 'posix' else []),
         "--",
         *internal_supervisor_arguments(arguments),
     ]
@@ -1238,7 +1252,7 @@ def main(argv: list[str] | None = None) -> int:
         arguments.new_claude_session = True
     try:
         context = resolve_context(arguments)
-    except (LaunchRefusal, project_config.ProjectConfigError) as refusal:
+    except (LaunchRefusal, project_config.ProjectConfigError, lifecycle.LifecycleError) as refusal:
         print(refusal, file=sys.stderr)
         return 2
 

@@ -156,6 +156,12 @@ under the canonical name. It refuses with strict Claude resume, `--no-server`,
 or either skipped service; use `--fresh` for ordinary context resets instead.
 Legacy `--new-codex-session` and `--new-claude-session` remain accepted.
 
+## Local takeover
+
+For a replacement chat, a human instruction to resume locally, or a station ownership
+guard message, follow [Station control](station-control.md). That procedure preserves
+work and history, reconciles the recorded writers and fences retired endpoints.
+
 ## Writer lease
 
 `scripts/station_lease.py` makes single-writer mechanical rather than

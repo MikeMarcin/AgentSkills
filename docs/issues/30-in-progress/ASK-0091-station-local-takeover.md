@@ -12,7 +12,7 @@ metadata: {"milestone_plan":{"id":"station-local-takeover","path":"docs/rfcs/pla
 # Managed station local takeover
 
 Owner-authorized on 2026-09-29; assignment `/root/station_takeover`, mandate
-`station-local-takeover-20260929-v1`, selected coordinator-implementer strategy.
+`station-local-takeover-20260929-v2`, selected coordinator-implementer strategy.
 RFC_BASE_SHA: acc7ac56a588e5b818ee99a117b6e917b07f1930 (pre-source baseline).
 No existing RFC is amended or closed by this bounded follow-up.
 
@@ -39,3 +39,12 @@ AC4: Focused fixture-process and mocked-runtime tests cover paused, crashed, act
 
 [Plan](../../rfcs/plans/station-local-takeover/milestone-plan.json).
 [Durable checkpoint](../../development/station-takeover.md).
+
+
+AC5: The owner amendment is integrated at the exact MASK candidate: normal imports preserve bounded interpreter caches, strict source verification and original preview consent; actual consumer readiness is restored without deleting caches.
+
+Owner amendment v2 (2026-09-29) adds bounded MASK bytecode verification without
+changing the station obligations or execution strategy. MASK-0127 is Done at
+189b218e8f1eaea74467203e4a8ddb2b3ad5f3f4; engineering candidate
+2fcd627c6ef89b0bd0d722a8802adc0ec30485fa. Its public import,
+preview-consent, artifact/recovery and actual readiness observations supply AC5.

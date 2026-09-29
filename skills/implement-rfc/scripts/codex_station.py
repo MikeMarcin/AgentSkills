@@ -1128,3 +1128,58 @@ def release_named_threads(
         client.request("thread/archive", {"threadId": thread_id})
         released.append(f"{thread_id} archived")
     return released
+
+
+def station_activity(client, station):
+    """Observe the exact endpoint on its existing owner server, without loading it."""
+    binding = station.get('codex')
+    thread_id = binding.get('thread_id') if isinstance(binding, dict) else None
+    if not thread_id:
+        raise CodexStationError('Station has no recorded Codex endpoint')
+    thread = _read_thread(client, thread_id, include_turns=True)
+    if (thread.get('id') != thread_id
+            or _normalized_path(thread.get('cwd', '')) != _normalized_path(client.context.source_root)):
+        raise CodexStationError('Stop observation belongs to another task or checkout')
+    turns = _thread_turns(thread, 'station activity')
+    result = client.request('thread/backgroundTerminals/list', {'threadId': thread_id, 'limit': 100})
+    terminals = result.get('data')
+    if (not isinstance(terminals, list) or result.get('nextCursor') is not None
+            or any(not isinstance(item, dict) or not isinstance(item.get('processId'), str) for item in terminals)):
+        raise CodexStationError('Terminal inventory is incomplete; use the owning runtime for recovery')
+    descendants = [receiver for turn in turns for item in turn.get('items', [])
+                   if item.get('type') == 'collabAgentToolCall' for receiver in item.get('receiverThreadIds', [])]
+    return dict(thread_id=thread_id, status=thread.get('status'),
+                active_turns=[turn['id'] for turn in turns if turn.get('status') == 'inProgress'],
+                terminals=terminals, descendants=descendants,
+                unknown_turns=[turn.get('id') for turn in turns if turn.get('status') not in ('inProgress', 'completed', 'interrupted', 'failed')],
+                in_flight_items=[item.get('id') for turn in turns for item in turn.get('items', []) if item.get('status') == 'inProgress'])
+
+
+def stop_station_turns(client, station, *, timeout=8):
+    """Stop turns and background terminals through the existing managed owner proxy.
+
+    Idle is accepted only with complete terminal inventory and no descendant writer.
+    notLoaded/systemError and standalone Desktop servers remain manual recovery.
+    The retired-endpoint hook fence prevents a later turn from regaining authority.
+    """
+    observed = station_activity(client, station)
+    for turn_id in observed['active_turns']:
+        client.request('turn/interrupt', {'threadId': observed['thread_id'], 'turnId': turn_id})
+    for terminal in observed['terminals']:
+        result = client.request('thread/backgroundTerminals/terminate',
+                                {'threadId': observed['thread_id'], 'processId': terminal['processId']})
+        if result.get('terminated') is not True:
+            raise CodexStationError('Recorded background terminal did not confirm termination')
+    deadline = time.monotonic() + timeout
+    while True:
+        observed = station_activity(client, station)
+        quiet = (observed['status'] == {'type': 'idle'} and not observed['active_turns']
+                 and not observed['terminals'] and not observed['descendants']
+                 and not observed['unknown_turns'] and not observed['in_flight_items'])
+        if quiet:
+            return dict(kind='managed-owner-proxy', endpoints={'codex': observed['thread_id']},
+                        writer_stopped=True, commands_stopped=True, observation=observed)
+        if time.monotonic() >= deadline or (isinstance(observed['status'], dict)
+                and observed['status'].get('type') in ('notLoaded', 'systemError')):
+            raise CodexStationError('Owner runtime has not proved idle turns, empty terminals and reconciled descendants; use manual recovery')
+        time.sleep(0.1)
