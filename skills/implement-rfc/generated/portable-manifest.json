@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "968466fca1a6af0eadfb5bc986a88e142ba5d81fe71369be6722d3df889767af"
+      "sha256": "50679bcc73da205bfba583317b24e666b5c2c4ca9be3853fbde169a6a0d006d3"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -106,7 +106,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "26433a625c322331e0f2e5413d44570b94b54f989f8c399cb40b862741a4842f"
+      "sha256": "4030deb378dbee15940ee25db61675eac3d78436a1d81be227b01f82c6ba3834"
     },
     {
       "path": "references/native-coordination.md",
@@ -558,7 +558,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "d3dd086873cfddd153fcecb25dd6ac043a7b851e883df506bb6b8ae49927d3e0"
+      "sha256": "bc2f626579faaac4bb73d037ef8b9e70e64cf7a9921859557548bd4a3e603372"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -602,7 +602,7 @@
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "4d4ebdcf1032867d20407f8a0f5e894d9782faa0d247c57ea33e2ef06e8b6197"
+      "sha256": "e8e9b0894b75338693159a0f1df7922fb32b8b5edf57f08b3324e30cdaaed401"
     },
     {
       "path": "tests/test_strategy_study.py",
@@ -645,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "a51d9b6a7cd602c7",
+  "portable_digest": "52d8322effddd897",
   "schema": "implement-rfc.portable-manifest.v1"
 }
