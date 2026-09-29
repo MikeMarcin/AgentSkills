@@ -82,3 +82,41 @@ Windows stop capability and actual deployment are separate unperformed work. The
 were not made new required live-model acceptance gates. Root owns presenting the
 reviewable BetterPullReview rollout preview and any later authorized deployment.
 No push, publication, credentials, global settings or automatic chat archive.
+
+## Final receipt
+
+AgentSkills engineering: bf257dabf48dde0527dc8e92e012095d71e7126c.
+ASK-0091 Done/acceptance: bb82eb8c32ee14a80ef9cdbcfa9d443690c9be58.
+Exact Git package validation at bf257da: valid passive payload, 166 files,
+1,727,040 bytes, payload digest
+`sha256:901b734823b258fd65d1bb7ef7d06e4afbf449063513a6ab99a1ea1ddb94586a`.
+Milestone checkpoint check returns `stop` at bb82eb8; all assigned obligations and
+five exits have passing evidence, with no required pending acceptance. Engineering
+acceptance is judged by this implementer; the helper reports not-evaluated.
+
+The root's final read-only BetterPullReview dev-link preview is preserved in
+[the rollout receipt](station-takeover-rollout.json). It returns exit 0, ok true,
+changed false, would_change true and no blockers. The reviewed scope is exactly two
+skill link replacements (Codex and Claude) plus a state record, using the canonical
+source checkout. Development preview identity:
+`sha256:48c8c190d3c4adc6b3e9240f6414fbe1b7bcf2124005414dfca0dfb96de01927`;
+review plan hash:
+`sha256:bed2f20f62e348ee3995d2f2b0e4f455247866957fbbe7db63a53ffc645832d7`.
+The preview's development snapshot identity is kept separately from the exact Git
+package identity above. The only warning is target.scope_shadowing: the personal
+skill of the same name remains at its existing version, so actual new-chat loading
+must be observed after any later adoption. No links, MASK state, BetterPullReview
+product files or global configuration were changed by the preview.
+
+All task test/validation commands have exited and all disposable fixture processes
+have been reaped. No review server is running or handed off. The temporary generated
+Codex protocol schema is removed; preserved preview/selection and acceptance receipts
+remain available for coordinator review. The only remaining dirty path in either
+engineering repository is its pre-existing `.mask.lock.json`. Root's read-only
+commands are its own scope and are not stopped here.
+
+Next action: the coordinator presents the reviewed rollout artifact and native-stop
+limitation. Actual adoption and new-chat host-load observation remain pending; this
+assignment performed neither. Current completion observation is kept in the Git
+directory as `implement-rfc-station-takeover-completion.json` alongside the authored
+binding and this public checkpoint.

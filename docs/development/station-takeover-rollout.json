@@ -1,0 +1,41 @@
+{
+  "exit_code": 0,
+  "ok": true,
+  "changed": false,
+  "would_change": true,
+  "actions": [
+    {
+      "kind": "link.create",
+      "path": "/Users/jaeger/Documents/GitHub/BetterPullReview/.agents/skills/implement-rfc",
+      "skill": "implement-rfc",
+      "source": "/Users/jaeger/Documents/GitHub/AgentSkills/skills/implement-rfc",
+      "status": "planned",
+      "target": "codex"
+    },
+    {
+      "kind": "link.create",
+      "path": "/Users/jaeger/Documents/GitHub/BetterPullReview/.claude/skills/implement-rfc",
+      "skill": "implement-rfc",
+      "source": "/Users/jaeger/Documents/GitHub/AgentSkills/skills/implement-rfc",
+      "status": "planned",
+      "target": "claude"
+    },
+    {
+      "kind": "state.record",
+      "status": "planned"
+    }
+  ],
+  "blockers": [],
+  "development": [
+    {
+      "coordinate": "agentskills/implement-rfc",
+      "payload_digest": "sha256:48c8c190d3c4adc6b3e9240f6414fbe1b7bcf2124005414dfca0dfb96de01927",
+      "root": "/Users/jaeger/Documents/GitHub/AgentSkills"
+    }
+  ],
+  "plan_hash": "sha256:bed2f20f62e348ee3995d2f2b0e4f455247866957fbbe7db63a53ffc645832d7",
+  "warning_codes": [
+    "target.scope_shadowing"
+  ],
+  "preview_file": "/tmp/implement-rfc-station-takeover-preview.json"
+}
