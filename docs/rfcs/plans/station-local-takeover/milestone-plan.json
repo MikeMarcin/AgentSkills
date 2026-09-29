@@ -1,0 +1,31 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "station-local-takeover",
+  "scope": {
+    "rfcs": [],
+    "issues": [
+      "ASK-0091"
+    ]
+  },
+  "coverage": "complete",
+  "unplanned_work": [],
+  "milestones": [
+    {
+      "id": "local-takeover",
+      "outcome": "An explicitly managed station can safely transfer to owner-authorized local work without blocking replacement prompts or losing prior work.",
+      "work": [
+        {
+          "issue": "ASK-0091"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "AC1: Ordinary unbound local chats remain unrestricted; managed replacement prompts and exact bounded inspection/recovery commands work while writes require quiescence.",
+        "AC2: JSON status and authorized local takeover preserve history, dirty edits, checkpoints, obligations and strategy, fence retired endpoints durably, serialize transfers and recover interrupted operations.",
+        "AC3: Project, branch, endpoint, envelope and supervisor lease guards remain enforced; fresh launcher contexts work and unsupported stop adapters provide precise manual recovery without guessing inactivity.",
+        "AC4: Focused fixture-process and mocked-runtime tests cover paused, crashed, active, stale, repeated, concurrent, interrupted, dirty and retired writes; two linked consumer compositions, package and documentation gates pass."
+      ],
+      "boundary": "One complete station lifecycle and recovery path; deployment and unsupported native stop remain separately reported."
+    }
+  ]
+}
