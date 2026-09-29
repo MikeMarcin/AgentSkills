@@ -20,6 +20,7 @@ The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarci
 | [writing-for-agents](skills/writing-for-agents/SKILL.md) | Write and review skills, AGENTS.md files and other instructions agents consume. |
 | [instamat-image-to-pbr](skills/instamat-image-to-pbr/SKILL.md) | Prepare and review PBR texture maps with the InstaMAT Pipeline CLI. |
 | [trellis-image-to-3d](skills/trellis-image-to-3d/SKILL.md) | Prepare images and use hosted TRELLIS providers, with offline validation and optional ExampleWorkflow receipts. |
+| [pr-tour](skills/pr-tour/SKILL.md) | Build, edit, rehearse or resume an author's guided GitHub pull-request tour through the `bpr tour` CLI, without publishing on the author's behalf. |
 | [concept-art-approval-pipeline](skills/concept-art-approval-pipeline/SKILL.md) | Produce and review concept-art candidates with exact, persistent approval records. |
 | [sprite-sheet-animation-updater](skills/sprite-sheet-animation-updater/SKILL.md) | Preserve character identity and validate fixed-cell sprite animation layouts. |
 
