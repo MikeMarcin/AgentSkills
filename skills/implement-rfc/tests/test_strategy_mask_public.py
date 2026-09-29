@@ -55,7 +55,7 @@ class StrategyMaskPublicTests(unittest.TestCase):
                         self.assertEqual(roles[('codex', 'rfc-implementer')]['route'],
                                          {'model': 'gpt-6-astra', 'model_reasoning_effort': 'xhigh'})
                         self.assertEqual(roles[('claude', 'rfc-implementer')]['route'],
-                                         {'model': 'claude-opus-5-5', 'effort': 'xhigh'})
+                                         {'model': 'claude-opus-5-5', 'effort': 'high'})
                     else:
                         self.assertEqual(result['roles'], [])
                 selected_roles = mask('status', '--project', root, '--check', '--workflow-profile', 'implement-rfc=planner-worker')

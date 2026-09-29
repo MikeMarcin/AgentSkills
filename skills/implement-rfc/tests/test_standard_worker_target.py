@@ -30,6 +30,6 @@ class StandardWorkerTargetTests(unittest.TestCase):
                                    ('claude', {'model':'claude-opus-5','effort':'xhigh'})]:
             self.assertEqual(routing['providers'][provider]['classes'].pop('integration'), expected)
             implementation = routing['providers'][provider]['classes'].pop('implementation')
-            self.assertEqual(implementation['effort'], 'max' if provider == 'codex' else 'xhigh')
+            self.assertEqual(implementation['effort'], 'xhigh' if provider == 'codex' else 'high')
         self.assertEqual(checker.configuration_findings(roles, routing, target), [])
         self.assertEqual(checker.rendering_findings(ROOT, roles, routing, target), [])

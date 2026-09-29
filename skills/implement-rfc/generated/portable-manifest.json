@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "3095b40d13c2151f108159b495e2e5d09c920aff3076a1ab5ae6b589fb64f90c"
+      "sha256": "968466fca1a6af0eadfb5bc986a88e142ba5d81fe71369be6722d3df889767af"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -106,7 +106,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "f1ac4c8b7b96a024f63c624dca76a5202fa1abbdfd6cfc710c982b918e10cd07"
+      "sha256": "26433a625c322331e0f2e5413d44570b94b54f989f8c399cb40b862741a4842f"
     },
     {
       "path": "references/native-coordination.md",
@@ -558,7 +558,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "05b23f8fe2605e9165ce095661bc7d12821350ddda7d997f95adc43746682a92"
+      "sha256": "d3dd086873cfddd153fcecb25dd6ac043a7b851e883df506bb6b8ae49927d3e0"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -590,7 +590,7 @@
     },
     {
       "path": "tests/test_standard_worker_target.py",
-      "sha256": "e3d35ca929910d993fd4bcfa47c2d97cd33d236a191f3d5aec8a6c729cf05c4f"
+      "sha256": "18f334dbd017b09cf0cfb2769c181232fa24c16bf527412bc277172dff4dfe77"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -602,7 +602,7 @@
     },
     {
       "path": "tests/test_strategy_mask_public.py",
-      "sha256": "5de57dfd62d8252f23b141670bbdd78070ee7791c17fad88976a098c0de3ebdc"
+      "sha256": "4d4ebdcf1032867d20407f8a0f5e894d9782faa0d247c57ea33e2ef06e8b6197"
     },
     {
       "path": "tests/test_strategy_study.py",
@@ -645,6 +645,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "3f3ba31ffec88277",
+  "portable_digest": "a51d9b6a7cd602c7",
   "schema": "implement-rfc.portable-manifest.v1"
 }
