@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0091"
 title: "Managed station local takeover"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: "P1"
