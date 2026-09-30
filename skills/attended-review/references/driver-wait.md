@@ -58,13 +58,14 @@ deterministic tool orchestration and prints no idle updates to the model. The
 12-hour command timeout ends the review wait once; it does not start a retry loop.
 After the process exits, check its exit code before parsing the event JSON.
 
-Qualification must cover the entire stack, including the outer wait. First use
-a disposable review: an intermediate decision must leave the call blocked and
-handback must return once. Then hold an unchanged fixture for six hours, inspect
-recorded model usage, and measure handback-to-return latency on an awake host.
-Require zero idle model requests and target a return within two seconds. A
-successful short probe or accepted timeout parameter does not prove overnight
-support. Record actual runtime/version and results in the consumer continuation.
+Qualification must cover the entire stack, including the outer wait. Use a
+disposable review: an intermediate decision must leave the call blocked and
+handback must return once. Inspect recorded model usage and measure
+handback-to-return latency on an awake host. Require zero idle model requests and
+target a return within two seconds. Record the observed duration and actual
+runtime/version in the consumer continuation; a short probe does not establish
+overnight reliability. Extended idle tests are optional and run only when the
+user requests them. An accepted timeout parameter alone proves no waiting behavior.
 Treat a changed host or an early outer yield as unqualified; do not hide it with
 model-driven re-polling. Native tools with other names require their own observed
 blocking-wait qualification rather than an assumed equivalent.

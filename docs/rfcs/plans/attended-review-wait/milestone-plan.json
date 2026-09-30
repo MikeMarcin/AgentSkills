@@ -10,7 +10,7 @@
       "depends_on": [],
       "exit_criteria": [
         "Canonical attended-review and coordinator instructions preserve host-specific waiting and safe intake.",
-        "Public tests and runtime probes record actual qualification, with manual resume if an uninterrupted six-hour wait cannot be sustained.",
+        "Public tests and bounded runtime probes record actual qualification and safe interruption; overnight reliability remains unverified under the user's amended mandate.",
         "The authorized aito heartbeat is paused and its chat receives the scoped replacement or fallback handoff."
       ],
       "boundary": "Verified instruction correction and scoped aito handoff; no publication or unrelated deployment."

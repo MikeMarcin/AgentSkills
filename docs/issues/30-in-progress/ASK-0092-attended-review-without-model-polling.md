@@ -27,9 +27,10 @@ Direct strategy; no model delegation, publication, or other consumer deployment.
   tool-side polling from model polling, and preserve handback-only intake and
   explicit interruption/manual-resume behavior.
 - ASK-0092-AC02: focused public tests and actual Codex-wrapper probes record
-  truthful evidence. Automatic waiting requires an unchanged six-hour wait with
-  no idle model requests and prompt handback. If the runtime forces intermediate
-  model wakeups, record that limitation and use manual resume instead.
+  truthful evidence: no idle model requests, handback-only return, and safe
+  cancellation. Record the observed duration; overnight reliability remains
+  unverified. If the runtime forces intermediate model wakeups, record that
+  limitation and use manual resume instead.
 - ASK-0092-AC03: pause only the authorized aito heartbeat, preserve the live
   review and pinned engineering workflow, and send its chat one setup message
   describing the qualified wait or the explicit manual-resume fallback.
@@ -44,3 +45,9 @@ Direct strategy; no model delegation, publication, or other consumer deployment.
 The existing Python wait API and session schema remain unchanged. A configured
 timeout is not evidence of an uninterrupted wait. A runtime capability failure
 ends automatic qualification rather than falling back to recurring inference.
+
+Amendment on 2026-09-30: the user cancelled the extended test and waived the
+six-hour prerequisite, choosing to observe overnight behavior during ordinary
+use. Preserve the bounded proof and interruption evidence without claiming
+overnight qualification. The fixture waiter, delayed handback trigger and
+temporary keep-awake process were stopped; no fixture handback was injected.
