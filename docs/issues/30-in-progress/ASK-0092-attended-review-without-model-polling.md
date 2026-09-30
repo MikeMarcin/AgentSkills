@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0092"
 title: "Attended review without model polling"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0003", "RFC-ASK-0014"]
 depends_on: []
 priority: "P1"
