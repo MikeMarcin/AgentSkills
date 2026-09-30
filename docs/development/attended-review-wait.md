@@ -51,7 +51,8 @@ documented interruption/recovery cases, not claimed continuous operation.
   passed after authoring the updated portable digest.
 - `python3 -B scripts/verify_documentation.py --root .`: no structural violations.
 - Passive frozen-Git payload validation: attended-review and implement-rfc both
-  passed at implementation commit `81ed6a6d17c6e6b7831a2af353ba9c7b38af23f3`.
+  passed at implementation commit `81ed6a6d17c6e6b7831a2af353ba9c7b38af23f3` and
+  the amended source commit `15992b600982ae999607f1bc597424e493ef36be`.
 - `git diff --check`: passed.
 
 These are local results. Native Windows waiting and other tool harnesses require
@@ -72,3 +73,12 @@ safe intake/recovery rules. It explicitly retained the pinned 901b strategy,
 engineering delegation, budgets and acceptance; it did not upgrade managed
 copies or grant new acceptance. No other consumers were deployed and nothing
 was pushed or published.
+
+The receiving chat reported that its old server and waiter had already ended,
+then restored the same durable session. Process/state inspection confirmed a new
+waiter with the installed script, cursor 18, handback-only filter and 12-hour
+timeout. Its recorded tool calls show the awaited code-mode cell followed by
+one `functions.wait` at 19:24:04.790 UTC with `yield_time_ms: 43200000`. The review
+remained at sequence 19 with six ready/protected candidates and one saved verdict.
+This verifies that the replacement was armed; the pending live review has not
+yet established overnight reliability or a real-user handback result.

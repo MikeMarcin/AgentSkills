@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0092"
 title: "Attended review without model polling"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P1"
 metadata: {"related_rfcs":["RFC-ASK-0003","RFC-ASK-0014"],"milestone_plan":{"id":"attended-review-wait","path":"docs/rfcs/plans/attended-review-wait/milestone-plan.json"}}
+acceptance: [{"criterion":"ASK-0092-AC01","outcome":"pass","revision":"15992b600982ae999607f1bc597424e493ef36be","evidence":{"kind":"artifact","detail":"Canonical host-wait reference and both coordinator recipes corrected; portable-source and documentation gates passed. Claude persistent-monitor path preserved.","path":"docs/development/attended-review-wait.md"}},{"criterion":"ASK-0092-AC02","outcome":"pass","revision":"15992b600982ae999607f1bc597424e493ef36be","evidence":{"kind":"artifact","detail":"27 public tests passed; actual outer wait blocked 145.532 seconds with no subsequent idle inference and returned 0.103197 seconds after handback. PTY cancellation preserved state. Extended wait interrupted and six-hour prerequisite explicitly waived by user; overnight reliability unverified.","path":"docs/development/attended-review-wait.md"}},{"criterion":"ASK-0092-AC03","outcome":"pass","revision":"15992b600982ae999607f1bc597424e493ef36be","evidence":{"kind":"artifact","detail":"App automation tool confirmed named heartbeat PAUSED. One authorized setup message delivered to the original aito chat with installed waiter, cursor, preserved pinned workflow and amended bounded qualification.","path":"docs/development/attended-review-wait.md"}}]
 ---
 
 # Attended review without model polling
