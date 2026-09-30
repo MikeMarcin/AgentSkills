@@ -212,6 +212,79 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual([(e["kind"], e["candidate"]) for e in decided["events"]], [("decision", "B")])
         self.assertEqual(self.cli("wait", "--after", str(woke["sequence"]), "--kind", "handed-back", "--timeout", "0.3", success=False).returncode, 1)
 
+    @contextmanager
+    def handback_waiter(self, after, root=None):
+        process = subprocess.Popen(
+            self.args("wait", "--after", str(after), "--kind", "handed-back", "--timeout", "10", root=root),
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+        try:
+            yield process
+        finally:
+            if process.poll() is None:
+                process.kill()
+            process.communicate(timeout=5)
+            process.stdout.close()
+            process.stderr.close()
+
+    def test_handback_only_wait_ignores_old_handback_and_partial_decision(self):
+        self.init(self.candidate(), self.candidate("B"))
+        self.cli("prepare")
+        self.cli("hand-back")
+        state = self.cli("start")
+        with self.handback_waiter(state["sequence"]) as process:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                process.communicate(timeout=0.3)
+            self.intake(self.decision(state))
+            with self.assertRaises(subprocess.TimeoutExpired):
+                process.communicate(timeout=0.3)
+            self.cli("hand-back")
+            out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 0, err)
+        woke = json.loads(out)
+        self.assertEqual(woke["session"], state["session"])
+        self.assertEqual([e["kind"] for e in woke["events"]], ["handed-back"])
+        self.assertEqual(woke["events"][0]["decided"], ["A"])
+        self.assertEqual(woke["events"][0]["pending"], ["B"])
+        self.assertEqual(out.count("\n"), 1)
+
+    def test_cancelled_wait_preserves_decisions_protection_and_can_resume(self):
+        self.init(self.candidate(paths=["product.txt"], resources=["install:fixture"]), self.candidate("B"))
+        state = self.cli("prepare")
+        self.intake(self.decision(state))
+        before = self.cli("status")
+        with self.handback_waiter(before["sequence"]) as process:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                process.communicate(timeout=0.3)
+            process.terminate()
+            process.communicate(timeout=5)
+        self.assertNotEqual(process.returncode, 0)
+        self.assertEqual(self.cli("status"), before)
+        self.assertIn("protected paths", json.dumps(self.cli("conflicts", "--paths", "product.txt")))
+        with self.handback_waiter(before["sequence"]) as resumed:
+            self.cli("hand-back")
+            out, err = resumed.communicate(timeout=5)
+        self.assertEqual(resumed.returncode, 0, err)
+        self.assertEqual(json.loads(out)["events"][0]["decided"], ["A"])
+
+    def test_wait_does_not_consume_another_checkout_handback(self):
+        other = self.base / "other-checkout"
+        other.mkdir()
+        self.init(self.candidate())
+        state = self.cli("prepare")
+        self.init(self.candidate("B"), root=other)
+        other_state = self.cli("prepare", root=other)
+        self.assertNotEqual(state["session"], other_state["session"])
+        with self.handback_waiter(state["sequence"]) as process:
+            self.cli("hand-back", root=other)
+            with self.assertRaises(subprocess.TimeoutExpired):
+                process.communicate(timeout=0.3)
+            self.cli("hand-back")
+            out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 0, err)
+        self.assertEqual(json.loads(out)["session"], state["session"])
+        self.assertEqual(json.loads(out)["events"][0]["pending"], ["A"])
+
     def test_new_work_clears_the_previous_hand_back(self):
         self.init(self.candidate())
         state = self.cli("prepare")

@@ -28,10 +28,13 @@ Required human judgment remains pending.
 
 Use local HTML and practical captured evidence. If a server is unavailable, use
 the existing offline export/import path; server absence does not force a different
-acceptance standard. Before ending the turn, arm the attended-review `wait` command
-as a background watch whose exit re-invokes the driver: on Claude Code, `Monitor` with
-`persistent: true`, since a plain background command is capped at ten minutes. A
-hand-back or decision then reaches the coordinator without a human message. Save each
+acceptance standard. Follow attended-review's Driver waiting instructions before
+handing over: Claude uses its persistent monitor; Codex keeps one qualified tool
+call pending on `wait --after SEQUENCE --kind handed-back`. The coordinator owns
+that wait. Partial decisions remain durable without releasing it. If the host
+cannot sustain the call, provide explicit manual resume; recurring model checks
+are not the automatic fallback. Verify the returned session and save the consumed
+cursor after reconciliation, before dispatching further work. Save each
 independent decision durably and preserve unanswered
 items. A partial review or “finish and hand back” signal is not approval of the
 remaining candidates.

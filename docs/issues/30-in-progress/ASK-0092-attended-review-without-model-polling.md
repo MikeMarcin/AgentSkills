@@ -3,9 +3,10 @@ schema: "implement-rfc.card.v1"
 id: "ASK-0092"
 title: "Attended review without model polling"
 status: "In Progress"
-rfcs: ["RFC-ASK-0003", "RFC-ASK-0014"]
+rfcs: []
 depends_on: []
 priority: "P1"
+metadata: {"related_rfcs":["RFC-ASK-0003","RFC-ASK-0014"],"milestone_plan":{"id":"attended-review-wait","path":"docs/rfcs/plans/attended-review-wait/milestone-plan.json"}}
 ---
 
 # Attended review without model polling

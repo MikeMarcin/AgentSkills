@@ -519,7 +519,7 @@ class Session:
         return {"handed_back": self.load()["handed_back"], "decided": decided, "pending": pending}
 
     def wait(self, after=None, kinds=("handed-back", "decision"), timeout=None, interval=0.5):
-        """Block until the human acts. A driver arms this before ending its turn; the exit is its wake.
+        """Block until the human acts; host orchestration determines whether the driver resumes.
 
         Only the file's modification time is polled while idle. The session file
         is read under the ordinary lock, and only when that time has moved.
@@ -734,7 +734,7 @@ def main(argv=None):
     sub.add_parser("html").add_argument("--output", required=True)
     sub.add_parser("pause")
     sub.add_parser("hand-back")
-    p = sub.add_parser("wait", help="Block until the reviewer hands back or decides; arm it as a background watch whose exit wakes the driver"); p.add_argument("--after", type=int, help="Sequence cursor; defaults to the current sequence"); p.add_argument("--kind", action="append", default=[], help="Event kind to wait for (repeatable); default handed-back and decision"); p.add_argument("--timeout", type=float, help="Seconds before giving up with exit 1 and the current sequence")
+    p = sub.add_parser("wait", help="Block until the reviewer hands back or decides; the host owns driver continuation"); p.add_argument("--after", type=int, help="Sequence cursor; defaults to the current sequence"); p.add_argument("--kind", action="append", default=[], help="Event kind to wait for (repeatable); default handed-back and decision"); p.add_argument("--timeout", type=float, help="Seconds before giving up with exit 1 and the current sequence")
     p = sub.add_parser("start"); p.add_argument("--keep-preparing", action="store_true")
     p = sub.add_parser("resume-development"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[]); p.add_argument("--candidate", action="append", default=[]); p.add_argument("--all", action="store_true"); p.add_argument("--preparation-stopped", action="store_true", help="Recovery attestation: driver has verified the interrupted preparation command tree is stopped")
     p = sub.add_parser("conflicts"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[])

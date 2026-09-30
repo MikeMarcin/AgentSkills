@@ -33,11 +33,15 @@ For each milestone:
 4. When required human acceptance is ready, require the implementer to prepare the
    configured attended-review session and start its loopback HTML server. Present the
    complete URL. After the implementer has returned a durable checkpoint and released
-   its writer ownership, arm `wait --after SEQUENCE` through the host's durable
-   background mechanism as `wait --after SEQUENCE --kind handed-back` **before yielding
-   to the user**. The coordinator owns that watch and reads `status --after SEQUENCE`
-   when it wakes; intermediate decisions stay durable without consuming the hand-back
-   watch, so hand-back never depends on another user message.
+   its writer ownership, follow [Attendance](../attendance.md) and the configured
+   attended-review skill's Driver waiting instructions. Arm
+   `wait --after SEQUENCE --kind handed-back` through Claude's persistent monitor
+   or keep one Codex tool call pending in a qualified runtime. The coordinator
+   owns the wait; partial decisions stay durable without releasing it. If no
+   qualified wait is available, give explicit manual-resume instructions instead
+   of recurring model checks. On return, verify the session, read
+   `status --after SEQUENCE`, reconcile intake and persist the consumed cursor
+   before dispatching further work.
 5. Treat an attended-review wait as a context boundary. After hand-back, reconcile
    the recorded candidate, verdicts, protections and command state. If engineering,
    interpretation or upkeep remains, start a **fresh `rfc-implementer`** with the

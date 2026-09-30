@@ -1,0 +1,19 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "attended-review-wait",
+  "scope": {"issues": ["ASK-0092"]},
+  "milestones": [
+    {
+      "id": "wait-correction",
+      "outcome": "Attended review uses a qualified host wait or explicit manual resume, without recurring model polling.",
+      "work": [{"issue": "ASK-0092"}],
+      "depends_on": [],
+      "exit_criteria": [
+        "Canonical attended-review and coordinator instructions preserve host-specific waiting and safe intake.",
+        "Public tests and runtime probes record actual qualification, with manual resume if an uninterrupted six-hour wait cannot be sustained.",
+        "The authorized aito heartbeat is paused and its chat receives the scoped replacement or fallback handoff."
+      ],
+      "boundary": "Verified instruction correction and scoped aito handoff; no publication or unrelated deployment."
+    }
+  ]
+}
