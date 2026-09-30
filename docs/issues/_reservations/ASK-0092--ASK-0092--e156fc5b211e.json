@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0092"
+  ],
+  "reserve_for": "attended-review-no-model-polling",
+  "purpose": "",
+  "created": "2026-09-30T17:48:51.673690+00:00",
+  "base": "f9242afad07bdb61ac7c072bff400f64ec7326c3"
+}
