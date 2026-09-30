@@ -23,9 +23,9 @@ For each milestone:
    references, baseline, prior handoff, permitted effects and a durable return
    location. Give it the shared engineering contract and this recipe. Initial plan
    preparation belongs to this same implementer.
-2. Wait for its result. Forward user amendments. The implementer owns engineering
-   decisions, verification and upkeep; the coordinator tracks scope, child identity,
-   progress and handoffs. A timeout continues the wait for the same child.
+2. Wait for its completion notification without polling its transcript. Forward
+   user amendments. The implementer owns engineering decisions, verification and
+   upkeep; the coordinator tracks scope, child identity, progress and handoffs. A timeout continues the wait for the same child.
 3. For unfinished work or corrections **within this milestone**, resume that same
    implementer, except across an attended-review wait. If native resume is unavailable,
    recover with a fresh implementer only after accounting for the previous owner's

@@ -135,6 +135,7 @@
     "rfc-implementer": {
       "description": "Milestone RFC implementer with complete planning, engineering, verification, integration and upkeep authority, operating as a non-delegating leaf.",
       "mutation": "workspace-write",
+      "background": true,
       "instructions": [
         "Own only the bounded milestone and exclusive repository or worktree scope assigned by the coordinator. Work as a leaf and do not spawn agents.",
         "Read the selected consumer project.json and project.md, every applicable AGENTS.md, the live RFC and cards, the authored milestone plan and current handoff before editing. Preserve user amendments, unfinished obligations and unrelated work.",

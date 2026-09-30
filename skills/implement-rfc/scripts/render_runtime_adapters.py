@@ -105,7 +105,7 @@ def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
         if not isinstance(original, dict):
             raise ValueError(f"role {name} must be an object")
         role = dict(original)
-        allowed = {"description", "mutation", "max_turns", "instructions"}
+        allowed = {"description", "mutation", "max_turns", "instructions", "background"}
         allowed |= {"may_spawn_utility"} if legacy else {"delegation", "entrypoint"}
         if set(role) - allowed:
             raise ValueError(f"unknown fields for role {name}")
@@ -130,6 +130,8 @@ def validate_roles(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
             raise ValueError(f"role {name} needs a description")
         if role.get("mutation") not in MUTATIONS:
             raise ValueError(f"role {name} has invalid mutation")
+        if "background" in role and role["background"] is not True:
+            raise ValueError(f"role {name} has invalid background")
         if name not in UNCAPPED_ROLES or "max_turns" in role:
             if type(role.get("max_turns")) is not int or role["max_turns"] < 1:
                 raise ValueError(f"role {name} has invalid max_turns")
@@ -401,6 +403,7 @@ def render_claude_agent(
         f"model: {q(route['model'])}",
         *([f"permissionMode: {permission_mode}"] if name != INTEGRATOR else []),
         *([f"maxTurns: {role['max_turns']}"] if "max_turns" in role else []),
+        *(["background: true"] if role.get("background") else []),
     ]
     if route.get("effort") is not None:
         frontmatter.append(f"effort: {route['effort']}")

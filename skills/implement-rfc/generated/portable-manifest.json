@@ -22,7 +22,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "9214fe2eba0c2361babf35e0dad3056245e5de26068907ea0f82f7b2b0d67eb3"
+      "sha256": "71a32f4eb2afef97d845c447c50e0d29d47a5d37f2b049fe7af839752c5632c5"
     },
     {
       "path": "config/routing-profiles.json",
@@ -158,7 +158,7 @@
     },
     {
       "path": "references/strategies/coordinator-implementer.md",
-      "sha256": "938b7af9cb09626a5ef209ecdabb4101815b6888fad05e93c46ccee23954e79c"
+      "sha256": "ec61cb447e6bde5f1a951bc8fd83872bc3284d55173ad2a88ef2bbee0cfc7857"
     },
     {
       "path": "references/strategies/coordinator-integrator.md",
@@ -354,7 +354,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "03d2362aff293cd2fc9a36edf69333165a8e39e40e284dfc7b43d4a3fadc102a"
+      "sha256": "3f2021a1ced71e7b8600ab104a6d3ad665aa6bab289a2c2769bb0f25d618d868"
     },
     {
       "path": "scripts/role_usage.py",
@@ -661,6 +661,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "fe991a6b866fbafa",
+  "portable_digest": "699a7d741bff6de0",
   "schema": "implement-rfc.portable-manifest.v1"
 }
