@@ -79,6 +79,10 @@ All deterministic and evaluator commands ended. Temporary test repositories/home
 remotes were removed by their temporary-directory contexts. No worktree or server
 was created. The coordinator returned canonical writer ownership for final acceptance
 and upkeep after all five evaluator assignments quiesced. Actual receipts are now
-durable here; the task-owned tabletop/source-plan scratch is eligible for cleanup.
+durable here; the task-owned tabletop/source-plan scratch was removed after receipt
+identity checks, including both consumed fixture Git repositories and their links.
 The compact run selection/checkpoint remains available to the coordinator for final
 handoff. Source packages have no changes after the accepted source candidate.
+ASK-0093 is Done at `7235132b25e478f2c37afdfe6693598dbf3ded83`; closeout records
+all five actual criterion outcomes. The selected milestone has no remaining
+in-scope obligation. Unrelated unfinished RFCs are preserved.

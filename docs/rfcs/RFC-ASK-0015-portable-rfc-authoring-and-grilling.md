@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0015"
 title: "Portable RFC authoring and optional grilling"
-status: "Implementing"
+status: "Auto-Verified"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
 ---
 
@@ -9,7 +9,7 @@ metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans
 
 The owner approved this integrated source-only milestone on 2026-10-01.
 [ASK-0093](../issues/60-done/ASK-0093-author-rfc-and-grilling-skills.md) implements it;
-[ASK-0094](../issues/30-in-progress/ASK-0094-close-rfc-authoring-skills.md) owns closeout.
+[ASK-0094](../issues/60-done/ASK-0094-close-rfc-authoring-skills.md) owns closeout.
 The [authored plan](plans/rfc-authoring-skills/milestone-plan.json) preserves one
 integrated outcome. Mandate revision: `user-approved-plan-v1`.
 
@@ -115,3 +115,15 @@ handoff. The coordinator supplies independent tabletop evidence and resumes the 
 for repairs and closeout. Structural checks and configuration readiness alone do not
 establish behavior or running-host skill loading. Required acceptance stays pending
 until supplied; no new real-host installation/native qualification is imposed.
+
+## Accepted source outcome
+
+AC01–AC05 pass for `39f02b7c654699e76233b8cfe6f966d915ca74b9`; see
+[actual evidence and coverage limits](../development/rfc-authoring-skills.md).
+Five independent Codex fixture cases and the actual newly authored pack's two-consumer
+public handoff supplied the remaining acceptance. No source repair was needed.
+Native Claude, automatic skill loading and native question tools were unexercised;
+nonsoftware coverage is its initial frontier. Synthetic scoped confirmation is
+test input, not a real human design decision. Source-only delivery and optional
+jsonschema skip remain explicit. Consumed fixture projects are cleaned up; no
+publication/deployment or unrelated closeout was performed.
