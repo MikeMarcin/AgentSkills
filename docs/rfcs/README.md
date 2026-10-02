@@ -37,3 +37,5 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0013 | Auto-Verified | Optional personal storage for the shared implement-rfc workflow |
 
 | RFC-ASK-0014 | Implementing | Selectable execution strategies and real-code experiments |
+
+| RFC-ASK-0015 | Accepted | Portable RFC authoring and optional grilling |

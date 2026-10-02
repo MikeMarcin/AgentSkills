@@ -1,0 +1,117 @@
+---
+id: "RFC-ASK-0015"
+title: "Portable RFC authoring and optional grilling"
+status: "Accepted"
+metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
+---
+
+# Portable RFC authoring and optional grilling
+
+The owner approved this integrated source-only milestone on 2026-10-01.
+[ASK-0093](../issues/20-ready/ASK-0093-author-rfc-and-grilling-skills.md) implements it;
+[ASK-0094](../issues/10-backlog/ASK-0094-close-rfc-authoring-skills.md) owns closeout.
+The [authored plan](plans/rfc-authoring-skills/milestone-plan.json) preserves one
+integrated outcome. Mandate revision: `user-approved-plan-v1`.
+
+## Problem and current behavior
+
+AgentSkills has an execution workflow with an offline milestone schema, validator,
+renderer, typed adoption and consumer binding. It lacks portable proposal authoring
+and interview skills. Matt Pocock's upstream grilling and domain-modeling material
+provides useful interview and terminology disciplines, but its explicit-only metadata,
+mandatory Skill-tool calls, mandatory exploration subagents and project-level document
+writes do not match this library's portable package and authoring boundaries.
+
+## Goals and boundaries
+
+Add `author-rfc -> optional grill-rfc -> implement-rfc` for new proposals and supplied
+ChatGPT-authored packs. Material design decisions are always covered; detailed internal
+implementation design is available for the entire proposal or selected areas on request.
+Grilling is optional per task and adds no execution review gate. Canonical source only:
+no personal/project selections, deployment, publication, pushes, credentials or permission
+changes. MASK program code remains outside this repository's scope.
+
+## Proposed behavior and interfaces
+
+`author-rfc` owns grounding and the artifact contract: new authoring, unadopted revision,
+proposed amendments to adopted material and resume. Read applicable instructions,
+relevant implementation, RFCs, terminology and available consumer context; distinguish
+observed behavior from proposals. Preserve originals, provenance, exact constraints and
+numeric defaults, authored grouping and settled decisions unless an agreed change
+warrants revision. An adopted-plan change identifies the live source, affected
+requirements, rationale and before/after changes; authorized implementation handles
+publication and active-work reconciliation. Replaying adoption over a live plan is
+invalid; source/intent conflicts refuse. `check-amendment` preserves scope, obligations
+and exits; it does not authorize changed requirements.
+
+Drafts contain an overview, RFCs, proposed implementation cards, one proposed closeout
+card per RFC, decision record, implementation entrypoint, canonical milestone JSON,
+generated Markdown view and portable schema. Reuse implement-rfc's offline kit rather
+than inventing an execution schema or planning engine. Resolve companions by skill
+name through host discovery; carry scope, decisions, questions and artifact paths.
+Unavailable capabilities are named and partial work preserved. Drafting needs no
+execution preflight. Authoring uses provisional IDs and canonical card fields/statuses;
+it never allocates live IDs, advances counters, captures RFC_BASE_SHA, claims cards,
+creates acceptance evidence or starts implementation.
+
+RFCs state problem, grounded current behavior, goals/boundaries, proposed behavior and
+interfaces, significant alternatives and stable acceptance, plus specialized detail
+when required. Pack-local decisions record rationale, unresolved questions, explicit
+deferrals, coverage and confirmation, linked to authoritative requirements/acceptance.
+Create pack-local contextual glossaries when needed; propose later project glossary/ADR
+adoption separately. Record a significant ADR when a real tradeoff is hard to reverse
+and surprising without context.
+
+`grill-me` owns shared interview mechanics, with a decision tree and at most three
+independent frontier questions with recommendations per round. Investigate discoverable
+facts directly; wait for explicit answers without autoResolutionMs. Standalone defaults
+to conversation only. `grill-rfc` combines author-rfc artifacts and grill-me mechanics,
+challenging scope, behavior, interfaces, failure cases, compatibility, migrations,
+acceptance, dependencies and milestone outcomes where relevant. After answered rounds,
+propagate decisions/consequences through RFCs, acceptance, cards and milestones and
+regenerate the view. Changed answers reopen affected branches and confirmation while
+preserving unaffected decisions. Finish with a concise shared-understanding summary and
+explicit confirmation. Recommendations remain proposals until answered; focused reviews
+report actual coverage.
+
+Structural validity, design readiness, confirmation and execution eligibility are
+separate. Unanswered material decisions leave affected scope unready. An independently
+ready current milestone may be identified without certifying the whole pack. Canonical
+`coverage`/`unplanned_work` permit partial decomposition of defined requirements; they
+neither settle material questions nor require optional internal design detail.
+
+## Alternatives and decisions
+
+Reuse the existing kit rather than a parallel planning engine. Three skills provide
+independent invocation while keeping interview guidance in grill-me, artifact guidance
+in author-rfc and specialized challenges in grill-rfc. Preserve MIT notices inside
+adapted packages and record upstream revision. Portable frontmatter and host discovery
+replace upstream host-specific invocation controls and mandatory dispatch.
+
+## Acceptance
+
+- **AC01:** author-rfc produces grounded, portable drafts/revisions/amendments with
+  the artifact, readiness, provenance and authority contracts above; no automatic grill.
+- **AC02:** grill-me and grill-rfc preserve explicit-answer interviews, resumed/changed
+  decisions, consequence propagation, focused coverage and explicit confirmation,
+  including standalone nonsoftware use and missing companions.
+- **AC03:** packages validate through disposable MASK fixtures; catalog/provenance and
+  relevant implement-rfc authoring pointers are current, MIT notice/source revision
+  retained, documentation and regenerated portable manifest checks pass.
+- **AC04:** a generated pack completes discovery, actual document/ID remapping,
+  adoption and binding of every milestone in two distinct disposable linked consumer
+  contexts; grouping survives and missing and ambiguous criterion selectors refuse.
+- **AC05:** independent fresh-agent tabletop scenarios exercise new authoring, supplied
+  revision, adopted amendments, interrupted/changed answers, partial decomposition,
+  focused deep review, contradictions, missing companions and nonsoftware grilling.
+  Inspect actual next actions/artifacts; unresolved material decisions keep affected
+  scope unready and declining optional grilling adds no implementation gate. Record
+  actual host coverage and unavailable checks honestly.
+
+## Verification and closeout
+
+The engineering leaf performs deterministic checks and prepares a durable exact-candidate
+handoff. The coordinator supplies independent tabletop evidence and resumes the leaf
+for repairs and closeout. Structural checks and configuration readiness alone do not
+establish behavior or running-host skill loading. Required acceptance stays pending
+until supplied; no new real-host installation/native qualification is imposed.
