@@ -1,0 +1,220 @@
+{
+  "assignment": "RFC-ASK-0015 / rfc-authoring-skills / portable-authoring",
+  "source_candidate_revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+  "acceptance_snapshot_revision": "cb0c9f22e4be9d14f2029fc19f66f9cc225063e1",
+  "observation": {
+    "run_id": "agent-skills-rfc-authoring-20261001",
+    "segment_id": "initial",
+    "mandate_revision": "user-approved-plan-v1",
+    "selection": {
+      "schema": "implement-rfc.strategy-selection.v1",
+      "strategy": "coordinator-implementer",
+      "topology_id": "coordinator-implementer",
+      "recipe_revision": "2",
+      "recipe_fingerprint": "sha256:f798ea0d5a9d86b935f1ffffe53670a9ac2a310037ceac6f960795b91a20b0e3",
+      "routing": {},
+      "requirement_profile": "coordinator-implementer",
+      "owners": {
+        "engineering": "implementer",
+        "bookkeeping": "implementer",
+        "product_edits": "implementer"
+      },
+      "delegation": "recipe",
+      "instruction_paths": [
+        "references/engineering-contract.md",
+        "references/strategies/coordinator-implementer.md"
+      ],
+      "configuration_complete": true,
+      "missing_routes": [],
+      "host_load": "not_verified"
+    },
+    "binding": {
+      "plan_id": "rfc-authoring-skills",
+      "plan_path": "docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json",
+      "milestone_id": "portable-authoring",
+      "definition_fingerprint": "sha256:e99c3a438659e6051e7a9281950dd110c0e242ecac7d6c2dc1dbf9bf287fd136",
+      "obligations": [
+        {
+          "id": "ASK-0093:*",
+          "source": "ASK-0093",
+          "selector": null,
+          "source_fingerprint": "sha256:0cba7bcd5a22d69c3e4d7e2b8679c786afd22a1768041344af69f5c3c9ef5607"
+        },
+        {
+          "id": "ASK-0094:*",
+          "source": "ASK-0094",
+          "selector": null,
+          "source_fingerprint": "sha256:fbecedac9d147d93f627c862e7859a7173a230719767a5a77aa732b3e2ca6617"
+        }
+      ],
+      "obligation_fingerprint": "sha256:d3aae581b668bb299b55000f81d84c7538627317086e24c74f24fed2c5881200",
+      "exit_criteria": [
+        {
+          "id": "portable-authoring:exit:1",
+          "text": "AC01\u2013AC05 pass on the exact canonical candidate, including coordinator-supplied independent behavioral acceptance."
+        },
+        {
+          "id": "portable-authoring:exit:2",
+          "text": "Source-only integration, documentation, local commits and task-owned temporary command cleanup are complete."
+        }
+      ],
+      "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "structural": "valid",
+      "references": "resolved",
+      "semantic_coverage": "unknown",
+      "diagnostics": [],
+      "diagnostics_truncated": false
+    },
+    "milestone": "portable-authoring",
+    "disposition": "pack-complete",
+    "candidate_revision": "cb0c9f22e4be9d14f2029fc19f66f9cc225063e1",
+    "handoff_ref": "docs/development/rfc-authoring-skills.md",
+    "ownership": "quiescent",
+    "required_pending": [],
+    "evidence_refs": [
+      "docs/development/rfc-authoring-skills.md",
+      "docs/development/rfc-authoring-skills-evidence.json",
+      "docs/development/rfc-authoring-skills-independent.json",
+      "docs/development/rfc-authoring-skills-fresh-handoff.json"
+    ],
+    "acceptance_records": [
+      {
+        "id": "ASK-0093:*",
+        "outcome": "pass",
+        "evidence_refs": [
+          "docs/development/rfc-authoring-skills.md",
+          "docs/development/rfc-authoring-skills-evidence.json",
+          "docs/development/rfc-authoring-skills-independent.json",
+          "docs/development/rfc-authoring-skills-fresh-handoff.json"
+        ]
+      },
+      {
+        "id": "ASK-0094:*",
+        "outcome": "pass",
+        "evidence_refs": [
+          "docs/development/rfc-authoring-skills.md",
+          "docs/development/rfc-authoring-skills-evidence.json",
+          "docs/development/rfc-authoring-skills-independent.json",
+          "docs/development/rfc-authoring-skills-fresh-handoff.json"
+        ]
+      },
+      {
+        "id": "portable-authoring:exit:1",
+        "outcome": "pass",
+        "evidence_refs": [
+          "docs/development/rfc-authoring-skills.md",
+          "docs/development/rfc-authoring-skills-evidence.json",
+          "docs/development/rfc-authoring-skills-independent.json",
+          "docs/development/rfc-authoring-skills-fresh-handoff.json"
+        ]
+      },
+      {
+        "id": "portable-authoring:exit:2",
+        "outcome": "pass",
+        "evidence_refs": [
+          "docs/development/rfc-authoring-skills.md",
+          "docs/development/rfc-authoring-skills-evidence.json",
+          "docs/development/rfc-authoring-skills-independent.json",
+          "docs/development/rfc-authoring-skills-fresh-handoff.json"
+        ]
+      }
+    ],
+    "continuation": {
+      "intent": "stop",
+      "next_milestone": null,
+      "reason": "target-complete",
+      "detail": "All source criteria, required independent observations, both card finishes, terminal baseline-format repair, final passing documentation gate and consumed fixture cleanup are complete. Only this selected source-only RFC/milestone is closed."
+    }
+  },
+  "checkpoint_check": {
+    "action": "report-closeout",
+    "detail": "All source criteria, required independent observations, both card finishes, terminal baseline-format repair, final passing documentation gate and consumed fixture cleanup are complete. Only this selected source-only RFC/milestone is closed.",
+    "engineering_acceptance": "not-evaluated"
+  },
+  "criterion_records": [
+    {
+      "criterion": "AC01",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Actual new portable pack, revisions through r5 and adopted amendment preserve artifact, readiness and authority contracts.",
+        "path": "docs/development/rfc-authoring-skills-independent.json"
+      }
+    },
+    {
+      "criterion": "AC02",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Actual dependent rounds, partial/changed answers, artifact propagation, material deferrals, exact scoped synthetic confirmation and standalone/missing-companion behavior observed.",
+        "path": "docs/development/rfc-authoring-skills-independent.json"
+      }
+    },
+    {
+      "criterion": "AC03",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Disposable MASK package validation, documentation and regenerated portable-source checks pass; MIT provenance/catalog/pointers verified.",
+        "path": "docs/development/rfc-authoring-skills-evidence.json"
+      }
+    },
+    {
+      "criterion": "AC04",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Actual independently generated partial pack passes 18 public commands in two linked consumers; every current milestone binds and typed future work/grouping survive. Missing and ambiguous selectors refuse in prior focused tests.",
+        "path": "docs/development/rfc-authoring-skills-fresh-handoff.json"
+      }
+    },
+    {
+      "criterion": "AC05",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Coordinator supplied five fresh-agent cases covering ten requested situations; actual receipts/hashes/confirmation audited, with declared host and nonsoftware coverage limits.",
+        "path": "docs/development/rfc-authoring-skills-independent.json"
+      }
+    }
+  ],
+  "card_statuses": {
+    "ASK-0093": "Done",
+    "ASK-0094": "Done"
+  },
+  "rfc_status": "Auto-Verified",
+  "cleanup": {
+    "removed": [
+      {
+        "path": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop",
+        "files": 202,
+        "reason": "Consumed task-owned temporary fixture/project inputs and outputs; actual receipts retained in canonical development evidence."
+      },
+      {
+        "path": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/source-plan",
+        "files": 1,
+        "reason": "Consumed task-owned temporary fixture/project inputs and outputs; actual receipts retained in canonical development evidence."
+      }
+    ],
+    "commands_running": [],
+    "servers": [],
+    "worktrees_created": [],
+    "retained": "Compact workflow/run/checkpoint and receipt JSON; no test checkout retained."
+  },
+  "scope_complete": true,
+  "required_pending": [],
+  "next_action": "Coordinator reports the completed selected source-only milestone; unrelated work remains unchanged.",
+  "limits": [
+    "Fixture inventory/direct reads; automatic host loading unexercised",
+    "Native Claude and native question tools unexercised",
+    "Nonsoftware initial frontier only",
+    "Confirmation is scoped synthetic test input",
+    "Optional jsonschema test skipped",
+    "No actual selections, deployment, product implementation, push or publication"
+  ]
+}

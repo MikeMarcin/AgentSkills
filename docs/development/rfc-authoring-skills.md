@@ -92,3 +92,9 @@ wrapped baseline field, although its actual pre-implementation SHA was recorded.
 The field now uses the gate's plain-SHA format; the failed receipt is retained in
 the command evidence JSON. This is bookkeeping formatting, with no baseline value,
 source acceptance or source-package change.
+The recorded final recheck passes at
+`cb0c9f22e4be9d14f2029fc19f66f9cc225063e1`: 15 RFCs, 94 cards, zero violations.
+[The completion snapshot](rfc-authoring-skills-completion.json) binds the accepted
+obligations/exits, selected recipe/run/mandate and actual criterion receipts. Both
+cards are Done and RFC-ASK-0015 is Auto-Verified. Later evidence-only commits do not
+change the accepted source bytes or the gate's tracker inputs.

@@ -67,6 +67,19 @@
         "stdout_tail": "15 RFCs, 94 cards; 1 structural violations\n",
         "stderr_tail": "ERROR terminal RFC lacks real baseline RFC-ASK-0015\n"
       }
+    },
+    {
+      "criterion": "final-documentation",
+      "outcome": "pass",
+      "revision": "cb0c9f22e4be9d14f2029fc19f66f9cc225063e1",
+      "evidence": {
+        "kind": "command",
+        "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+        "exit_code": 0,
+        "elapsed_seconds": 0.178,
+        "stdout_tail": "15 RFCs, 94 cards; 0 structural violations\n",
+        "stderr_tail": ""
+      }
     }
   ]
 }
