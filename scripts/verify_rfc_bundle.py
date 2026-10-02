@@ -12,13 +12,14 @@ import tempfile
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mask-program', type=Path, required=True)
+    parser.add_argument('--source-revision', help='Exact committed source candidate (defaults to HEAD)')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     source = Path(__file__).resolve().parents[1]
     program = args.mask_program.resolve()
     def git(root, *words):
         return subprocess.run(['git', '-C', str(root), *map(str, words)], check=True, capture_output=True, text=True).stdout.strip()
-    revision = git(source, 'rev-parse', 'HEAD')
+    revision = git(source, 'rev-parse', '--verify', (args.source_revision or 'HEAD') + '^{commit}')
     index = json.loads(git(source, 'show', revision + ':mask-source.json'))
     expected = {path.split('/')[1]: '/'.join(path.split('/')[:-1]) for path in git(source, 'ls-tree', '-r', '--name-only', revision, 'skills').splitlines()
                 if path.endswith('/SKILL.md') and len(path.split('/')) == 3}
@@ -46,7 +47,7 @@ def main():
             assert run.returncode == 0 and not run.stderr and result['ok'], (words, run.returncode, result, run.stderr)
             commands.append(dict(argv=list(map(str, words)), exit_code=run.returncode))
             return result
-        mask('tap', 'agentskills', upstream)
+        mask('tap', 'agentskills', upstream, '--ref', revision)
         mask('tap', 'fetch', 'agentskills')
         catalog = mask('search')['data']['skills']
         assert {row['id']: row['path'] for row in catalog} == expected
