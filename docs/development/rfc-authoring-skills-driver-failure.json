@@ -1,0 +1,61 @@
+{
+  "state": "fail",
+  "failure": "'/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/ledger.py' is not in the subpath of '/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring'",
+  "pack": "/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export",
+  "pack_sha256": {
+    "DECISIONS.md": "68987b88832f750006a908e2af426da2e568207874f94e3c0b24db5754ac978b",
+    "GLOSSARY.md": "4e5883fd870b3fee3669d75672011065181146f40ca69afb438c02772528f299",
+    "IMPLEMENTATION_PROMPT.md": "8b0dba2185c4e9b50fa07fe9992d27d6a220d4f3cea5369d7525a582951024ec",
+    "MILESTONES.md": "baf669f86fea2370f017e597a4bbba47d59cbefd7ac92b8c73a006f2263eac64",
+    "README.md": "578e92629aa26e76b897186e37479a41beaba571ee054b01cb0ac74e5714252a",
+    "cards/DRAFT-0001-protect-destination.md": "141b323583e1f64fdeaca93bbcff4938583e8cd1f42d233c3b1d0bbdddcb1b2b",
+    "cards/DRAFT-0002-limit-csv-size.md": "022d52fd8aa9ce925cf99f2309a95285814d2346254bb78ca803691e1167a659",
+    "cards/DRAFT-0003-enforce-timeout.md": "67b1e97d3ef8b46fc74b5b47482db34dfc1fb37968466d730618356e683eb58c",
+    "cards/DRAFT-0004-closeout-single-file.md": "f221e40d82f7ebccd00a034d851c3c2839a982c3f583b271eb382357b301ea08",
+    "cards/DRAFT-0005-closeout-batch-resume.md": "d29d0845065466ba4d88f5c15bdbd68b088e43c845612fcbd168e965186ea797",
+    "checks/artifact-audit.txt": "73458fc9a5e8e80d5f9c75447ef44895264d5cd9b3936f4fef6d58420caf1bc9",
+    "checks/render-check.txt": "01171b92855ce99e08094d5f8e4026d897df364ac384eb318c0f0c27b47697ae",
+    "checks/source-baseline.json": "64d61b89025fecf798cbd264900907f8902d6cd1b28218f416849f8af9562cea",
+    "checks/structural-validation.txt": "fbbb61603aea847659ad9a4362add3b657fae55d6001ca598431c5c6e6a2a986",
+    "milestone-plan.json": "0650a4c5c7f44d06268143876b0106bd07bff02b1c7acac6a8332fefe5c0415d",
+    "milestone-plan.schema.json": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+    "rfcs/RFC-DRAFT-0001-safe-single-file-export.md": "6f1bbd60e08387f4bf3c4fc2f5a8e2bd4574d9b655794dca3eafd0bc0f9a5c32",
+    "rfcs/RFC-DRAFT-0002-batch-resume-export.md": "1fa8d99e5c8d3469a37b0b5a13577594f0895d18dd3b2ee2e55def6cca8d0d31"
+  },
+  "commands": [
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-9ank333u/alpha/.agents/skills/implement-rfc/examples/milestone-plans/validate.py",
+        "/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/milestone-plan.json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-9ank333u",
+      "exit_code": 0,
+      "elapsed_seconds": 0.037,
+      "stdout": "Structurally valid; references and semantic coverage unchecked.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-9ank333u/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-9ank333u/alpha",
+        "discover",
+        "--source-root",
+        "/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-9ank333u",
+      "exit_code": 0,
+      "elapsed_seconds": 0.091,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/milestone-plan.json\", \"origin\": \"root\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"]}\n",
+      "stderr": ""
+    }
+  ],
+  "consumer_outcomes": [],
+  "canonical_source_read_only": true,
+  "cleanup": "TemporaryDirectory cleanup ran; no source repair attempted."
+}

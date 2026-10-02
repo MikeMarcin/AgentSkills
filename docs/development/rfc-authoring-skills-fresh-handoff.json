@@ -1,0 +1,873 @@
+{
+  "state": "pass",
+  "candidate_revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+  "pack": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export",
+  "pack_sha256": {
+    "DECISIONS.md": "68987b88832f750006a908e2af426da2e568207874f94e3c0b24db5754ac978b",
+    "GLOSSARY.md": "4e5883fd870b3fee3669d75672011065181146f40ca69afb438c02772528f299",
+    "IMPLEMENTATION_PROMPT.md": "8b0dba2185c4e9b50fa07fe9992d27d6a220d4f3cea5369d7525a582951024ec",
+    "MILESTONES.md": "baf669f86fea2370f017e597a4bbba47d59cbefd7ac92b8c73a006f2263eac64",
+    "README.md": "578e92629aa26e76b897186e37479a41beaba571ee054b01cb0ac74e5714252a",
+    "cards/DRAFT-0001-protect-destination.md": "141b323583e1f64fdeaca93bbcff4938583e8cd1f42d233c3b1d0bbdddcb1b2b",
+    "cards/DRAFT-0002-limit-csv-size.md": "022d52fd8aa9ce925cf99f2309a95285814d2346254bb78ca803691e1167a659",
+    "cards/DRAFT-0003-enforce-timeout.md": "67b1e97d3ef8b46fc74b5b47482db34dfc1fb37968466d730618356e683eb58c",
+    "cards/DRAFT-0004-closeout-single-file.md": "f221e40d82f7ebccd00a034d851c3c2839a982c3f583b271eb382357b301ea08",
+    "cards/DRAFT-0005-closeout-batch-resume.md": "d29d0845065466ba4d88f5c15bdbd68b088e43c845612fcbd168e965186ea797",
+    "checks/artifact-audit.txt": "73458fc9a5e8e80d5f9c75447ef44895264d5cd9b3936f4fef6d58420caf1bc9",
+    "checks/render-check.txt": "01171b92855ce99e08094d5f8e4026d897df364ac384eb318c0f0c27b47697ae",
+    "checks/source-baseline.json": "64d61b89025fecf798cbd264900907f8902d6cd1b28218f416849f8af9562cea",
+    "checks/structural-validation.txt": "fbbb61603aea847659ad9a4362add3b657fae55d6001ca598431c5c6e6a2a986",
+    "milestone-plan.json": "0650a4c5c7f44d06268143876b0106bd07bff02b1c7acac6a8332fefe5c0415d",
+    "milestone-plan.schema.json": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+    "rfcs/RFC-DRAFT-0001-safe-single-file-export.md": "6f1bbd60e08387f4bf3c4fc2f5a8e2bd4574d9b655794dca3eafd0bc0f9a5c32",
+    "rfcs/RFC-DRAFT-0002-batch-resume-export.md": "1fa8d99e5c8d3469a37b0b5a13577594f0895d18dd3b2ee2e55def6cca8d0d31"
+  },
+  "commands": [
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/examples/milestone-plans/validate.py",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/milestone-plan.json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.039,
+      "stdout": "Structurally valid; references and semantic coverage unchecked.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+        "discover",
+        "--source-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.1,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/milestone-plan.json\", \"origin\": \"root\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "add",
+        ".mask",
+        "docs/rfcs",
+        "docs/items"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+      "exit_code": 0,
+      "elapsed_seconds": 0.024,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "commit",
+        "-m",
+        "Import actual fresh-authored documents with fixture remapping"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+      "exit_code": 0,
+      "elapsed_seconds": 0.025,
+      "stdout": "[main 5c6fe85] Import actual fresh-authored documents with fixture remapping\n 29 files changed, 1143 insertions(+), 1 deletion(-)\n create mode 100644 docs/items/10-backlog/FAL-0001-protect-destination.md\n create mode 100644 docs/items/10-backlog/FAL-0002-limit-csv-size.md\n create mode 100644 docs/items/10-backlog/FAL-0003-enforce-timeout.md\n create mode 100644 docs/items/10-backlog/FAL-0004-closeout-single-file.md\n create mode 100644 docs/items/10-backlog/FAL-0005-closeout-batch-resume.md\n create mode 100644 docs/items/NEXT_ID\n create mode 100644 docs/rfcs/RFC-FAL-0001-safe-single-file-export.md\n create mode 100644 docs/rfcs/RFC-FAL-0002-batch-resume-export.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/context/ledger.py\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/DECISIONS.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/GLOSSARY.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/IMPLEMENTATION_PROMPT.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/MILESTONES.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/README.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/cards/DRAFT-0001-protect-destination.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/cards/DRAFT-0002-limit-csv-size.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/cards/DRAFT-0003-enforce-timeout.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/cards/DRAFT-0004-closeout-single-file.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/cards/DRAFT-0005-closeout-batch-resume.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/checks/artifact-audit.txt\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/checks/render-check.txt\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/checks/source-baseline.json\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/checks/structural-validation.txt\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/map.json\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/milestone-plan.json\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/milestone-plan.schema.json\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/rfcs/RFC-DRAFT-0001-safe-single-file-export.md\n create mode 100644 docs/rfcs/assets/fresh-authoring/pack/rfcs/RFC-DRAFT-0002-batch-resume-export.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+        "adopt",
+        "--source-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/docs/rfcs/assets/fresh-authoring/pack",
+        "--id-map",
+        "map.json",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.092,
+      "stdout": "{\"state\": \"adopted\", \"plan_id\": \"safe-ledger-export\", \"plan_path\": \"docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"structural\": \"valid\", \"references\": \"unchecked\", \"semantic_coverage\": \"unknown\", \"next\": \"bind selected milestone to resolve criteria\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+        "discover",
+        "--target",
+        "RFC-FAL-0001",
+        "--target",
+        "RFC-FAL-0002",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.091,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"origin\": \"live\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+        "bind",
+        "--target",
+        "RFC-FAL-0001",
+        "--milestone",
+        "safe-single-file-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.145,
+      "stdout": "{\"plan_id\": \"safe-ledger-export\", \"plan_path\": \"docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"milestone_id\": \"safe-single-file-export\", \"definition_fingerprint\": \"sha256:9d9df432f4dfa3d1fd702120c716cc9883766672b93d76f6603a5c48fb2b527e\", \"obligations\": [{\"id\": \"RFC-FAL-0001:AC01\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC01\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}, {\"id\": \"RFC-FAL-0001:AC02\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC02\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}, {\"id\": \"RFC-FAL-0001:AC03\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC03\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}, {\"id\": \"RFC-FAL-0001:AC04\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC04\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}], \"obligation_fingerprint\": \"sha256:2a06ed22a49465ff2dbe98180a9fd20df478070ef0ea756142e5f7c3a00a9ae8\", \"exit_criteria\": [{\"id\": \"safe-single-file-export:exit:1\", \"text\": \"AC01: Existing destinations are refused unchanged through the public export entrypoint.\"}, {\"id\": \"safe-single-file-export:exit:2\", \"text\": \"AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\"}, {\"id\": \"safe-single-file-export:exit:3\", \"text\": \"AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\"}, {\"id\": \"safe-single-file-export:exit:4\", \"text\": \"AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\"}, {\"id\": \"safe-single-file-export:exit:5\", \"text\": \"Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\"}], \"prerequisite_fingerprint\": \"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\", \"structural\": \"valid\", \"references\": \"resolved\", \"semantic_coverage\": \"unknown\", \"diagnostics\": [], \"diagnostics_truncated\": false, \"work\": [{\"rfc\": \"RFC-FAL-0001\", \"criteria\": [\"AC01\", \"AC02\", \"AC03\", \"AC04\"]}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+        "inspect",
+        "--target",
+        "RFC-FAL-0001",
+        "--milestone",
+        "safe-single-file-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.142,
+      "stdout": "{\"plan_id\": \"safe-ledger-export\", \"plan_path\": \"docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"milestone_id\": \"safe-single-file-export\", \"definition_fingerprint\": \"sha256:9d9df432f4dfa3d1fd702120c716cc9883766672b93d76f6603a5c48fb2b527e\", \"obligations\": [{\"id\": \"RFC-FAL-0001:AC01\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC01\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}, {\"id\": \"RFC-FAL-0001:AC02\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC02\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}, {\"id\": \"RFC-FAL-0001:AC03\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC03\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}, {\"id\": \"RFC-FAL-0001:AC04\", \"source\": \"RFC-FAL-0001\", \"selector\": \"AC04\", \"source_fingerprint\": \"sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087\"}], \"obligation_fingerprint\": \"sha256:2a06ed22a49465ff2dbe98180a9fd20df478070ef0ea756142e5f7c3a00a9ae8\", \"exit_criteria\": [{\"id\": \"safe-single-file-export:exit:1\", \"text\": \"AC01: Existing destinations are refused unchanged through the public export entrypoint.\"}, {\"id\": \"safe-single-file-export:exit:2\", \"text\": \"AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\"}, {\"id\": \"safe-single-file-export:exit:3\", \"text\": \"AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\"}, {\"id\": \"safe-single-file-export:exit:4\", \"text\": \"AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\"}, {\"id\": \"safe-single-file-export:exit:5\", \"text\": \"Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\"}], \"prerequisite_fingerprint\": \"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\", \"structural\": \"valid\", \"references\": \"resolved\", \"semantic_coverage\": \"unknown\", \"diagnostics\": [], \"diagnostics_truncated\": false, \"work\": [{\"rfc\": \"RFC-FAL-0001\", \"criteria\": [\"AC01\", \"AC02\", \"AC03\", \"AC04\"]}], \"planning\": {\"issues\": [], \"unplanned_work\": [{\"rfc\": \"RFC-FAL-0002\", \"criteria\": [\"AC05\", \"AC06\", \"AC07\", \"AC08\", \"AC09\", \"AC10\"]}], \"acceptance\": \"unknown\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha",
+        "render",
+        "--target",
+        "RFC-FAL-0001",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.089,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"origin\": \"live\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"], \"view\": \"# Milestones\\n\\n> Generated from `milestone-plan.json`; edit the JSON, not this view.\\n\\nPlan: **safe-ledger-export** \u00b7 Coverage: **partial**\\n\\nThese are integration outcomes, not compulsory agent-launch boundaries.\\n\\n## safe-single-file-export\\n\\nThe existing ledger export entrypoint produces bounded CSV files, preserves existing destinations, and enforces a 30-second job timeout.\\n\\n**Work:** `RFC-FAL-0001` [AC01, AC02, AC03, AC04]\\n\\n**Prerequisites:** None\\n\\n**Completion:**\\n\\n- AC01: Existing destinations are refused unchanged through the public export entrypoint.\\n- AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\\n- AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\\n- AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\\n- Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\\n\\n**Boundary:** Fully decomposed single-file export outcome with proposed implementation cards and closeout. Defined batch/resume requirements remain represented as unplanned_work for later decomposition.\\n\\n## Required work not yet decomposed\\n\\n```json\\n[\\n  {\\n    \\\"rfc\\\": \\\"RFC-FAL-0002\\\",\\n    \\\"criteria\\\": [\\n      \\\"AC05\\\",\\n      \\\"AC06\\\",\\n      \\\"AC07\\\",\\n      \\\"AC08\\\",\\n      \\\"AC09\\\",\\n      \\\"AC10\\\"\\n    ]\\n  }\\n]\\n```\\n\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/examples/milestone-plans/validate.py",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/milestone-plan.json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.031,
+      "stdout": "Structurally valid; references and semantic coverage unchecked.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+        "discover",
+        "--source-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.09,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/milestone-plan.json\", \"origin\": \"root\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "add",
+        ".mask",
+        "design/specifications",
+        "work/cards"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+      "exit_code": 0,
+      "elapsed_seconds": 0.026,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "commit",
+        "-m",
+        "Import actual fresh-authored documents with fixture remapping"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+      "exit_code": 0,
+      "elapsed_seconds": 0.026,
+      "stdout": "[main 2da280c] Import actual fresh-authored documents with fixture remapping\n 29 files changed, 1143 insertions(+), 1 deletion(-)\n create mode 100644 design/specifications/RFC-FBE-0001-safe-single-file-export.md\n create mode 100644 design/specifications/RFC-FBE-0002-batch-resume-export.md\n create mode 100644 design/specifications/assets/fresh-authoring/context/ledger.py\n create mode 100644 design/specifications/assets/fresh-authoring/pack/DECISIONS.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/GLOSSARY.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/IMPLEMENTATION_PROMPT.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/MILESTONES.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/README.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/cards/DRAFT-0001-protect-destination.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/cards/DRAFT-0002-limit-csv-size.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/cards/DRAFT-0003-enforce-timeout.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/cards/DRAFT-0004-closeout-single-file.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/cards/DRAFT-0005-closeout-batch-resume.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/checks/artifact-audit.txt\n create mode 100644 design/specifications/assets/fresh-authoring/pack/checks/render-check.txt\n create mode 100644 design/specifications/assets/fresh-authoring/pack/checks/source-baseline.json\n create mode 100644 design/specifications/assets/fresh-authoring/pack/checks/structural-validation.txt\n create mode 100644 design/specifications/assets/fresh-authoring/pack/map.json\n create mode 100644 design/specifications/assets/fresh-authoring/pack/milestone-plan.json\n create mode 100644 design/specifications/assets/fresh-authoring/pack/milestone-plan.schema.json\n create mode 100644 design/specifications/assets/fresh-authoring/pack/rfcs/RFC-DRAFT-0001-safe-single-file-export.md\n create mode 100644 design/specifications/assets/fresh-authoring/pack/rfcs/RFC-DRAFT-0002-batch-resume-export.md\n create mode 100644 work/cards/10-backlog/FBE-0001-protect-destination.md\n create mode 100644 work/cards/10-backlog/FBE-0002-limit-csv-size.md\n create mode 100644 work/cards/10-backlog/FBE-0003-enforce-timeout.md\n create mode 100644 work/cards/10-backlog/FBE-0004-closeout-single-file.md\n create mode 100644 work/cards/10-backlog/FBE-0005-closeout-batch-resume.md\n create mode 100644 work/cards/NEXT_ID\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+        "adopt",
+        "--source-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/design/specifications/assets/fresh-authoring/pack",
+        "--id-map",
+        "map.json",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.098,
+      "stdout": "{\"state\": \"adopted\", \"plan_id\": \"safe-ledger-export\", \"plan_path\": \"design/specifications/plans/safe-ledger-export/milestone-plan.json\", \"structural\": \"valid\", \"references\": \"unchecked\", \"semantic_coverage\": \"unknown\", \"next\": \"bind selected milestone to resolve criteria\"}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+        "discover",
+        "--target",
+        "RFC-FBE-0001",
+        "--target",
+        "RFC-FBE-0002",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.091,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/design/specifications/plans/safe-ledger-export/milestone-plan.json\", \"origin\": \"live\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+        "bind",
+        "--target",
+        "RFC-FBE-0001",
+        "--milestone",
+        "safe-single-file-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.15,
+      "stdout": "{\"plan_id\": \"safe-ledger-export\", \"plan_path\": \"design/specifications/plans/safe-ledger-export/milestone-plan.json\", \"milestone_id\": \"safe-single-file-export\", \"definition_fingerprint\": \"sha256:239b6b3cb680a994f6a308e073cf9f7d316d3959ad1d8da065e9fbf14ec5843d\", \"obligations\": [{\"id\": \"RFC-FBE-0001:AC01\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC01\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}, {\"id\": \"RFC-FBE-0001:AC02\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC02\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}, {\"id\": \"RFC-FBE-0001:AC03\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC03\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}, {\"id\": \"RFC-FBE-0001:AC04\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC04\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}], \"obligation_fingerprint\": \"sha256:5dcbb6b3507c24e082b3cd48ab2d03abb1165f2eff389f4221b4785766e33d06\", \"exit_criteria\": [{\"id\": \"safe-single-file-export:exit:1\", \"text\": \"AC01: Existing destinations are refused unchanged through the public export entrypoint.\"}, {\"id\": \"safe-single-file-export:exit:2\", \"text\": \"AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\"}, {\"id\": \"safe-single-file-export:exit:3\", \"text\": \"AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\"}, {\"id\": \"safe-single-file-export:exit:4\", \"text\": \"AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\"}, {\"id\": \"safe-single-file-export:exit:5\", \"text\": \"Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\"}], \"prerequisite_fingerprint\": \"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\", \"structural\": \"valid\", \"references\": \"resolved\", \"semantic_coverage\": \"unknown\", \"diagnostics\": [], \"diagnostics_truncated\": false, \"work\": [{\"rfc\": \"RFC-FBE-0001\", \"criteria\": [\"AC01\", \"AC02\", \"AC03\", \"AC04\"]}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+        "inspect",
+        "--target",
+        "RFC-FBE-0001",
+        "--milestone",
+        "safe-single-file-export",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.183,
+      "stdout": "{\"plan_id\": \"safe-ledger-export\", \"plan_path\": \"design/specifications/plans/safe-ledger-export/milestone-plan.json\", \"milestone_id\": \"safe-single-file-export\", \"definition_fingerprint\": \"sha256:239b6b3cb680a994f6a308e073cf9f7d316d3959ad1d8da065e9fbf14ec5843d\", \"obligations\": [{\"id\": \"RFC-FBE-0001:AC01\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC01\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}, {\"id\": \"RFC-FBE-0001:AC02\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC02\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}, {\"id\": \"RFC-FBE-0001:AC03\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC03\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}, {\"id\": \"RFC-FBE-0001:AC04\", \"source\": \"RFC-FBE-0001\", \"selector\": \"AC04\", \"source_fingerprint\": \"sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32\"}], \"obligation_fingerprint\": \"sha256:5dcbb6b3507c24e082b3cd48ab2d03abb1165f2eff389f4221b4785766e33d06\", \"exit_criteria\": [{\"id\": \"safe-single-file-export:exit:1\", \"text\": \"AC01: Existing destinations are refused unchanged through the public export entrypoint.\"}, {\"id\": \"safe-single-file-export:exit:2\", \"text\": \"AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\"}, {\"id\": \"safe-single-file-export:exit:3\", \"text\": \"AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\"}, {\"id\": \"safe-single-file-export:exit:4\", \"text\": \"AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\"}, {\"id\": \"safe-single-file-export:exit:5\", \"text\": \"Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\"}], \"prerequisite_fingerprint\": \"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\", \"structural\": \"valid\", \"references\": \"resolved\", \"semantic_coverage\": \"unknown\", \"diagnostics\": [], \"diagnostics_truncated\": false, \"work\": [{\"rfc\": \"RFC-FBE-0001\", \"criteria\": [\"AC01\", \"AC02\", \"AC03\", \"AC04\"]}], \"planning\": {\"issues\": [], \"unplanned_work\": [{\"rfc\": \"RFC-FBE-0002\", \"criteria\": [\"AC05\", \"AC06\", \"AC07\", \"AC08\", \"AC09\", \"AC10\"]}], \"acceptance\": \"unknown\"}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/.agents/skills/implement-rfc/scripts/milestone_plan.py",
+        "--repo-root",
+        "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta",
+        "render",
+        "--target",
+        "RFC-FBE-0001",
+        "--json"
+      ],
+      "cwd": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq",
+      "exit_code": 0,
+      "elapsed_seconds": 0.097,
+      "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/design/specifications/plans/safe-ledger-export/milestone-plan.json\", \"origin\": \"live\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file-export\"], \"view\": \"# Milestones\\n\\n> Generated from `milestone-plan.json`; edit the JSON, not this view.\\n\\nPlan: **safe-ledger-export** \u00b7 Coverage: **partial**\\n\\nThese are integration outcomes, not compulsory agent-launch boundaries.\\n\\n## safe-single-file-export\\n\\nThe existing ledger export entrypoint produces bounded CSV files, preserves existing destinations, and enforces a 30-second job timeout.\\n\\n**Work:** `RFC-FBE-0001` [AC01, AC02, AC03, AC04]\\n\\n**Prerequisites:** None\\n\\n**Completion:**\\n\\n- AC01: Existing destinations are refused unchanged through the public export entrypoint.\\n- AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\\n- AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\\n- AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\\n- Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\\n\\n**Boundary:** Fully decomposed single-file export outcome with proposed implementation cards and closeout. Defined batch/resume requirements remain represented as unplanned_work for later decomposition.\\n\\n## Required work not yet decomposed\\n\\n```json\\n[\\n  {\\n    \\\"rfc\\\": \\\"RFC-FBE-0002\\\",\\n    \\\"criteria\\\": [\\n      \\\"AC05\\\",\\n      \\\"AC06\\\",\\n      \\\"AC07\\\",\\n      \\\"AC08\\\",\\n      \\\"AC09\\\",\\n      \\\"AC10\\\"\\n    ]\\n  }\\n]\\n```\\n\"}\n",
+      "stderr": ""
+    }
+  ],
+  "consumer_outcomes": [
+    {
+      "consumer": "alpha",
+      "rfc_root": "docs/rfcs",
+      "issue_root": "docs/items",
+      "id_map": {
+        "DRAFT-0001": "FAL-0001",
+        "DRAFT-0002": "FAL-0002",
+        "DRAFT-0003": "FAL-0003",
+        "DRAFT-0004": "FAL-0004",
+        "DRAFT-0005": "FAL-0005",
+        "RFC-DRAFT-0001": "RFC-FAL-0001",
+        "RFC-DRAFT-0002": "RFC-FAL-0002"
+      },
+      "discovery": {
+        "state": "found",
+        "path": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/alpha/docs/rfcs/plans/safe-ledger-export/milestone-plan.json",
+        "origin": "live",
+        "plan_id": "safe-ledger-export",
+        "structural": "valid",
+        "semantic_coverage": "unknown",
+        "milestone_ids": [
+          "safe-single-file-export"
+        ]
+      },
+      "adoption": {
+        "state": "adopted",
+        "plan_id": "safe-ledger-export",
+        "plan_path": "docs/rfcs/plans/safe-ledger-export/milestone-plan.json",
+        "structural": "valid",
+        "references": "unchecked",
+        "semantic_coverage": "unknown",
+        "next": "bind selected milestone to resolve criteria"
+      },
+      "bindings": [
+        {
+          "plan_id": "safe-ledger-export",
+          "plan_path": "docs/rfcs/plans/safe-ledger-export/milestone-plan.json",
+          "milestone_id": "safe-single-file-export",
+          "definition_fingerprint": "sha256:9d9df432f4dfa3d1fd702120c716cc9883766672b93d76f6603a5c48fb2b527e",
+          "obligations": [
+            {
+              "id": "RFC-FAL-0001:AC01",
+              "source": "RFC-FAL-0001",
+              "selector": "AC01",
+              "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+            },
+            {
+              "id": "RFC-FAL-0001:AC02",
+              "source": "RFC-FAL-0001",
+              "selector": "AC02",
+              "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+            },
+            {
+              "id": "RFC-FAL-0001:AC03",
+              "source": "RFC-FAL-0001",
+              "selector": "AC03",
+              "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+            },
+            {
+              "id": "RFC-FAL-0001:AC04",
+              "source": "RFC-FAL-0001",
+              "selector": "AC04",
+              "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+            }
+          ],
+          "obligation_fingerprint": "sha256:2a06ed22a49465ff2dbe98180a9fd20df478070ef0ea756142e5f7c3a00a9ae8",
+          "exit_criteria": [
+            {
+              "id": "safe-single-file-export:exit:1",
+              "text": "AC01: Existing destinations are refused unchanged through the public export entrypoint."
+            },
+            {
+              "id": "safe-single-file-export:exit:2",
+              "text": "AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation."
+            },
+            {
+              "id": "safe-single-file-export:exit:3",
+              "text": "AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it."
+            },
+            {
+              "id": "safe-single-file-export:exit:4",
+              "text": "AC04: Successful exports preserve the account,amount header and ordered entry values for complete input."
+            },
+            {
+              "id": "safe-single-file-export:exit:5",
+              "text": "Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria."
+            }
+          ],
+          "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "structural": "valid",
+          "references": "resolved",
+          "semantic_coverage": "unknown",
+          "diagnostics": [],
+          "diagnostics_truncated": false,
+          "work": [
+            {
+              "rfc": "RFC-FAL-0001",
+              "criteria": [
+                "AC01",
+                "AC02",
+                "AC03",
+                "AC04"
+              ]
+            }
+          ]
+        }
+      ],
+      "inspection": {
+        "plan_id": "safe-ledger-export",
+        "plan_path": "docs/rfcs/plans/safe-ledger-export/milestone-plan.json",
+        "milestone_id": "safe-single-file-export",
+        "definition_fingerprint": "sha256:9d9df432f4dfa3d1fd702120c716cc9883766672b93d76f6603a5c48fb2b527e",
+        "obligations": [
+          {
+            "id": "RFC-FAL-0001:AC01",
+            "source": "RFC-FAL-0001",
+            "selector": "AC01",
+            "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+          },
+          {
+            "id": "RFC-FAL-0001:AC02",
+            "source": "RFC-FAL-0001",
+            "selector": "AC02",
+            "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+          },
+          {
+            "id": "RFC-FAL-0001:AC03",
+            "source": "RFC-FAL-0001",
+            "selector": "AC03",
+            "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+          },
+          {
+            "id": "RFC-FAL-0001:AC04",
+            "source": "RFC-FAL-0001",
+            "selector": "AC04",
+            "source_fingerprint": "sha256:b984f6b77f3dd8a2e0b03022dd49961aa9f005d285dfaea1b02b18cca6dfa087"
+          }
+        ],
+        "obligation_fingerprint": "sha256:2a06ed22a49465ff2dbe98180a9fd20df478070ef0ea756142e5f7c3a00a9ae8",
+        "exit_criteria": [
+          {
+            "id": "safe-single-file-export:exit:1",
+            "text": "AC01: Existing destinations are refused unchanged through the public export entrypoint."
+          },
+          {
+            "id": "safe-single-file-export:exit:2",
+            "text": "AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation."
+          },
+          {
+            "id": "safe-single-file-export:exit:3",
+            "text": "AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it."
+          },
+          {
+            "id": "safe-single-file-export:exit:4",
+            "text": "AC04: Successful exports preserve the account,amount header and ordered entry values for complete input."
+          },
+          {
+            "id": "safe-single-file-export:exit:5",
+            "text": "Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria."
+          }
+        ],
+        "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "structural": "valid",
+        "references": "resolved",
+        "semantic_coverage": "unknown",
+        "diagnostics": [],
+        "diagnostics_truncated": false,
+        "work": [
+          {
+            "rfc": "RFC-FAL-0001",
+            "criteria": [
+              "AC01",
+              "AC02",
+              "AC03",
+              "AC04"
+            ]
+          }
+        ],
+        "planning": {
+          "issues": [],
+          "unplanned_work": [
+            {
+              "rfc": "RFC-FAL-0002",
+              "criteria": [
+                "AC05",
+                "AC06",
+                "AC07",
+                "AC08",
+                "AC09",
+                "AC10"
+              ]
+            }
+          ],
+          "acceptance": "unknown"
+        }
+      },
+      "grouping_preserved": true,
+      "typed_future_work_preserved": [
+        {
+          "rfc": "RFC-FAL-0002",
+          "criteria": [
+            "AC05",
+            "AC06",
+            "AC07",
+            "AC08",
+            "AC09",
+            "AC10"
+          ]
+        }
+      ],
+      "live_plan": {
+        "schema": "implement-rfc.milestone-plan.v1",
+        "id": "safe-ledger-export",
+        "scope": {
+          "rfcs": [
+            "RFC-FAL-0001",
+            "RFC-FAL-0002"
+          ]
+        },
+        "coverage": "partial",
+        "unplanned_work": [
+          {
+            "rfc": "RFC-FAL-0002",
+            "criteria": [
+              "AC05",
+              "AC06",
+              "AC07",
+              "AC08",
+              "AC09",
+              "AC10"
+            ]
+          }
+        ],
+        "milestones": [
+          {
+            "id": "safe-single-file-export",
+            "outcome": "The existing ledger export entrypoint produces bounded CSV files, preserves existing destinations, and enforces a 30-second job timeout.",
+            "work": [
+              {
+                "rfc": "RFC-FAL-0001",
+                "criteria": [
+                  "AC01",
+                  "AC02",
+                  "AC03",
+                  "AC04"
+                ]
+              }
+            ],
+            "depends_on": [],
+            "exit_criteria": [
+              "AC01: Existing destinations are refused unchanged through the public export entrypoint.",
+              "AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.",
+              "AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.",
+              "AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.",
+              "Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria."
+            ],
+            "boundary": "Fully decomposed single-file export outcome with proposed implementation cards and closeout. Defined batch/resume requirements remain represented as unplanned_work for later decomposition."
+          }
+        ]
+      },
+      "rendered_view": "# Milestones\n\n> Generated from `milestone-plan.json`; edit the JSON, not this view.\n\nPlan: **safe-ledger-export** \u00b7 Coverage: **partial**\n\nThese are integration outcomes, not compulsory agent-launch boundaries.\n\n## safe-single-file-export\n\nThe existing ledger export entrypoint produces bounded CSV files, preserves existing destinations, and enforces a 30-second job timeout.\n\n**Work:** `RFC-FAL-0001` [AC01, AC02, AC03, AC04]\n\n**Prerequisites:** None\n\n**Completion:**\n\n- AC01: Existing destinations are refused unchanged through the public export entrypoint.\n- AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\n- AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\n- AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\n- Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\n\n**Boundary:** Fully decomposed single-file export outcome with proposed implementation cards and closeout. Defined batch/resume requirements remain represented as unplanned_work for later decomposition.\n\n## Required work not yet decomposed\n\n```json\n[\n  {\n    \"rfc\": \"RFC-FAL-0002\",\n    \"criteria\": [\n      \"AC05\",\n      \"AC06\",\n      \"AC07\",\n      \"AC08\",\n      \"AC09\",\n      \"AC10\"\n    ]\n  }\n]\n```\n",
+      "temporary_checkout_removed_on_exit": true
+    },
+    {
+      "consumer": "beta",
+      "rfc_root": "design/specifications",
+      "issue_root": "work/cards",
+      "id_map": {
+        "DRAFT-0001": "FBE-0001",
+        "DRAFT-0002": "FBE-0002",
+        "DRAFT-0003": "FBE-0003",
+        "DRAFT-0004": "FBE-0004",
+        "DRAFT-0005": "FBE-0005",
+        "RFC-DRAFT-0001": "RFC-FBE-0001",
+        "RFC-DRAFT-0002": "RFC-FBE-0002"
+      },
+      "discovery": {
+        "state": "found",
+        "path": "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/fresh-author-rfc-consumers-buug2sdq/beta/design/specifications/plans/safe-ledger-export/milestone-plan.json",
+        "origin": "live",
+        "plan_id": "safe-ledger-export",
+        "structural": "valid",
+        "semantic_coverage": "unknown",
+        "milestone_ids": [
+          "safe-single-file-export"
+        ]
+      },
+      "adoption": {
+        "state": "adopted",
+        "plan_id": "safe-ledger-export",
+        "plan_path": "design/specifications/plans/safe-ledger-export/milestone-plan.json",
+        "structural": "valid",
+        "references": "unchecked",
+        "semantic_coverage": "unknown",
+        "next": "bind selected milestone to resolve criteria"
+      },
+      "bindings": [
+        {
+          "plan_id": "safe-ledger-export",
+          "plan_path": "design/specifications/plans/safe-ledger-export/milestone-plan.json",
+          "milestone_id": "safe-single-file-export",
+          "definition_fingerprint": "sha256:239b6b3cb680a994f6a308e073cf9f7d316d3959ad1d8da065e9fbf14ec5843d",
+          "obligations": [
+            {
+              "id": "RFC-FBE-0001:AC01",
+              "source": "RFC-FBE-0001",
+              "selector": "AC01",
+              "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+            },
+            {
+              "id": "RFC-FBE-0001:AC02",
+              "source": "RFC-FBE-0001",
+              "selector": "AC02",
+              "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+            },
+            {
+              "id": "RFC-FBE-0001:AC03",
+              "source": "RFC-FBE-0001",
+              "selector": "AC03",
+              "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+            },
+            {
+              "id": "RFC-FBE-0001:AC04",
+              "source": "RFC-FBE-0001",
+              "selector": "AC04",
+              "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+            }
+          ],
+          "obligation_fingerprint": "sha256:5dcbb6b3507c24e082b3cd48ab2d03abb1165f2eff389f4221b4785766e33d06",
+          "exit_criteria": [
+            {
+              "id": "safe-single-file-export:exit:1",
+              "text": "AC01: Existing destinations are refused unchanged through the public export entrypoint."
+            },
+            {
+              "id": "safe-single-file-export:exit:2",
+              "text": "AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation."
+            },
+            {
+              "id": "safe-single-file-export:exit:3",
+              "text": "AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it."
+            },
+            {
+              "id": "safe-single-file-export:exit:4",
+              "text": "AC04: Successful exports preserve the account,amount header and ordered entry values for complete input."
+            },
+            {
+              "id": "safe-single-file-export:exit:5",
+              "text": "Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria."
+            }
+          ],
+          "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "structural": "valid",
+          "references": "resolved",
+          "semantic_coverage": "unknown",
+          "diagnostics": [],
+          "diagnostics_truncated": false,
+          "work": [
+            {
+              "rfc": "RFC-FBE-0001",
+              "criteria": [
+                "AC01",
+                "AC02",
+                "AC03",
+                "AC04"
+              ]
+            }
+          ]
+        }
+      ],
+      "inspection": {
+        "plan_id": "safe-ledger-export",
+        "plan_path": "design/specifications/plans/safe-ledger-export/milestone-plan.json",
+        "milestone_id": "safe-single-file-export",
+        "definition_fingerprint": "sha256:239b6b3cb680a994f6a308e073cf9f7d316d3959ad1d8da065e9fbf14ec5843d",
+        "obligations": [
+          {
+            "id": "RFC-FBE-0001:AC01",
+            "source": "RFC-FBE-0001",
+            "selector": "AC01",
+            "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+          },
+          {
+            "id": "RFC-FBE-0001:AC02",
+            "source": "RFC-FBE-0001",
+            "selector": "AC02",
+            "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+          },
+          {
+            "id": "RFC-FBE-0001:AC03",
+            "source": "RFC-FBE-0001",
+            "selector": "AC03",
+            "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+          },
+          {
+            "id": "RFC-FBE-0001:AC04",
+            "source": "RFC-FBE-0001",
+            "selector": "AC04",
+            "source_fingerprint": "sha256:efcb1580924d058173a7f230e6bc7f4c51557ebef94bf871ebdce7185d053f32"
+          }
+        ],
+        "obligation_fingerprint": "sha256:5dcbb6b3507c24e082b3cd48ab2d03abb1165f2eff389f4221b4785766e33d06",
+        "exit_criteria": [
+          {
+            "id": "safe-single-file-export:exit:1",
+            "text": "AC01: Existing destinations are refused unchanged through the public export entrypoint."
+          },
+          {
+            "id": "safe-single-file-export:exit:2",
+            "text": "AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation."
+          },
+          {
+            "id": "safe-single-file-export:exit:3",
+            "text": "AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it."
+          },
+          {
+            "id": "safe-single-file-export:exit:4",
+            "text": "AC04: Successful exports preserve the account,amount header and ordered entry values for complete input."
+          },
+          {
+            "id": "safe-single-file-export:exit:5",
+            "text": "Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria."
+          }
+        ],
+        "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "structural": "valid",
+        "references": "resolved",
+        "semantic_coverage": "unknown",
+        "diagnostics": [],
+        "diagnostics_truncated": false,
+        "work": [
+          {
+            "rfc": "RFC-FBE-0001",
+            "criteria": [
+              "AC01",
+              "AC02",
+              "AC03",
+              "AC04"
+            ]
+          }
+        ],
+        "planning": {
+          "issues": [],
+          "unplanned_work": [
+            {
+              "rfc": "RFC-FBE-0002",
+              "criteria": [
+                "AC05",
+                "AC06",
+                "AC07",
+                "AC08",
+                "AC09",
+                "AC10"
+              ]
+            }
+          ],
+          "acceptance": "unknown"
+        }
+      },
+      "grouping_preserved": true,
+      "typed_future_work_preserved": [
+        {
+          "rfc": "RFC-FBE-0002",
+          "criteria": [
+            "AC05",
+            "AC06",
+            "AC07",
+            "AC08",
+            "AC09",
+            "AC10"
+          ]
+        }
+      ],
+      "live_plan": {
+        "schema": "implement-rfc.milestone-plan.v1",
+        "id": "safe-ledger-export",
+        "scope": {
+          "rfcs": [
+            "RFC-FBE-0001",
+            "RFC-FBE-0002"
+          ]
+        },
+        "coverage": "partial",
+        "unplanned_work": [
+          {
+            "rfc": "RFC-FBE-0002",
+            "criteria": [
+              "AC05",
+              "AC06",
+              "AC07",
+              "AC08",
+              "AC09",
+              "AC10"
+            ]
+          }
+        ],
+        "milestones": [
+          {
+            "id": "safe-single-file-export",
+            "outcome": "The existing ledger export entrypoint produces bounded CSV files, preserves existing destinations, and enforces a 30-second job timeout.",
+            "work": [
+              {
+                "rfc": "RFC-FBE-0001",
+                "criteria": [
+                  "AC01",
+                  "AC02",
+                  "AC03",
+                  "AC04"
+                ]
+              }
+            ],
+            "depends_on": [],
+            "exit_criteria": [
+              "AC01: Existing destinations are refused unchanged through the public export entrypoint.",
+              "AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.",
+              "AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.",
+              "AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.",
+              "Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria."
+            ],
+            "boundary": "Fully decomposed single-file export outcome with proposed implementation cards and closeout. Defined batch/resume requirements remain represented as unplanned_work for later decomposition."
+          }
+        ]
+      },
+      "rendered_view": "# Milestones\n\n> Generated from `milestone-plan.json`; edit the JSON, not this view.\n\nPlan: **safe-ledger-export** \u00b7 Coverage: **partial**\n\nThese are integration outcomes, not compulsory agent-launch boundaries.\n\n## safe-single-file-export\n\nThe existing ledger export entrypoint produces bounded CSV files, preserves existing destinations, and enforces a 30-second job timeout.\n\n**Work:** `RFC-FBE-0001` [AC01, AC02, AC03, AC04]\n\n**Prerequisites:** None\n\n**Completion:**\n\n- AC01: Existing destinations are refused unchanged through the public export entrypoint.\n- AC02: New CSV files stay at or below 10 MiB (10,485,760 bytes); oversized exports fail without a successful truncation.\n- AC03: Export jobs enforce a 30-second timeout and report timeout when the job cannot finish within it.\n- AC04: Successful exports preserve the account,amount header and ordered entry values for complete input.\n- Proposed cards DRAFT-0001 through DRAFT-0003 have their integrated acceptance verified, with the RFC closeout evaluated against all four authoritative criteria.\n\n**Boundary:** Fully decomposed single-file export outcome with proposed implementation cards and closeout. Defined batch/resume requirements remain represented as unplanned_work for later decomposition.\n\n## Required work not yet decomposed\n\n```json\n[\n  {\n    \"rfc\": \"RFC-FBE-0002\",\n    \"criteria\": [\n      \"AC05\",\n      \"AC06\",\n      \"AC07\",\n      \"AC08\",\n      \"AC09\",\n      \"AC10\"\n    ]\n  }\n]\n```\n",
+      "temporary_checkout_removed_on_exit": true
+    }
+  ],
+  "canonical_source_read_only": true,
+  "source_pack_unchanged": true,
+  "prior_fixture_driver_failure": "fresh-generated-handoff.initial-failure.json",
+  "cleanup": "Both disposable consumer repositories removed by TemporaryDirectory; no task commands or servers remain.",
+  "implementation": "No product code implemented; only imported draft/provenance documents and copied source context.",
+  "unavailable": "Live execution eligibility/product acceptance not claimed."
+}

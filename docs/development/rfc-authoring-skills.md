@@ -28,21 +28,41 @@ the committed source candidate. Self-review checked companion reachability, sing
 ownership of interview/artifact guidance, exact numeric constraints, amendment and
 readiness boundaries, MIT notices, and the actual public helper path.
 
-## Behavioral acceptance frontier
+## Independent behavioral acceptance
 
-AC01, AC02 and AC05 remain pending independent tabletop evidence. Raw task inputs
-are separate from evaluation judgments in
-`skills/author-rfc/tests/fixtures/tabletop-requests.md`. The coordinator receives
-isolated projects for new authoring/partial decomposition, supplied-pack resume and
-changed decisions/focused review, adopted amendments with active/pending obligations,
-and missing companions; standalone nonsoftware interviewing uses conversation.
-Evaluator questions go to the coordinator for simulated fixture replies, not the
-human. Existing task authorization is not test-design confirmation.
+AC01, AC02 and AC05 pass on the unchanged source candidate. The coordinator supplied
+[actual independent observations, replies and receipts](rfc-authoring-skills-independent.json)
+from five fresh Codex agents. All 36 protected canonical hashes and 41 protected
+original/live fixture files matched; no material source defect was found. Raw tasks
+remain separate from judgments in `skills/author-rfc/tests/fixtures/tabletop-requests.md`.
 
-This evidence establishes offline helper/package behavior, not running-host skill
-loading, real installations or broad native qualification. No independent outcome
-is inferred from instruction wording. The final candidate and actual evaluator
-coverage/outcomes must be recorded before closing this milestone.
+| Case | Actual coverage |
+|---|---|
+| New authoring | Two RFCs/five proposed cards; declined optional grilling, complete artifact contract, four planned/six defined future criteria and partial coverage; optional internals/confirmation add no implementation gate |
+| Supplied-pack resume | Partial replies and changed D1 reopen only affected branches; decisions and consequences propagate through RFC/cards/plan/view after each round; exact defaults/grouping/originals preserved |
+| Focused retention/recovery | Revision 5 keeps material age/collision/race/recovery-data deferrals unready; terminology and observed/proposed contradictions remain explicit; separate exact synthetic confirmation covers only retention-recovery-r5 |
+| Adopted amendment | Separate proposal records numeric before/after and live identities; active writer and pending native candidate unchanged; later reconciliation required before publication/binding renewal |
+| Missing companions | Unavailable author-rfc/implement-rfc named; bounded grounding and unanswered frontier retained; pack unchanged and complete workflow pending |
+| Standalone nonsoftware | Initial conversation-only frontier of three independent questions with recommendations; no RFC artifacts/companions or inferred answers |
+
+The engineering leaf also exercised the **actual independently generated pack** in
+two additional disposable linked consumers. [The 18 command receipts](rfc-authoring-skills-fresh-handoff.json)
+record discovery, two-RFC/five-card ID and document-pointer remapping, adoption,
+binding every current milestone, inspection and rendering. The authored
+`safe-single-file-export` group binds AC01–AC04; partial coverage and typed future
+AC05–AC10 survive unchanged after remapping. An initial driver path-normalization
+failure from macOS `/var` versus `/private/var` is retained in
+[its separate receipt](rfc-authoring-skills-driver-failure.json); only the disposable
+driver was corrected. No source repair was required.
+
+Actual host coverage is fixture inventory resolution/direct skill reads in Codex,
+with synthetic coordinator replies. Automatic skill triggering/loading, native
+Claude and native question-tool execution were not exercised. Nonsoftware coverage
+ends at its initial frontier, not a completed event plan. No real installation,
+selection, deployment or product implementation was performed. The optional
+jsonschema check remains skipped. These limits do not waive a selected source
+criterion or imply broader qualification. Synthetic design confirmation belongs
+only to that test design, not to the human's real design decisions.
 
 ## Run contract and command state
 
@@ -55,9 +75,10 @@ Bind/check use the matching installed
 `/Users/jaeger/.agents/skills/implement-rfc/scripts/milestone_checkpoint.py`;
 candidate tests use canonical source. No installed selection/role was changed.
 
-All deterministic processes ended. Temporary test repositories/homes/remotes were
-removed by their temporary-directory contexts. No worktree or server was created.
-Only the explicit run/checkpoint/tabletop scratch directory is retained for the
-coordinator's required acceptance. Canonical source writer ownership is released
-at this checkpoint; evaluators may read source and write isolated fixture artifacts.
-Resume engineering for repairs and final closeout after their actual evidence arrives.
+All deterministic and evaluator commands ended. Temporary test repositories/homes/
+remotes were removed by their temporary-directory contexts. No worktree or server
+was created. The coordinator returned canonical writer ownership for final acceptance
+and upkeep after all five evaluator assignments quiesced. Actual receipts are now
+durable here; the task-owned tabletop/source-plan scratch is eligible for cleanup.
+The compact run selection/checkpoint remains available to the coordinator for final
+handoff. Source packages have no changes after the accepted source candidate.

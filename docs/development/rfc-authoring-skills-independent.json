@@ -1,0 +1,706 @@
+{
+  "candidate_revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+  "evaluator": "/root (coordinator), independent from engineering leaf",
+  "method": "Five fresh Codex subagents used isolated fixture tasks and explicit host-discovery inventories. Replies in supplied-resume were synthetic fixture answers; no real user input tools were invoked.",
+  "coverage_limits": [
+    "Automatic host skill triggering/loading was not exercised.",
+    "No native Claude execution was exercised.",
+    "No actual installation, registry selection, consumer deployment or product implementation was performed.",
+    "Nonsoftware grilling was evaluated through its initial conversation frontier, not a completed real-world event plan."
+  ],
+  "preservation": {
+    "candidate": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+    "canonical_source": {
+      "README.md": {
+        "expected": "d8e7c4fa1829050e97acff8a1d4f98262b7e9f567293bff59f6026e114fc95f7",
+        "actual": "d8e7c4fa1829050e97acff8a1d4f98262b7e9f567293bff59f6026e114fc95f7",
+        "unchanged": true
+      },
+      "docs/development/skill-provenance.md": {
+        "expected": "758b7d62b71691c47df07bc2dc7e35c798955b258cdcb52b48c59ed7ac6704eb",
+        "actual": "758b7d62b71691c47df07bc2dc7e35c798955b258cdcb52b48c59ed7ac6704eb",
+        "unchanged": true
+      },
+      "skills/implement-rfc/SKILL.md": {
+        "expected": "270215b89b4039d8e6d323d289f3e78f43b90642338a18a481397cfa04a2ce45",
+        "actual": "270215b89b4039d8e6d323d289f3e78f43b90642338a18a481397cfa04a2ce45",
+        "unchanged": true
+      },
+      "skills/implement-rfc/examples/milestone-plans/README.md": {
+        "expected": "6f4c24e0fe9190efc19ed8fa32cc34f3c70a0e3ed75d1e9e0470f72c49a277ff",
+        "actual": "6f4c24e0fe9190efc19ed8fa32cc34f3c70a0e3ed75d1e9e0470f72c49a277ff",
+        "unchanged": true
+      },
+      "skills/implement-rfc/generated/portable-manifest.json": {
+        "expected": "cb14cbd6eb79900aeedb1787a40d86301cfe902db1b8621759c9e1c9146795d0",
+        "actual": "cb14cbd6eb79900aeedb1787a40d86301cfe902db1b8621759c9e1c9146795d0",
+        "unchanged": true
+      },
+      "skills/implement-rfc/references/pack-lifecycle.md": {
+        "expected": "5cc791d4787b8b707557b21a61922d67307843e260d9fb6f0fe54f545cbd5ad1",
+        "actual": "5cc791d4787b8b707557b21a61922d67307843e260d9fb6f0fe54f545cbd5ad1",
+        "unchanged": true
+      },
+      "docs/rfcs/README.md": {
+        "expected": "5bcbd6ac44ac2c7e8d68c6d6dce81c5c1257d563c77c8e8bacf9f8da19e89643",
+        "actual": "5bcbd6ac44ac2c7e8d68c6d6dce81c5c1257d563c77c8e8bacf9f8da19e89643",
+        "unchanged": true
+      },
+      "docs/rfcs/RFC-ASK-0015-portable-rfc-authoring-and-grilling.md": {
+        "expected": "2d294f3589f5099ca9c27980e256c69e495542d12fb56d7cfb3f5b47e8172f7d",
+        "actual": "2d294f3589f5099ca9c27980e256c69e495542d12fb56d7cfb3f5b47e8172f7d",
+        "unchanged": true
+      },
+      "docs/rfcs/assets/rfc-authoring-skills.LIVE_IMPORT.md": {
+        "expected": "f9f0194f5a69c2f095cde1f3cc3dea4f113cf8f4113527c7b82cbd854c4f8549",
+        "actual": "f9f0194f5a69c2f095cde1f3cc3dea4f113cf8f4113527c7b82cbd854c4f8549",
+        "unchanged": true
+      },
+      "docs/rfcs/assets/rfc-authoring-skills/milestone-plan.json": {
+        "expected": "7c8d406f92fc61af3b6044c531063023b627d6b468df724ece001a9625cbf203",
+        "actual": "7c8d406f92fc61af3b6044c531063023b627d6b468df724ece001a9625cbf203",
+        "unchanged": true
+      },
+      "skills/author-rfc/LICENSE": {
+        "expected": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "actual": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "unchanged": true
+      },
+      "skills/author-rfc/SKILL.md": {
+        "expected": "9f5292d0bd492bec097da2b08f994c8dc7e03a7174de2920e2111dd0466f02d1",
+        "actual": "9f5292d0bd492bec097da2b08f994c8dc7e03a7174de2920e2111dd0466f02d1",
+        "unchanged": true
+      },
+      "skills/author-rfc/assets/card.template.md": {
+        "expected": "0d3d63f31f833d2db9a18d7481a38ccacba59e7a72c90ef1f377767134b6ec44",
+        "actual": "0d3d63f31f833d2db9a18d7481a38ccacba59e7a72c90ef1f377767134b6ec44",
+        "unchanged": true
+      },
+      "skills/author-rfc/assets/decisions.template.md": {
+        "expected": "d8d03de012a537c0b87da4f8ff1896a9ef3bb29cc12d7aa5f71026b9e83d8201",
+        "actual": "d8d03de012a537c0b87da4f8ff1896a9ef3bb29cc12d7aa5f71026b9e83d8201",
+        "unchanged": true
+      },
+      "skills/author-rfc/assets/rfc.template.md": {
+        "expected": "b82f138dd4423582ca78cac02a577c45420fc0c8b924f6713a2a9f113074d1d0",
+        "actual": "b82f138dd4423582ca78cac02a577c45420fc0c8b924f6713a2a9f113074d1d0",
+        "unchanged": true
+      },
+      "skills/author-rfc/references/amendments.md": {
+        "expected": "856d8f4900555d1bc7d50f59d8c5a4d4d787f860f20943dce4e49c106c822fcf",
+        "actual": "856d8f4900555d1bc7d50f59d8c5a4d4d787f860f20943dce4e49c106c822fcf",
+        "unchanged": true
+      },
+      "skills/author-rfc/references/artifact-contract.md": {
+        "expected": "9c9943a508d6a3040549fd2d0b801f13754d5530bdb74d85567aaa2e14ded25a",
+        "actual": "9c9943a508d6a3040549fd2d0b801f13754d5530bdb74d85567aaa2e14ded25a",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/ledger/AGENTS.md": {
+        "expected": "6e80f6f4222aed789ab1aea69c0e9f42367b06d8c5cecd0baea50c2c36e40629",
+        "actual": "6e80f6f4222aed789ab1aea69c0e9f42367b06d8c5cecd0baea50c2c36e40629",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/ledger/GLOSSARY.md": {
+        "expected": "dfb480fdd54cbd903684fd741818acacbee3fcba393a3252df573cc1119dd379",
+        "actual": "dfb480fdd54cbd903684fd741818acacbee3fcba393a3252df573cc1119dd379",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/ledger/README.md": {
+        "expected": "0c82df751713b2c540d80d984be54825e3509cb653f54a5f7601281d5680c322",
+        "actual": "0c82df751713b2c540d80d984be54825e3509cb653f54a5f7601281d5680c322",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/ledger/ledger.py": {
+        "expected": "96bca64d8cc37e00bad5ab6015f308308f32e010c7975276805121c1a8994a13",
+        "actual": "96bca64d8cc37e00bad5ab6015f308308f32e010c7975276805121c1a8994a13",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/DECISIONS.md": {
+        "expected": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+        "actual": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/IMPLEMENTATION_PROMPT.md": {
+        "expected": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+        "actual": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/MILESTONES.md": {
+        "expected": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+        "actual": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/README.md": {
+        "expected": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+        "actual": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/issues/DRAFT-0001-single-file.md": {
+        "expected": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+        "actual": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/issues/DRAFT-0002-batch-resume.md": {
+        "expected": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+        "actual": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/issues/DRAFT-0003-closeout.md": {
+        "expected": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+        "actual": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/milestone-plan.json": {
+        "expected": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+        "actual": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/portable-pack/rfcs/RFC-DRAFT-0001-ledger-export.md": {
+        "expected": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+        "actual": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/fixtures/tabletop-requests.md": {
+        "expected": "8799fd35b8c5c2e69a9bcf9b560a11dab845e97c8e81dc4aa9e8b36e989f65af",
+        "actual": "8799fd35b8c5c2e69a9bcf9b560a11dab845e97c8e81dc4aa9e8b36e989f65af",
+        "unchanged": true
+      },
+      "skills/author-rfc/tests/test_portable_handoff.py": {
+        "expected": "52fb812d2a4755a99beabcf3b763a2d5b88e7ae4c55548bec3d11671dd65275f",
+        "actual": "52fb812d2a4755a99beabcf3b763a2d5b88e7ae4c55548bec3d11671dd65275f",
+        "unchanged": true
+      },
+      "skills/grill-rfc/LICENSE": {
+        "expected": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "actual": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "unchanged": true
+      },
+      "skills/grill-rfc/SKILL.md": {
+        "expected": "d075b1ccd0e30cd0f08a045dcdb4e4eac66089272199269878f1f46178c6a88a",
+        "actual": "d075b1ccd0e30cd0f08a045dcdb4e4eac66089272199269878f1f46178c6a88a",
+        "unchanged": true
+      },
+      "skills/grill-me/LICENSE": {
+        "expected": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "actual": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "unchanged": true
+      },
+      "skills/grill-me/SKILL.md": {
+        "expected": "9efe3b44cc9d9ec0b2a1259c8be345d971f79f473cbc78354eec7ee222c347b8",
+        "actual": "9efe3b44cc9d9ec0b2a1259c8be345d971f79f473cbc78354eec7ee222c347b8",
+        "unchanged": true
+      }
+    },
+    "protected_fixture_inputs": {
+      "new-authoring": {},
+      "supplied-resume": {
+        "supplied/original/IMPLEMENTATION_PROMPT.md": {
+          "expected": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+          "actual": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+          "unchanged": true
+        },
+        "supplied/original/milestone-plan.json": {
+          "expected": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+          "actual": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+          "unchanged": true
+        },
+        "supplied/original/milestone-plan.schema.json": {
+          "expected": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+          "actual": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+          "unchanged": true
+        },
+        "supplied/original/README.md": {
+          "expected": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+          "actual": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+          "unchanged": true
+        },
+        "supplied/original/MILESTONES.md": {
+          "expected": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+          "actual": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+          "unchanged": true
+        },
+        "supplied/original/DECISIONS.md": {
+          "expected": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+          "actual": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+          "unchanged": true
+        },
+        "supplied/original/rfcs/RFC-DRAFT-0001-ledger-export.md": {
+          "expected": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+          "actual": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0002-batch-resume.md": {
+          "expected": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+          "actual": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0003-closeout.md": {
+          "expected": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+          "actual": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0001-single-file.md": {
+          "expected": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+          "actual": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+          "unchanged": true
+        }
+      },
+      "adopted-amendment": {
+        "supplied/original/IMPLEMENTATION_PROMPT.md": {
+          "expected": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+          "actual": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+          "unchanged": true
+        },
+        "supplied/original/milestone-plan.json": {
+          "expected": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+          "actual": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+          "unchanged": true
+        },
+        "supplied/original/milestone-plan.schema.json": {
+          "expected": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+          "actual": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+          "unchanged": true
+        },
+        "supplied/original/README.md": {
+          "expected": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+          "actual": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+          "unchanged": true
+        },
+        "supplied/original/MILESTONES.md": {
+          "expected": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+          "actual": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+          "unchanged": true
+        },
+        "supplied/original/map.json": {
+          "expected": "e645bcc0aaf3117f04ebf53e2e1553343dd74173d2959ac267b8fa939ed7f052",
+          "actual": "e645bcc0aaf3117f04ebf53e2e1553343dd74173d2959ac267b8fa939ed7f052",
+          "unchanged": true
+        },
+        "supplied/original/DECISIONS.md": {
+          "expected": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+          "actual": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+          "unchanged": true
+        },
+        "supplied/original/rfcs/RFC-DRAFT-0001-ledger-export.md": {
+          "expected": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+          "actual": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0002-batch-resume.md": {
+          "expected": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+          "actual": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0003-closeout.md": {
+          "expected": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+          "actual": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0001-single-file.md": {
+          "expected": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+          "actual": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+          "unchanged": true
+        },
+        "docs/pending-native-acceptance.md": {
+          "expected": "963daf982eff4bf53b3d08e3055a07553aa85b65d90ebcf38f29e32b10024be9",
+          "actual": "963daf982eff4bf53b3d08e3055a07553aa85b65d90ebcf38f29e32b10024be9",
+          "unchanged": true
+        },
+        "docs/rfcs/RFC-LED-0001-ledger-export.md": {
+          "expected": "fa2c38338dcd51fe40eb817b10b696f667d70511f6e150759842355b915dcf0b",
+          "actual": "fa2c38338dcd51fe40eb817b10b696f667d70511f6e150759842355b915dcf0b",
+          "unchanged": true
+        },
+        "docs/issues/NEXT_ID": {
+          "expected": "b846fad486d282e43e4f33731b9ddc44f6149ea8787aeeb7f5448bcc080d85b9",
+          "actual": "b846fad486d282e43e4f33731b9ddc44f6149ea8787aeeb7f5448bcc080d85b9",
+          "unchanged": true
+        },
+        "docs/issues/10-backlog/LED-0003-closeout.md": {
+          "expected": "a65d354688cabbbfa6fb0fee428622e3e4d6dddee08c4424dc1f2067d064e0fa",
+          "actual": "a65d354688cabbbfa6fb0fee428622e3e4d6dddee08c4424dc1f2067d064e0fa",
+          "unchanged": true
+        },
+        "docs/issues/10-backlog/LED-0002-batch-resume.md": {
+          "expected": "6cac1df2a0a61186ffab14adeca18fb3e0ab92e1f873ece5e519b7558af1f3d3",
+          "actual": "6cac1df2a0a61186ffab14adeca18fb3e0ab92e1f873ece5e519b7558af1f3d3",
+          "unchanged": true
+        },
+        "docs/issues/30-in-progress/LED-0001-single-file.md": {
+          "expected": "0d0dafe16c8b495f51f33ded000b7ed4b9b056713a7b3d409442b9f2185b9d2d",
+          "actual": "0d0dafe16c8b495f51f33ded000b7ed4b9b056713a7b3d409442b9f2185b9d2d",
+          "unchanged": true
+        },
+        "docs/rfcs/plans/ledger-export/source.json": {
+          "expected": "ff4b4c7b1285a5a8b8d55ac53065969137ae97d10f7a0e0f43e642262370d899",
+          "actual": "ff4b4c7b1285a5a8b8d55ac53065969137ae97d10f7a0e0f43e642262370d899",
+          "unchanged": true
+        },
+        "docs/rfcs/plans/ledger-export/milestone-plan.json": {
+          "expected": "0ceb23a5a8dfb20edf19c732097638573cc6a459e1c4b1cfe16e6a692801e0d1",
+          "actual": "0ceb23a5a8dfb20edf19c732097638573cc6a459e1c4b1cfe16e6a692801e0d1",
+          "unchanged": true
+        },
+        ".mask/skill-config/implement-rfc/project.json": {
+          "expected": "cc0cc2dfb9520f44fff7e4b4b937adb0ee34d32a6b03a7d939f8adca409f3189",
+          "actual": "cc0cc2dfb9520f44fff7e4b4b937adb0ee34d32a6b03a7d939f8adca409f3189",
+          "unchanged": true
+        },
+        ".mask/skill-config/implement-rfc/project.md": {
+          "expected": "ef55cdce503cab5336cb6a4d8b0ebf246a701517cf1a25e1d6891a2c46b998ab",
+          "actual": "ef55cdce503cab5336cb6a4d8b0ebf246a701517cf1a25e1d6891a2c46b998ab",
+          "unchanged": true
+        }
+      },
+      "missing-companion": {
+        "supplied/original/IMPLEMENTATION_PROMPT.md": {
+          "expected": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+          "actual": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065",
+          "unchanged": true
+        },
+        "supplied/original/milestone-plan.json": {
+          "expected": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+          "actual": "e4f2d515e0fa7c069e28d1b25439dca27cd288931f631122a3d7584c6943490b",
+          "unchanged": true
+        },
+        "supplied/original/milestone-plan.schema.json": {
+          "expected": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+          "actual": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d",
+          "unchanged": true
+        },
+        "supplied/original/README.md": {
+          "expected": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+          "actual": "e858108ee5175ff0c47492facba95296f311420ee53a9bcee3f4ba7e1f6044e1",
+          "unchanged": true
+        },
+        "supplied/original/MILESTONES.md": {
+          "expected": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+          "actual": "63322768fe68fffe32f9b20dd2cd6d402d2fa93d300766125639f01921b5525c",
+          "unchanged": true
+        },
+        "supplied/original/DECISIONS.md": {
+          "expected": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+          "actual": "440af3e6d0b316115420044e68fab75d8025832ce524262c2c3f6831e999fdd4",
+          "unchanged": true
+        },
+        "supplied/original/rfcs/RFC-DRAFT-0001-ledger-export.md": {
+          "expected": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+          "actual": "c39fd32208444ea5e598315e913feecf8ae5a5c6bff04e498fbb1afff0e0dc94",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0002-batch-resume.md": {
+          "expected": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+          "actual": "0d6d32dd7a68e85aa20c35e5423a3b9df94b3a584e2d4b134d0d0f46ba1fbb0e",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0003-closeout.md": {
+          "expected": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+          "actual": "cb97d2c3ff8acabe2e8cdab94c9e373ccc898b924856152f30510081bce090c2",
+          "unchanged": true
+        },
+        "supplied/original/issues/DRAFT-0001-single-file.md": {
+          "expected": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+          "actual": "6f06791cd4baf7cccea838565816dd58ebe4e6e7b8b8a8b31731291100b290e0",
+          "unchanged": true
+        }
+      }
+    },
+    "passed": true
+  },
+  "scenarios": [
+    {
+      "name": "new-authoring",
+      "agent": "/root/tabletop_new_authoring",
+      "state": "pass",
+      "covers": [
+        "new authoring",
+        "partial decomposition of defined requirements",
+        "declined optional grilling",
+        "portable artifact contract"
+      ],
+      "observed": [
+        "Two RFCs, five proposed Backlog cards including one closeout per RFC, schema, decision record, glossary, entrypoint, canonical JSON and generated view.",
+        "Four current criteria fully decomposed; six defined future criteria retained in typed unplanned_work without overlap.",
+        "No unanswered material choice invented; no class/module prerequisite, live ID/baseline/claim/evidence, optional grill gate or authoring-confirmation gate.",
+        "Authoritative offline validation and generated-view comparison passed.",
+        "Coordinator inspected the plan, decision record, entrypoint and acceptance/card references; engineering separately passed the actual generated-pack handoff in two disposable consumers."
+      ],
+      "report": "Created the portable [export RFC pack](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/README.md) using author-rfc and the discovered implement-rfc offline kit. Single-file export is fully decomposed into three implementation cards and a closeout. Defined batch/resume work is retained as typed `unplanned_work` with `coverage: partial`. No grilling or internal class/module design was performed.\n\nArtifacts created: `drafts/new-export/` contains two RFCs, five proposed Backlog cards, overview, decisions, glossary, implementation entrypoint, canonical milestone JSON, generated Markdown, copied schema and four draft check records. The original request is preserved at [drafts/originals/new-export-user-task.md](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/originals/new-export-user-task.md). This account is saved at [evaluation-result.md](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/evaluation-result.md).\n\nChecks run: exact final JSON passed the authoritative offline validator (exit 0); rendering and final render comparison passed. Local audit passed for links, all 10 uniquely defined criteria, four planned/six unplanned criteria without overlap, card fields/dependencies, one closeout per RFC and unchanged copied schema. All four original fixture files match their captured hashes. Read-only `git status` returned 128 because this fixture is not a Git checkout. No product tests were run.\n\nUnresolved user questions: none. Supplied behavior is settled; separate confirmation of the synthesized draft is unrecorded. Later decomposition and live execution eligibility remain pending, with no additional authoring-confirmation or grilling gate.\n\nNext action: invoke implement-rfc through [IMPLEMENTATION_PROMPT.md](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/new-authoring/drafts/new-export/IMPLEMENTATION_PROMPT.md) for `safe-single-file-export`, resolve actual consumer/live eligibility, then begin DRAFT-0001's destination protection and compatible CSV export.\n\nCommand quiescence: all task commands completed; no background process or subagent was started. Source remained unchanged; no commits, pushes, installations, live selections or product implementation occurred.\n"
+    },
+    {
+      "name": "adopted-amendment",
+      "agent": "/root/tabletop_adopted_amendment",
+      "state": "pass",
+      "covers": [
+        "adopted-plan amendment",
+        "active work and pending acceptance preservation"
+      ],
+      "observed": [
+        "Separate proposed amendment identifies live requirements, identities, revisions, numeric before/after and later reconciliation action.",
+        "Authored single-file and batch-resume groups retained; no replay of adoption, ID duplication, live publication, or invented acceptance.",
+        "Checkpoint/candidate and active card preserved; proposed new limits do not certify historical evidence.",
+        "Coordinator inspected amendment entrypoint; all protected live/original hashes matched."
+      ],
+      "report": "Used author-rfc to create [the amendment proposal](/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/adopted-amendment/drafts/amendment/README.md): batch files at most 250 data rows, whole-job timeout 60 seconds, with single-file then batch/resume retained. Live requirements, cards, provenance, active writer and pending native acceptance were unchanged.\n\nCreated under `/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/adopted-amendment/drafts/amendment`: `README.md`, `AMENDMENT.md`, `DECISIONS.md`, `SOURCE_IDENTITIES.json`, `IMPLEMENTATION_PROMPT.md`, `milestone-plan.json`, `milestone-plan.schema.json`, `MILESTONES.md`, `rfcs/RFC-DRAFT-0001-ledger-export.md`, three proposed cards in `issues/`, and three check records in `checks/`. Saved this account at [evaluation-result.md](/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/adopted-amendment/evaluation-result.md).\n\nChecks actually run: the companion offline validator and renderer both exited 0; schema copy matched; provisional-ID remapping preserved the complete live plan; 40 local Markdown links resolved; card fields and unique acceptance IDs checked; hashes confirmed all 37 preexisting files unchanged. Live selector binding, semantic coverage proof and execution eligibility were not claimed. No implementation tests ran.\n\nNo required material question remains. Complete-revision confirmation is unrecorded. Native acceptance remains pending for `151e6b3afca2a80067b8d7bee742dbddf13b6f88`.\n\nNext authorized action: use [the implementation entrypoint](/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/adopted-amendment/drafts/amendment/IMPLEMENTATION_PROMPT.md) to reconcile fixture engineering owner's active LED-0001 work and that exact pending candidate, verify actual writer quiescence, preserve original review coverage, then publish the numeric amendment and renew affected bindings before implementation. Existing acceptance cannot certify the changed timeout automatically.\n\nAll task-owned commands completed. No subagents, background commands, commits, pushes, installations, live selections or product implementation were started. The existing engineering writer's quiescence was not asserted.\n"
+    },
+    {
+      "name": "supplied-resume",
+      "agent": "/root/tabletop_supplied_resume",
+      "state": "pass",
+      "covers": [
+        "supplied ChatGPT pack revision",
+        "interrupted answers",
+        "changed decisions",
+        "partial replies",
+        "focused deep review",
+        "contradictions",
+        "scoped readiness",
+        "explicit confirmation"
+      ],
+      "observed": [
+        "Revision 2 settled only retention duration, changed prior destination policy, preserved unanswered Q2 and reopened affected branches/confirmation.",
+        "Revision 3 recorded complete-input digest and operator retention/cleanup; deliberately unanswered Q4 remained open.",
+        "RFC, cards, canonical plan, generated view, glossary and decision consequences updated after each actual reply.",
+        "Structural validation passed while both affected milestones remained design-unready.",
+        "Account/export-file terminology and observed unused 45-second default versus proposed 30-second budget distinguished; untouched row-bound contradiction retained for later review.",
+        "Q4\u2013Q6 applied, then explicitly named material deferrals retained without policy answers.",
+        "Presented actual summary retention-recovery-r5, awaited separate explicit synthetic confirmation, then recorded only its scope/version.",
+        "Confirmation did not certify whole-pack readiness, resolve deferrals, introduce an implementation gate or authorize publication.",
+        "Coordinator independently compared final JSON digest to both exit-0 receipts, generated view to actual renderer stdout, and inspected final summary/confirmation/readiness."
+      ],
+      "fixture_replies": [
+        {
+          "round": "initial resumed task",
+          "answers": {
+            "Q1": "Retain completed export files for 7 days.",
+            "D1 change": "Allow replacing an existing single-file destination only with explicit per-command confirmation."
+          },
+          "unanswered": [
+            "Q2"
+          ],
+          "terminology": "Account is the ledger concept; produced CSV is an export file."
+        },
+        {
+          "round": "revision-2 frontier",
+          "answers": {
+            "Q2": "Digest of complete input contents.",
+            "Q3": "Operator retention/cleanup; export/resume commands must not automatically delete completed files."
+          },
+          "unanswered": [
+            "Q4"
+          ]
+        },
+        {
+          "round": "revision-3 frontier",
+          "answers": {
+            "Q4": "Preserve previous destination until complete replacement; failure/interruption/size/time limits leave it intact.",
+            "Q5": "Seven days begin at each file first successful completion; resume must not reset that start.",
+            "Q6": "Missing completed output stops with clear error, preserving existing files/completed progress, without automatic regeneration."
+          }
+        },
+        {
+          "round": "explicit scope deferral",
+          "answer": "Defer age-based checkpoint eligibility, destination collision/race, changed completed output and corrupt recovery-record branches for later design work. These are material and affected scope remains unready; no waiver or whole-pack claim."
+        },
+        {
+          "round": "presented retention-recovery-r5 summary",
+          "answer": "I confirm summary retention-recovery-r5 accurately states the reviewed retention/recovery decisions, coverage and explicit material deferrals, including the affected scope that remains unready. This confirms only that named revision-5 focused summary. It does not answer Q7\u2013Q9, certify untouched scope, or authorize implementation/publication."
+        }
+      ],
+      "report": "Applied grill-rfc and its required companions to working revision 2. Recorded Q1 as **7 days**, changed D1 to explicit confirmation for each replacement command, preserved D2\u2013D4 and both milestone groups, and separated \u201caccount\u201d from \u201cexport file.\u201d\n\nUpdated the RFC, three cards, plan, generated view and entrypoint in the [current pack](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/README.md). Created a local glossary and check receipts; the [artifact inventory](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/checks/artifact-paths.json) lists every changed/created path. Saved this account as [evaluation-result.md](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/evaluation-result.md).\n\nChecks actually run: candidate skill-tree comparison matched `39f02b7`; offline validator and renderer both exited 0; artifact audit passed unique criterion assignment, local target existence, schema identity, generated-view equality and preservation of 14 protected inputs. Originals and source are unchanged. The fixture is not a Git repository. Live references, semantic acceptance and execution eligibility remain unchecked; no implementation tests ran.\n\nThe next question round, saved in the [design record](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/DECISIONS.md), is:\n\n1. **Q2:** Should resume verify the complete input with a digest, or only filename/size? Recommend the full digest: it detects content changes but requires reading the entire input. Filename/size can miss changed entries and would reopen D4\u2019s guarantee.\n2. **Q3:** Who owns the 7-day retention and cleanup? Recommend operator responsibility under the existing no-deletion boundary. Tool-managed cleanup would amend that boundary and require subsequent clock/expiry/recovery decisions.\n3. **Q4:** After a confirmed replacement fails or is interrupted, must the previous file survive? Recommend preserving it until a complete replacement exists, requiring temporary space. Early replacement may destroy it and leave incomplete output.\n\nRetention timing, expiry/checkpoint recovery, collision/race behavior and confirmation remain pending. A pre-existing single-file row-bound discrepancy is recorded for later review. Both milestones remain unready for affected behavior. Next action: await explicit simulated answers, update only answered branches and affected artifacts, regenerate the view, then continue toward confirmation for the resulting scope/version.\n\nMy commands are quiescent: all completed, with no background jobs launched. No commits, pushes, installations, live selections, product edits or real user-input calls occurred. Work depending on answers is stopped.\n\n---\n\nContinued to working revision 3 using the explicit fixture replies. Settled Q2 as a digest of the complete input contents, Q3 as operator-owned retention/cleanup with no automatic deletion of completed files by export/resume commands, and the Account/export-file terminology. **Q4 remains unanswered.**\n\nPropagated those answers through the RFC, glossary, three cards, canonical plan, generated view and entrypoint in the [current pack](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/README.md). Preserved exact limits, prior settled answers, original milestone grouping and supplied originals. The [revision-3 inventory](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/checks/artifact-paths-r3.json) lists changed/created paths. Appended this continuation to [evaluation-result.md](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/evaluation-result.md).\n\nChecks actually run: revision-3 offline validator and renderer both exited 0. Artifact audit passed criterion uniqueness/assignment, local target existence, schema identity, grouping preservation, generated-view equality, Backlog card status, the explicit Q2/Q3 answers and preservation of Q4/14 protected inputs. Structural success does not establish semantic readiness, live references or execution eligibility. No implementation tests ran.\n\nThe next frontier, saved in the [design record](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/DECISIONS.md), is:\n\n1. **Q4:** What happens to the prior file if a confirmed replacement fails or is interrupted? Recommend keeping it intact until replacement completes, using temporary space. Early destructive replacement may lose it and leave incomplete output.\n2. **Q5:** When do the operator\u2019s seven days begin for batch files? Recommend each file\u2019s first completion, without reset on later resume. Starting at successful whole-batch completion keeps older files longer and provides no start date for an unfinished batch.\n3. **Q6:** If input still matches but a checkpoint refers to a completed file the operator removed, should resume stop or regenerate it? Recommend a clear missing-output error while preserving existing files. Regeneration restores output automatically but may undo deliberate cleanup and consume space.\n\nAge-based checkpoint eligibility, collision/race behavior, changed outputs and corrupt recovery records remain unresolved. Shared-understanding confirmation is pending; Q2/Q3 answers confirm those decisions only. Both milestones remain unready for affected behavior. Next action: await explicit simulated answers, propagate only answered branches, regenerate the view and continue the focused review.\n\nAll my commands completed; no background jobs were launched. No real user-input calls, product changes, commits, pushes, installations or live selections occurred. Work depending on pending answers is stopped.\n\n---\n\nFinished the named focused review and recorded the exact synthetic confirmation of **retention-recovery-r5** in the [design record](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/DECISIONS.md). Confirmation covers only revision 5\u2019s reviewed decisions, coverage and explicit material deferrals; it changes no requirement or plan and authorizes no implementation/publication.\n\nApplied Q4\u2013Q6: every failed confirmed replacement leaves the prior destination intact; the operator\u2019s seven days start at each file\u2019s first successful completion without resume resets; missing checkpointed completed output stops with a clear error, preserving existing files and recorded progress without automatic regeneration. Earlier digest, operator-cleanup and terminology answers remain unchanged.\n\nAge-based checkpoint eligibility, destination collision/race, changed completed output and corrupt recovery records remain **material, unanswered and explicitly deferred**. Their affected scope remains unready. The unrelated row-bound discrepancy and other unreviewed scope remain visible; no whole-pack readiness is claimed. No active question or confirmation remains in this focused round. Next action belongs to later authorized design work on those branches.\n\nUpdated the current overview, RFC, glossary, cards, plan, generated view and entrypoint; the [final artifact inventory](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/checks/artifact-paths-r5.json) lists all paths. Appended this actual continuation to [evaluation-result.md](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/evaluation-result.md), preserving earlier accounts.\n\nChecks actually run: revision-4 and final revision-5 offline validation/rendering passed. The [final receipt](/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/checks/plan-validation-r5.json) binds the exact JSON digest; the final audit verified generated-view equality, grouping/schema/criterion consistency, local targets, exact scoped confirmation, material deferrals and 14 unchanged protected inputs. No unchanged checks were repeated solely for confirmation. Live references, semantic acceptance and execution eligibility remain unchecked; no implementation tests ran.\n\nMy commands are quiescent: all completed, no background jobs launched. No source/product changes, commits, pushes, installations, live selections or real user-input calls occurred.\n",
+      "final_decision_record": "# Design record: ledger export\n\n## Scope and provenance\n\nUnadopted working revision 5 of fixture ChatGPT draft revision 1. Originals remain\nin [supplied/original](../../supplied/original/); edits belong in `drafts/current`.\nThis continuation applies explicit simulated answers to Q4, Q5 and Q6, retaining\nall earlier answers and terminology, then records the user's additional explicit\nmaterial deferrals. Detailed review remains focused on retention and recovery;\nother scope remains explicitly unreviewed. The user has now explicitly confirmed\nsummary retention-recovery-r5 after reading its actual section, without answering the\ndeferred design branches or changing any requirement. Authored groups remain single-file, then batch/resume. This record contains\nfixture design answers, not acceptance of skill implementation or product execution.\n\n## Decisions\n\n| Decision | Requirement/acceptance | Status and actual answer | Rationale/consequences | Depends on / affected artifacts |\n|---|---|---|---|---|\n| D1 Destination consent | RFC AC01 | Settled, revised in revision 2: \u201cinstead of refusing an existing destination, allow replacing it after an explicit per-command confirmation\u201d | Supersedes the earlier refusal policy for the single-file destination. Absence, rejection or silence is not confirmation. Prior confirmation cannot authorize a later command. D8 now requires preserving the prior destination on every failed replacement. | Reopens affected confirmation and replacement safety; RFC, DRAFT-0001, single-file milestone, closeout |\n| D2 Bounded files | RFC AC02; unchanged goals | Settled in supplied history: at most 100 data rows and 10 MiB | Exact bounds retained; no new answer inferred | RFC, cards and both milestone exits |\n| D3 Job timeout | RFC AC01/AC02 | Settled in supplied history: 30 seconds | Exact proposed default retained; observed module declares 45 seconds and does not enforce a timeout. Full-input verification is not permission to extend the job limit. | RFC, cards and milestones |\n| D4 Resume identity mismatch | RFC AC03 | Settled in supplied history: refuse mismatched input | Avoid duplicate/wrong output; D6 now settles verification by complete-input contents | Batch/resume and closeout |\n| D5 Retention duration / Q1 | RFC AC04/AC05 | Settled answer: \u201cretain completed files for 7 days\u201d | Duration and operator ownership are settled. D10 now starts it at each file's first successful completion without resume resets; checkpoint age eligibility remains open in D12. | D7, D10, D11 and D12; both implementation cards and milestones |\n| D6 Identity verification / Q2 | RFC AC03 | Settled explicit simulated answer: \u201cuse a digest of the complete input contents\u201d | Compare the resumed input against the recorded complete-input digest before producing resumed output. Filename/size alone is insufficient. Digest algorithm and checkpoint internals remain optional detail. | RFC, DRAFT-0002, batch-resume exit and closeout |\n| D7 Retention ownership / Q3 | RFC AC04/AC05 | Settled explicit simulated answer: \u201cthe operator owns retention and cleanup; export/resume commands must not automatically delete completed files\u201d | A retention deadline does not authorize command cleanup. Preserve completed files from automatic retention deletion; D1's explicitly confirmed replacement remains a separate operator action. No cleanup service or command is introduced. | RFC, both implementation cards, both milestone exits, closeout; cleanup ownership remains settled |\n| D8 Failed confirmed replacement / Q4 | RFC AC01 | Settled explicit simulated answer: preserve the previous destination until a complete replacement is available; interruption, a size/time limit or other replacement failure leaves it intact | Failed replacement must not truncate, remove or partially replace the prior destination; successful publication may replace it after per-command confirmation. Commit/staging mechanics are not prescribed. | RFC, DRAFT-0001, single-file exit and closeout |\n| D9 Domain terminology | RFC terminology; pack-local glossary | Settled explicit simulated answer: \u201cKeep Account as the ledger concept and call the produced artifact an export file\u201d | No one-file/one-account assumption. No live glossary adoption is implied. | RFC, glossary, cards and question wording |\n| D10 Retention clock / Q5 | RFC AC04/AC05 | Settled explicit simulated answer: the operator's seven days begin at each export file's first successful completion; later resume must not reset that start | Same per-file rule applies to single-file and batch output, including an unfinished batch. No automatic deletion follows from reaching the date. | RFC, both implementation cards, both exits and closeout |\n| D11 Missing completed output / Q6 | RFC AC03/AC05 | Settled explicit simulated answer: stop with a clear missing-output error, preserve existing files and recorded completed progress, and do not automatically regenerate missing output | A checkpoint offset is not proof that recorded output remains available; respect operator cleanup and retain the recovery record for deliberate recovery. | RFC, DRAFT-0002, batch-resume exit and closeout |\n| D12 Checkpoint age eligibility / Q7 | RFC AC05 | Explicitly deferred, material; no actual eligibility answer. The user assigned age-based checkpoint eligibility to later design work and understands affected scope remains unready. | Neither expiry nor indefinite resume is selected. The previous no-age-only-expiry recommendation remains unaccepted. | Batch recovery unready for this branch; RFC/card/plan/closeout carry the deferral |\n| D13 Untrusted recovery data / Q8 | RFC AC03 | Explicitly deferred, material; no repair/refusal answer. The user deferred changed completed output and corrupt recovery-record branches to later design work. | Missing/unreadable/corrupt record cases grouped in Q8 remain unresolved; Q6 only settles missing completed output. No error/repair mechanism is chosen. | Batch recovery unready for this branch; RFC/card/plan/closeout carry the deferral |\n| D14 Destination collision/race / Q9 and related race branch | RFC AC01/AC03 | Explicitly deferred, material; no collision/race answer. The user assigned destination collision/race branches to later design work. | No refusal, replacement, concurrency or ownership-resolution policy is selected for unrelated batch files or destination changes during confirmation/publication. D1/D8 remain settled for the defined single-file behavior. | Affected single-file destination-race and batch collision/race scope remain unready; RFC/cards/plan/closeout carry the deferral |\n\n## Grounding and language\n\n[ledger.py](../../ledger.py) opens the destination with mode `w`, writes the `account`\nand `amount` columns and declares `DEFAULT_TIMEOUT_SECONDS = 45`. It has no batch,\nresume, retention or confirmation path, and its export function does not enforce the\nproposed row, size or timeout bounds. These are observed facts; the 30-second proposal\nis unchanged. The supplied ownership refusal was a proposal, not current behavior.\n\nThe fixture glossary defines an account as a named grouping of ledger entries.\nThe resumed user explicitly retained that concept and chose \u201cexport file\u201d for the\nproduced CSV. The [pack-local glossary](GLOSSARY.md) reflects that answer; no\none-file/one-account requirement is inferred, and no live glossary was changed.\n\n## Interrupted round and actual continuation\n\n- Q1 was explicitly answered as **7 days** in revision 2; duration remains settled.\n- Q2 and Q3 were initially unanswered, then explicitly settled in revision 3 as\n  complete-input contents digest and operator-owned retention/cleanup with no\n  automatic deletion of completed files by export/resume commands.\n- Q4 was deliberately unanswered through revision 3. It is now explicitly answered:\n  preserve the previous destination until a complete replacement is available;\n  interruption, a size/time limit or any other replacement failure leaves it intact.\n- Q5 is now explicitly answered: each file's first successful completion starts the\n  operator's seven days, and later resume must not reset that start.\n- Q6 is now explicitly answered: missing checkpointed completed output causes a clear\n  error while preserving existing files and recorded completed progress; no automatic\n  regeneration is allowed.\n- The additional simulated user scope decision explicitly defers age-based checkpoint\n  eligibility, destination collision/race, changed completed output and corrupt\n  recovery-record branches for later design work. The user understands these are\n  material, leave affected scope unready, and are not a waiver or whole-pack readiness.\n- Account/export-file terminology and D1\u2013D4 remain unchanged. That deferral message\n  explicitly does **not** confirm a summary/version that had not yet been presented.\n  The subsequent exact confirmation of the presented revision-5 summary is recorded\n  below; the earlier deferral message itself was not treated as confirmation.\n\n## Deferred question record for later design work\n\nQ7\u2013Q9 retain the actual questions previously prepared, now explicitly deferred by\nuser scope decision. They are not the active frontier and require no answer in this\nfocused round. They remain material/unanswered, with affected scope unready. Their\nrecommendations are preserved as proposals only; none is accepted by the deferral.\n\n**Q7 \u2014 May resume continue after the seven days if input, completed output and\n  recovery data are still valid?**\nFor example, a batch is interrupted and the operator keeps every completed file for\n10 days. Recommendation: do not expire its checkpoint merely because it is old;\nretention remains the operator's policy, with normal recovery validation still required.\n\n- **No age-only expiry (recommended):** Intact retained output remains resumable;\n  missing output still stops under Q6, and cleanup remains the operator's choice.\n- **Expire resume eligibility after seven days:** Require a fresh export after the\n  retention deadline even if files remain; the checkpoint deadline must then be defined\n  consistently for batches containing files completed at different times.\n\n**Q8 \u2014 If a checkpoint is missing/corrupt or a completed file still exists but has\n  changed, must resume stop, or may it offer explicit repair?**\nRecommendation: stop with a clear recovery-data error, leave files and available\nrecorded progress unchanged, and require operator recovery. Q6 already settles the\nseparate missing-completed-file case; this question does not reopen it.\n\n- **Stop and preserve (recommended):** Do not guess an offset or overwrite changed\n  output; restoring a trustworthy recovery basis is an operator action.\n- **Offer confirmed repair:** Add an explicitly confirmed reconstruction/repair path\n  for damaged records or changed output; its validation and ownership contract would\n  need a later dependent round. This does not permit automatic regeneration under Q6.\n\n**Q9 \u2014 If the next numbered batch path contains an unrelated file, should batch or\n  resume refuse, or allow explicitly confirmed replacement?**\nRecommendation: refuse with a collision error while preserving that file, existing\ncompleted output and recorded progress. Normal resume can still replace a proven\npartial file belonging to its own interrupted run, as already proposed.\n\n- **Refuse unrelated collisions (recommended):** Preserve output ownership; the\n  operator can move the unrelated file or select a fresh batch directory.\n- **Permit confirmed replacement:** Extend D1's per-command confirmation and D8's\n  preservation-on-failure policy to that batch collision; this expands replacement\n  behavior beyond the currently settled single-file scope.\n\n## Remaining recovery branches and explicit deferrals\n\nQ4\u2013Q6 are settled by actual answers. The user's additional scope decision is: defer\n\u201cage-based checkpoint eligibility, destination collision/race, changed completed output\nand corrupt recovery-record branches\u201d for later design work, acknowledging that these\nare material and their affected scope remains unready. This is an explicit deferral,\nnot a selected behavior, readiness waiver, acceptance evidence or whole-pack claim.\n\nConsequences: AC05 remains unready for checkpoint-age behavior; AC03 remains unready\nfor changed output, untrusted recovery records and unrelated batch collision/race;\nAC01's destination-race branch also remains unready. Existing settled mismatch refusal,\nmissing-output refusal/progress preservation and replacement-failure preservation\nremain in force for their defined cases. No deferred branch is resolved by analogy.\nThe Q8 record-integrity group includes its already recorded missing/unreadable/corrupt\ncheckpoint cases; these remain unresolved for later design. The pre-existing single-\nfile row-bound discrepancy is retained separately as unreviewed, with full-scope\nreadiness unresolved.\n\nExisting AC03 requires no duplicate entries after interruption, including a crash\nafter a file completes but before its offset is recorded. Partial files are excluded\nfrom completed offsets. Full-input digest mismatch is refused without changing\ncompleted files, and verification respects the existing 30-second job limit.\nExact transactional/checkpoint/staging mechanics, class/module structure and hash\nalgorithm remain optional internal design deferred under the observable constraints.\nNo implementation mechanism is imposed as an authoring/confirmation prerequisite.\nGeneral concurrent-writer support beyond the material destination-race deferral and\nother unrelated scope remain unreviewed; no support or exclusion is adopted here.\n\n## Readiness and coverage\n\nStructural validity: `python3 -B` with the discovered implement-rfc offline\n`examples/milestone-plans/validate.py` passed the final revision-5 JSON normally and\nwith `--render` (exit 0). Renderer stdout regenerated `MILESTONES.md`; the final\n[receipt](checks/plan-validation-r5.json) records exact commands/results and the plan\nSHA256. Earlier receipts are preserved. No unchanged plan check was repeated solely\nfor confirmation. Offline passes do not resolve live references, prove semantic\nadequacy or supply implementation acceptance evidence. Defined criteria remain assigned\nto the original plan groups; complete decomposition does not settle deferred material design.\n\nDesign readiness: the reviewed decisions are defined, and the user's material deferrals\nare explicit with their consequences understood. Affected destination-race, checkpoint-\nage, collision and recovery-data-integrity scope remains unready. Other scope, the\nrow-bound discrepancy and general concurrency remain unreviewed. No full milestone or\nfull pack is declared ready. Exact scoped synthetic confirmation is now recorded below.\nReview coverage: retention duration/ownership/clock, missing-output recovery,\ncomplete-input identity, interruption/offset recovery, replacement consent/failure,\nterminology, plus identification and explicit deferral of the named material branches.\nExecution eligibility is unevaluated: no live mappings, mandate, baseline, card claims\nor implementation acceptance evidence is established by drafting checks or confirmation.\n\n## Shared understanding and confirmation\n\nSummary ID: **retention-recovery-r5**. Scope: the reviewed retention/recovery decisions\nand their explicit deferrals in working revision 5, retaining supplied numeric bounds\nand authored grouping. Other design scope is explicitly unreviewed.\n\n1. The operator owns seven-day retention and cleanup, starting at each export file's\n   first successful completion. Later resume does not reset that start; export/resume\n   commands do not automatically delete completed files.\n2. Replacing an existing single-file destination requires explicit confirmation for\n   that command. Only a complete replacement may be published. Interruption, size/time\n   limits or any other replacement failure leave the prior destination intact.\n3. Resume checks a digest of the complete input contents, refuses a mismatch without\n   changing completed files, excludes interrupted partial files from completed\n   progress, and retains the no-duplicate requirement. Missing checkpointed completed\n   output causes a clear error while preserving existing files and recorded progress;\n   it is not automatically regenerated.\n4. Account remains the ledger concept; the produced CSV is an export file. Existing\n   bounds remain 100 data rows, 10 MiB and 30 seconds; the pre-existing single-file\n   row-bound discrepancy is retained for later review.\n5. Age-based checkpoint eligibility, destination collision/race, changed completed\n   output and corrupt recovery-record branches are explicitly deferred, material and\n   unready in their affected scope. No deferred policy or whole-pack readiness is\n   inferred. Optional internals remain deferred; other scope is unreviewed.\n\n**Recorded scoped synthetic confirmation:** The user explicitly read this actual\nsection and confirmed summary **retention-recovery-r5**, working revision 5:\n\n> I confirm summary retention-recovery-r5 accurately states the reviewed retention/recovery decisions, coverage and explicit material deferrals, including the affected scope that remains unready. This confirms only that named revision-5 focused summary. It does not answer Q7\u2013Q9, certify untouched scope, or authorize implementation/publication.\n\nThis actual answer confirms only the named reviewed decisions, actual coverage and\nexplicit material deferrals. Q7\u2013Q9 remain unanswered/deferred; their affected scope\nremains unready. No requirement or plan change results from this confirmation, so\nrevision 5 is retained. Neither the earlier deferral instruction nor silence was used\nas confirmation. This record creates no implement-rfc review gate and authorizes no\nimplementation, publication or whole-pack readiness claim.\n\n## Continuation\n\nThe named revision-5 focused review and its scoped synthetic confirmation are complete.\nNo further answer is sought in this focused round. Preserve the explicit material\ndeferrals and unready scope for later design work; future adoption/implementation must\nresolve its affected behavior under the user's then-authorized scope. Keep the unrelated\nrow-bound discrepancy and other unreviewed scope visible. Hand off the actual artifacts,\nfinal exact-plan check receipts and quiescent command state. No implementation or\npublication is authorized, and no deferred question has been silently answered.\n",
+      "final_audit": {
+        "revision": 5,
+        "protected_inputs_unchanged": true,
+        "protected_input_count": 14,
+        "changed_protected_inputs": [],
+        "schema_matches_discovered_kit": true,
+        "milestone_grouping_order_dependencies_preserved": true,
+        "unique_authoritative_acceptance_ids": true,
+        "local_acceptance_assignments_exactly_once": true,
+        "criterion_ids": [
+          "AC01",
+          "AC02",
+          "AC03",
+          "AC04",
+          "AC05"
+        ],
+        "final_plan_sha256_matches_receipts": true,
+        "generated_view_matches_final_renderer_stdout": true,
+        "validator_and_renderer_passed": true,
+        "local_markdown_target_count": 40,
+        "local_markdown_targets_exist": true,
+        "missing_local_markdown_targets": [],
+        "exact_scoped_confirmation_recorded": true,
+        "revision_5_retained": true,
+        "no_pending_confirmation_prompt": true,
+        "no_active_design_question_frontier": true,
+        "deferred_question_ids": [
+          "7",
+          "8",
+          "9"
+        ],
+        "material_deferrals_recorded_without_answers": true,
+        "row_bound_discrepancy_retained": true,
+        "card_statuses_backlog": true,
+        "unchecked": [
+          "live selector resolution",
+          "semantic acceptance adequacy",
+          "implementation behavior",
+          "execution eligibility",
+          "Markdown anchor IDs",
+          "unreviewed design scope"
+        ]
+      },
+      "final_plan_validation": [
+        {
+          "revision": 5,
+          "plan_sha256": "aa3c8ce9b120a3b4b2d1a448a888fafac1197c2b0f9b08d0d6cf9eae669941e5",
+          "command": [
+            "python3",
+            "-B",
+            "/Users/jaeger/Documents/GitHub/AgentSkills/skills/implement-rfc/examples/milestone-plans/validate.py",
+            "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/milestone-plan.json"
+          ],
+          "exit_code": 0,
+          "stdout": "Structurally valid; references and semantic coverage unchecked.\n",
+          "stderr": ""
+        },
+        {
+          "revision": 5,
+          "plan_sha256": "aa3c8ce9b120a3b4b2d1a448a888fafac1197c2b0f9b08d0d6cf9eae669941e5",
+          "command": [
+            "python3",
+            "-B",
+            "/Users/jaeger/Documents/GitHub/AgentSkills/skills/implement-rfc/examples/milestone-plans/validate.py",
+            "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/milestone-plan.json",
+            "--render"
+          ],
+          "exit_code": 0,
+          "stdout": "# Milestones\n\n> Generated from `milestone-plan.json`; edit the JSON, not this view.\n\nPlan: **ledger-export** \u00b7 Coverage: **complete**\n\nThese are integration outcomes, not compulsory agent-launch boundaries.\n\n## single-file\n\nOperators can safely export a bounded CSV through the public CLI.\n\n**Work:** `RFC-DRAFT-0001` [AC01, AC04]\n\n**Prerequisites:** None\n\n**Completion:**\n\n- The public single-file path requires per-command confirmation before replacing an existing destination. Only a complete replacement may be published; interruption, size/time limits or any other replacement failure leaves the previous destination intact.\n- Single-file export preserves the exact output/job limits, documents operator-owned 7-day retention from first successful completion without resume resets, and performs no automatic retention deletion.\n- Resolve the explicitly deferred destination-race behavior before claiming acceptance for that affected scope; this drafting review does not waive it or certify other single-file scope.\n\n**Boundary:** A usable single-file export before the batch increment.\n\n## batch-resume\n\nOperators can resume bounded batches without duplicate output.\n\n**Work:** `RFC-DRAFT-0001` [AC02, AC03, AC05]\n\n**Prerequisites:** single-file\n\n**Completion:**\n\n- Public batch/resume paths satisfy partition, interruption and complete-input digest verification, including file-completion/checkpoint interruption; missing checkpointed output stops with a clear error without changing existing files or recorded progress and without automatic regeneration.\n- Batch/resume documents operator-owned 7-day retention from each file's first successful completion without resume resets or automatic completed-file deletion. Explicitly deferred checkpoint-age, recovery-data integrity and destination collision/race policies require later design resolution before acceptance of their affected scope; all RFC criteria need actual closeout evidence during authorized execution.\n\n**Boundary:** The complete defined batch/resume outcome with closeout evidence.\n",
+          "stderr": ""
+        }
+      ],
+      "partial_reply_audit": {
+        "revision": 3,
+        "protected_inputs_unchanged": true,
+        "protected_input_count": 14,
+        "changed_protected_inputs": [],
+        "schema_matches_discovered_kit": true,
+        "milestone_grouping_order_dependencies_preserved": true,
+        "unique_authoritative_acceptance_ids": true,
+        "local_acceptance_assignments_exactly_once": true,
+        "criterion_ids": [
+          "AC01",
+          "AC02",
+          "AC03",
+          "AC04",
+          "AC05"
+        ],
+        "local_markdown_target_count": 40,
+        "local_markdown_targets_exist": true,
+        "missing_local_markdown_targets": [],
+        "generated_view_matches_recorded_renderer_stdout": true,
+        "active_frontier_ids": [
+          "4",
+          "5",
+          "6"
+        ],
+        "unanswered_q4_preserved": true,
+        "q2_and_q3_explicit_answers_recorded": true,
+        "confirmation_pending": true,
+        "card_statuses_backlog": true,
+        "unchecked": [
+          "live selector resolution",
+          "semantic acceptance adequacy",
+          "implementation behavior",
+          "execution eligibility",
+          "Markdown anchor IDs"
+        ]
+      }
+    },
+    {
+      "name": "missing-companion",
+      "agent": "/root/tabletop_missing_companion",
+      "state": "pass",
+      "covers": [
+        "missing companions",
+        "partial capability preservation",
+        "contradictions"
+      ],
+      "observed": [
+        "Only grill-rfc and grill-me resolved in isolated inventory; author-rfc and implement-rfc explicitly unavailable, no ambient substitute used.",
+        "Useful bounded source probe and independent frontier recorded, with recommendations unaccepted and final confirmation pending.",
+        "Working/supplied pack stayed unchanged; schema validation and complete artifact workflow correctly unavailable.",
+        "No automatic install, source/product changes or real state edits."
+      ],
+      "report": "# Missing-companion tabletop result\n\nCandidate: `39f02b7c654699e76233b8cfe6f966d915ca74b9`.\n\nResult: useful independent grounding completed; complete RFC grilling and artifact synchronization remain pending. No answers or confirmation were fabricated.\n\n## Actions and capability boundary\n\n- Read this fixture's `AGENTS.md`, `README.md`, `GLOSSARY.md`, `ledger.py`, and the supplied working pack under `drafts/current/`.\n- Used the discovered `grill-rfc` and `grill-me` guidance. The complete isolated inventory cannot resolve `author-rfc` or `implement-rfc`; no ambient or sibling copy of either absent capability was accessed.\n- The candidate comparison `git diff --exit-code 39f02b7c654699e76233b8cfe6f966d915ca74b9 -- skills/grill-rfc/SKILL.md skills/grill-me/SKILL.md` returned exit 0. Although the canonical checkout HEAD is `d9a7cbace49d783c7dc5fda7ea5dbb31b72bc0dd`, the two skill files read match the requested candidate.\n- Preserved the unadopted revision-1 pack, supplied decisions and two authored outcomes (`single-file`, then `batch-resume`). Did not revise RFCs, cards, the canonical plan or generated milestone view without the artifact-owning companion.\n- Executed a bounded baseline probe using a temporary directory inside this fixture; removed its temporary CSV when the probe finished. Saved separate grounding evidence, without product implementation.\n\n`author-rfc` is needed for the complete artifact contract, provenance handling and coordinated changes across RFC acceptance, decisions, cards, plan JSON and generated view. `implement-rfc` is needed for the companion's portable plan-kit workflow and its validation surfaces. A supplied schema file does not resolve either missing skill. Their portions remain pending.\n\n## Observed facts and actual checks\n\n`ledger.export` opens its destination in write mode. An execution probe replaced an existing sentinel file with the expected `account,amount` CSV and passed. The module declares `DEFAULT_TIMEOUT_SECONDS = 45`; inspection shows `export` does not enforce that timeout. The module's only top-level function is `export`, with no CLI, batch or resume definition. Thus the proposed refusal of existing destinations, 30-second timeout, CLI, bounds and recovery are proposed changes, not existing implementation behavior.\n\nBoth current plan JSON and supplied schema JSON parsed successfully. The plan assigns AC01 to `single-file`, and AC02/AC03 to `batch-resume` with a dependency on `single-file`. This records observed structure only. Schema validation was not run because `jsonschema` is unavailable; nothing was installed. The unavailable implement-rfc kit, reference resolution, semantic coverage, live selectors and execution eligibility were not verified.\n\nSHA-256 checks confirmed that all read fixture instructions, glossary, source and working-pack files were unchanged during the grounding probe. The supplied originals were never modified or used as replacement outputs. There were no commits, pushes, installations, live selections, publication or source changes.\n\n## Pending frontier questions for simulated replies\n\nThe following three questions have settled factual prerequisites. Their recommendations remain unaccepted. Return explicit simulated answers to the coordinator; dependent design changes and final confirmation are stopped pending those answers and the missing companion capability.\n\n1. **Single-file row overflow:** The Goals say each file has at most 100 data rows, but D2 assigns the bound to the batch milestone and AC01 omits the row limit. With 101 entries that fit within 10 MiB and 30 seconds, what should `ledger export OUTPUT` do? **Recommendation:** retain the 100-row maximum and return an explicit overflow error rather than write 101 entries. Restricting the row bound to batch output changes the stated Goals. The failed destination's state is the separate question below.\n\n2. **Failed single-file destination:** When a new single-file export reaches its size or time limit before all entries are written, should the destination retain a visible partial CSV, or should a CSV appear there only after successful completion? **Recommendation:** publish only a complete successful CSV and expressly permit cleanup of job-owned temporary output. This needs clarification of the broad \u201cNo ... deletion\u201d boundary. Retaining a partial destination makes a normal retry fail the settled existing-destination refusal, so that choice also needs an explicit recovery contract.\n\n3. **Batch crash between file and offset:** Suppose a numbered CSV is fully written, but the process stops before its completed row offset is durably recorded. May resume replace that unrecorded file, or must it recover the file as completed? **Recommendation:** define completion by a durable validated checkpoint and permit replacement of this run's uncommitted output, while preserving checkpointed files. Recovering an unrecorded file as complete requires durable evidence of its exact entries and offset. The current \u201cpartial file\u201d wording does not settle this fully written, unrecorded case.\n\n## Coverage and continuation\n\nActual coverage: source baseline; destination ownership; numeric-default change; single-file overflow and failure scenarios; one batch interruption boundary; observed milestone grouping and criterion references. This is scoped independent grounding, not a completed interview or artifact review. Input identity definition, input sourcing for the proposed CLI, concurrent writers, exact limit accounting, further recovery scenarios and complete acceptance/dependency semantics remain unreviewed. Supplied D1\u2013D4 were retained as supplied decisions, not newly confirmed. No final shared-understanding confirmation was requested or recorded because material questions remain open.\n\nNext action: answer the three frontier questions and make `author-rfc`, with its resolvable `implement-rfc` companion, available through the fixture's host discovery. Resume `grill-rfc` from `drafts/current/` and this continuation record; keep the supplied provenance and authored grouping. Then apply accepted decisions consistently, use the companion's actual validation workflow, and obtain explicit confirmation of the resulting scope/version and actual coverage. No install command is prescribed from an unavailable capability.\n\nOutputs:\n\n- `evaluation-result.md` \u2014 this account, capability limits, questions and continuation.\n- `review-evidence/checks.json` \u2014 actual grounding results and input hashes.\n\nCommand quiescence: every invoked command completed; the probe's temporary directory was cleaned up; no asynchronous cell, shell session, child agent or background job was started. All dependent work is stopped awaiting simulated replies and missing capabilities.\n"
+    },
+    {
+      "name": "nonsoftware",
+      "agent": "/root/tabletop_nonsoftware",
+      "state": "pass",
+      "covers": [
+        "conversation-only standalone grilling",
+        "ordinary conversation question fallback"
+      ],
+      "observed": [
+        "Read only grill-me from explicit inventory.",
+        "Asked three independent questions about primary goal, known availability and book-budget ownership, each with recommendation and tradeoff.",
+        "All recommendations and scheduling/venue choices remain unaccepted pending answers.",
+        "No RFC companions, output artifacts, delegation, external actions, or user-input tool used."
+      ],
+      "actual_frontier": [
+        "What should this group chiefly achieve: neighbor connection, thoughtful book discussion, or a regular reading habit? Recommend neighbor connection with a manageable shared read; varied reading speeds welcomed at some cost to depth.",
+        "What is already known about your and likely members availability for weekly evenings versus a long Saturday? Recommend establishing availability before format; frequent commitment versus risk of a month missed.",
+        "Must the $120 cover books, or can members obtain their own copies? Recommend participants sourcing/borrowing with some assistance budget; venue flexibility versus participant preparation."
+      ],
+      "command_state": "One completed cat command; no files changed or running commands."
+    }
+  ],
+  "fresh_generated_handoff": {
+    "path": "fresh-generated-handoff.json",
+    "state": "pass",
+    "public_commands": 18,
+    "consumer_roots": [
+      "FAL: docs/rfcs + docs/items",
+      "FBE: design/specifications + work/cards"
+    ],
+    "milestones_bound": [
+      "safe-single-file-export"
+    ],
+    "criteria_bound": [
+      "AC01",
+      "AC02",
+      "AC03",
+      "AC04"
+    ],
+    "future_work_preserved": [
+      "AC05",
+      "AC06",
+      "AC07",
+      "AC08",
+      "AC09",
+      "AC10"
+    ],
+    "note": "An initial runtime-driver /var versus /private/var normalization error was corrected only in the disposable driver; no source-package defect surfaced."
+  },
+  "material_source_defects_found": [],
+  "commands_and_writers": "All five evaluator assignments and coordinator audits complete; commands quiescent, no background evaluator writers. Canonical source writer ownership may return to the same engineering leaf for acceptance and closeout.",
+  "state": "pass for covered source acceptance; host limitations remain explicit",
+  "criteria_judgments": {
+    "AC01": {
+      "outcome": "pass",
+      "reason": "Actual generated portable authoring output, supplied-pack revisions, scoped readiness and protected adopted amendment observed."
+    },
+    "AC02": {
+      "outcome": "pass",
+      "reason": "Independent frontier rounds, recommendations remaining unaccepted, partial/resumed/changed answers, propagation, explicit material deferrals and separate scoped confirmation observed."
+    },
+    "AC05": {
+      "outcome": "pass",
+      "reason": "Five fresh isolated agents cover all ten named behavioral situations. Scenario and host limits remain explicit; no broader native qualification inferred."
+    }
+  }
+}
