@@ -1,0 +1,11 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0093",
+    "ASK-0094"
+  ],
+  "reserve_for": "rfc-authoring-skills",
+  "purpose": "",
+  "created": "2026-10-02T04:26:54.916243+00:00",
+  "base": "fb2f330e75410a32a9c68cdf818f139d524cfc5e"
+}
