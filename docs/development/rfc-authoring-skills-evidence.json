@@ -1,0 +1,57 @@
+{
+  "candidate": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+  "records": [
+    {
+      "criterion": "portable-handoff",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "command",
+        "detail": "[\"env\", \"MASK_PROGRAM=/Users/jaeger/Documents/GitHub/ManageAgentSkills\", \"python3\", \"-B\", \"skills/author-rfc/tests/test_portable_handoff.py\"]",
+        "exit_code": 0,
+        "elapsed_seconds": 10.847,
+        "stdout_tail": "",
+        "stderr_tail": "..\n----------------------------------------------------------------------\nRan 2 tests in 10.795s\n\nOK\n"
+      }
+    },
+    {
+      "criterion": "documentation",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "command",
+        "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+        "exit_code": 0,
+        "elapsed_seconds": 0.252,
+        "stdout_tail": "15 RFCs, 94 cards; 0 structural violations\n",
+        "stderr_tail": ""
+      }
+    },
+    {
+      "criterion": "portable-source",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "command",
+        "detail": "[\"python3\", \"-B\", \"skills/implement-rfc/scripts/validate_portable_agents.py\", \"--source-only\"]",
+        "exit_code": 0,
+        "elapsed_seconds": 0.084,
+        "stdout_tail": "portable source valid\n",
+        "stderr_tail": ""
+      }
+    },
+    {
+      "criterion": "offline-kit",
+      "outcome": "pass",
+      "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
+      "evidence": {
+        "kind": "command",
+        "detail": "[\"python3\", \"-B\", \"-m\", \"unittest\", \"discover\", \"-s\", \"skills/implement-rfc/tests\", \"-p\", \"test_milestone_authoring.py\"]",
+        "exit_code": 0,
+        "elapsed_seconds": 0.264,
+        "stdout_tail": "",
+        "stderr_tail": "..s\n----------------------------------------------------------------------\nRan 3 tests in 0.202s\n\nOK (skipped=1)\n"
+      }
+    }
+  ]
+}
