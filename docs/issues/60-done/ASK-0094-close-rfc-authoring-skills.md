@@ -13,6 +13,15 @@ acceptance: [{"criterion":"AC01","outcome":"pass","revision":"39f02b7c654699e762
 
 # Close portable RFC authoring and grilling
 
+Named-bundle follow-up, 2026-10-02: actual ASK-0095 adds the flat
+`agentskills/rfc` index and installation guidance at source candidate
+`fb67261a5fd8a69231e963226189fd98458e4d82`. The [public bundle evidence](../../development/rfc-bundle-evidence.json)
+binds MASK `bc4f9f9015ee2bd3495101e91d0077f35ebc1733`, verifies all 16 package
+discoveries/validation, four installed companions, reviewed implement-rfc setup,
+healthy status and repeat no-op. This source follow-up supplies MASK-0064's bounded
+bundle handoff; no publication, real consumer migration or native host loading is
+claimed. Original authoring acceptance below remains its own historical record.
+
 RFC_BASE_SHA: 9e99199705ad1afec7a8722e38a26b4b37bbbb33
 
 Planned local cards: ASK-0093 and ASK-0094. Scope and mandate are recorded in
