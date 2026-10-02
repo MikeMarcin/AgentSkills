@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0095"
+  ],
+  "reserve_for": "canonical-rfc-bundle",
+  "purpose": "",
+  "created": "2026-10-02T23:22:39.059886+00:00",
+  "base": "6b757708ecfda7566747fb9aaecc2c1820ffacbf"
+}
