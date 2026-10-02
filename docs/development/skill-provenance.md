@@ -41,3 +41,21 @@ upstream wording wherever the adaptation does not change the content, so
 upstream revisions stay diffable; the MASK mechanics reference and the
 RFC-ASK-0008/0010 additions remain this library's own. The card's recorded
 rewrite evidence describes revision `096f3c8`, not the current text.
+
+## Portable RFC authoring and grilling
+
+RFC-ASK-0015 / ASK-0093 adds `author-rfc`, `grill-rfc` and `grill-me`. Adapted
+material comes from Matt Pocock's MIT-licensed `mattpocock/skills` at
+`d81f3a183412e71a5b1e84ca21bc1a35eea03a60`: `skills/engineering/grill-with-docs`,
+`skills/productivity/grilling`, `skills/productivity/grill-me`, and
+`skills/engineering/domain-modeling` (including glossary and ADR guidance).
+Each adapted package retains the upstream notice in `LICENSE`.
+
+The adaptation consolidates interview mechanics in grill-me, bounds rounds to
+three independent questions with explicit answers, supports host discovery and
+conversation without mandatory Skill-tool/subagent dispatch, and removes upstream
+explicit-only metadata. Domain terminology and significant tradeoff criteria are
+adapted into pack-local authoring guidance; live project adoption is separate.
+The artifact/readiness/amendment contract and composition with implement-rfc's
+existing offline kit are this library's additions. No selections, deployments or
+upstream edits are part of this source import.

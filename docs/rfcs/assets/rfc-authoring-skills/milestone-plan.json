@@ -1,0 +1,29 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "rfc-authoring-skills",
+  "scope": {
+    "rfcs": [
+      "RFC-ASK-0015"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "portable-authoring",
+      "outcome": "Three portable skills compose grounded authoring, optional grilling and execution-ready handoff with verified boundaries.",
+      "work": [
+        {
+          "issue": "ASK-0093"
+        },
+        {
+          "issue": "ASK-0094"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "AC01\u2013AC05 pass on the exact canonical candidate, including coordinator-supplied independent behavioral acceptance.",
+        "Source-only integration, documentation, local commits and task-owned temporary command cleanup are complete."
+      ],
+      "boundary": "The complete approved source-only feature; no deployment or publication."
+    }
+  ]
+}

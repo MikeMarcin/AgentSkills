@@ -19,6 +19,11 @@ Roles:
 
 ## Import
 
+`author-rfc` can produce or revise the portable draft before this authorized live
+import. Resolve it by skill name. Its provisional IDs, design decisions and proposed
+amendments do not allocate live IDs or publish over adopted active plans. Optional
+`grill-rfc` creates no implementation review gate; execute against live requirements.
+
 When authoring a new pack, copy the [offline milestone kit](../examples/milestone-plans/README.md)
 to its root and edit the JSON plan first. Include the implementation-entrypoint
 pointer, regenerate its Markdown view, and retain the schema with exported authoring

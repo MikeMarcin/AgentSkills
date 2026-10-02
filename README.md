@@ -10,6 +10,9 @@ The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarci
 
 | Skill | Use it for |
 |---|---|
+| [author-rfc](skills/author-rfc/SKILL.md) | Draft grounded RFCs/packs, revise supplied designs or propose amendments with a portable implementation handoff. |
+| [grill-rfc](skills/grill-rfc/SKILL.md) | Optionally challenge RFC designs while keeping decisions, acceptance and draft artifacts consistent. |
+| [grill-me](skills/grill-me/SKILL.md) | Stress-test plans, decisions or ideas through explicit-answer interviews, including nonsoftware topics. |
 | [implement-rfc](skills/implement-rfc/SKILL.md) | Carry RFCs or RFC packs through bounded implementation, acceptance verification, commits and issue-board closeout. Requires consumer workflow context. |
 | [attended-review](skills/attended-review/SKILL.md) | Prepare protected candidates and save partial human decisions through local HTML, with an offline fallback. |
 | [wizard](skills/wizard/SKILL.md) | Guide required manual steps one at a time with durable progress on native Windows and macOS. |
@@ -69,6 +72,13 @@ and complete contributor documentation. Bundled scripts resolve relative to the
 installed skill, while consumer paths resolve relative to the consumer.
 
 ## Configure implement-rfc
+
+For proposals, use `author-rfc`, optionally `grill-rfc`, then `implement-rfc` for
+authorized execution. `grill-me` supplies shared interview mechanics. Grilling is
+optional per task; drafting confirmation adds no implementation gate. Complete
+portable authoring uses implement-rfc's existing offline kit. RFC grilling requires
+author-rfc and grill-me; resolve companions by skill name in the current host.
+These new source packages are not added to project or personal selections here.
 
 New runs default to `coordinator-implementer`: a low-effort coordinator and one fresh
 provider-routed `rfc-implementer` per milestone or post-review engineering round.

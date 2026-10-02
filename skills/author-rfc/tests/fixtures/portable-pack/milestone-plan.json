@@ -1,0 +1,23 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "ledger-export",
+  "scope": {"rfcs": ["RFC-DRAFT-0001"]},
+  "milestones": [
+    {
+      "id": "single-file",
+      "outcome": "Operators can safely export a bounded CSV through the public CLI.",
+      "work": [{"rfc": "RFC-DRAFT-0001", "criteria": ["AC01"]}],
+      "depends_on": [],
+      "exit_criteria": ["The public single-file path preserves destination ownership and exact output/job limits."],
+      "boundary": "A usable single-file export before the batch increment."
+    },
+    {
+      "id": "batch-resume",
+      "outcome": "Operators can resume bounded batches without duplicate output.",
+      "work": [{"rfc": "RFC-DRAFT-0001", "criteria": ["AC02", "AC03"]}],
+      "depends_on": ["single-file"],
+      "exit_criteria": ["Public batch/resume paths satisfy partition, interruption and identity behavior."],
+      "boundary": "The complete defined batch/resume outcome with closeout evidence."
+    }
+  ]
+}

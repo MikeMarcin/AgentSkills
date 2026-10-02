@@ -9,6 +9,12 @@ Resolve the consumer and the selected execution strategy before loading an engin
 procedure or checking custom roles. Helper paths are relative to this installed skill;
 consumer paths always use an explicit absolute source checkout root.
 
+For proposal drafting or supplied-pack revision, resolve `author-rfc` by skill name;
+it uses the [offline milestone kit](examples/milestone-plans/README.md). Optional
+`grill-rfc` challenges the design. Drafting does not run execution preflight, and
+declining grilling creates no implementation gate. Continue authorized execution
+with this workflow's live requirements and eligibility checks.
+
 For explicit personal storage or a remembered external tracker, first read
 [Personal storage](references/personal-storage.md). Otherwise resolve project context
 with `scripts/project_config.py --repo-root ROOT` and read its `project.json`,
