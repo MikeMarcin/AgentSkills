@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0094"
 title: "Close portable RFC authoring and grilling"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0015"]
 depends_on: ["ASK-0093"]
 closeout_for: ["RFC-ASK-0015"]

@@ -9,7 +9,7 @@ metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans
 
 The owner approved this integrated source-only milestone on 2026-10-01.
 [ASK-0093](../issues/60-done/ASK-0093-author-rfc-and-grilling-skills.md) implements it;
-[ASK-0094](../issues/20-ready/ASK-0094-close-rfc-authoring-skills.md) owns closeout.
+[ASK-0094](../issues/30-in-progress/ASK-0094-close-rfc-authoring-skills.md) owns closeout.
 The [authored plan](plans/rfc-authoring-skills/milestone-plan.json) preserves one
 integrated outcome. Mandate revision: `user-approved-plan-v1`.
 
