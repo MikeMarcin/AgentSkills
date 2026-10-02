@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0093"
 title: "Add portable RFC authoring and grilling skills"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0015"]
 depends_on: []
 priority: "P1"
