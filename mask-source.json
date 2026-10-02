@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "packages": {
+    "attended-review": "skills/attended-review",
+    "author-rfc": "skills/author-rfc",
+    "coauthoring": "skills/coauthoring",
+    "code-simplifier": "skills/code-simplifier",
+    "concept-art-approval-pipeline": "skills/concept-art-approval-pipeline",
+    "grill-me": "skills/grill-me",
+    "grill-rfc": "skills/grill-rfc",
+    "implement-rfc": "skills/implement-rfc",
+    "instamat-image-to-pbr": "skills/instamat-image-to-pbr",
+    "manage-agent-skills": "skills/manage-agent-skills",
+    "pr-tour": "skills/pr-tour",
+    "sprite-sheet-animation-updater": "skills/sprite-sheet-animation-updater",
+    "technical-book-humanizer": "skills/technical-book-humanizer",
+    "trellis-image-to-3d": "skills/trellis-image-to-3d",
+    "wizard": "skills/wizard",
+    "writing-for-agents": "skills/writing-for-agents"
+  },
+  "bundles": {
+    "rfc": {
+      "description": "Draft, grill and implement RFCs with their shared companions.",
+      "skills": [
+        {
+          "source": "agentskills",
+          "id": "author-rfc"
+        },
+        {
+          "source": "agentskills",
+          "id": "grill-rfc"
+        },
+        {
+          "source": "agentskills",
+          "id": "grill-me"
+        },
+        {
+          "source": "agentskills",
+          "id": "implement-rfc"
+        }
+      ]
+    }
+  }
+}

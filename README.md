@@ -78,7 +78,24 @@ authorized execution. `grill-me` supplies shared interview mechanics. Grilling i
 optional per task; drafting confirmation adds no implementation gate. Complete
 portable authoring uses implement-rfc's existing offline kit. RFC grilling requires
 author-rfc and grill-me; resolve companions by skill name in the current host.
-These new source packages are not added to project or personal selections here.
+`author-rfc` also uses implement-rfc's portable plan kit. The flat `agentskills/rfc`
+bundle selects all four companions: author-rfc, grill-rfc, grill-me and implement-rfc.
+After approving the tap and configuring the consumer context below, fetch its catalog
+and review this installation:
+
+```sh
+mask tap fetch agentskills --json
+mask bundle show agentskills/rfc --json
+mask bundle apply agentskills/rfc --project /absolute/path/to/project --dry-run --json
+mask bundle apply agentskills/rfc --project /absolute/path/to/project --approve-plan RETURNED_HASH --json
+mask status --project /absolute/path/to/project --check --json
+```
+
+The review includes implement-rfc's required native-role setup. Bundle apply preserves
+manual selections and exact locks; future definition changes require an explicit
+`mask bundle refresh agentskills/rfc --dry-run` review. Each skill remains individually
+installable with `mask install agentskills/SKILL`. The source index lists every existing
+package; adding this bundle does not change real project or personal selections here.
 
 New runs default to `coordinator-implementer`: a low-effort coordinator and one fresh
 provider-routed `rfc-implementer` per milestone or post-review engineering round.
