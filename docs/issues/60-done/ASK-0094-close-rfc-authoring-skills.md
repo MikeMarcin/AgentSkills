@@ -13,7 +13,7 @@ acceptance: [{"criterion":"AC01","outcome":"pass","revision":"39f02b7c654699e762
 
 # Close portable RFC authoring and grilling
 
-RFC_BASE_SHA: `9e99199705ad1afec7a8722e38a26b4b37bbbb33`
+RFC_BASE_SHA: 9e99199705ad1afec7a8722e38a26b4b37bbbb33
 
 Planned local cards: ASK-0093 and ASK-0094. Scope and mandate are recorded in
 [RFC-ASK-0015](../../rfcs/RFC-ASK-0015-portable-rfc-authoring-and-grilling.md).

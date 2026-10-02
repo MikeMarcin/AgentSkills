@@ -53,5 +53,20 @@
         "stderr_tail": "..s\n----------------------------------------------------------------------\nRan 3 tests in 0.202s\n\nOK (skipped=1)\n"
       }
     }
+  ],
+  "closeout_records": [
+    {
+      "criterion": "final-documentation",
+      "outcome": "fail",
+      "revision": "d88de0aba653cce7e0649649de57cdd630cb9c12",
+      "evidence": {
+        "kind": "command",
+        "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+        "exit_code": 1,
+        "elapsed_seconds": 0.2,
+        "stdout_tail": "15 RFCs, 94 cards; 1 structural violations\n",
+        "stderr_tail": "ERROR terminal RFC lacks real baseline RFC-ASK-0015\n"
+      }
+    }
   ]
 }

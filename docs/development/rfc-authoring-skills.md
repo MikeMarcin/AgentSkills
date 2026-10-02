@@ -86,3 +86,9 @@ handoff. Source packages have no changes after the accepted source candidate.
 ASK-0093 is Done at `7235132b25e478f2c37afdfe6693598dbf3ded83`; closeout records
 all five actual criterion outcomes. The selected milestone has no remaining
 in-scope obligation. Unrelated unfinished RFCs are preserved.
+
+The terminal-state documentation gate initially refused the closeout's backtick-
+wrapped baseline field, although its actual pre-implementation SHA was recorded.
+The field now uses the gate's plain-SHA format; the failed receipt is retained in
+the command evidence JSON. This is bookkeeping formatting, with no baseline value,
+source acceptance or source-package change.
