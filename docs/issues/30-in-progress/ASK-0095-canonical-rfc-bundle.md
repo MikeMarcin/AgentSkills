@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0095"
 title: "Publish the canonical RFC bundle in the source index"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0015"]
 depends_on: ["ASK-0093"]
 ---
