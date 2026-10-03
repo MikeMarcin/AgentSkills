@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0097
 title: Refresh supporting implement-rfc role models from public evidence
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"source_baseline":"b4a3357404e4c4f74f1e6cb55d695cf18eacd5bf","execution_strategy":"direct","requested_on":"2026-10-03"}
