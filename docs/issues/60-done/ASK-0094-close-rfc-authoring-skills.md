@@ -137,3 +137,11 @@ configured documentation gate reported 15 RFCs, 101 cards and 0 violations. Dire
 execution remained non-delegating; exact serving route and installed host loading
 are unverified. No companion runtime/schema, live consumer or MASK source changed.
 No in-scope obligation or deployment remains; installed skills were not upgraded.
+
+Guarded finish: `3c6fa17d0b14751868afc3c28426aa2a7d7aba40`; scoped queue is 6/6
+Done with no next card. The final documentation gate passes. An earlier transition
+check caught the still-In-Progress card, and finish required explicit inclusion
+of its dirty checkpoint metadata; both guards were resolved without unrelated edits.
+The direct completion check reports `report-closeout`; its selection, binding and
+observation are preserved on ASK-0101. Task commands ended and the temporary receipt
+directory was removed; no task-owned background process or writer remains.
