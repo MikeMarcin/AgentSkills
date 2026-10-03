@@ -82,15 +82,16 @@ follows its contract.
 `implement-rfc` determines live execution eligibility; authoring confirmation and
 optional grilling add no implementation gate.
 
-End the reply with a short, copyable prompt for a new session invoking `implement-rfc`
-with the exact saved RFC's absolute path or existing pack entrypoint. Add selected
-scope and constraints only where they change execution. Name or link material open
+End the reply with a short, copyable prompt for a new session beginning literally
+with `/implement-rfc`. Include the exact saved RFC's absolute path or existing pack
+entrypoint. Add selected scope and constraints only where they change execution.
+Name or link material open
 choices and direct their resolution before implementing affected scope. Suggesting
 the prompt does not create or message a chat, grant authority or claim readiness;
 keep it in the reply without a new artifact. For example:
 
 ```text
-Use implement-rfc to implement the RFC at /absolute/path/to/RFC.md.
+/implement-rfc Implement the RFC at /absolute/path/to/RFC.md.
 ```
 
 Use provisional `RFC-DRAFT-NNNN` IDs for RFCs and `DRAFT-NNNN` for proposed cards,
