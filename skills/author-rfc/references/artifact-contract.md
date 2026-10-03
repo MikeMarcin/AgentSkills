@@ -31,8 +31,8 @@ change, update affected artifacts and render the milestone view from JSON.
 
 Use [the card template](../assets/card.template.md) and canonical
 `implement-rfc.card.v1` fields/statuses from the companion's bookkeeping reference.
-Relationships are arrays. Provisional `DRAFT-NNNN` and `RFC-DRAFT-NNNN` IDs make their
-non-live identity visible; reconcile actual IDs during authorized import. Proposed
+Relationships are arrays. Use the provisional IDs defined in `SKILL.md`; reconcile
+actual IDs during authorized import. Proposed
 cards normally use `Backlog`; execution establishes eligibility/Ready. Each RFC has
 one proposed card with `closeout_for` including its ID, linked to all its required
 acceptance. Do not put a made-up baseline, revisions or passing acceptance in it.

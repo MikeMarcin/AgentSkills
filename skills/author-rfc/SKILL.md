@@ -80,7 +80,8 @@ follows its contract.
 `implement-rfc` determines live execution eligibility; authoring confirmation and
 optional grilling add no implementation gate.
 
-Use provisional IDs; any authoring cards are proposed. Live ID allocation, counter
+Use provisional `RFC-DRAFT-NNNN` IDs for RFCs and `DRAFT-NNNN` for proposed cards,
+with zero-padded numeric suffixes. Live ID allocation, counter
 advancement, RFC_BASE_SHA capture, card claims, acceptance evidence and implementation
 belong to authorized `implement-rfc` execution. Keep draft validation output distinct
 from implementation acceptance evidence.
