@@ -123,7 +123,16 @@ Generated Claude agents:
 
 Parent permission modes can take precedence over a subagent's `permissionMode`. Before relying on read-only scouting or review, keep the parent in a permission mode that does not widen the child, and inspect `git status --short` after the run. The read-focused agents retain Bash for Git inspection and read-only verification commands, but `permissionMode: plan` denies mutating commands: configure, build, or test runs that write artifacts stay with the designated integrator, bounded worker, or test runner. Unexpected repository-source writes from a test runner invalidate the result.
 
-The checked-in route declares Claude Code 2.1.255 or later for Fable 5.1. This floor is an owner-specified admission requirement; verify the installed runtime before claiming native serving. Configuration validation is not a live model-availability test. Worktree-isolated subagents received important main-checkout safety fixes by 2.1.210, but the default portable policy still does not enable static worktree isolation: a custom worktree subagent may branch from the repository's default branch rather than the primary session's current `HEAD`. Use worktree writers only after explicitly proving the desired base and integration behavior.
+The checked-in route declares Claude Code 2.1.284 or later. Current
+[model configuration documentation](https://code.claude.com/docs/en/model-config)
+requires 2.1.284 for Sonnet 5.5 and 2.1.280 for Opus 5.5 (checked 2026-10-03).
+Verify the installed runtime before claiming native serving; configuration
+validation is not a live model-availability test. Worktree-isolated subagents
+received important main-checkout safety fixes by 2.1.210, but the default portable
+policy still does not enable static worktree isolation: a custom worktree subagent
+may branch from the repository's default branch rather than the primary session's
+current `HEAD`. Use worktree writers only after explicitly proving the desired
+base and integration behavior.
 
 Claude Code keeps its default concurrency limit of 10. The portable skill uses
 only bounded lanes that materially help the current task.
@@ -182,7 +191,12 @@ supported — that is how several stations share a host.
 - Station servers are drivable from the web and mobile app; the guard applies
   to those asks identically.
 
-For Bedrock, keep the generated agent definitions unchanged and use `modelOverrides` in local or managed Claude Code settings to map the canonical model IDs to exact approved inference-profile ARNs. Family aliases are not considered reproducible routing. Unverified as of 2026-08-02: the `modelOverrides` setting could not be confirmed in official Claude Code documentation. Before relying on role-to-model routing through Bedrock, confirm on the Bedrock-configured machine that each generated agent's startup banner reports the expected model; if the setting is ignored, escalate to organization-managed model policy instead.
+For Bedrock, keep the generated agent definitions unchanged and use `modelOverrides`
+in local or managed Claude Code settings to map canonical model IDs to exact approved
+inference-profile ARNs. [Model configuration](https://code.claude.com/docs/en/model-config)
+documents the setting (checked 2026-10-03). Family aliases are not reproducible
+routing. Confirm approved inference profiles and each role's effective model on
+the Bedrock-configured machine before relying on those routes.
 
 ## Capability Fallback
 

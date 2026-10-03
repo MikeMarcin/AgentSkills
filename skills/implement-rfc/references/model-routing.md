@@ -8,14 +8,14 @@ The coordinator's current route is never an implicit engineering override.
 
 | Role | Class | Codex | Claude |
 |---|---|---|---|
-| `rfc-utility`, `rfc-test-runner` | mechanical | Luna xhigh | Haiku 4.5 unsupported/null |
-| `rfc-scout` | balanced | Sol low | Opus 5 low |
-| `rfc-worker` | standard | Astra low | Opus 5 xhigh |
+| `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna low | Haiku 4.5 unsupported/null |
+| `rfc-scout` | balanced | Sol 6.1 medium | Sonnet 5.5 medium |
+| `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
 | `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 high |
-| `rfc-integrator` | integration | Sol xhigh | Opus 5 xhigh |
-| `rfc-worker-deep` | deep | Astra high | Fable 5.1 high |
-| `rfc-reviewer` | review | Astra medium | Fable 5.1 medium |
-| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.1 xhigh |
+| `rfc-integrator` | integration | Sol 6.1 xhigh | Opus 5.5 high |
+| `rfc-worker-deep` | deep | Astra high | Opus 5.5 high |
+| `rfc-reviewer` | review | Astra medium | Opus 5.5 medium |
+| `rfc-reviewer-critical` | critical | Astra xhigh | Opus 5.5 xhigh |
 
 Standard is broad engineering; deep addresses named unresolved difficulty.
 Review is independently configurable from deep implementation. Critical review
@@ -23,15 +23,17 @@ addresses a named material risk and replaces normal review when selected; no
 medium-then-critical pipeline. Effort does not change acceptance or authority.
 See [delegated execution](delegated-execution.md) for selection and contracts.
 
-This is the owner's 2026-09-08 allocation decision, with the integrator moved to Sol
-xhigh / Opus 5 xhigh on 2026-09-11 and the Claude implementer moved to Opus 5.5
-xhigh on 2026-09-22, the Codex implementer moved to Astra xhigh on
-2026-09-25, and the Claude implementer moved to Opus 5.5 high on 2026-09-28, and the Codex implementer moved to Sol 6.1 xhigh on
-2026-09-29, not measured quality equivalence or subscription
-savings. No live bakeoff is required for this promotion. Exact
-model IDs and requested effort live in configuration; requests do not prove serving.
-Claude's declared floor is 2.1.255; no automatic client upgrade, effort clamp,
-model fallback, reset or credit purchase is authorized. Preserve processing speed.
+The owner authorized a public-evidence refresh of supporting roles on 2026-10-03.
+For the benchmarks, prices, mixed public reports and role-specific judgment behind
+these choices, read [Selection evidence](model-selection-evidence.md) when reviewing
+or changing the allocation. The coordinator/implementer strategy, its coordinator
+session routes and its implementation routes retain the owner's existing choices.
+The older integrator route is independently refreshed. Exact model IDs and requested
+effort live in configuration; `verified_as_of` dates the source/configuration review,
+not observed serving or measured RFC-task quality. No local model bakeoff was run.
+Claude's declared floor is 2.1.284 for Sonnet 5.5; Opus 5.5 requires at least 2.1.280.
+No automatic client upgrade, effort clamp, model fallback, reset or credit purchase
+is authorized. Preserve processing speed.
 
 ## Native dispatch arguments
 
@@ -109,7 +111,10 @@ The generated Claude agents always name stable Anthropic model IDs. Keep those s
 
 `modelOverrides` lets Claude Code retain the canonical model family and capability identity while sending the provider-specific ARN to Bedrock. When managed `availableModels` policy is active, the organization may need to own the overrides because lower-precedence mappings can be ignored.
 
-Unverified as of 2026-08-02: the `modelOverrides` setting could not be confirmed in official Claude Code documentation. Before relying on role-to-model routing through Bedrock, verify on the Bedrock-configured machine that each generated agent's startup banner reports the expected model; if the setting is ignored, route through organization-managed model policy instead.
+Checked 2026-10-03: [Claude Code model configuration](https://code.claude.com/docs/en/model-config)
+documents `modelOverrides`. The organization must still supply approved mappings
+and verify the effective role route on its Bedrock host. Documentation support
+does not establish that a particular inference profile exists or is permitted.
 
 Do not set `CLAUDE_CODE_SUBAGENT_MODEL` when role-specific routing is expected. That environment variable overrides every subagent definition's model.
 

@@ -106,10 +106,10 @@ class CodexLaneTest(unittest.TestCase):
     def test_all_routes_are_forwarded_with_role_instructions_and_identity(self) -> None:
         module = _load_codex_lane()
         expected = {
-            "rfc-utility": ("gpt-5.6-luna", "xhigh"),
-            "rfc-test-runner": ("gpt-5.6-luna", "xhigh"),
-            "rfc-scout": ("gpt-5.6-sol", "low"),
-            "rfc-worker": ("gpt-6-astra", "low"),
+            "rfc-utility": ("gpt-6-luna", "low"),
+            "rfc-test-runner": ("gpt-6-luna", "low"),
+            "rfc-scout": ("gpt-6.1-sol", "medium"),
+            "rfc-worker": ("gpt-6.1-sol", "high"),
             "rfc-worker-deep": ("gpt-6-astra", "high"),
             "rfc-reviewer": ("gpt-6-astra", "medium"),
             "rfc-reviewer-critical": ("gpt-6-astra", "xhigh"),

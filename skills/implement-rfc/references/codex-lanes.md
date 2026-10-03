@@ -114,9 +114,9 @@ Whenever an independent review runs, record one line per review on the
 closeout card:
 
 ```text
-Closeout review runtime: codex (gpt-6-astra, high)
-Closeout review runtime: claude (claude-fable-5-1, xhigh)
-Closeout review runtime: claude (claude-fable-5-1, high) — waived: <reason cross-family was skipped>
+Closeout review runtime: codex (gpt-6-astra, medium)
+Closeout review runtime: claude (claude-opus-5-5, xhigh)
+Closeout review runtime: claude (claude-opus-5-5, medium) — waived: <reason cross-family was skipped>
 ```
 
 These are alternative examples, not a required set of reviews. When a second
