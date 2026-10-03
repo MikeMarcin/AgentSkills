@@ -145,3 +145,10 @@ of its dirty checkpoint metadata; both guards were resolved without unrelated ed
 The direct completion check reports `report-closeout`; its selection, binding and
 observation are preserved on ASK-0101. Task commands ended and the temporary receipt
 directory was removed; no task-owned background process or writer remains.
+
+Owner-requested ASK-0101 format correction: `848faa96f54c576d09819e4ebbf44c99cac06625` makes the
+copyable prompt begin literally with `/implement-rfc` and updates the example.
+Focused instruction review confirms saved-path, selected-scope and material-choice
+guidance remains intact. Skill validation and diff checks passed; prior acceptance
+is preserved. This verifies the requested prompt format, not host UI invocation.
+The correction remains source-only; no installed upgrade or publication occurred.
