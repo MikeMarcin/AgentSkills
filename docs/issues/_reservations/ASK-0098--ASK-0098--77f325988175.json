@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0098"
+  ],
+  "reserve_for": "concise-rfc-authoring-20261003",
+  "purpose": "",
+  "created": "2026-10-03T19:25:36.719134+00:00",
+  "base": "5a6c64d167b65b7ff52b9b2e347ba2412baa6c03"
+}
