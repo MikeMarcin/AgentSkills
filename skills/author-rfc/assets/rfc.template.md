@@ -10,23 +10,14 @@ status: "Proposed"
 
 Describe the problem and observed behavior with source pointers. Separate proposals.
 
-## Goals and boundaries
+## Proposed behavior and boundaries
 
-State desired outcomes, exact constraints and explicit deferrals.
-
-## Proposed behavior and interfaces
-
-Define material behavior, interfaces and failure/compatibility/migration boundaries.
-Link open decisions to the decision record; mark affected scope unready.
-
-## Significant alternatives
-
-Record real tradeoffs and rationale; link significant pack-local ADRs when needed.
+State the intended outcome, changed behavior and material boundaries. Reference
+established conventions; retain exact constraints and numeric defaults. Include
+material decisions, actual answers and remaining questions here, identifying affected
+unready scope. Add alternatives or technical detail only where they clarify a real
+tradeoff or required behavior.
 
 ## Acceptance
 
 - **AC01:** Observable outcome with a stable, unique criterion definition.
-
-## Work and implementation handoff
-
-Link proposed implementation cards, this RFC's closeout card, and the canonical plan.

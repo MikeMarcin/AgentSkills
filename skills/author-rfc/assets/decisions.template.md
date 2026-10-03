@@ -2,7 +2,9 @@
 
 ## Scope and provenance
 
-Current draft/version, original source, artifacts and requested review coverage.
+Current draft/version, source and requested review coverage. Use this record when
+substantial history benefits continuation, or as part of a portable pack; otherwise
+keep decisions inline in the RFC.
 
 ## Decisions
 
@@ -14,15 +16,13 @@ Current draft/version, original source, artifacts and requested review coverage.
 Record pending questions, recommendations as proposals, and exact answered portions
 of interrupted rounds. Distinguish material unanswered choices from optional detail.
 
-## Readiness and coverage
+## Checks and confirmation
 
-Structural checks (including unchecked live selectors), design readiness by affected
-scope/milestone, actual review coverage, and unevaluated execution eligibility.
-
-## Shared understanding and confirmation
-
-Concise design summary; explicit answer and the design scope/version it confirms,
-or pending. Reopen affected confirmation after changed decisions.
+Checks actually performed and their limits; material unanswered scope; actual user
+confirmation and its scope/version, if any. For a pack, also record structural
+validity and unevaluated live execution eligibility. Keep these facts distinct in
+this one location; link here from the overview. Reopen only affected confirmation
+after a changed decision. An ordinary draft needs no blanket confirmation step.
 
 ## Continuation
 

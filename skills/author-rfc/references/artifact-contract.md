@@ -1,4 +1,7 @@
-# Artifact contract
+# Portable pack contract
+
+Use this contract when a pack is requested, supplied, or required by the repository
+at this drafting stage. Ordinary compact RFCs follow `SKILL.md` and its RFC template.
 
 Keep an overview, RFCs, proposed implementation cards, one proposed closeout card per
 RFC, decision record, implementation entrypoint, canonical milestone JSON, generated
@@ -20,13 +23,11 @@ normally use it from the discovered companion without copying a second engine.
 
 ## RFCs and cards
 
-Use [the RFC template](../assets/rfc.template.md) for problem, grounded current
-behavior, goals/boundaries, proposed behavior/interfaces, significant alternatives
-and stable acceptance IDs. Include operational/technical details when their omission
-would leave required behavior ambiguous. Testable acceptance describes observable
-outcomes, not particular tool invocations or optional internals. Give each referenced
-criterion exactly one authoritative definition; repeated criterion labels can make
-consumer binding ambiguous. Keep numeric limits/defaults exact.
+Use [the RFC template](../assets/rfc.template.md) and link each RFC to its proposed
+implementation cards, closeout and canonical plan. RFC requirements/acceptance remain
+authoritative; decisions link to them and cards/milestone work derive from them.
+Repeated criterion definitions can make consumer binding ambiguous. After an agreed
+change, update affected artifacts and render the milestone view from JSON.
 
 Use [the card template](../assets/card.template.md) and canonical
 `implement-rfc.card.v1` fields/statuses from the companion's bookkeeping reference.
@@ -70,11 +71,12 @@ requirements have not been decomposed. Include every remaining obligation withou
 overlapping planned work. Partial decomposition does not answer a material design
 question. When future behavior itself is undecided, record that question and mark
 affected future scope unready; a valid JSON plan must not be presented as full design
-readiness. Keep optional internal detail explicitly deferred when observable
+readiness. Identify independently ready current milestones without certifying future
+scope. Keep optional internal detail explicitly deferred when observable
 requirements are already defined. Do not add session routes, launch commands,
 completion status or fabricated revisions to the plan.
 
-Report four independent facts in the overview/decision record:
+Record four independent facts once in the decision record, linked from the overview:
 
 - Structural validity: validator command/result and unchecked selectors/coverage.
 - Design readiness: scope/milestones with material answers or remaining questions.

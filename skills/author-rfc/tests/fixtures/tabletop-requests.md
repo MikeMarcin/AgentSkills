@@ -3,6 +3,19 @@
 These are user-task inputs, not expected outcomes. The coordinator provides fixture
 discovery and simulated replies; questions must go to the coordinator, not the human.
 
+## Small authoring request
+
+Use author-rfc to draft an RFC for an option on `mask upgrade` to commit the project
+files it changes. I've already answered two questions: commit both `.mask.json` and
+`.mask.lock.json` when changed, and include existing uncommitted MASK changes.
+Save it under drafts/upgrade-commit.
+
+## Changed answer on the small draft
+
+Change my earlier answer: if either MASK file already has uncommitted changes,
+refuse the commit option before upgrading and tell me to resolve them first.
+Keep the rest of the request and revise the same draft.
+
 ## New authoring
 
 Use author-rfc to draft a portable RFC pack for safe ledger export in this project.

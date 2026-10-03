@@ -78,11 +78,12 @@ installed skill, while consumer paths resolve relative to the consumer.
 
 For proposals, use `author-rfc`, optionally `grill-rfc`, then `implement-rfc` for
 authorized execution. `grill-me` supplies shared interview mechanics. Grilling is
-optional per task; drafting confirmation adds no implementation gate. Complete
-portable authoring uses implement-rfc's existing offline kit. RFC grilling requires
+optional per task; drafting confirmation adds no implementation gate. Authoring
+defaults to one compact grounded RFC. Requested, supplied or repository-required
+portable packs use implement-rfc's existing offline kit. RFC grilling requires
 author-rfc and grill-me; resolve companions by skill name in the current host.
-`author-rfc` also uses implement-rfc's portable plan kit. The flat `agentskills/rfc`
-bundle selects all four companions: author-rfc, grill-rfc, grill-me and implement-rfc.
+The flat `agentskills/rfc` bundle selects all four companions: author-rfc, grill-rfc,
+grill-me and implement-rfc.
 After approving the tap and configuring the consumer context below, fetch its catalog
 and review this installation:
 

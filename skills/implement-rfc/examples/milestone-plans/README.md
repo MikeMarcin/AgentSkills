@@ -1,8 +1,10 @@
 # Offline milestone authoring
 
-For the surrounding RFC/card/decision artifact contract, resolve `author-rfc` by
-skill name through the host's discovery. `grill-rfc` is an optional design interview;
-neither it nor authoring confirmation adds an execution gate. This kit remains the
+For a requested, supplied or repository-required portable pack's artifact contract,
+resolve `author-rfc` by skill name through the host's discovery. Ordinary authoring
+defaults to a compact RFC and does not require this kit; absent plans are prepared
+during authorized execution as described below. `grill-rfc` is an optional design
+interview; neither it nor authoring confirmation adds an execution gate. This kit remains the
 authoritative plan schema/validator/renderer; drafting needs no execution preflight.
 
 Copy `milestone-plan.json` and `IMPLEMENTATION_PROMPT.md` to the pack root. Replace

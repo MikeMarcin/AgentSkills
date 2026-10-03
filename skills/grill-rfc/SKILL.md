@@ -12,11 +12,12 @@ These two companions are required for a complete RFC grilling operation. Name an
 unavailable capability, preserve the supplied draft/answers and leave that portion
 pending. You may perform independent grounding or clearly scoped analysis with
 available capabilities; do not silently substitute a complete interview/artifact
-workflow. `author-rfc` in turn resolves `implement-rfc` for the portable plan kit.
+workflow. When a portable pack is requested, supplied or required at this stage,
+`author-rfc` also resolves `implement-rfc` for its plan kit.
 
 Carry the current scope, settled decisions, unanswered questions, artifact paths and
 requested coverage into the companions. Resume from their records without repeating
-intake. Determine whether this is new authoring, an unadopted working-pack revision or
+intake. Determine whether this is new authoring, an unadopted working-draft revision or
 a proposed amendment to adopted requirements. Author-rfc owns that boundary and
 provenance; keep adopted live sources unchanged during this design review.
 
@@ -46,13 +47,14 @@ Detailed internal design is available on request for the whole proposal or named
 areas. A focused deep review explores that area and reports its actual coverage;
 it does not certify untouched scope or force an interview of every internal choice.
 
-## Keep the pack current
+## Keep the draft current
 
-After every answered round, apply author-rfc's artifact contract: record decisions and
-consequences, update affected RFC requirements/acceptance, cards and milestone JSON,
-then regenerate the view. Changed decisions reopen dependent questions and affected
+After every answered round, follow author-rfc's selected artifact shape. Update
+affected RFC requirements/acceptance and inline decisions; a compact RFC stays compact.
+For a portable pack, also update its decision record, affected cards/milestone JSON
+and generated view. Changed decisions reopen dependent questions and affected
 confirmation; preserve unaffected answers, exact constraints and authored grouping.
-Record terminology/ADRs pack-locally using author-rfc's criteria. Proposed project
+Record terminology/ADRs when material using author-rfc's criteria. Proposed project
 adoption remains a separate later action.
 
 Report material unanswered choices as unready for their affected scope. Distinguish

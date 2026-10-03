@@ -5,80 +5,73 @@ description: Draft or revise grounded RFCs and portable RFC packs, propose amend
 
 # Author RFC
 
-Own the proposal and its artifacts. Use this skill for new designs, supplied packs
-(including ChatGPT drafts), unadopted revisions and proposed amendments. Draft without
-automatically running a full interview. Material design choices still need answers;
-offer `grill-rfc` when a systematic challenge would help or use it when requested.
-Declining that optional interview creates no implement-rfc review gate.
+Own the proposal and its artifacts. Default to one compact RFC. Build a portable
+pack when requested, maintain it when supplied, or follow repository requirements
+for pack artifacts at this drafting stage. Later implementation bookkeeping alone
+does not require an authoring pack. Draft without automatically running an interview;
+use `grill-rfc` for a requested challenge or offer it when systematic review would help.
 
 ## Ground the proposal
 
-Read applicable instructions, existing RFCs, relevant implementation and terminology
-(including context maps/glossaries). Read available consumer workflow context for
-document conventions and constraints. Consumer configuration and execution preflight
-are unnecessary just to draft. Investigate discoverable facts directly; describe
-observed behavior with its source separately from proposed behavior. Surface conflicts
-between the supplied design, code and existing requirements; do not silently choose
-which source should change.
+Read applicable instructions and available consumer workflow context for document
+conventions and constraints. Inspect the affected implementation, existing requirements
+and relevant terminology until the proposal's material claims are supported; cite
+decisive sources. Investigate discoverable facts directly. Separate observed behavior
+from proposals and surface conflicts between supplied designs, code and requirements.
+Consumer configuration and execution preflight are unnecessary just to draft.
 
-Recover current scope, artifact locations, settled decisions and unanswered questions
-before new intake. Preserve original supplied material and provenance. Edit unadopted
-working drafts directly, keeping authored grouping unless an agreed design change
-warrants regrouping. For adopted material, read [Amendments](references/amendments.md).
-Honor the requested destination or repository draft convention; otherwise use a
-portable draft directory separate from live trackers.
+On resume, recover current scope, artifacts, settled decisions and unanswered questions.
+Preserve supplied originals and provenance. Edit unadopted drafts directly, retaining
+authored grouping unless an agreed change warrants regrouping. For adopted material,
+read [Amendments](references/amendments.md). Honor the requested destination or draft
+convention; otherwise save the RFC separately from live trackers.
 
-Cover material decisions about behavior, boundaries, interfaces, failure handling,
-compatibility, migrations and acceptance. A material unanswered choice makes the
-affected scope unready; record it instead of filling it with your recommendation.
-Detailed internal implementation design is optional: provide it on request for the
-whole proposal or named areas. Explicitly defer detail that does not affect required
-behavior; avoid converting such detail into an execution prerequisite.
+Ask about unresolved tradeoffs that the request and established contracts do not
+settle. A material choice changes the intended outcome, scope, safety, authority,
+compatibility or a contract callers depend on. Keep such unanswered choices explicit
+and affected scope unready; a recommendation is not a user answer. Routine engineering
+choices that honor those constraints belong to implementation.
 
-## Build and maintain the pack
+## Write and revise
 
-Read [Artifact contract](references/artifact-contract.md) when producing or revising
-artifacts. Use its templates for RFCs, cards and the decision record. Resolve the
-companion `implement-rfc` **by skill name through the host's available discovery**;
-read its offline milestone authoring kit and use its existing schema, validator and
-renderer. Paths in that kit are relative to the discovered package. No particular
-host Skill tool or installation root is assumed. If unavailable, name the missing
-capability, preserve drafts and explain which artifacts/checks await it; do not
-invent a replacement schema or silently claim a complete handoff.
+Use [the RFC template](assets/rfc.template.md) for the grounded problem, proposed
+behavior/boundaries and observable acceptance. Include only detail needed to decide
+the proposal and verify its outcome. Reference established conventions and specify
+the changes. Add significant alternatives or technical detail where their omission
+would leave material behavior ambiguous, or when requested. Internal design may be
+deferred without becoming an execution prerequisite. Keep exact constraints and
+numeric defaults; give each acceptance criterion one stable, authoritative definition.
 
-Keep the RFC requirements/acceptance authoritative. Decisions link to those sections;
-cards and milestone work derive from them. After each answered round or agreed change,
-update the decision record and consequences across RFCs, acceptance, cards and plan;
-regenerate the milestone Markdown view from JSON. Preserve exact constraints and
-numeric defaults. Reopen affected dependent decisions and confirmation after a change,
-while retaining unaffected answers. If interrupted, record the exact pending frontier
-and next action at the existing draft location.
+Keep material decisions, actual answers and open questions inline. Use a separate
+[decision record](assets/decisions.template.md) when substantial history benefits
+continuation. Link to requirements rather than restating them. After an answered
+round or agreed change, update affected behavior, acceptance and existing supporting
+artifacts; reopen only affected questions and confirmation, retaining other answers.
+On interruption, record the pending frontier and next action at the existing location.
 
-Use `grill-me` only when interview mechanics are needed, or `grill-rfc` for an RFC
-challenge. Pass scope, settled decisions, open questions, artifact paths and requested
-coverage to the companion without restarting intake. Companion requirements depend
-on the operation: `implement-rfc` for a complete portable plan kit; `grill-rfc` and its
-companions for requested RFC grilling. Missing optional grilling does not block
-ordinary authoring; missing required capabilities leave their operation pending.
+## Portable packs
+
+When building or maintaining a pack, read [Artifact contract](references/artifact-contract.md).
+Resolve `implement-rfc` by skill name through the host's discovery and use its offline
+milestone kit; this branch needs its canonical schema, validator and renderer. Paths
+are relative to the discovered package. If unavailable, preserve useful drafts and
+name the artifacts/checks still pending; do not invent a replacement schema.
+
+Use `grill-me` only for interview mechanics, or `grill-rfc` for RFC challenge. Pass
+scope, settled decisions, questions, artifact paths and requested coverage without
+restarting intake. Missing optional companions do not block ordinary RFC authoring.
 
 ## Hand off truthfully
 
-Report structural validation, design readiness by affected scope/milestone, user
-confirmation and execution eligibility separately. Structural success does not answer
-design questions or resolve live dependencies. An independently ready current
-milestone may be identified while future material decisions remain open; do not
-certify the whole pack. Partial decomposition of **defined** requirements uses the
-canonical `coverage` and `unplanned_work`, not a readiness waiver.
+Deliver the draft without requiring blanket confirmation. Seek an explicit answer
+when resolving a material choice or conducting requested shared-understanding review.
+Record only actual answers and their scope/version; earlier confirmation does not
+cover changed behavior. Hand over artifact paths, material open questions, relevant
+deferrals and checks actually performed. Pack readiness reporting follows its contract.
+`implement-rfc` determines live execution eligibility; authoring confirmation and
+optional grilling add no implementation gate.
 
-Summarize the design and ask for explicit confirmation when seeking shared
-understanding. Record only an actual answer; recommendations and earlier confirmation
-of a different design remain unaccepted for changed scope. Focused review confirms
-only its recorded coverage. `implement-rfc` determines live execution eligibility
-under its own authorized workflow; authoring confirmation is a design record, not a
-new implementation gate. Hand over artifact paths, unresolved decisions/deferrals,
-validation results and the implementation entrypoint.
-
-Authoring uses provisional IDs and proposed cards. Live ID allocation, counter
+Use provisional IDs; any authoring cards are proposed. Live ID allocation, counter
 advancement, RFC_BASE_SHA capture, card claims, acceptance evidence and implementation
 belong to authorized `implement-rfc` execution. Keep draft validation output distinct
 from implementation acceptance evidence.
