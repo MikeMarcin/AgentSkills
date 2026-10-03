@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0101"
 title: "Suggest an implementation prompt after RFC authoring"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0015"]
 depends_on: []
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}

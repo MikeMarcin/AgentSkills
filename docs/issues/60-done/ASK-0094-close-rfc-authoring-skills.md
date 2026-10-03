@@ -115,7 +115,7 @@ managed worktree or pending source writer remains.
 
 ## New-session prompt follow-up — 2026-10-03
 
-[ASK-0101](../20-ready/ASK-0101-author-rfc-session-prompt.md) owns the requested final
+[ASK-0101](../30-in-progress/ASK-0101-author-rfc-session-prompt.md) owns the requested final
 reply prompt, AC08. Follow-up baseline: `eafcc1fe59ce48d2ad6e05d3c52dbb3b7f7c5352`.
 The original RFC baseline and prior acceptance remain unchanged. Direct execution;
 current frontier is the small instruction addition and focused validation.
