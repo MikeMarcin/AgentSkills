@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0097"
+  ],
+  "reserve_for": "implement-rfc-model-refresh-2026-10-03",
+  "purpose": "",
+  "created": "2026-10-03T19:13:59.274228+00:00",
+  "base": "b4a3357404e4c4f74f1e6cb55d695cf18eacd5bf"
+}
