@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0099
 title: Apply owner amendments to supporting role model choices
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"source_baseline":"d1ef57c8b6817b0f6340f01ecafd7cea1b380239","execution_strategy":"direct","requested_on":"2026-10-03"}
