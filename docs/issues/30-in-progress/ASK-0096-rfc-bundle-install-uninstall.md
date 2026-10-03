@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0096"
 title: "Update canonical RFC bundle install and uninstall handoff"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0015"]
 depends_on: ["ASK-0095"]
 ---
