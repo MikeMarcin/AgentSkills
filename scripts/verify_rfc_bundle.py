@@ -54,25 +54,39 @@ def main():
         validation = mask('skill', 'validate', '--all')
         shown = mask('bundle', 'show', 'agentskills/rfc')['data']['bundle']
         assert shown['commit'] == revision
-        preview = mask('bundle', 'apply', 'agentskills/rfc', '--dry-run')
+        preview = mask('bundle', 'install', 'agentskills/rfc', '--dry-run')
         assert not (consumer / '.mask.json').exists()
         assert preview['data']['setup']['actions'], preview
-        installed = mask('bundle', 'apply', 'agentskills/rfc', '--approve-plan', preview['data']['plan_hash'])
+        installed = mask('bundle', 'install', 'agentskills/rfc', '--approve-plan', preview['data']['plan_hash'])
         assert all((consumer / parent / name).is_symlink() for parent in ('.agents/skills', '.claude/skills') for name in names)
         assert {row['id'] for row in json.loads((consumer / '.mask.json').read_text())['skills']} == set(names)
         assert all(row['state'] == 'published' for row in installed['data']['setup']['actions']), installed
         status = mask('status', '--check')
         assert status['data']['healthy']
-        assert not mask('bundle', 'apply', 'agentskills/rfc')['changed']
+        assert not mask('bundle', 'install', 'agentskills/rfc')['changed']
+        mask('install', 'grill-me', '--no-update')  # Preserve a separately selected companion.
+        removal = mask('bundle', 'uninstall', 'agentskills/rfc', '--dry-run', '--offline')
+        assert set(removal['data']['removed']) == {'agentskills/' + name for name in names if name != 'grill-me'}
+        mask('bundle', 'uninstall', 'agentskills/rfc', '--offline', '--approve-plan', removal['data']['plan_hash'])
+        remaining = json.loads((consumer / '.mask.json').read_text())
+        assert [row['id'] for row in remaining['skills']] == ['grill-me']
+        assert remaining['bundle_state']['bundles'] == {}
+        assert all((consumer / parent / 'grill-me').is_symlink() for parent in ('.agents/skills', '.claude/skills'))
+        assert all(not (consumer / parent / name).exists() for parent in ('.agents/skills', '.claude/skills') for name in names if name != 'grill-me')
+        assert not mask('bundle', 'uninstall', 'agentskills/rfc', '--offline')['changed']
+        reinstall = mask('bundle', 'install', 'agentskills/rfc', '--dry-run')
+        mask('bundle', 'install', 'agentskills/rfc', '--approve-plan', reinstall['data']['plan_hash'])
+        assert all((consumer / parent / name).is_symlink() for parent in ('.agents/skills', '.claude/skills') for name in names)
+        assert mask('status', '--check')['data']['healthy']
         receipt = dict(source_revision=revision, mask_revision=git(program, 'rev-parse', 'HEAD'),
                        bundle=shown, packages_discovered=len(expected), package_validation=validation['ok'],
                        selected=names, workflow_readiness=status['data'].get('workflow_readiness'),
                        setup=[dict(skill=row.get('skill'), action=row.get('action'), state=row['state']) for row in installed['data']['setup']['actions']],
-                       healthy=True, host_load='not_verified', platform=sys.platform, commands=commands,
+                       healthy=True, uninstall=dict(removed=removal['data']['removed'], preserved='agentskills/grill-me', repeat_noop=True, offline=True), reinstall_healthy=True, host_load='not_verified', platform=sys.platform, commands=commands,
                        fixture_cleanup='TemporaryDirectory removed on completion')
     if args.output:
         args.output.write_text(json.dumps(receipt, indent=2) + '\n')
-    print(f"Canonical agentskills/rfc ready: {len(names)} skills; {len(expected)} packages preserved; reviewed setup published.")
+    print(f"Canonical agentskills/rfc ready: {len(names)} skills; {len(expected)} packages preserved; reviewed setup published; safe uninstall and reinstall passed.")
 
 
 if __name__ == '__main__':

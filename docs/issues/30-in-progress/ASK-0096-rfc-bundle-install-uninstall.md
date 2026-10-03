@@ -18,3 +18,7 @@ in a disposable consumer using an exact local source candidate and MASK runtime.
 Individual skill install remains available. No publication, real deployment,
 credential or permission changes. MASK-0128 owns runtime; do not duplicate its
 mutable tracker. Historical ASK-0095 acceptance remains intact.
+
+Owner follow-up "refresh seems like it should be upgade, no?": public vocabulary
+install/uninstall/upgrade, mandate `named-bundles-v3`. Preserve historical evidence
+and verify final exact command surface after the package-version policy is settled.

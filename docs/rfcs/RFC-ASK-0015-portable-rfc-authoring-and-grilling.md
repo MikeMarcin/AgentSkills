@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0015"
 title: "Portable RFC authoring and optional grilling"
-status: "Auto-Verified"
+status: "Implementing"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
 ---
 
@@ -127,3 +127,13 @@ nonsoftware coverage is its initial frontier. Synthetic scoped confirmation is
 test input, not a real human design decision. Source-only delivery and optional
 jsonschema skip remain explicit. Consumed fixture projects are cleaned up; no
 publication/deployment or unrelated closeout was performed.
+
+## Canonical bundle command amendment — 2026-10-02
+
+Owner authorization "Make the admendment to the rfc and update it" selects MASK's
+bundle install/uninstall vocabulary under `named-bundles-v2`. Follow-up ASK-0096
+updates canonical README and disposable verification, preserving accepted skill
+payloads, four-skill bundle and discovery of all 16 packages. Historical ASK-0095
+acceptance remains valid for its candidate; current command acceptance is verified
+against the revised exact source/runtime. MASK-0128 owns runtime and the live
+RFC-MASK-0010 amendment. No publication or real consumer deployment is implied.

@@ -47,6 +47,8 @@ Review the proposed actions and use the returned `data.plan_hash`:
 ```sh
 mask install manage-agent-skills --project /absolute/path/to/project --approve-plan RETURNED_HASH --json
 mask status --project /absolute/path/to/project --check --json
+# Remove this bundle contribution while retaining separately selected companions:
+mask bundle uninstall agentskills/rfc --project /absolute/path/to/project --dry-run --json
 ```
 
 `install` and `uninstall` preserve unrelated selections. `register` prepares an
@@ -86,14 +88,18 @@ and review this installation:
 ```sh
 mask tap fetch agentskills --json
 mask bundle show agentskills/rfc --json
-mask bundle apply agentskills/rfc --project /absolute/path/to/project --dry-run --json
-mask bundle apply agentskills/rfc --project /absolute/path/to/project --approve-plan RETURNED_HASH --json
+mask bundle install agentskills/rfc --project /absolute/path/to/project --dry-run --json
+mask bundle install agentskills/rfc --project /absolute/path/to/project --approve-plan RETURNED_HASH --json
 mask status --project /absolute/path/to/project --check --json
+# Remove this bundle contribution while retaining separately selected companions:
+mask bundle uninstall agentskills/rfc --project /absolute/path/to/project --dry-run --json
 ```
 
-The review includes implement-rfc's required native-role setup. Bundle apply preserves
-manual selections and exact locks; future definition changes require an explicit
-`mask bundle refresh agentskills/rfc --dry-run` review. Each skill remains individually
+The review includes implement-rfc's required native-role setup. Bundle install preserves
+manual selections and exact locks. Bundle uninstall removes only its local contribution,
+preserving separately selected, overlapping, held and locally edited members. Future
+definition changes require an explicit
+`mask bundle upgrade agentskills/rfc --dry-run` review. Each skill remains individually
 installable with `mask install agentskills/SKILL`. The source index lists every existing
 package; adding this bundle does not change real project or personal selections here.
 

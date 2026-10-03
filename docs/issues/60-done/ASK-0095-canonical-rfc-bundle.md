@@ -22,3 +22,9 @@ including all four links and complete required workflow setup.
 
 No source publication/push, real deployment, permission or credential change.
 Record the actual upstream commit in the MASK handoff; do not copy tracker state.
+
+## Authorized command follow-up
+
+The later install/uninstall/upgrade vocabulary amendment belongs to active
+[ASK-0096](../30-in-progress/ASK-0096-rfc-bundle-install-uninstall.md). Preserve the
+original exact-candidate evidence above; revised public verification is separate.
