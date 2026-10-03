@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0100"
+  ],
+  "reserve_for": "implement-rfc-mechanical-error-capability-2026-10-03",
+  "purpose": "",
+  "created": "2026-10-03T21:08:05.619127+00:00",
+  "base": "eafcc1fe59ce48d2ad6e05d3c52dbb3b7f7c5352"
+}
