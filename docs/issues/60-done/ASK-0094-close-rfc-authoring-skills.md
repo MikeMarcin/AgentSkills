@@ -70,3 +70,18 @@ synthetic fixture input. Optional jsonschema check skipped. See
 
 The selected source-only milestone is accepted. No remaining in-scope obligation;
 unrelated RFC-ASK-0012/0014 and their unfinished work remain unchanged.
+
+## Completed command amendment handoff — 2026-10-02
+
+Actual ASK-0096 completes the owner-authorized install/uninstall/upgrade follow-up.
+Canonical candidate `39a6de558252eb0bf8c3cf9ae0d48f3fb10fa0ee` with MASK
+`b879f8136489a98cfa26e0aae1da7e7e268c589b` passes
+[22 public commands](../../development/rfc-bundle-upgrade-evidence.json): all four
+skills ready with reviewed setup, all 16 packages discovered/validated, offline
+manual-safe uninstall/reinstall, combined named preview and guarded aggregate
+upgrade of a distinct derived fixture revision, healthy status and repeat no-op.
+Owner version policy is resolved; no in-scope decision remains. RFC-ASK-0015
+returns to Auto-Verified for its source-only boundary. Earlier authoring and
+ASK-0095 acceptance remain historical; no native or actual host loading is claimed.
+Verifier/Git/setup commands ended and temporary consumers/remotes/machine roots
+were cleaned; no server, worktree or protected review candidate remains.

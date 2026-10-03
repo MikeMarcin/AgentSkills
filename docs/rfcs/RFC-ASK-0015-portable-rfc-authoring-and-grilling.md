@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0015"
 title: "Portable RFC authoring and optional grilling"
-status: "Implementing"
+status: "Auto-Verified"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
 ---
 
@@ -137,3 +137,15 @@ payloads, four-skill bundle and discovery of all 16 packages. Historical ASK-009
 acceptance remains valid for its candidate; current command acceptance is verified
 against the revised exact source/runtime. MASK-0128 owns runtime and the live
 RFC-MASK-0010 amendment. No publication or real consumer deployment is implied.
+
+Owner then selected install/uninstall/upgrade and answered "yes go with
+recommendation": upgrade reviews definition changes and newer unheld package
+versions together, preserving manual/overlapping selections, pins and local edits.
+The owner also requested installed bundles be included in `mask upgrade --all`.
+ASK-0096 verifies the exact canonical source with MASK's combined named preview
+and guarded aggregate application, using a separate derived local fixture update.
+All four RFC skills are ready with reviewed setup; all 16 packages remain
+discoverable. [Current receipt](../development/rfc-bundle-upgrade-evidence.json)
+also covers offline safe uninstall, manual companion preservation, reinstall and
+repeat no-op. The source-only follow-up is accepted; original authoring acceptance
+and host-loading limits remain unchanged.
