@@ -26,17 +26,24 @@ authored grouping unless an agreed change warrants regrouping. For adopted mater
 read [Amendments](references/amendments.md). Honor the requested destination or draft
 convention; otherwise save the RFC separately from live trackers.
 
-Ask about unresolved tradeoffs that the request and established contracts do not
-settle. A material choice changes the intended outcome, scope, safety, authority,
-compatibility or a contract callers depend on. Keep such unanswered choices explicit
-and affected scope unready; a recommendation is not a user answer. Routine engineering
-choices that honor those constraints belong to implementation.
+Open a question when a concrete scenario in the request, inspected code or applicable
+rules leaves competing outcomes unresolved. Hypothetical risks alone do not create a
+design or permission question. Follow established execution conventions within current
+authorization and retain actual approval boundaries. A material choice changes the
+intended outcome, scope, safety, authority, compatibility or a contract callers depend
+on. Keep such unanswered choices explicit and affected scope unready; a recommendation
+is not a user answer. Routine engineering choices belong to implementation.
 
 ## Write and revise
 
 Use [the RFC template](assets/rfc.template.md) for the grounded problem, proposed
 behavior/boundaries and observable acceptance. Include only detail needed to decide
-the proposal and verify its outcome. Reference established conventions and specify
+the proposal and distinguish success from failure. For small changes, use short
+paragraphs and a few independent acceptance criteria; expand to resolve concrete
+ambiguity. State each requirement once. Acceptance names distinguishing observations
+and refers to defined behavior instead of repeating it. Leave mechanisms and test-case
+inventories to implementation unless they settle a material design choice.
+Reference established conventions and specify
 the changes. Add significant alternatives or technical detail where their omission
 would leave material behavior ambiguous, or when requested. Internal design may be
 deferred without becoming an execution prerequisite. Keep exact constraints and
@@ -67,7 +74,9 @@ Deliver the draft without requiring blanket confirmation. Seek an explicit answe
 when resolving a material choice or conducting requested shared-understanding review.
 Record only actual answers and their scope/version; earlier confirmation does not
 cover changed behavior. Hand over artifact paths, material open questions, relevant
-deferrals and checks actually performed. Pack readiness reporting follows its contract.
+deferrals and checks actually performed in the reply. Keep authoring/check/runtime
+reports in that reply unless requested as saved artifacts. Pack readiness reporting
+follows its contract.
 `implement-rfc` determines live execution eligibility; authoring confirmation and
 optional grilling add no implementation gate.
 
