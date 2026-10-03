@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0015"
 title: "Portable RFC authoring and optional grilling"
-status: "Auto-Verified"
+status: "Implementing"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
 ---
 
@@ -44,20 +44,27 @@ publication and active-work reconciliation. Replaying adoption over a live plan 
 invalid; source/intent conflicts refuse. `check-amendment` preserves scope, obligations
 and exits; it does not authorize changed requirements.
 
-Drafts contain an overview, RFCs, proposed implementation cards, one proposed closeout
-card per RFC, decision record, implementation entrypoint, canonical milestone JSON,
-generated Markdown view and portable schema. Reuse implement-rfc's offline kit rather
-than inventing an execution schema or planning engine. Resolve companions by skill
-name through host discovery; carry scope, decisions, questions and artifact paths.
-Unavailable capabilities are named and partial work preserved. Drafting needs no
-execution preflight. Authoring uses provisional IDs and canonical card fields/statuses;
-it never allocates live IDs, advances counters, captures RFC_BASE_SHA, claims cards,
-creates acceptance evidence or starts implementation.
+Ordinary authoring produces one compact RFC, with material decisions, actual answers
+and open questions inline. A portable pack is created when requested, maintained when
+supplied, or produced when the repository requires those artifacts at the drafting
+stage. Such packs contain an overview, RFCs, proposed implementation cards, one
+proposed closeout card per RFC, decision record, implementation entrypoint, canonical
+milestone JSON, generated Markdown view and portable schema. Only that branch needs
+implement-rfc's offline kit. Reuse its schema and helpers; resolve companions by skill
+name through host discovery. Unavailable capabilities leave their operation pending,
+while useful drafts are preserved. Drafting needs no execution preflight. Authoring
+uses provisional IDs and never allocates live IDs, advances counters, captures
+RFC_BASE_SHA, claims cards, creates acceptance evidence or starts implementation.
 
-RFCs state problem, grounded current behavior, goals/boundaries, proposed behavior and
-interfaces, significant alternatives and stable acceptance, plus specialized detail
-when required. Pack-local decisions record rationale, unresolved questions, explicit
-deferrals, coverage and confirmation, linked to authoritative requirements/acceptance.
+RFCs state the grounded problem, proposed behavior/boundaries and stable observable
+acceptance. Add alternatives, specialized detail or separate decision history only
+when they carry a material tradeoff or aid continuation. Inspect the affected path
+until material claims are supported and cite decisive sources. Reuse established
+conventions by reference; routine engineering choices remain with implementation.
+Unresolved choices affecting intended outcomes, scope, safety, authority, compatibility
+or caller-dependent contracts remain explicit. Ordinary drafts need no blanket design
+confirmation; record actual answers and their scope. Pack-local decisions link to
+authoritative requirements/acceptance rather than restating them.
 Create pack-local contextual glossaries when needed; propose later project glossary/ADR
 adoption separately. Record a significant ADR when a real tradeoff is hard to reverse
 and surprising without context.
@@ -107,6 +114,13 @@ replace upstream host-specific invocation controls and mandatory dispatch.
   Inspect actual next actions/artifacts; unresolved material decisions keep affected
   scope unready and declining optional grilling adds no implementation gate. Record
   actual host coverage and unavailable checks honestly.
+- **AC06:** a small authoring request produces a compact grounded RFC without an
+  unsolicited implementation pack or blanket confirmation step. A changed answer
+  updates affected behavior/acceptance and preserves other answers and material
+  uncertainty, without inventing confirmation or execution authority.
+- **AC07:** requested or supplied portable packs retain canonical artifact and handoff
+  compatibility. Companion guidance selects the compact or pack branch consistently;
+  focused package, documentation and public handoff checks pass on the source candidate.
 
 ## Verification and closeout
 
@@ -149,3 +163,13 @@ discoverable. [Current receipt](../development/rfc-bundle-upgrade-evidence.json)
 also covers offline safe uninstall, manual companion preservation, reinstall and
 repeat no-op. The source-only follow-up is accepted; original authoring acceptance
 and host-loading limits remain unchanged.
+
+## Compact authoring amendment — 2026-10-03
+
+The owner authorized the reviewed alignment and implementation: “Ask the sub agent
+to do that alignment, and then implement the plan.” [ASK-0098](../issues/20-ready/ASK-0098-compact-rfc-authoring.md)
+owns the bounded follow-up above and AC06–AC07, with the original RFC baseline and
+historical AC01–AC05 evidence retained. The source baseline for this amendment is
+`5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. One added milestone preserves the original
+completed grouping. Existing pack schema/runtime behavior and the MASK auto-commit
+draft are outside this change; no publication or consumer deployment is authorized.

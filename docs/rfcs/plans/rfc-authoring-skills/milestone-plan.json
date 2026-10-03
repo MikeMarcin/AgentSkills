@@ -24,6 +24,17 @@
         "Source-only integration, documentation, local commits and task-owned temporary command cleanup are complete."
       ],
       "boundary": "The complete approved source-only feature; no deployment or publication."
+    },
+    {
+      "id": "compact-authoring",
+      "outcome": "Ordinary requests produce compact grounded RFCs while requested portable packs retain their existing handoff.",
+      "work": [{"issue": "ASK-0098"}],
+      "depends_on": ["portable-authoring"],
+      "exit_criteria": [
+        "AC06 and AC07 pass with observed small-request, changed-answer and explicit-pack behavior plus focused portable handoff checks.",
+        "Source-only integration and truthful closeout preserve unrelated work, historical acceptance and deployment boundaries."
+      ],
+      "boundary": "The owner-authorized compact-authoring amendment; no schema/runtime changes or consumer deployment."
     }
   ],
   "coverage": "complete",

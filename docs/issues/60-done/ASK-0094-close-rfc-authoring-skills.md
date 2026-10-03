@@ -85,3 +85,19 @@ returns to Auto-Verified for its source-only boundary. Earlier authoring and
 ASK-0095 acceptance remain historical; no native or actual host loading is claimed.
 Verifier/Git/setup commands ended and temporary consumers/remotes/machine roots
 were cleaned; no server, worktree or protected review candidate remains.
+
+## Compact authoring follow-up — 2026-10-03
+
+The owner authorized alignment and implementation of the reviewed compact-authoring
+default. [ASK-0098](../20-ready/ASK-0098-compact-rfc-authoring.md) owns AC06–AC07.
+Original RFC_BASE_SHA and historical acceptance above remain unchanged. Amendment
+baseline: `5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. The prior milestone is accepted;
+the added `compact-authoring` milestone is in progress under direct execution.
+
+| Criterion | Check/evidence | Outcome | Implementation revision |
+|---|---|---|---|
+| AC06 | Small request and changed-answer behavior | pending | pending |
+| AC07 | Explicit pack and focused package/handoff checks | pending | pending |
+
+Current frontier: claim ASK-0098, align source instructions, obtain independent
+behavior observations and run focused checks. No source behavior is accepted yet.
