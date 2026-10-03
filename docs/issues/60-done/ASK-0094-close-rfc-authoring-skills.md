@@ -115,11 +115,25 @@ managed worktree or pending source writer remains.
 
 ## New-session prompt follow-up — 2026-10-03
 
-[ASK-0101](../30-in-progress/ASK-0101-author-rfc-session-prompt.md) owns the requested final
+[ASK-0101](ASK-0101-author-rfc-session-prompt.md) owns the requested final
 reply prompt, AC08. Follow-up baseline: `eafcc1fe59ce48d2ad6e05d3c52dbb3b7f7c5352`.
 The original RFC baseline and prior acceptance remain unchanged. Direct execution;
-current frontier is the small instruction addition and focused validation.
+the final-response addition is accepted at `f3023cde4c3be905b34af219e39c83b9fb6e17f7`.
 
 | Criterion | Check/evidence | Outcome | Implementation revision |
 |---|---|---|---|
-| AC08 | Final-response instruction, compact/pack/open-choice handoff review and package validation | pending | pending |
+| AC08 | Focused self-review of compact/pack/open-choice prompts; skill validator and documentation gate | pass | f3023cde4c3be905b34af219e39c83b9fb6e17f7 |
+
+The scoped diff adds only the final-reply prompt instruction and short example.
+Self-review covered a saved standalone RFC, an existing pack entrypoint, and a
+selected scope with an unresolved choice: the instruction supplies the relevant
+path, carries only execution-changing context, and defers affected implementation
+until that choice is resolved. It emits no artifact/chat or readiness/authority
+claim. This is instruction review, not a new fresh-agent behavior result; earlier
+behavioral and portable-handoff acceptance is reused for unchanged behavior.
+
+`quick_validate.py skills/author-rfc` passed; `git diff --check` passed; the
+configured documentation gate reported 15 RFCs, 101 cards and 0 violations. Direct
+execution remained non-delegating; exact serving route and installed host loading
+are unverified. No companion runtime/schema, live consumer or MASK source changed.
+No in-scope obligation or deployment remains; installed skills were not upgraded.
