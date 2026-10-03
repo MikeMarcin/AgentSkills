@@ -106,15 +106,15 @@ class CodexLaneTest(unittest.TestCase):
     def test_all_routes_are_forwarded_with_role_instructions_and_identity(self) -> None:
         module = _load_codex_lane()
         expected = {
-            "rfc-utility": ("gpt-6-luna", "low"),
-            "rfc-test-runner": ("gpt-6-luna", "low"),
-            "rfc-scout": ("gpt-6.1-sol", "medium"),
-            "rfc-worker": ("gpt-6.1-sol", "high"),
-            "rfc-worker-deep": ("gpt-6-astra", "high"),
-            "rfc-reviewer": ("gpt-6-astra", "medium"),
-            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh"),
+            "rfc-utility": ("gpt-6-luna", "low", "low"),
+            "rfc-test-runner": ("gpt-6-luna", "low", "low"),
+            "rfc-scout": ("gpt-6.1-sol", "medium", "medium"),
+            "rfc-worker": ("gpt-6.1-sol", "high", "high"),
+            "rfc-worker-deep": ("gpt-6.1-sol", "max", "xhigh"),
+            "rfc-reviewer": ("gpt-6.1-sol", "xhigh", "xhigh"),
+            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "xhigh"),
         }
-        for name, (model, effort) in expected.items():
+        for name, (model, requested_effort, effort) in expected.items():
             with self.subTest(role=name):
                 lane_name = name.replace("-", "_") + "_focused_check"
                 result = self._launch(
@@ -122,7 +122,10 @@ class CodexLaneTest(unittest.TestCase):
                     "--task", "Bounded assignment.",
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertNotIn("downgrade", result.stderr)
+                if requested_effort == effort:
+                    self.assertNotIn("downgrade", result.stderr)
+                else:
+                    self.assertIn("downgrade", result.stderr)
                 payload = json.loads(result.stdout)
                 args = payload["args"]
                 self.assertEqual(args[0], "task")
@@ -130,7 +133,11 @@ class CodexLaneTest(unittest.TestCase):
                 self.assertEqual(args[args.index("--effort") + 1], effort)
                 self.assertNotIn("--write", args)
                 role, route = module.load_role_route(name)
-                self.assertIn(module.renderer.startup_banner(name, route), payload["prompt"])
+                self.assertEqual(route["effort"], requested_effort)
+                effective_route = {**route, "effort": effort}
+                self.assertIn(module.renderer.startup_banner(name, effective_route), payload["prompt"])
+                if requested_effort != effort:
+                    self.assertNotIn(module.renderer.startup_banner(name, route), payload["prompt"])
                 for instruction in module.renderer.project_instructions(role, PROJECT):
                     self.assertIn(instruction, payload["prompt"])
                 addenda_roles = ("rfc-worker", name) if name == "rfc-worker-deep" else (name,)
@@ -143,13 +150,13 @@ class CodexLaneTest(unittest.TestCase):
                 self.assertEqual(record["role"], name)
                 self.assertEqual(record["lane_name"], lane_name)
                 self.assertEqual(record["model"], model)
-                self.assertEqual(record["effort_requested"], effort)
+                self.assertEqual(record["effort_requested"], requested_effort)
                 self.assertEqual(record["effort"], effort)
                 self.assertFalse(record["write"])
         self.assertEqual(len(self._lane_log()), len(expected))
 
     def test_effort_max_downgrades_to_xhigh(self) -> None:
-        # Compatibility fallback is exercised without keeping a live route at max.
+        # Exercise the fallback independently of the canonical role selection.
         module = _load_codex_lane()
         role, route = module.load_role_route("rfc-utility")
         route = {**route, "effort": "max"}

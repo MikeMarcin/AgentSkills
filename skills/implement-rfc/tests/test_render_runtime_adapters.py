@@ -82,15 +82,15 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         # Approved role assignments are an independent expectation, not derived
         # from the routing file whose accidental edits this test should catch.
         expected = {
-            "rfc-integrator": ("gpt-6.1-sol", "xhigh", "claude-opus-5-5", "high", "workspace-write", True),
-            "rfc-utility": ("gpt-6-luna", "low", "claude-haiku-4-5", None, "read-only", False),
-            "rfc-test-runner": ("gpt-6-luna", "low", "claude-haiku-4-5", None, "build-write", False),
+            "rfc-integrator": ("gpt-6.1-sol", "high", "claude-opus-5-5", "high", "workspace-write", True),
+            "rfc-utility": ("gpt-6-luna", "low", "claude-sonnet-5-5", "low", "read-only", False),
+            "rfc-test-runner": ("gpt-6-luna", "low", "claude-sonnet-5-5", "low", "build-write", False),
             "rfc-scout": ("gpt-6.1-sol", "medium", "claude-sonnet-5-5", "medium", "read-only", False),
             "rfc-worker": ("gpt-6.1-sol", "high", "claude-opus-5-5", "medium", "workspace-write", False),
             "rfc-implementer": ("gpt-6.1-sol", "xhigh", "claude-opus-5-5", "high", "workspace-write", False),
-            "rfc-worker-deep": ("gpt-6-astra", "high", "claude-opus-5-5", "high", "workspace-write", False),
-            "rfc-reviewer": ("gpt-6-astra", "medium", "claude-opus-5-5", "medium", "read-only", False),
-            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-opus-5-5", "xhigh", "read-only", False),
+            "rfc-worker-deep": ("gpt-6.1-sol", "max", "claude-opus-5-5", "max", "workspace-write", False),
+            "rfc-reviewer": ("gpt-6.1-sol", "xhigh", "claude-opus-5-5", "xhigh", "read-only", False),
+            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-fable-5-1", "xhigh", "read-only", False),
         }
         self.assertEqual(set(ROUTING["assignments"]), set(expected))
         with tempfile.TemporaryDirectory() as temp:

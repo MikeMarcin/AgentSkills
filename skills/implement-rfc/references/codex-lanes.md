@@ -86,12 +86,13 @@ Lane rules:
 - Collect results with `codex_lane.py result -- <job-id> --cwd <lane cwd>`;
   cancel abandoned lanes with `codex_lane.py cancel` rather than leaving
   them running.
-- The companion runtime caps reasoning effort at `xhigh`. When a route names
-  `max` in a future routing configuration, the launcher downgrades to
-  `xhigh` and reports it; record the downgrade in the closeout card per the
-  standard fallback rule. Review scope and acceptance gates never narrow
-  because of the downgrade. The native `.codex/agents` adapters are
-  unaffected. All checked-in routes fit the cap and require no downgrade.
+- The companion runtime caps reasoning effort at `xhigh`. The checked-in
+  deep-worker route requests Sol 6.1 `max`; the launcher runs it at `xhigh`,
+  reports the downgrade and records requested/effective effort separately.
+  Record the downgrade in the closeout card per the standard fallback rule.
+  Review scope and acceptance gates never narrow because of the downgrade.
+  Native `.codex/agents` adapters retain `max`; use the native route when the
+  assignment requires that exact effort. Other checked-in leaf routes fit the cap.
 
 ## Result Handling
 
@@ -114,9 +115,9 @@ Whenever an independent review runs, record one line per review on the
 closeout card:
 
 ```text
-Closeout review runtime: codex (gpt-6-astra, medium)
-Closeout review runtime: claude (claude-opus-5-5, xhigh)
-Closeout review runtime: claude (claude-opus-5-5, medium) — waived: <reason cross-family was skipped>
+Closeout review runtime: codex (gpt-6.1-sol, xhigh)
+Closeout review runtime: claude (claude-fable-5-1, xhigh)
+Closeout review runtime: claude (claude-opus-5-5, xhigh) — waived: <reason cross-family was skipped>
 ```
 
 These are alternative examples, not a required set of reviews. When a second

@@ -8,18 +8,21 @@ RFC targets and accepted evidence retain their original routes.
 
 ## Decisions
 
-These are allocation judgments from public evidence, not measured equivalence on
+These choices combine public evidence with the owner's subsequent amendments on
+2026-10-03. The owner selected the integrator/reviewer efforts, max for infrequent
+deep work, Fable for critical-review diversity and Sonnet for Claude mechanical
+work. Those preferences are not benchmark conclusions or measured equivalence on
 this skill's RFC tasks. `config/routing.json` owns the exact requested pairs.
 
 | Role | Choice and reason |
 |---|---|
-| Utility and test runner | GPT-6 Luna **low** / Haiku 4.5 **unsupported/null**. These roles execute supplied commands, locate exact material and collect checkable results. Luna improves the cost baseline; xhigh adds reasoning to a job that explicitly excludes diagnosis and acceptance judgment. Haiku 4.5 remains the released small Claude model; the announced Haiku 5.5 is not a selectable replacement yet. |
+| Utility and test runner | GPT-6 Luna **low** / Sonnet 5.5 **low**. These roles execute supplied commands, locate exact material and collect checkable results. Luna retains the lower cost baseline. The owner prefers the newer Sonnet over Haiku for Claude collection work and keeps effort low; diagnosis and acceptance judgment remain outside these roles. Sonnet's input/output token rates are twice Haiku's, so this is a capability preference, not a token-price saving. |
 | Scout | Sol 6.1 **medium** / Sonnet 5.5 **medium**. Tracing ownership, execution paths and causal failures needs more judgment than mechanical extraction. Medium gives the newer workhorses room for that analysis without the former Sol/Opus price. |
 | Standard worker | Sol 6.1 **high** / Opus 5.5 **medium**. The role includes investigation, multi-file changes and local design, so it needs a broad engineer. Sol is a credible lower-cost replacement for routine Astra use. Opus medium is the newer model's engineering baseline; carrying Opus 5 xhigh forward would ignore recalibrated effort. Sonnet 5.5 medium is a reasonable explicit choice for well-specified slices, but its cheaper token rate is insufficient reason to make it the default for this entire role. |
-| Deep worker | Retain Astra **high**; move Claude to Opus 5.5 **high**. Keep a stronger Codex route for named unresolved difficulty. Opus's current coding and general benchmarks justify replacing the more expensive Fable default. Fable 5.1 remains an explicit candidate when evidence on a particular problem supports it. |
-| Normal reviewer | Retain Astra **medium**; move Claude to Opus 5.5 **medium**. Acceptance falsification involves hard-to-check omissions and false positives. Preserve Astra's established review allocation and reasoning diversity from Sol workers; medium Opus is a defensible starting point for ordinary review. Fresh context and the existing cross-provider preference still matter. A model change alone does not prove independent errors. |
-| Critical reviewer | Retain Astra **xhigh**; move Claude to Opus 5.5 **xhigh**. Named material risks justify deeper counterexample search. Current evidence does not establish Fable as a better general reviewer. Max is not an automatic upgrade and remains outside the defaults. |
-| Older integrator | Sol 6.1 **xhigh** / Opus 5.5 **high**. Integration combines conflicting evidence, engineering and acceptance adjudication. Keep substantial reasoning while upgrading the older Sol/Opus models; this changes neither its authority nor the selected execution topology. |
+| Deep worker | Sol 6.1 **max** / Opus 5.5 **max**. The owner chooses the newer workhorses with maximum reasoning for named unresolved difficulty because this role is infrequent. This is an explicit budget/quality preference; public evidence does not prove that max always beats high or xhigh. Native adapters request max; the existing Codex companion reports an xhigh fallback. |
+| Normal reviewer | Sol 6.1 **xhigh** / Opus 5.5 **xhigh**. Acceptance falsification involves hard-to-check omissions and false positives. The owner prefers substantial reasoning on the newer workhorses. The Sol/Astra benchmark gap is narrow, but these measurements do not establish equal reviewer recall. Fresh context and the existing cross-provider preference still matter. A model change alone does not prove independent errors. |
+| Critical reviewer | Astra **xhigh** / Fable 5.1 **xhigh**. Named material risks justify deeper counterexample search. The owner retains different models from the ordinary Sol/Opus worker and reviewer routes. Current evidence does not establish Fable as a better general reviewer; this is a deliberate diversity allocation with a higher token price, not a guarantee of independent errors. |
+| Older integrator | Sol 6.1 **high** / Opus 5.5 **high**. Integration combines conflicting evidence, engineering and acceptance adjudication. The owner selects high on Sol while retaining high on Opus; this changes neither its authority nor the selected execution topology. |
 
 ## Benchmarks and their limits
 
@@ -29,15 +32,17 @@ puts Sol 6.1 at 51 and Astra at 52 on Intelligence Index v4.3.2. Its
 reports 50/47 on that index and 52%/44% on Terminal-Bench 4.0. These are
 benchmark-provider results at the named efforts, not reviewer recall measurements
 or proof that Astra wins every difficult problem. The narrow Sol/Astra gap supports
-moving ordinary implementation to Sol while keeping Astra available for the
-less frequent difficulty and review roles.
+moving ordinary implementation and review to Sol while retaining Astra for
+critical review. It does not establish the owner's max-effort deep-work choice.
 
 Artificial Analysis reports **58** for
 [Opus 5.5 max with default fallback](https://artificialanalysis.ai/models/claude-opus-5-5)
 and **53** for [Fable 5.1 max with default fallback](https://artificialanalysis.ai/models/claude-fable-5-1).
 Those pages report benchmark cost per task of $5.98 and $7.63 respectively. They
 support reconsidering Fable's blanket premium, but do not establish the same
-ordering at medium or high or on security review. Anthropic's
+ordering at medium, high or xhigh or on security review. The amended allocation
+uses Opus for engineering and ordinary review, while reserving Fable's premium
+for critical-review diversity. Anthropic's
 [Opus release evaluation](https://www.anthropic.com/claude-opus-5-5)
 also reports stronger coding results than Fable and describes their practical gap
 as narrower than benchmark margins suggest. Its headline scores mostly use max,
@@ -58,7 +63,9 @@ complex open-ended judgment. Sonnet's advantage is clearest at lower efforts;
 higher settings can have similar task cost to Opus. Its FrontierCode footnote
 records worse max than xhigh results when additional review and edits exceeded
 scope. That argues for medium scouts and a broader Opus worker, rather than
-assuming that the highest effort or lowest token price is always best.
+assuming that the highest effort or lowest token price is always best. The owner
+nonetheless chooses max for the rare deep role; its bounded assignment and scope
+checks remain necessary.
 
 ## Cost basis
 
@@ -118,8 +125,15 @@ and frontier Astra work. [Claude effort guidance](https://platform.claude.com/do
 supports the selected levels, identifies medium as Opus 5.5's default and
 recommends medium for well-specified Sonnet agentic tasks.
 [Claude Code model configuration](https://code.claude.com/docs/en/model-config)
-requires version 2.1.284 for Sonnet 5.5 and 2.1.280 for Opus 5.5. Raise the shared
-admission floor to 2.1.284; do not update installed clients automatically.
+requires version 2.1.284 for Sonnet 5.5 and 2.1.280 for Opus 5.5. Keep the shared
+admission floor at 2.1.284; do not update installed clients automatically. The
+owner's Sonnet low and deep max preferences differ from the general medium
+recommendations; no local quality comparison at those efforts is claimed.
+
+The native deep-worker routes request max. The existing Codex companion caps
+effort at xhigh, emits the effective-effort banner and logs requested max versus
+effective xhigh; see [Codex lanes](codex-lanes.md). That fallback is not execution
+at max and must be reported when used.
 
 Validation here covers source consistency, native rendering and fake-driver
 requests in disposable consumers. No local model-quality trial, native serving

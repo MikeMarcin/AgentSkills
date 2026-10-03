@@ -8,22 +8,25 @@ The coordinator's current route is never an implicit engineering override.
 
 | Role | Class | Codex | Claude |
 |---|---|---|---|
-| `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna low | Haiku 4.5 unsupported/null |
+| `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna low | Sonnet 5.5 low |
 | `rfc-scout` | balanced | Sol 6.1 medium | Sonnet 5.5 medium |
 | `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
 | `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 high |
-| `rfc-integrator` | integration | Sol 6.1 xhigh | Opus 5.5 high |
-| `rfc-worker-deep` | deep | Astra high | Opus 5.5 high |
-| `rfc-reviewer` | review | Astra medium | Opus 5.5 medium |
-| `rfc-reviewer-critical` | critical | Astra xhigh | Opus 5.5 xhigh |
+| `rfc-integrator` | integration | Sol 6.1 high | Opus 5.5 high |
+| `rfc-worker-deep` | deep | Sol 6.1 max | Opus 5.5 max |
+| `rfc-reviewer` | review | Sol 6.1 xhigh | Opus 5.5 xhigh |
+| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.1 xhigh |
 
 Standard is broad engineering; deep addresses named unresolved difficulty.
 Review is independently configurable from deep implementation. Critical review
 addresses a named material risk and replaces normal review when selected; no
-medium-then-critical pipeline. Effort does not change acceptance or authority.
+ordinary-then-critical pipeline. Effort does not change acceptance or authority.
 See [delegated execution](delegated-execution.md) for selection and contracts.
 
-The owner authorized a public-evidence refresh of supporting roles on 2026-10-03.
+The owner authorized a public-evidence refresh of supporting roles on 2026-10-03
+and then amended the defaults above. Deep work remains reserved for named unresolved
+difficulty; its max effort reflects the owner's preference for these infrequent
+assignments. Critical review retains Astra/Fable for model diversity.
 For the benchmarks, prices, mixed public reports and role-specific judgment behind
 these choices, read [Selection evidence](model-selection-evidence.md) when reviewing
 or changing the allocation. The coordinator/implementer strategy, its coordinator
@@ -32,7 +35,9 @@ The older integrator route is independently refreshed. Exact model IDs and reque
 effort live in configuration; `verified_as_of` dates the source/configuration review,
 not observed serving or measured RFC-task quality. No local model bakeoff was run.
 Claude's declared floor is 2.1.284 for Sonnet 5.5; Opus 5.5 requires at least 2.1.280.
-No automatic client upgrade, effort clamp, model fallback, reset or credit purchase
+Native adapters preserve the requested efforts. The existing Codex companion
+fallback for max is documented in [codex-lanes.md](codex-lanes.md). No automatic
+client upgrade, other effort clamp or model fallback, reset or credit purchase
 is authorized. Preserve processing speed.
 
 ## Native dispatch arguments

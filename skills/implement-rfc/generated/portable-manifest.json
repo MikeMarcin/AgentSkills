@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "b2bd41fbcc0278f472a4491576e2e03d392f592b4ec00e570d5c1e760318de09"
+      "sha256": "181d0fc7e1b7c153700459c886906c0546785d308abab2133db080373fb9386b"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -82,7 +82,7 @@
     },
     {
       "path": "references/codex-lanes.md",
-      "sha256": "fc169df08fc49f3d137e95f37686fcd710a22034eea11ca874a47ea8f2afc8cd"
+      "sha256": "a48e18e63a1b347739b7b4b0b204726a30bf989f30e26ff6ea9e2dd48a3f528a"
     },
     {
       "path": "references/coordination-handoff.md",
@@ -106,11 +106,11 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "18ba6a98dddd699ea446980c8b17cadda6cac514a1c5ad5a09a2652458be80a9"
+      "sha256": "c01ef04cfe98139ec2bb570d6dd76ed63fe63635c29028414547690256c13c17"
     },
     {
       "path": "references/model-selection-evidence.md",
-      "sha256": "c884c22f4f93b3b4afa2f9d2a5587bcecdcfa644089b1e72d4bff75570b239ee"
+      "sha256": "20682200d1199c5f133130423050aa23ceec3de49cad0de4a595d01cdb9946e3"
     },
     {
       "path": "references/native-coordination.md",
@@ -458,7 +458,7 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "d89b9f91e7db51a1b15b1e6417835b75ef6dec6f22aadb55d765fe64b9507a4a"
+      "sha256": "6f836533024b56ea93e4049415287d9ffb91390793e2e6e2d69ab1fae8cd6be8"
     },
     {
       "path": "tests/test_codex_station.py",
@@ -574,7 +574,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "4b27f380f57b7525915139d96b6961b80259531b0abb2b2deec80192c3e9b268"
+      "sha256": "1d13e4873b7c88c19fda5bf5499bf486d841732fac1e558d81ccab787509dd89"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -665,6 +665,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "7d0cdbbb5f08fd23",
+  "portable_digest": "04fc3ea83d80dd84",
   "schema": "implement-rfc.portable-manifest.v1"
 }
