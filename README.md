@@ -98,8 +98,10 @@ mask bundle uninstall agentskills/rfc --project /absolute/path/to/project --dry-
 The review includes implement-rfc's required native-role setup. Bundle install preserves
 manual selections and exact locks. Bundle uninstall removes only its local contribution,
 preserving separately selected, overlapping, held and locally edited members. Future
-definition changes require an explicit
-`mask bundle upgrade agentskills/rfc --dry-run` review. Each skill remains individually
+definition changes and newer unheld skill versions are reviewed together with
+`mask bundle upgrade agentskills/rfc --dry-run`. Ordinary `mask upgrade`, including
+`--all`, includes installed bundles too. Pins, exact selectors, manual/overlapping
+membership and local edits are preserved; conflicting constraints need an explicit choice. Each skill remains individually
 installable with `mask install agentskills/SKILL`. The source index lists every existing
 package; adding this bundle does not change real project or personal selections here.
 

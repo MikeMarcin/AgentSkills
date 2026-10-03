@@ -30,6 +30,7 @@ def main():
         base = Path(temporary).resolve()
         upstream, home, consumer = base / 'AgentSkills.git', base / 'machine', base / 'consumer'
         git(base, 'clone', '--bare', source, upstream)
+        git(upstream, 'update-ref', 'refs/heads/main', revision)
         consumer.mkdir()
         git(consumer, 'init', '-b', 'main')
         context = consumer / '.mask/skill-config/implement-rfc'
@@ -47,7 +48,7 @@ def main():
             assert run.returncode == 0 and not run.stderr and result['ok'], (words, run.returncode, result, run.stderr)
             commands.append(dict(argv=list(map(str, words)), exit_code=run.returncode))
             return result
-        mask('tap', 'agentskills', upstream, '--ref', revision)
+        mask('tap', 'agentskills', upstream, '--ref', 'refs/heads/main')
         mask('tap', 'fetch', 'agentskills')
         catalog = mask('search')['data']['skills']
         assert {row['id']: row['path'] for row in catalog} == expected
@@ -78,15 +79,37 @@ def main():
         mask('bundle', 'install', 'agentskills/rfc', '--approve-plan', reinstall['data']['plan_hash'])
         assert all((consumer / parent / name).is_symlink() for parent in ('.agents/skills', '.claude/skills') for name in names)
         assert mask('status', '--check')['data']['healthy']
+        # Upgrade a derived fixture revision; the original canonical candidate stays untouched.
+        author = base / 'upgrade-author'
+        git(base, 'clone', upstream, author)
+        git(author, 'config', 'user.name', 'Bundle fixture')
+        git(author, 'config', 'user.email', 'bundle-fixture@example.invalid')
+        derived = json.loads((author / 'mask-source.json').read_text())
+        derived['bundles']['rfc']['description'] += ' Fixture definition upgrade.'
+        (author / 'mask-source.json').write_text(json.dumps(derived, indent=2) + '\n')
+        with (author / 'skills/grill-me/SKILL.md').open('a') as stream:
+            stream.write('\nDisposable package upgrade fixture.\n')
+        git(author, 'add', 'mask-source.json', 'skills/grill-me/SKILL.md')
+        git(author, 'commit', '-m', 'Disposable definition and package update')
+        derived_revision = git(author, 'rev-parse', 'HEAD')
+        git(author, 'push', upstream, 'HEAD:main')
+        mask('tap', 'fetch', 'agentskills')
+        named_upgrade = mask('bundle', 'upgrade', 'agentskills/rfc', '--dry-run')
+        assert any(row['coordinate'] == 'agentskills/grill-me' and row['before_digest'] != row['after_digest'] for row in named_upgrade['data']['versions'])
+        aggregate = mask('upgrade', '--all', '--dry-run', '--no-update')
+        assert aggregate['data']['bundle_updates'][0]['definitions'][0]['commit'] == derived_revision
+        mask('upgrade', '--all', '--approve-plan', aggregate['data']['plan_hash'], '--no-update')
+        assert mask('status', '--check')['data']['healthy']
+        assert not mask('bundle', 'upgrade', 'agentskills/rfc', '--offline')['changed']
         receipt = dict(source_revision=revision, mask_revision=git(program, 'rev-parse', 'HEAD'),
                        bundle=shown, packages_discovered=len(expected), package_validation=validation['ok'],
                        selected=names, workflow_readiness=status['data'].get('workflow_readiness'),
                        setup=[dict(skill=row.get('skill'), action=row.get('action'), state=row['state']) for row in installed['data']['setup']['actions']],
-                       healthy=True, uninstall=dict(removed=removal['data']['removed'], preserved='agentskills/grill-me', repeat_noop=True, offline=True), reinstall_healthy=True, host_load='not_verified', platform=sys.platform, commands=commands,
+                       healthy=True, uninstall=dict(removed=removal['data']['removed'], preserved='agentskills/grill-me', repeat_noop=True, offline=True), reinstall_healthy=True, upgrade=dict(derived_fixture_revision=derived_revision, changed_member='agentskills/grill-me', named_preview=True, aggregate_definitions=True, healthy=True, repeat_noop=True), host_load='not_verified', platform=sys.platform, commands=commands,
                        fixture_cleanup='TemporaryDirectory removed on completion')
     if args.output:
         args.output.write_text(json.dumps(receipt, indent=2) + '\n')
-    print(f"Canonical agentskills/rfc ready: {len(names)} skills; {len(expected)} packages preserved; reviewed setup published; safe uninstall and reinstall passed.")
+    print(f"Canonical agentskills/rfc ready: {len(names)} skills; {len(expected)} packages preserved; reviewed setup published; safe uninstall/reinstall and combined aggregate upgrade passed.")
 
 
 if __name__ == '__main__':
