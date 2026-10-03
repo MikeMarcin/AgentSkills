@@ -26,7 +26,7 @@ normally use it from the discovered companion without copying a second engine.
 Use [the RFC template](../assets/rfc.template.md) and link each RFC to its proposed
 implementation cards, closeout and canonical plan. RFC requirements/acceptance remain
 authoritative; decisions link to them and cards/milestone work derive from them.
-Repeated criterion definitions can make consumer binding ambiguous. After an agreed
+Keep the core skill's unique criterion-label convention for consumer binding. After an agreed
 change, update affected artifacts and render the milestone view from JSON.
 
 Use [the card template](../assets/card.template.md) and canonical

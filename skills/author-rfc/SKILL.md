@@ -47,7 +47,9 @@ Reference established conventions and specify
 the changes. Add significant alternatives or technical detail where their omission
 would leave material behavior ambiguous, or when requested. Internal design may be
 deferred without becoming an execution prerequisite. Keep exact constraints and
-numeric defaults; give each acceptance criterion one stable, authoritative definition.
+numeric defaults. Define each stable acceptance ID once in its RFC; the handoff
+binder counts repeated labels even in cross-references. Within that RFC, refer to
+behavior by heading or description; cards and plans may reference its criterion IDs.
 
 Keep material decisions, actual answers and open questions inline. Use a separate
 [decision record](assets/decisions.template.md) when substantial history benefits
