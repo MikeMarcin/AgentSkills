@@ -3,6 +3,7 @@
   "packages": {
     "attended-review": "skills/attended-review",
     "author-rfc": "skills/author-rfc",
+    "bpr-cycle": "skills/bpr-cycle",
     "coauthoring": "skills/coauthoring",
     "code-simplifier": "skills/code-simplifier",
     "concept-art-approval-pipeline": "skills/concept-art-approval-pipeline",
