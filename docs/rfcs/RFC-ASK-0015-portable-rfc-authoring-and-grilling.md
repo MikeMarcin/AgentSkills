@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0015"
 title: "Portable RFC authoring and optional grilling"
-status: "Auto-Verified"
+status: "Implementing"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
 ---
 
@@ -121,6 +121,11 @@ replace upstream host-specific invocation controls and mandatory dispatch.
 - **AC07:** requested or supplied portable packs retain canonical artifact and handoff
   compatibility. Companion guidance selects the compact or pack branch consistently;
   focused package, documentation and public handoff checks pass on the source candidate.
+- **AC08:** the final authoring reply includes a short, copyable new-session prompt
+  invoking implement-rfc with the exact saved RFC or existing pack entrypoint. It
+  preserves selected scope/constraints and directs resolution of material open
+  choices before implementing affected scope, without extra files, chat creation
+  or claims of readiness, confirmation or implementation authority.
 
 ## Verification and closeout
 
@@ -179,3 +184,11 @@ The compact-authoring follow-up satisfies AC06–AC07 at canonical source
 retain failed observations, focused repairs, actual drafting/resume results and the
 revised generated pack's successful two-consumer handoff. Prior acceptance remains
 historical. Source-only delivery is complete; installed host behavior is unverified.
+
+## New-session prompt follow-up — 2026-10-03
+
+The owner requested a suggested prompt for implementing the completed RFC in a new
+session. [ASK-0101](../issues/20-ready/ASK-0101-author-rfc-session-prompt.md) owns this
+small final-response addition and AC08. Baseline:
+`eafcc1fe59ce48d2ad6e05d3c52dbb3b7f7c5352`. Existing authoring/pack behavior and
+historical acceptance remain intact; this follow-up does not start implementation.

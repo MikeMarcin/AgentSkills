@@ -35,6 +35,14 @@
         "Source-only integration and truthful closeout preserve unrelated work, historical acceptance and deployment boundaries."
       ],
       "boundary": "The owner-authorized compact-authoring amendment; no schema/runtime changes or consumer deployment."
+    },
+    {
+      "id": "session-prompt",
+      "outcome": "The final authoring reply supplies a usable new-session implementation prompt without changing scope or authority.",
+      "work": [{"issue": "ASK-0101"}],
+      "depends_on": ["compact-authoring"],
+      "exit_criteria": ["AC08 is verified proportionately and source-only closeout preserves prior acceptance."],
+      "boundary": "Final-response instruction only; no new chat, artifact or implementation."
     }
   ],
   "coverage": "complete",

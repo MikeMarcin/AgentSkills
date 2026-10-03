@@ -112,3 +112,14 @@ attested. The implementation session remained non-delegating. Test commands ende
 all source snapshots, temporary consumers and parent-owned evaluator/manifest fixtures
 were removed. Durable artifacts and results are in the evidence file. No server,
 managed worktree or pending source writer remains.
+
+## New-session prompt follow-up — 2026-10-03
+
+[ASK-0101](../20-ready/ASK-0101-author-rfc-session-prompt.md) owns the requested final
+reply prompt, AC08. Follow-up baseline: `eafcc1fe59ce48d2ad6e05d3c52dbb3b7f7c5352`.
+The original RFC baseline and prior acceptance remain unchanged. Direct execution;
+current frontier is the small instruction addition and focused validation.
+
+| Criterion | Check/evidence | Outcome | Implementation revision |
+|---|---|---|---|
+| AC08 | Final-response instruction, compact/pack/open-choice handoff review and package validation | pending | pending |

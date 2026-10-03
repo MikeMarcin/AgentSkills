@@ -35,3 +35,17 @@ Ordinary requests produce compact grounded RFCs while requested portable packs r
 - Source-only integration and truthful closeout preserve unrelated work, historical acceptance and deployment boundaries.
 
 **Boundary:** The owner-authorized compact-authoring amendment; no schema/runtime changes or consumer deployment.
+
+## session-prompt
+
+The final authoring reply supplies a usable new-session implementation prompt without changing scope or authority.
+
+**Work:** `ASK-0101`
+
+**Prerequisites:** compact-authoring
+
+**Completion:**
+
+- AC08 is verified proportionately and source-only closeout preserves prior acceptance.
+
+**Boundary:** Final-response instruction only; no new chat, artifact or implementation.
