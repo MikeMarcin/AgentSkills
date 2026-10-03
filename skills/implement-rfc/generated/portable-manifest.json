@@ -6,7 +6,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "270215b89b4039d8e6d323d289f3e78f43b90642338a18a481397cfa04a2ce45"
+      "sha256": "b69702e9560a0190f0c62b0215ca7dca8c1351437c8b53363b8f3ec049472676"
     },
     {
       "path": "agents/openai.yaml",
@@ -46,7 +46,7 @@
     },
     {
       "path": "examples/milestone-plans/README.md",
-      "sha256": "6f4c24e0fe9190efc19ed8fa32cc34f3c70a0e3ed75d1e9e0470f72c49a277ff"
+      "sha256": "18b41598b577b89fbe9ba699771424c7a6487c9e2014f42bb284d6dde80cc979"
     },
     {
       "path": "examples/milestone-plans/milestone-plan.json",
@@ -665,6 +665,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "4d05fbf735b2a62d",
+  "portable_digest": "7d0cdbbb5f08fd23",
   "schema": "implement-rfc.portable-manifest.v1"
 }
