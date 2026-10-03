@@ -9,7 +9,29 @@
     "strategy": "direct",
     "implementation_delegation": "none",
     "requested_implementation_route": "existing Astra/max reviewer selected by owner",
-    "independent_behavior": "Parent supplied separate fresh evaluators and natural changed-answer/handoff-review continuations; they wrote only disposable output roots. Exact serving model/effort was not independently attested."
+    "independent_behavior": "Parent supplied separate fresh evaluators and natural changed-answer/handoff-review continuations; they wrote only disposable output roots. Exact serving model/effort was not independently attested.",
+    "resolved_selection": {
+      "schema": "implement-rfc.strategy-selection.v1",
+      "strategy": "direct",
+      "topology_id": "direct",
+      "recipe_revision": "1",
+      "recipe_fingerprint": "sha256:838abf11a8cb4483b359d884f911d7d31d49f5354867eafdb28394a61520a010",
+      "routing": {},
+      "requirement_profile": "direct",
+      "owners": {
+        "engineering": "primary",
+        "bookkeeping": "primary",
+        "product_edits": "primary"
+      },
+      "delegation": "none",
+      "instruction_paths": [
+        "references/engineering-contract.md",
+        "references/strategies/direct.md"
+      ],
+      "configuration_complete": true,
+      "missing_routes": [],
+      "host_load": "not_verified"
+    }
   },
   "acceptance": [
     {
@@ -383,5 +405,16 @@
     "Fresh runs plus focused resumes demonstrate the sampled behavior, not a guarantee across all models/prompts.",
     "Canonical source and direct file discovery were exercised; installed skill upgrades, automatic host loading and native Claude were not tested or changed."
   ],
-  "cleanup": "All temporary source snapshots, handoff consumers, evaluator fixtures and isolated manifest roots have been removed by their owners. All task commands ended; no server, worktree or source writer remains. Local checkpoint receipts are retained only until the final completion check."
+  "cleanup": "All temporary source snapshots, handoff consumers, evaluator fixtures, isolated manifest roots and final local checkpoint receipts have been removed by their owners. Commands ended; no task-owned server, worktree or source writer remains.",
+  "completion": {
+    "finish_commit": "479b1b976a2e839d118896a28828fb152aed11a5",
+    "checkpoint_result": {
+      "action": "report-closeout",
+      "detail": "Compact-authoring amendment is integrated with actual behavioral and portable handoff acceptance; prior milestone acceptance is retained.",
+      "engineering_acceptance": "not-evaluated"
+    },
+    "documentation": "15 RFCs, 99 cards; 0 structural violations",
+    "board": "No violations or warnings; all five RFC-ASK-0015 cards Done; next is null.",
+    "unrelated_work": "The finish guard refused a stale expected HEAD after another owner claimed ASK-0099. Its unrelated changes were inspected and preserved before retrying against the new revision. Only the preexisting .mask.lock.json remains dirty."
+  }
 }
