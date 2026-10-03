@@ -8,7 +8,7 @@ The coordinator's current route is never an implicit engineering override.
 
 | Role | Class | Codex | Claude |
 |---|---|---|---|
-| `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna low | Sonnet 5.5 low |
+| `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna xhigh | Sonnet 5.5 low |
 | `rfc-scout` | balanced | Sol 6.1 medium | Sonnet 5.5 medium |
 | `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
 | `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 high |
@@ -27,6 +27,9 @@ The owner authorized a public-evidence refresh of supporting roles on 2026-10-03
 and then amended the defaults above. Deep work remains reserved for named unresolved
 difficulty; its max effort reflects the owner's preference for these infrequent
 assignments. Critical review retains Astra/Fable for model diversity.
+The owner selected Luna xhigh for mechanical roles after reviewing failure-reporting
+requirements and the comparison with Sonnet low. Similar aggregate intelligence
+does not establish equal terminal or error-handling performance.
 For the benchmarks, prices, mixed public reports and role-specific judgment behind
 these choices, read [Selection evidence](model-selection-evidence.md) when reviewing
 or changing the allocation. The coordinator/implementer strategy, its coordinator

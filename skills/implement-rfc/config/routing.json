@@ -17,7 +17,7 @@
       "classes": {
         "mechanical": {
           "model": "gpt-6-luna",
-          "effort": "low"
+          "effort": "xhigh"
         },
         "balanced": {
           "model": "gpt-6.1-sol",

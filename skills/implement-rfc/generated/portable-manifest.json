@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "181d0fc7e1b7c153700459c886906c0546785d308abab2133db080373fb9386b"
+      "sha256": "8c8e3302fb211da2344d0a1110092e6799d0cc4250a3d98b1b8eded695b70126"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -106,11 +106,11 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "c01ef04cfe98139ec2bb570d6dd76ed63fe63635c29028414547690256c13c17"
+      "sha256": "6c57dd58acbabfa333e8c2f49929adee2752179fb97429324886c8df778f40cf"
     },
     {
       "path": "references/model-selection-evidence.md",
-      "sha256": "20682200d1199c5f133130423050aa23ceec3de49cad0de4a595d01cdb9946e3"
+      "sha256": "0c08333f85127d6a18680b2c5a474aaa8cdbaedd05611c47052788408e4e6e51"
     },
     {
       "path": "references/native-coordination.md",
@@ -458,7 +458,7 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "6f836533024b56ea93e4049415287d9ffb91390793e2e6e2d69ab1fae8cd6be8"
+      "sha256": "ca2b663278b6fe1dc0d271f5b8393b37fca98a3a417aa3e1f25bde03294a5656"
     },
     {
       "path": "tests/test_codex_station.py",
@@ -574,7 +574,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "1d13e4873b7c88c19fda5bf5499bf486d841732fac1e558d81ccab787509dd89"
+      "sha256": "a9689a5caaf0f7a68c8904d816f5868882bb5d20e0da0043c859bd550613ad39"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -665,6 +665,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "04fc3ea83d80dd84",
+  "portable_digest": "6aeef8b741438c36",
   "schema": "implement-rfc.portable-manifest.v1"
 }

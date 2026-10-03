@@ -10,13 +10,13 @@ RFC targets and accepted evidence retain their original routes.
 
 These choices combine public evidence with the owner's subsequent amendments on
 2026-10-03. The owner selected the integrator/reviewer efforts, max for infrequent
-deep work, Fable for critical-review diversity and Sonnet for Claude mechanical
-work. Those preferences are not benchmark conclusions or measured equivalence on
-this skill's RFC tasks. `config/routing.json` owns the exact requested pairs.
+deep work, Fable for critical-review diversity and Luna xhigh / Sonnet low for
+mechanical work. Those preferences are not benchmark conclusions or measured
+equivalence on this skill's RFC tasks. `config/routing.json` owns the exact requested pairs.
 
 | Role | Choice and reason |
 |---|---|
-| Utility and test runner | GPT-6 Luna **low** / Sonnet 5.5 **low**. These roles execute supplied commands, locate exact material and collect checkable results. Luna retains the lower cost baseline. The owner prefers the newer Sonnet over Haiku for Claude collection work and keeps effort low; diagnosis and acceptance judgment remain outside these roles. Sonnet's input/output token rates are twice Haiku's, so this is a capability preference, not a token-price saving. |
+| Utility and test runner | GPT-6 Luna **xhigh** / Sonnet 5.5 **low**. These roles must recognize failures, skips and incomplete runs, preserve command/exit-status/diagnostic evidence and return unsupplied decisions to the integrator. The owner selects Luna's lower token price with greater reasoning effort, alongside the newer Sonnet on Claude. Overall intelligence is close at these settings; terminal performance still favors Sonnet. Diagnosis and acceptance judgment remain outside both roles. |
 | Scout | Sol 6.1 **medium** / Sonnet 5.5 **medium**. Tracing ownership, execution paths and causal failures needs more judgment than mechanical extraction. Medium gives the newer workhorses room for that analysis without the former Sol/Opus price. |
 | Standard worker | Sol 6.1 **high** / Opus 5.5 **medium**. The role includes investigation, multi-file changes and local design, so it needs a broad engineer. Sol is a credible lower-cost replacement for routine Astra use. Opus medium is the newer model's engineering baseline; carrying Opus 5 xhigh forward would ignore recalibrated effort. Sonnet 5.5 medium is a reasonable explicit choice for well-specified slices, but its cheaper token rate is insufficient reason to make it the default for this entire role. |
 | Deep worker | Sol 6.1 **max** / Opus 5.5 **max**. The owner chooses the newer workhorses with maximum reasoning for named unresolved difficulty because this role is infrequent. This is an explicit budget/quality preference; public evidence does not prove that max always beats high or xhigh. Native adapters request max; the existing Codex companion reports an xhigh fallback. |
@@ -54,8 +54,26 @@ found Sol and Astra both passing 58/58 coding attempts, versus Luna's 52/58; on
 the harder ten tasks Luna passed 14/20 while Sol and Astra passed 20/20. Simple
 function-calling tasks saturated for all models. Small samples, ceiling effects
 and overlapping coding confidence intervals limit the comparison. This supports
-keeping Luna on checkable mechanical work, not promoting it to broad engineering
-or semantic review merely because it is cheap.
+limiting Luna to checkable mechanical work; it does not establish that low effort
+is sufficient for failure reporting or justify broad engineering or semantic review.
+
+[Artificial Analysis's effort-specific Luna/Sonnet comparison](https://artificialanalysis.ai/models/releases/comparisons/claude-sonnet-5-5-vs-gpt-6-luna)
+reports the following on Intelligence Index v4.3.2, checked 2026-10-03:
+
+| Model and effort | Intelligence Index | Terminal-Bench 4.0 | Benchmark USD/task |
+|---|---:|---:|---:|
+| GPT-6 Luna low | 22 | 0.0% | $0.0045 |
+| GPT-6 Luna high | 33 | 4.5% | $0.03 |
+| GPT-6 Luna xhigh | 35 | 8.1% | $0.04 |
+| GPT-6 Luna max | 38 | 12.6% | $0.07 |
+| Sonnet 5.5 low with default fallback | 36 | 20.7% | $0.42 |
+
+Luna xhigh is close to Sonnet low on the aggregate, with lower benchmark task
+cost, while the terminal results show a material gap. Terminal-Bench measures
+agentic coding beyond prescribed result collection; it is not a direct test of
+error reporting. The owner chose this cost tradeoff. It does not establish equal
+reliability, measured local savings or inability to handle any particular error.
+Xhigh also fits the companion's existing cap without a downgrade.
 
 Anthropic's [Sonnet 5.5 release](https://www.anthropic.com/claude-sonnet-5-5)
 reports large improvements in focused coding, but says Opus remains stronger at
@@ -121,7 +139,10 @@ they do not establish a provider-wide reliability ranking.
 
 [OpenAI's model guidance](https://developers.openai.com/api/docs/guides/latest-model)
 supports the selected efforts and separates focused Luna work from complex Sol
-and frontier Astra work. [Claude effort guidance](https://platform.claude.com/docs/en/build-with-claude/effort)
+and frontier Astra work. [Official OpenAI subagent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents)
+recommends starting explicit Luna subagents at high. The owner selects xhigh
+after the effort-specific comparison; low effort is no longer the mechanical
+default. [Claude effort guidance](https://platform.claude.com/docs/en/build-with-claude/effort)
 supports the selected levels, identifies medium as Opus 5.5's default and
 recommends medium for well-specified Sonnet agentic tasks.
 [Claude Code model configuration](https://code.claude.com/docs/en/model-config)
