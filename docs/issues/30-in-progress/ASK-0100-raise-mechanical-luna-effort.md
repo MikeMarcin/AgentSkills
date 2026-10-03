@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0100
 title: Raise mechanical Luna effort for reliable failure reporting
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"source_baseline":"eafcc1fe59ce48d2ad6e05d3c52dbb3b7f7c5352","execution_strategy":"direct","requested_on":"2026-10-03"}
