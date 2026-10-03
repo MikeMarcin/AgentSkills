@@ -1,0 +1,387 @@
+{
+  "task": "ASK-0098",
+  "date": "2026-10-03",
+  "source_revision": "d1ef57c8b6817b0f6340f01ecafd7cea1b380239",
+  "amendment_baseline": "5a6c64d167b65b7ff52b9b2e347ba2412baa6c03",
+  "manifest_integration_revision": "1e1a3f8c7aee3785427ce49c5134c66051903bb0",
+  "mask_program_revision": "40080e0f739cee53390e93428e9d17daa5a983aa",
+  "execution": {
+    "strategy": "direct",
+    "implementation_delegation": "none",
+    "requested_implementation_route": "existing Astra/max reviewer selected by owner",
+    "independent_behavior": "Parent supplied separate fresh evaluators and natural changed-answer/handoff-review continuations; they wrote only disposable output roots. Exact serving model/effort was not independently attested."
+  },
+  "acceptance": [
+    {
+      "criterion": "AC06",
+      "outcome": "pass",
+      "evidence": "Fresh compact rerun and independent changed-answer/identity-check resumes produce one RFC, preserve concrete open questions, propagate dirty-file refusal, correct provisional identity and retain distinct criterion labels without invented confirmation or implementation authority."
+    },
+    {
+      "criterion": "AC07",
+      "outcome": "pass",
+      "evidence": "Explicit partial pack preserves exact constraints and typed future work; independent handoff resume repairs repeated labels; six public discovery/adoption/binding commands pass in two linked consumers; package, source and documentation checks pass."
+    }
+  ],
+  "behavior_observations": [
+    {
+      "case": "fresh-small-rerun",
+      "candidate": "fabcab37ae504350d23ddc4427b811ad81701a8d",
+      "observation": "Parent observed one 607-word RFC, four independent criteria, no sidecar, no speculative hook-permission question and no blanket confirmation. Word count is observational, not a pass threshold. Numeric identity needed the recorded repair."
+    },
+    {
+      "case": "changed-answer-and-handoff-resume",
+      "candidate": "e64cb8bd53aee7e066d9ffeeef0d1c1f93576194",
+      "observation": "The same evaluator reloaded current instructions on a natural handoff review. Final artifact is RFC-DRAFT-0001 with five distinct labels each occurring once. Both-file selection survives; the earlier inclusion answer is explicitly replaced by early dirty-control refusal in live and preview behavior. Real scope questions remain open. Only RFC.md exists."
+    },
+    {
+      "case": "explicit-pack-and-handoff-resume",
+      "initial_candidate": "41c24294e1376690fc0e146912f3677b9348264f",
+      "resume_candidate": "d1ef57c8b6817b0f6340f01ecafd7cea1b380239",
+      "observation": "Fresh pack and a natural handoff-review resume retain 10 MiB, 30 seconds, 100 rows, input identity, completed offset and partial-file semantics. Planned AC01–AC04 and typed unplanned AC05–AC09 remain disjoint/exhaustive. User-decided behavior is distinct from artifact confirmation and live eligibility. Public binding passes after the selector repair."
+    }
+  ],
+  "failures_and_repairs": [
+    {
+      "kind": "behavior",
+      "candidate": "41c24294e1376690fc0e146912f3677b9348264f",
+      "observation": "Fresh small draft had 829 words, unsolicited authoring-report.md and unsupported hypothetical Git-hook authority question.",
+      "disposition": "Repaired in fabcab37ae504350d23ddc4427b811ad81701a8d; a fresh small-request rerun produced one RFC without the speculative hooks question or sidecar."
+    },
+    {
+      "kind": "identity",
+      "candidate": "fabcab37ae504350d23ddc4427b811ad81701a8d",
+      "observation": "Fresh compact draft used RFC-DRAFT-upgrade-commit instead of a numeric provisional ID.",
+      "disposition": "Repaired shared ID rule in e64cb8bd53aee7e066d9ffeeef0d1c1f93576194; an independent focused resume reloaded instructions and corrected the artifact without being told the defect."
+    },
+    {
+      "kind": "public-handoff",
+      "candidate": "41c24294e1376690fc0e146912f3677b9348264f",
+      "observed_with_runtime": "e64cb8bd53aee7e066d9ffeeef0d1c1f93576194",
+      "command": "milestone_plan.py --repo-root TEMP_CONSUMER bind --target RFC-ALP-0001 --milestone safe-single-file --json",
+      "exit_code": 2,
+      "diagnostics": [
+        "RFC-ALP-0001: missing or ambiguous criterion AC03",
+        "RFC-ALP-0001: missing or ambiguous criterion AC04"
+      ],
+      "observation": "AC05 repeated plain AC03 and AC04 labels. The binder counts all standalone label occurrences; offline structural validation had passed.",
+      "disposition": "Repaired shared selector rule in d1ef57c8b6817b0f6340f01ecafd7cea1b380239; independent handoff resume corrected the labels and the actual revised pack then adopted/bound in two consumers."
+    },
+    {
+      "kind": "verification-setup",
+      "observation": "Snapshot documentation check had no Git metadata; live integrated gate passed. The first generated-pack fixture used an uppercase project token; corrected to lowercase. An overly broad assertion remapped prose as well as typed IDs; corrected to preserve authored narrative and assert typed mappings.",
+      "disposition": "Test setup corrections only; no production code changed."
+    }
+  ],
+  "checks": {
+    "initial_focused_tests": [
+      {
+        "command": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "skills/author-rfc/tests",
+          "-v"
+        ],
+        "source_revision": "41c24294e1376690fc0e146912f3677b9348264f",
+        "exit_code": 0,
+        "elapsed_seconds": 9.831,
+        "stdout": "",
+        "stderr": "test_generated_pack_two_consumer_handoff_and_selector_failures (test_portable_handoff.PortableHandoffTests.test_generated_pack_two_consumer_handoff_and_selector_failures) ... ok\ntest_passive_packages_through_disposable_mask (test_portable_handoff.PortableHandoffTests.test_passive_packages_through_disposable_mask) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 9.777s\n\nOK\n"
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "scripts/verify_documentation.py",
+          "--root",
+          "."
+        ],
+        "source_revision": "41c24294e1376690fc0e146912f3677b9348264f",
+        "exit_code": 2,
+        "elapsed_seconds": 0.062,
+        "stdout": "",
+        "stderr": "error: not a Git consumer repository: /private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/candidate-source; pass --repo-root PATH\n"
+      }
+    ],
+    "integration_checks": [
+      {
+        "command": [
+          "python3",
+          "-B",
+          "skills/implement-rfc/scripts/validate_portable_agents.py",
+          "--source-only"
+        ],
+        "source_revision": "1e1a3f8c7aee3785427ce49c5134c66051903bb0",
+        "exit_code": 0,
+        "elapsed_seconds": 0.103,
+        "stdout": "portable source valid\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "scripts/verify_documentation.py",
+          "--root",
+          "."
+        ],
+        "source_revision": "1e1a3f8c7aee3785427ce49c5134c66051903bb0",
+        "exit_code": 0,
+        "elapsed_seconds": 0.275,
+        "stdout": "15 RFCs, 98 cards; 0 structural violations\n",
+        "stderr": ""
+      }
+    ],
+    "final_source_checks": [
+      {
+        "command": [
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "test_portable_handoff.PortableHandoffTests.test_passive_packages_through_disposable_mask",
+          "-v"
+        ],
+        "source_revision": "d1ef57c8b6817b0f6340f01ecafd7cea1b380239",
+        "exit_code": 0,
+        "elapsed_seconds": 7.562,
+        "stdout": "",
+        "stderr": "test_passive_packages_through_disposable_mask (test_portable_handoff.PortableHandoffTests.test_passive_packages_through_disposable_mask) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 7.512s\n\nOK\n"
+      },
+      {
+        "command": [
+          "python3",
+          "-B",
+          "skills/implement-rfc/scripts/validate_portable_agents.py",
+          "--source-only"
+        ],
+        "source_revision": "d1ef57c8b6817b0f6340f01ecafd7cea1b380239",
+        "exit_code": 0,
+        "elapsed_seconds": 0.061,
+        "stdout": "portable source valid\n",
+        "stderr": ""
+      }
+    ],
+    "actual_fresh_pack_handoff": {
+      "source_revision": "d1ef57c8b6817b0f6340f01ecafd7cea1b380239",
+      "commands": [
+        {
+          "consumer": "ALP",
+          "operation": [
+            "discover",
+            "--source-root",
+            "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/authored-pack-h8ej79ic/ALP-pack"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.126,
+          "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/authored-pack-h8ej79ic/ALP-pack/milestone-plan.json\", \"origin\": \"root\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file\"]}\n",
+          "stderr": ""
+        },
+        {
+          "consumer": "ALP",
+          "operation": [
+            "adopt",
+            "--source-root",
+            "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/authored-pack-h8ej79ic/ALP-pack",
+            "--id-map",
+            "map.json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.126,
+          "stdout": "{\"state\": \"adopted\", \"plan_id\": \"safe-ledger-export\", \"plan_path\": \"docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"structural\": \"valid\", \"references\": \"unchecked\", \"semantic_coverage\": \"unknown\", \"next\": \"bind selected milestone to resolve criteria\"}\n",
+          "stderr": ""
+        },
+        {
+          "consumer": "ALP",
+          "operation": [
+            "bind",
+            "--target",
+            "RFC-ALP-0001",
+            "--milestone",
+            "safe-single-file"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.176,
+          "stdout": "{\"plan_id\": \"safe-ledger-export\", \"plan_path\": \"docs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"milestone_id\": \"safe-single-file\", \"definition_fingerprint\": \"sha256:596a4630341a2f8bea8f554a5ca9a13a2aecbfe80502a477d3b38fff72889e5a\", \"obligations\": [{\"id\": \"RFC-ALP-0001:AC01\", \"source\": \"RFC-ALP-0001\", \"selector\": \"AC01\", \"source_fingerprint\": \"sha256:1ed1ad39684ac9b2d3092528563270ebc1580844120f05a7b7cfdbd46b670bc0\"}, {\"id\": \"RFC-ALP-0001:AC02\", \"source\": \"RFC-ALP-0001\", \"selector\": \"AC02\", \"source_fingerprint\": \"sha256:1ed1ad39684ac9b2d3092528563270ebc1580844120f05a7b7cfdbd46b670bc0\"}, {\"id\": \"RFC-ALP-0001:AC03\", \"source\": \"RFC-ALP-0001\", \"selector\": \"AC03\", \"source_fingerprint\": \"sha256:1ed1ad39684ac9b2d3092528563270ebc1580844120f05a7b7cfdbd46b670bc0\"}, {\"id\": \"RFC-ALP-0001:AC04\", \"source\": \"RFC-ALP-0001\", \"selector\": \"AC04\", \"source_fingerprint\": \"sha256:1ed1ad39684ac9b2d3092528563270ebc1580844120f05a7b7cfdbd46b670bc0\"}], \"obligation_fingerprint\": \"sha256:89280533e99647f089e489291363a76bed6248bd4a50cda95a38d2791c8cf4f1\", \"exit_criteria\": [{\"id\": \"safe-single-file:exit:1\", \"text\": \"RFC-DRAFT-0001 AC01–AC04 pass through export, covering refusal, compatible output, byte boundaries and job timeout.\"}], \"prerequisite_fingerprint\": \"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\", \"structural\": \"valid\", \"references\": \"resolved\", \"semantic_coverage\": \"unknown\", \"diagnostics\": [], \"diagnostics_truncated\": false, \"work\": [{\"rfc\": \"RFC-ALP-0001\", \"criteria\": [\"AC01\", \"AC02\", \"AC03\", \"AC04\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "consumer": "BET",
+          "operation": [
+            "discover",
+            "--source-root",
+            "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/authored-pack-h8ej79ic/BET-pack"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.111,
+          "stdout": "{\"state\": \"found\", \"path\": \"/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/authored-pack-h8ej79ic/BET-pack/milestone-plan.json\", \"origin\": \"root\", \"plan_id\": \"safe-ledger-export\", \"structural\": \"valid\", \"semantic_coverage\": \"unknown\", \"milestone_ids\": [\"safe-single-file\"]}\n",
+          "stderr": ""
+        },
+        {
+          "consumer": "BET",
+          "operation": [
+            "adopt",
+            "--source-root",
+            "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/concise-rfc-authoring-8s67p2_t/authored-pack-h8ej79ic/BET-pack",
+            "--id-map",
+            "map.json"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.129,
+          "stdout": "{\"state\": \"adopted\", \"plan_id\": \"safe-ledger-export\", \"plan_path\": \"specs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"structural\": \"valid\", \"references\": \"unchecked\", \"semantic_coverage\": \"unknown\", \"next\": \"bind selected milestone to resolve criteria\"}\n",
+          "stderr": ""
+        },
+        {
+          "consumer": "BET",
+          "operation": [
+            "bind",
+            "--target",
+            "RFC-BET-0001",
+            "--milestone",
+            "safe-single-file"
+          ],
+          "exit_code": 0,
+          "elapsed_seconds": 0.198,
+          "stdout": "{\"plan_id\": \"safe-ledger-export\", \"plan_path\": \"specs/rfcs/plans/safe-ledger-export/milestone-plan.json\", \"milestone_id\": \"safe-single-file\", \"definition_fingerprint\": \"sha256:43b2c332ae7d705917ceee90b3b399ac82d8c0f4f780a199da4b8431004a84a2\", \"obligations\": [{\"id\": \"RFC-BET-0001:AC01\", \"source\": \"RFC-BET-0001\", \"selector\": \"AC01\", \"source_fingerprint\": \"sha256:31f392899ce0fa8925845eca3fcceb6f625a193ca98cf4dad5f97d0906fdf9ea\"}, {\"id\": \"RFC-BET-0001:AC02\", \"source\": \"RFC-BET-0001\", \"selector\": \"AC02\", \"source_fingerprint\": \"sha256:31f392899ce0fa8925845eca3fcceb6f625a193ca98cf4dad5f97d0906fdf9ea\"}, {\"id\": \"RFC-BET-0001:AC03\", \"source\": \"RFC-BET-0001\", \"selector\": \"AC03\", \"source_fingerprint\": \"sha256:31f392899ce0fa8925845eca3fcceb6f625a193ca98cf4dad5f97d0906fdf9ea\"}, {\"id\": \"RFC-BET-0001:AC04\", \"source\": \"RFC-BET-0001\", \"selector\": \"AC04\", \"source_fingerprint\": \"sha256:31f392899ce0fa8925845eca3fcceb6f625a193ca98cf4dad5f97d0906fdf9ea\"}], \"obligation_fingerprint\": \"sha256:c5c73f307153d8c4db9e71b4318dacc24ddb12a97b576fdd29cbb6eac05fb0bd\", \"exit_criteria\": [{\"id\": \"safe-single-file:exit:1\", \"text\": \"RFC-DRAFT-0001 AC01–AC04 pass through export, covering refusal, compatible output, byte boundaries and job timeout.\"}], \"prerequisite_fingerprint\": \"sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a\", \"structural\": \"valid\", \"references\": \"resolved\", \"semantic_coverage\": \"unknown\", \"diagnostics\": [], \"diagnostics_truncated\": false, \"work\": [{\"rfc\": \"RFC-BET-0001\", \"criteria\": [\"AC01\", \"AC02\", \"AC03\", \"AC04\"]}]}\n",
+          "stderr": ""
+        }
+      ],
+      "outcome": "pass",
+      "cleanup": "Temporary consumers and remapped pack copies removed."
+    }
+  },
+  "artifact_snapshots": {
+    "compact_final": {
+      "sha256": "0853db0cf239a415803b6d67b54b33b1efd492ef40264073b2e3398c26aeb41c",
+      "text": "---\nid: \"RFC-DRAFT-0001\"\ntitle: \"Commit project changes after mask upgrade\"\nstatus: \"Proposed\"\n---\n\n# Commit project changes after mask upgrade\n\n## Problem and grounded current behavior\n\nProject selections and exact resolutions belong in Git, but upgrading them currently leaves the user to commit them manually. The [declarations guide](../../docs/guides/declarations.md#files-and-targeting) recommends committing `.mask.json` and `.mask.lock.json` and ignoring generated skill links. The public [upgrade command](../../mask_cli.py) has no commit option.\n\nUpgrade defaults to the current checkout; `--project PATH`, `--user`, and `--all` select other scopes. It can change bundle declarations, locks, and native role files, and it performs setup and final readiness verification. All-scope upgrades can apply independent consumers while reporting blocked ones. See [upgrade semantics](../../docs/guides/sources-and-updates.md#upgrade-skills), [the resolver/dispatcher](../../mask_update.py), and [the task lifecycle](../../mask_lifecycle.py). A MASK transaction reported as `committed` currently describes deployment persistence, not a Git commit.\n\n## Proposed behavior and boundaries\n\nAdd an opt-in `mask upgrade --commit`, including `upgrade ID --commit` and `--project PATH`. Ordinary upgrade retains its existing behavior. The option creates a local Git commit after the selected project's upgrade and readiness verification succeed. It does not authorize a push or change the existing setup/replacement approval rules.\n\n**Settled user decisions (revised):** include both `.mask.json` and `.mask.lock.json` when changed by the upgrade. The user replaced the earlier decision to include existing uncommitted MASK changes: if either file has staged, unstaged, or untracked changes at invocation, refuse `--commit` before upgrading. Name the affected files and tell the user to resolve them first. Apply this check to live execution and previews. After a successful upgrade, commit the final eligible file differences from HEAD; when none exist, report a no-op without an empty commit.\n\nPreserve unrelated working-tree changes and staged entries. The commit must contain only eligible project paths, including newly created eligible files. Preview names the project, eligible paths, and intended commit, or reports the pre-existing-change refusal. `--dry-run` creates no commit or index changes; reviewed application binds the commit intent to the same preview and rejects stale Git/file observations. Use a default message, `Upgrade MASK project skills`; a custom message option is deferred.\n\nRequire a usable Git checkout and refuse conflicts or an in-progress Git operation before consumer writes. A later commit failure leaves the successfully applied upgrade available for inspection and manual commit, returns a nonzero result, and distinguishes upgrade success from commit failure. Human and JSON output report the commit outcome, exact included paths, and created revision when available. Do not reinterpret the deployment transaction field as proof of a Git commit.\n\n`--commit --user` is invalid because personal selections are machine-local rather than project Git files.\n\n**Open Q1 — generated files:** upgrade can also write native roles and their ownership lock. Should the commit include those managed files, or only the two settled project files? Recommendation: initially limit it to the two project files. Other generated-file inclusion remains unready until answered.\n\n**Open Q2 — all scopes:** should `upgrade --all --commit` create one commit per successfully upgraded project, or be invalid? Recommendation: initially require one project per invocation. Multi-project commit behavior remains unready until answered; existing `--all` behavior without this option is unaffected.\n\n## Acceptance\n\n- **AC01:** A successful single-project invocation creates a commit containing the eligible final project-file differences, produced by the upgrade; an unchanged eligible set produces no commit.\n- **AC02:** Unrelated staged and working-tree changes survive, and neither previews nor invocations without the option create a project Git commit.\n- **AC03:** Invalid Git state refuses before consumer changes; commit failure after a verified upgrade reports the retained upgrade and failed commit separately with a nonzero result.\n- **AC04:** Preview, approved application, human output, and JSON consistently expose the commit intent and outcome, and changed reviewed observations are rejected as stale.\n- **AC05:** With a pre-existing change to either MASK project file, live execution and preview refuse before upgrading, name the affected files, and instruct the user to resolve them first.\n\nThis remains an unadopted proposal. The next authoring step is to obtain answers to Q1 and Q2 and update their affected behavior and acceptance; the recommendations above are not user answers. Their affected scope remains unready. This draft allocates no live RFC or issue IDs. A later authorized implement-rfc task determines live execution eligibility and owns implementation planning, live bookkeeping, and acceptance evidence.\n"
+    },
+    "pack_final_rfc": {
+      "sha256": "e32aa62daebc8e2a0ed08860540a9d4a7c05a8191814afca43681f68a150d51f",
+      "text": "---\nid: \"RFC-DRAFT-0001\"\ntitle: \"Safe ledger export\"\nstatus: \"Proposed\"\n---\n\n# Safe ledger export\n\n## Problem and grounded current behavior\n\n[ledger.py](../../ledger.py) opens the destination with `w`, so an existing file is\ntruncated. It writes `account,amount` followed by each entry in input order. Its\n`DEFAULT_TIMEOUT_SECONDS` is 45, but `export` does not enforce a deadline. It has no\nsize check or batch/resume mechanism. [README](../../README.md) describes the same\nbaseline; [project terminology](../../GLOSSARY.md) defines entry and account.\n\n## Proposed behavior and boundaries\n\nThe [supplied request](SOURCE_REQUEST.md) settles the observable contract below.\nThe first outcome makes single-file export safe while preserving the CSV columns and\nentry order. Later work adds batch/resume behavior. The acceptance section is the\nsingle authoritative definition of constraints; cards and plan refer to it.\n\nMiB means 1,048,576 bytes. The file-size bound applies to the complete encoded CSV,\nincluding header and line endings. A completed offset counts input entries represented\nin completed batch files, excluding CSV headers. Input identity must cover the content\nand order needed to reproduce the export; implementation may choose its representation.\nA failed job must not be reported successful. Internal classes/modules, byte-counting,\ntimeout enforcement, checkpoint representation and cleanup mechanisms are deferred\nengineering choices. Partial files may require cleanup on recovery but never count as\ncompleted output. No material design question is open for the requested scope.\n\nDecomposition is complete for the first outcome; later batch/resume decomposition is\nexplicitly pending. Neither optional grilling nor blanket authoring confirmation is\nan execution prerequisite.\n\n## Acceptance\n\n- **AC01:** Single-file export refuses any existing destination and leaves its contents unchanged, including when another writer creates it before this job acquires the new destination.\n- **AC02:** A successful single-file export to a new destination writes the `account,amount` CSV header and each input entry exactly once in input order using the existing account/amount mapping.\n- **AC03:** A new CSV file is limited to 10 MiB (10,485,760 encoded bytes), including header and line endings. Exactly the bound is allowed; a job that would exceed it fails without producing an oversized file or reporting success.\n- **AC04:** Export jobs have a 30-second elapsed-time timeout; work still running at that deadline stops with a timeout failure, with no successful completion reported. The default is 30 seconds rather than 45.\n- **AC05:** Batch export puts at most 100 data rows in each new CSV file; headers do not count as data rows. Its files and jobs also satisfy the file-size bound and job deadline above.\n- **AC06:** Batch export records a durable completed offset equal to the number of input entries represented by completed files, advancing only for completed files.\n- **AC07:** Resuming an interrupted batch export from its completed offset produces each input entry exactly once across completed files, with no duplicated rows or skipped entries.\n- **AC08:** Resume refuses changed input identity before continuing output, preserving previously completed files and the completed offset.\n- **AC09:** On interruption, partial files contribute no entries to the completed offset; recovery excludes those files from completed output before reprocessing their entries.\n\n## Proposed implementation links\n\n[Plan](milestone-plan.json), first-outcome cards [DRAFT-0001](cards/DRAFT-0001.md),\n[DRAFT-0002](cards/DRAFT-0002.md), [DRAFT-0003](cards/DRAFT-0003.md), later-scope\n[DRAFT-0004](cards/DRAFT-0004.md) and [closeout](cards/DRAFT-0005.md).\n"
+    },
+    "pack_final_decisions": {
+      "sha256": "fba45c296cd6e65022675be9b068ff898a6b798c7afe38bacb3e4fe83141e026",
+      "text": "# Design record\n\n## Scope and provenance\n\nDraft v2, 2026-10-03. The [preserved user request](SOURCE_REQUEST.md), fixture\n[README](../../README.md), [instructions](../../AGENTS.md), [glossary](../../GLOSSARY.md)\nand [implementation](../../ledger.py) ground this pack. Originals are unchanged.\nThe discovered author-rfc package provides artifact conventions; the discovered\nimplement-rfc offline kit supplies the copied plan example, entrypoint and schema.\nNo design interview was requested or conducted.\n\nHandoff review revised only an internal criterion cross-reference so each acceptance\nlabel occurs once in the RFC. Requirements, provisional IDs, milestone grouping,\ndependencies and later unplanned scope are unchanged from v1.\n\n## Decisions\n\n| Decision | Authoritative acceptance | Status and actual answer | Rationale / consequence | Affected artifacts |\n|---|---|---|---|---|\n| Destination protection | [AC01](RFC-DRAFT-0001.md#acceptance) | Settled: user says refuse existing destination unchanged. | Avoid ledger loss. | DRAFT-0001, safe-single-file |\n| Preserve CSV mapping | [AC02](RFC-DRAFT-0001.md#acceptance) | Settled existing contract observed in ledger.py. | Preserve established successful output. | DRAFT-0001 |\n| Size bound | [AC03](RFC-DRAFT-0001.md#acceptance) | Settled: user specifies 10 MiB. | Count actual encoded file bytes. | DRAFT-0002; later batch |\n| Deadline | [AC04](RFC-DRAFT-0001.md#acceptance) | Settled: user specifies 30 seconds. | Enforce deadline rather than only replacing a constant. | DRAFT-0003; later batch |\n| Batch / resume | [AC05–AC09](RFC-DRAFT-0001.md#acceptance) | Settled: user specifies row cap, offset, duplicate-free resume, changed-identity refusal, and partial-file exclusion. | Completed progress must describe recoverable output. | DRAFT-0004, unplanned_work |\n| Scope decomposition | [plan](milestone-plan.json) | Settled: fully decompose first outcome; later batch/resume decomposition pending. | Current milestone can be handed off independently. | Plan and all cards |\n| Internal design | [boundaries](RFC-DRAFT-0001.md#proposed-behavior-and-boundaries) | Explicitly deferred: user says not to choose internal classes/modules. | Engineering may choose mechanisms within the observable contract. | Implementation |\n\n## Open frontier and explicit deferrals\n\nNo material user questions remain. Batch/resume behavior is defined, while its detailed\nwork/dependency decomposition is pending. Its typed unplanned_work covers AC05–AC09;\nAC03/AC04 apply to that mode through AC05. Internal engineering detail is deferred and\ncreates no design-readiness gate. No proposed project glossary adoption or ADR is needed.\n\n## Checks and confirmation\n\n- **Structural validity:** See [exact commands and results](DRAFT_CHECKS.md). The offline validator checks structure, identity, cycles and overlaps; it does not resolve live selectors or prove semantic coverage. Draft selector uniqueness, criterion coverage, card relationships and local links were checked; live binding remains unevaluated.\n- **Design readiness:** The first outcome is defined and fully decomposed. Batch/resume behavior is defined; its implementation decomposition is pending. No material unanswered choice is being disguised by partial coverage.\n- **Confirmation:** The actual supplied user statement is “All this behavior is decided,” covering the requirements in SOURCE_REQUEST.md. No separate confirmation of these generated artifacts or interview answers is claimed; blanket confirmation is unnecessary.\n- **Execution eligibility:** Unevaluated by drafting. No launcher or consumer readiness configuration was supplied. Authorized implement-rfc execution must resolve live context, mappings, dependencies, mandate and acceptance.\n\n## Continuation\n\nImplement-rfc should import/reconcile this pack and adopt `safe-single-file`, then\nbegin DRAFT-0001's destination protection and compatibility work. Decompose later\nscope before batch/resume execution. Full RFC closeout waits for every acceptance\ncriterion; draft checks are never implementation acceptance evidence.\n"
+    },
+    "pack_final_plan": {
+      "schema": "implement-rfc.milestone-plan.v1",
+      "id": "safe-ledger-export",
+      "scope": {
+        "rfcs": [
+          "RFC-DRAFT-0001"
+        ]
+      },
+      "milestones": [
+        {
+          "id": "safe-single-file",
+          "outcome": "Single-file ledger export preserves existing destinations and produces bounded CSV output under an enforced job deadline.",
+          "work": [
+            {
+              "rfc": "RFC-DRAFT-0001",
+              "criteria": [
+                "AC01",
+                "AC02",
+                "AC03",
+                "AC04"
+              ]
+            }
+          ],
+          "depends_on": [],
+          "exit_criteria": [
+            "RFC-DRAFT-0001 AC01–AC04 pass through export, covering refusal, compatible output, byte boundaries and job timeout."
+          ],
+          "boundary": "Complete single-file safety outcome using DRAFT-0001 through DRAFT-0003; batch/resume remains defined unplanned work and full RFC closeout remains pending."
+        }
+      ],
+      "coverage": "partial",
+      "unplanned_work": [
+        {
+          "rfc": "RFC-DRAFT-0001",
+          "criteria": [
+            "AC05",
+            "AC06",
+            "AC07",
+            "AC08",
+            "AC09"
+          ]
+        }
+      ]
+    },
+    "pack_before_selector_repair": {
+      "sha256": "adcdcd34efadc15806aa4bbb65eeebd774e8b01124b4778efc4c4459de7763ae",
+      "text": "---\nid: \"RFC-DRAFT-0001\"\ntitle: \"Safe ledger export\"\nstatus: \"Proposed\"\n---\n\n# Safe ledger export\n\n## Problem and grounded current behavior\n\n[ledger.py](../../ledger.py) opens the destination with `w`, so an existing file is\ntruncated. It writes `account,amount` followed by each entry in input order. Its\n`DEFAULT_TIMEOUT_SECONDS` is 45, but `export` does not enforce a deadline. It has no\nsize check or batch/resume mechanism. [README](../../README.md) describes the same\nbaseline; [project terminology](../../GLOSSARY.md) defines entry and account.\n\n## Proposed behavior and boundaries\n\nThe [supplied request](SOURCE_REQUEST.md) settles the observable contract below.\nThe first outcome makes single-file export safe while preserving the CSV columns and\nentry order. Later work adds batch/resume behavior. The acceptance section is the\nsingle authoritative definition of constraints; cards and plan refer to it.\n\nMiB means 1,048,576 bytes. The file-size bound applies to the complete encoded CSV,\nincluding header and line endings. A completed offset counts input entries represented\nin completed batch files, excluding CSV headers. Input identity must cover the content\nand order needed to reproduce the export; implementation may choose its representation.\nA failed job must not be reported successful. Internal classes/modules, byte-counting,\ntimeout enforcement, checkpoint representation and cleanup mechanisms are deferred\nengineering choices. Partial files may require cleanup on recovery but never count as\ncompleted output. No material design question is open for the requested scope.\n\nDecomposition is complete for the first outcome; later batch/resume decomposition is\nexplicitly pending. Neither optional grilling nor blanket authoring confirmation is\nan execution prerequisite.\n\n## Acceptance\n\n- **AC01:** Single-file export refuses any existing destination and leaves its contents unchanged, including when another writer creates it before this job acquires the new destination.\n- **AC02:** A successful single-file export to a new destination writes the `account,amount` CSV header and each input entry exactly once in input order using the existing account/amount mapping.\n- **AC03:** A new CSV file is limited to 10 MiB (10,485,760 encoded bytes), including header and line endings. Exactly the bound is allowed; a job that would exceed it fails without producing an oversized file or reporting success.\n- **AC04:** Export jobs have a 30-second elapsed-time timeout; work still running at that deadline stops with a timeout failure, with no successful completion reported. The default is 30 seconds rather than 45.\n- **AC05:** Batch export puts at most 100 data rows in each new CSV file; headers do not count as data rows. Its files and jobs also satisfy AC03 and AC04.\n- **AC06:** Batch export records a durable completed offset equal to the number of input entries represented by completed files, advancing only for completed files.\n- **AC07:** Resuming an interrupted batch export from its completed offset produces each input entry exactly once across completed files, with no duplicated rows or skipped entries.\n- **AC08:** Resume refuses changed input identity before continuing output, preserving previously completed files and the completed offset.\n- **AC09:** On interruption, partial files contribute no entries to the completed offset; recovery excludes those files from completed output before reprocessing their entries.\n\n## Proposed implementation links\n\n[Plan](milestone-plan.json), first-outcome cards [DRAFT-0001](cards/DRAFT-0001.md),\n[DRAFT-0002](cards/DRAFT-0002.md), [DRAFT-0003](cards/DRAFT-0003.md), later-scope\n[DRAFT-0004](cards/DRAFT-0004.md) and [closeout](cards/DRAFT-0005.md).\n"
+    }
+  },
+  "pack_inventory": [
+    {
+      "path": "DECISIONS.md",
+      "sha256": "fba45c296cd6e65022675be9b068ff898a6b798c7afe38bacb3e4fe83141e026"
+    },
+    {
+      "path": "DRAFT_CHECKS.md",
+      "sha256": "be77144b7d1fe02b040a0f568e9aeec09871df5f13dc90726b826c4172e976ef"
+    },
+    {
+      "path": "GLOSSARY.md",
+      "sha256": "572f04ebfd94fafdaf018aef9e323a0da22cee1531d670cc1d87c5c1324b1807"
+    },
+    {
+      "path": "IMPLEMENTATION_PROMPT.md",
+      "sha256": "db1f861d1b8a80d61771fe0fc865f7f8b8e57a4ef55125995acfeb6d9a39daa1"
+    },
+    {
+      "path": "MILESTONES.md",
+      "sha256": "c42bb50468ba9525a5a640debd79bfc010ac84b34144228934668eae31e05f79"
+    },
+    {
+      "path": "README.md",
+      "sha256": "9c6c8e1213be3ddca3eb8057f948b9d6959895554c42b2b53b2ef01b49ab7f79"
+    },
+    {
+      "path": "RFC-DRAFT-0001.md",
+      "sha256": "e32aa62daebc8e2a0ed08860540a9d4a7c05a8191814afca43681f68a150d51f"
+    },
+    {
+      "path": "SOURCE_REQUEST.md",
+      "sha256": "339ace5aaf3d0a004f2ea872d588494284634be43b13a751c0f2cf6255784f26"
+    },
+    {
+      "path": "cards/DRAFT-0001.md",
+      "sha256": "b9f259b155b791c845ed2cbc2c5527e2157ec3d8e2381a7a6d1bd8968a83022d"
+    },
+    {
+      "path": "cards/DRAFT-0002.md",
+      "sha256": "f824036cc0920531217937309408ef7f6b540d8f49bb1d2c3557681a8d0fe304"
+    },
+    {
+      "path": "cards/DRAFT-0003.md",
+      "sha256": "2d4b77277c4988d0533580b11376d2084a83c3184e2eab9aaf8d9c88fd4776ba"
+    },
+    {
+      "path": "cards/DRAFT-0004.md",
+      "sha256": "87e3eca162a3d0c3c33074d3596cc6a26dd6b78695941ae7bef8e929099f1fc0"
+    },
+    {
+      "path": "cards/DRAFT-0005.md",
+      "sha256": "5f758a91e62a1c58faf19b2b3d5d383b25e485f43e893395d3bab3a15898093e"
+    },
+    {
+      "path": "milestone-plan.json",
+      "sha256": "eaa8916a8cbb05758355b267cba6da999b73549f264242de0876135973f1c789"
+    },
+    {
+      "path": "milestone-plan.schema.json",
+      "sha256": "b146094d7dbd335f45b8c2ec8fc7cc0b3c059ad6e92621e2f79f120d7792146d"
+    }
+  ],
+  "limits": [
+    "Fixtures use synthetic user replies; no real MASK feature or consumer was implemented.",
+    "Fresh runs plus focused resumes demonstrate the sampled behavior, not a guarantee across all models/prompts.",
+    "Canonical source and direct file discovery were exercised; installed skill upgrades, automatic host loading and native Claude were not tested or changed."
+  ],
+  "cleanup": "All temporary source snapshots, handoff consumers, evaluator fixtures and isolated manifest roots have been removed by their owners. All task commands ended; no server, worktree or source writer remains. Local checkpoint receipts are retained only until the final completion check."
+}

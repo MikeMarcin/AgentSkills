@@ -8,7 +8,7 @@ depends_on: ["ASK-0093"]
 closeout_for: ["RFC-ASK-0015"]
 priority: "P1"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
-acceptance: [{"criterion":"AC01","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Actual new portable pack, revisions through r5 and adopted amendment preserve artifact, readiness and authority contracts.","path":"docs/development/rfc-authoring-skills-independent.json"}},{"criterion":"AC02","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Actual dependent rounds, partial/changed answers, artifact propagation, material deferrals, exact scoped synthetic confirmation and standalone/missing-companion behavior observed.","path":"docs/development/rfc-authoring-skills-independent.json"}},{"criterion":"AC03","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Disposable MASK package validation, documentation and regenerated portable-source checks pass; MIT provenance/catalog/pointers verified.","path":"docs/development/rfc-authoring-skills-evidence.json"}},{"criterion":"AC04","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Actual independently generated partial pack passes 18 public commands in two linked consumers; every current milestone binds and typed future work/grouping survive. Missing and ambiguous selectors refuse in prior focused tests.","path":"docs/development/rfc-authoring-skills-fresh-handoff.json"}},{"criterion":"AC05","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Coordinator supplied five fresh-agent cases covering ten requested situations; actual receipts/hashes/confirmation audited, with declared host and nonsoftware coverage limits.","path":"docs/development/rfc-authoring-skills-independent.json"}}]
+acceptance: [{"criterion":"AC01","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Actual new portable pack, revisions through r5 and adopted amendment preserve artifact, readiness and authority contracts.","path":"docs/development/rfc-authoring-skills-independent.json"}},{"criterion":"AC02","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Actual dependent rounds, partial/changed answers, artifact propagation, material deferrals, exact scoped synthetic confirmation and standalone/missing-companion behavior observed.","path":"docs/development/rfc-authoring-skills-independent.json"}},{"criterion":"AC03","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Disposable MASK package validation, documentation and regenerated portable-source checks pass; MIT provenance/catalog/pointers verified.","path":"docs/development/rfc-authoring-skills-evidence.json"}},{"criterion":"AC04","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Actual independently generated partial pack passes 18 public commands in two linked consumers; every current milestone binds and typed future work/grouping survive. Missing and ambiguous selectors refuse in prior focused tests.","path":"docs/development/rfc-authoring-skills-fresh-handoff.json"}},{"criterion":"AC05","outcome":"pass","revision":"39f02b7c654699e76233b8cfe6f966d915ca74b9","evidence":{"kind":"artifact","detail":"Coordinator supplied five fresh-agent cases covering ten requested situations; actual receipts/hashes/confirmation audited, with declared host and nonsoftware coverage limits.","path":"docs/development/rfc-authoring-skills-independent.json"}},{"criterion":"AC06","outcome":"pass","revision":"d1ef57c8b6817b0f6340f01ecafd7cea1b380239","evidence":{"kind":"artifact","detail":"Independent compact authoring and changed-answer/handoff resumes preserve actual decisions, uncertainty, numeric draft IDs and unique criteria without unsolicited pack/report artifacts or blanket confirmation. Failed initial observations and repairs are retained.","path":"docs/development/compact-rfc-authoring-evidence.json"}},{"criterion":"AC07","outcome":"pass","revision":"d1ef57c8b6817b0f6340f01ecafd7cea1b380239","evidence":{"kind":"artifact","detail":"Requested partial pack preserves exact constraints and typed future work; revised generated pack completes six public discovery/adoption/binding commands in two linked consumers. Final packages and portable source pass; historical handoff negatives remain verified.","path":"docs/development/compact-rfc-authoring-evidence.json"}}]
 ---
 
 # Close portable RFC authoring and grilling
@@ -88,16 +88,27 @@ were cleaned; no server, worktree or protected review candidate remains.
 
 ## Compact authoring follow-up — 2026-10-03
 
-The owner authorized alignment and implementation of the reviewed compact-authoring
-default. [ASK-0098](../30-in-progress/ASK-0098-compact-rfc-authoring.md) owns AC06–AC07.
+The owner-authorized [ASK-0098](ASK-0098-compact-rfc-authoring.md)
+follow-up satisfies AC06–AC07 at `d1ef57c8b6817b0f6340f01ecafd7cea1b380239`.
 Original RFC_BASE_SHA and historical acceptance above remain unchanged. Amendment
-baseline: `5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. The prior milestone is accepted;
-the added `compact-authoring` milestone is in progress under direct execution.
+baseline: `5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. Manifest integration is
+`1e1a3f8c7aee3785427ce49c5134c66051903bb0`; unrelated model work remained with its
+owner. The added `compact-authoring` milestone is accepted under direct execution.
 
 | Criterion | Check/evidence | Outcome | Implementation revision |
 |---|---|---|---|
-| AC06 | Small request and changed-answer behavior | pending | pending |
-| AC07 | Explicit pack and focused package/handoff checks | pending | pending |
+| AC06 | Independent fresh compact draft and changed-answer/identity resumes; [artifacts and observations](../../development/compact-rfc-authoring-evidence.json) | pass | d1ef57c8b6817b0f6340f01ecafd7cea1b380239 |
+| AC07 | Explicit pack plus real two-consumer import/adopt/bind; passive package, existing handoff and portable-source checks; [receipts](../../development/compact-rfc-authoring-evidence.json) | pass | d1ef57c8b6817b0f6340f01ecafd7cea1b380239 |
 
-Current frontier: claim ASK-0098, align source instructions, obtain independent
-behavior observations and run focused checks. No source behavior is accepted yet.
+The evidence records the initial excessive output, malformed provisional ID and
+ambiguous criterion-label failure, their targeted instruction repairs, and actual
+successful rechecks. The fresh compact run and focused resumes are reported separately;
+no untested clean-run guarantee is implied. All selected obligations are satisfied.
+No schema/runtime change, MASK feature implementation, publication or deployment occurred.
+
+Closeout review runtime: parent-supplied fresh fixture evaluators and natural follow-up
+reviews in Codex. Exact serving models/efforts and installed host loading were not
+attested. The implementation session remained non-delegating. Test commands ended;
+all source snapshots, temporary consumers and parent-owned evaluator/manifest fixtures
+were removed. Durable artifacts and results are in the evidence file. No server,
+managed worktree or pending source writer remains.

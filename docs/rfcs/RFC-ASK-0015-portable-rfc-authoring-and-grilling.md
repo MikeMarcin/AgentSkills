@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0015"
 title: "Portable RFC authoring and optional grilling"
-status: "Implementing"
+status: "Auto-Verified"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
 ---
 
@@ -167,9 +167,15 @@ and host-loading limits remain unchanged.
 ## Compact authoring amendment — 2026-10-03
 
 The owner authorized the reviewed alignment and implementation: “Ask the sub agent
-to do that alignment, and then implement the plan.” [ASK-0098](../issues/30-in-progress/ASK-0098-compact-rfc-authoring.md)
+to do that alignment, and then implement the plan.” [ASK-0098](../issues/60-done/ASK-0098-compact-rfc-authoring.md)
 owns the bounded follow-up above and AC06–AC07, with the original RFC baseline and
 historical AC01–AC05 evidence retained. The source baseline for this amendment is
 `5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. One added milestone preserves the original
 completed grouping. Existing pack schema/runtime behavior and the MASK auto-commit
 draft are outside this change; no publication or consumer deployment is authorized.
+
+The compact-authoring follow-up satisfies AC06–AC07 at canonical source
+`d1ef57c8b6817b0f6340f01ecafd7cea1b380239`; [evidence and limits](../development/compact-rfc-authoring-evidence.json)
+retain failed observations, focused repairs, actual drafting/resume results and the
+revised generated pack's successful two-consumer handoff. Prior acceptance remains
+historical. Source-only delivery is complete; installed host behavior is unverified.

@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0098"
 title: "Default to compact RFC authoring"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0015"]
 depends_on: []
 priority: "P1"
 metadata: {"milestone_plan":{"id":"rfc-authoring-skills","path":"docs/rfcs/plans/rfc-authoring-skills/milestone-plan.json"}}
+acceptance: [{"criterion":"AC06","outcome":"pass","revision":"d1ef57c8b6817b0f6340f01ecafd7cea1b380239","evidence":{"kind":"artifact","detail":"Independent compact authoring and changed-answer/handoff resumes preserve actual decisions, uncertainty, numeric draft IDs and unique criteria without unsolicited pack/report artifacts or blanket confirmation. Failed initial observations and repairs are retained.","path":"docs/development/compact-rfc-authoring-evidence.json"}},{"criterion":"AC07","outcome":"pass","revision":"d1ef57c8b6817b0f6340f01ecafd7cea1b380239","evidence":{"kind":"artifact","detail":"Requested partial pack preserves exact constraints and typed future work; revised generated pack completes six public discovery/adoption/binding commands in two linked consumers. Final packages and portable source pass; historical handoff negatives remain verified.","path":"docs/development/compact-rfc-authoring-evidence.json"}}]
 ---
 
 # Default to compact RFC authoring
