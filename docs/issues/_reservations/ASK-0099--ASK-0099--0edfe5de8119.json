@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0099"
+  ],
+  "reserve_for": "implement-rfc-owner-routing-amendment-2026-10-03",
+  "purpose": "",
+  "created": "2026-10-03T19:47:55.482479+00:00",
+  "base": "d1ef57c8b6817b0f6340f01ecafd7cea1b380239"
+}
