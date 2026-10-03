@@ -167,7 +167,7 @@ and host-loading limits remain unchanged.
 ## Compact authoring amendment — 2026-10-03
 
 The owner authorized the reviewed alignment and implementation: “Ask the sub agent
-to do that alignment, and then implement the plan.” [ASK-0098](../issues/20-ready/ASK-0098-compact-rfc-authoring.md)
+to do that alignment, and then implement the plan.” [ASK-0098](../issues/30-in-progress/ASK-0098-compact-rfc-authoring.md)
 owns the bounded follow-up above and AC06–AC07, with the original RFC baseline and
 historical AC01–AC05 evidence retained. The source baseline for this amendment is
 `5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. One added milestone preserves the original

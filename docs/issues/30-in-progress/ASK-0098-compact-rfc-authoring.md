@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0098"
 title: "Default to compact RFC authoring"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0015"]
 depends_on: []
 priority: "P1"

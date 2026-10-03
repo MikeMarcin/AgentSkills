@@ -89,7 +89,7 @@ were cleaned; no server, worktree or protected review candidate remains.
 ## Compact authoring follow-up — 2026-10-03
 
 The owner authorized alignment and implementation of the reviewed compact-authoring
-default. [ASK-0098](../20-ready/ASK-0098-compact-rfc-authoring.md) owns AC06–AC07.
+default. [ASK-0098](../30-in-progress/ASK-0098-compact-rfc-authoring.md) owns AC06–AC07.
 Original RFC_BASE_SHA and historical acceptance above remain unchanged. Amendment
 baseline: `5a6c64d167b65b7ff52b9b2e347ba2412baa6c03`. The prior milestone is accepted;
 the added `compact-authoring` milestone is in progress under direct execution.
