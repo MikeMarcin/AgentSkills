@@ -21,6 +21,7 @@ from typing import Any
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import project_config  # noqa: E402
 import station_lifecycle as lifecycle  # noqa: E402
+import station_task_admission as admission  # noqa: E402
 
 STATION_SCHEMA = lifecycle.STATION_SCHEMA
 TASK_ENVELOPE = "implement-rfc.remote-task.v1"
@@ -28,6 +29,7 @@ SESSION_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 SKILL_RELATIVE = pathlib.Path(".agents/skills/implement-rfc")
 TASK_ID = re.compile(r"^task-[0-9a-z-]{4,64}$")
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
+MAX_REQUEST_RECEIPTS = 4096
 FENCED_BLOCK = re.compile(r"```(?:yaml|yml|json)?\s*\n(.*?)\n```", re.DOTALL)
 YAML_KEY = re.compile(r"^([a-z_]+):(?:\s*(.*))?$")
 REQUIRED_TASK_FIELDS = {
@@ -316,6 +318,8 @@ def _write_turn_state(
     root: pathlib.Path,
     event: dict[str, Any],
     envelope: dict[str, Any],
+    *,
+    admission_source: str = "UserPromptSubmit",
 ) -> None:
     session_id = str(event.get("session_id", ""))
     turn_id = str(event.get("turn_id", ""))
@@ -332,6 +336,8 @@ def _write_turn_state(
                 "turn_id": turn_id,
                 "task_id": envelope["task_id"],
                 "authority": envelope["authority"],
+                "admission_source": admission_source,
+                "expires_at": envelope.get("expires_at") if admission_source == "PreToolUse" else None,
             },
             indent=2,
         )
@@ -355,11 +361,74 @@ def _read_turn_state(root: pathlib.Path, event: dict[str, Any]) -> dict[str, Any
             "this tool call has no accepted remote-task turn",
         ) from error
     if (
-        state.get("session_id") != event.get("session_id")
+        not isinstance(state, dict)
+        or state.get("schema") != "implement-rfc.remote-turn.v1"
+        or state.get("session_id") != event.get("session_id")
         or state.get("turn_id") != event.get("turn_id")
     ):
         raise GuardRefusal("authority-exceeded", "remote-task turn identity changed")
+    expiry = _parse_expiry(state.get("expires_at"))
+    if expiry is not None and expiry <= dt.datetime.now(dt.timezone.utc):
+        raise GuardRefusal("expired", "accepted remote-task turn has expired")
     return state
+
+
+def _request_envelope(root: pathlib.Path, event: dict[str, Any]) -> dict | None:
+    if event.get("tool_name") != "Bash" or not isinstance(event.get("tool_input"), dict):
+        return None
+    tool_input = event["tool_input"]
+    if "command" in tool_input and "cmd" in tool_input and tool_input["command"] != tool_input["cmd"]:
+        raise GuardRefusal("authority-exceeded", "admission tool input has conflicting commands")
+    command = tool_input.get("command", tool_input.get("cmd", ""))
+    try:
+        request = admission.command_request(command)
+    except admission.RequestError as error:
+        raise GuardRefusal("project-mismatch", str(error)) from error
+    if request is None:
+        return None
+    script, envelope = request
+    installed = root / SKILL_RELATIVE / "scripts" / "station_task_admission.py"
+    supplied = pathlib.Path(script)
+    trusted = pathlib.Path(__file__).with_name("station_task_admission.py").resolve()
+    if not supplied.is_absolute() or supplied.resolve() != installed.resolve() or installed.resolve() != trusted:
+        raise GuardRefusal("authority-exceeded", "admission requires the exact installed request helper")
+    return envelope
+
+
+def _admit_request(root: pathlib.Path, event: dict[str, Any], envelope: dict) -> None:
+    session, turn = event.get("session_id"), event.get("turn_id")
+    if not all(isinstance(value, str) and 1 <= len(value) <= 256 and "\0" not in value for value in (session, turn)):
+        raise GuardRefusal("authority-exceeded", "hook input has no valid turn identity")
+    state_path = _state_path(root, session, turn)
+    if state_path.exists():
+        raise GuardRefusal("authority-exceeded", "this turn is already admitted; a request cannot replace its authority")
+    # Receipts confer no tool authority. Retain them after Stop to reject task
+    # replay for this endpoint; cap count and payload size without deleting history.
+    receipts = state_path.parent / "requests" / hashlib.sha256(session.encode()).hexdigest()
+    receipts.mkdir(parents=True, exist_ok=True)
+    for index, _ in enumerate(receipts.iterdir()):
+        if index >= MAX_REQUEST_RECEIPTS - 1:
+            raise GuardRefusal("authority-exceeded", "endpoint admission receipt capacity reached; preserve history for recovery")
+    task_key = hashlib.sha256(envelope["task_id"].encode()).hexdigest()
+    receipt = receipts / f"{task_key}.json"
+    record = {
+        "schema": "implement-rfc.admission-receipt.v1", "session_id": session,
+        "turn_id": turn, "task_id": envelope["task_id"], "authority": envelope["authority"],
+        "admission_source": "PreToolUse", "expires_at": envelope.get("expires_at"),
+        "envelope_sha256": hashlib.sha256(json.dumps(envelope, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+    }
+    try:
+        with receipt.open("x", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, indent=2) + "\n")
+    except FileExistsError as error:
+        raise GuardRefusal("authority-exceeded", "admission task was already used; send a fresh task_id") from error
+    except OSError as error:
+        raise GuardRefusal("authority-exceeded", "cannot retain admission receipt") from error
+    try:
+        _write_turn_state(root, event, envelope, admission_source="PreToolUse")
+    except OSError as error:
+        raise GuardRefusal("authority-exceeded", "cannot write turn admission; task receipt retained, send a fresh task_id") from error
+    _hook_context("PreToolUse", "Remote-task admission accepted by the actual host event: " + json.dumps(record, sort_keys=True))
 
 
 def _clear_turn_state(root: pathlib.Path, event: dict[str, Any]) -> None:
@@ -532,6 +601,13 @@ def _handle_tool(
             return
         _validate_live_checkout(root, station, project)
         _lease_record(root, station)
+        envelope = _request_envelope(root, event)
+        if envelope is not None:
+            _validate_envelope(root, station, envelope)
+            if "checkout" in envelope and pathlib.Path(envelope["checkout"]).resolve() != root:
+                raise GuardRefusal("project-mismatch", "remote-task checkout does not match this live root")
+            _admit_request(root, event, envelope)
+            return
         state = _read_turn_state(root, event)
         if state.get("authority") == "lane-commit":
             return
@@ -554,6 +630,8 @@ def _handle_tool(
                 )
     except GuardRefusal as refusal:
         _deny_tool(refusal.detail)
+    except OSError as error:
+        _deny_tool(f"station admission/state I/O failed: {error}")
 
 
 def main() -> int:
@@ -610,7 +688,10 @@ def main() -> int:
     try:
         project = _load_project(root)
     except GuardRefusal as refusal:
-        _block(refusal.detail)
+        if event.get("hook_event_name") == "PreToolUse":
+            _deny_tool(refusal.detail)
+        else:
+            _block(refusal.detail)
         return 0
 
     event_name = event.get("hook_event_name")

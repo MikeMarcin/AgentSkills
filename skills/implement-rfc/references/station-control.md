@@ -18,6 +18,46 @@ Canonical launchers emit `implement-rfc.remote-station.v2`. The exact former
 identity and authority checks. Compatibility changes no registry bytes, endpoint,
 generation or lease. Other markers carrying a Codex binding remain refused.
 
+### Delegated tool-output turns
+
+Some Codex app versions deliver `send_message_to_thread` as a tool-output item,
+which does not invoke UserPromptSubmit. If that route has no prompt admission,
+make the first tool an exact request through the installed helper:
+
+```sh
+python3 -B "/absolute/consumer/.agents/skills/implement-rfc/scripts/station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE
+```
+
+On Windows the exact shape is `py -3 -B "C:\absolute\consumer\.agents\skills\implement-rfc\scripts\station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE`.
+Use one ordinary command with the quoted absolute helper path, exactly ordered
+arguments and canonical base64 of the UTF-8 JSON remote-task envelope. No shell
+prefix, suffix, interpreter `-c`, caller session/turn arguments or envelope file
+is accepted. The helper's resolved path must equal both the consumer's installed
+helper and the adjacent trusted guard helper; the installed link's exact target
+is equivalent. Copied helpers receive no admission authority.
+
+The actual PreToolUse event supplies session and turn identity. The hook checks
+the current endpoint, lifecycle, project/origin/branch, expected held supervisor
+lease, full envelope, authority, ancestor base and expiry before admission.
+Caller identity fields and unknown/duplicate fields are refused. The normal
+fenced-envelope UserPromptSubmit path remains available. Independent readiness
+tasks may have empty RFC/card arrays.
+
+The request CLI only validates syntax and reports `admission: hook-controlled`;
+that output alone is not proof of admission. The hook's additional context names
+the actual source event/session/turn. Tools need that exact accepted pair, and
+request expiry is checked again on later tools. A second request cannot replace
+authority in an already admitted turn. Stop clears current authorization.
+
+Always issue a fresh task ID for each request, including retries after a
+partially written request. A receipt under the existing Git guard namespace
+retains task use after Stop and rejects replay at this endpoint. Receipts confer
+no authority and cannot revive a retired or transferring endpoint. Payloads are
+bounded to 16 KiB UTF-8 JSON / 21,848 base64 characters; receipts contain only
+bounded identity/digest metadata, with at most 4,096 per endpoint session.
+Capacity exhaustion refuses admission and preserves history for supported
+recovery; do not delete receipts, seed turn records or relax hooks to continue.
+
 ## Inspect and resume here
 
 A replacement chat can submit prompts, inspect the recorded ownership and perform
