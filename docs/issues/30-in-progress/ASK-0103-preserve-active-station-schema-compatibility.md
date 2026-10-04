@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0103
 title: Preserve enforcement for existing project-prefixed station v2 bindings
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
