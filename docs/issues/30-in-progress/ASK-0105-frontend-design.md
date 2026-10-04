@@ -1,18 +1,22 @@
 ---
 schema: implement-rfc.card.v1
 id: ASK-0105
-title: Adapt frontend design for web, mobile and desktop
+title: Create frontend design for web, mobile and desktop
 status: "In Progress"
 rfcs: []
 depends_on: []
+metadata: {"milestone_plan":{"id":"frontend-design","path":"docs/rfcs/plans/frontend-design/milestone-plan.json"}}
 ---
 
 # Frontend design skill
 
-Create `skills/frontend-design` from the user-supplied Anthropic frontend-design
-skill. Work directly in AgentSkills. Preserve the source's deliberate visual
-direction and extend it to web, mobile and desktop UI. Keep the package portable
-and preserve source attribution and licensing.
+Create an original `skills/frontend-design` inspired by the design ideas in the
+user-supplied Anthropic frontend-design skill. Work directly in AgentSkills and
+cover web, mobile and desktop UI with portable instructions.
+
+User amendment on 2026-10-04: use the reference as inspiration, without copying
+upstream text or including the Anthropic license. Replaced the initial adaptation
+with original instructions and removed its copied license and adaptation notice.
 
 ## Outcome and acceptance
 
@@ -21,7 +25,8 @@ and preserve source attribution and licensing.
 - AC2: Shared design guidance and reachable platform references cover web,
   mobile and desktop interactions, accessibility, content and visual verification.
 - AC3: Package metadata, internal references, source catalog and documentation
-  validate; the upstream license and source identity are retained.
+  validate; the final package contains original instructions and no upstream
+  license or copied payload files.
 - AC4: MASK validates the actual package through a disposable local tap and
   resolves its content through links in two temporary consumer projects.
 
@@ -29,5 +34,28 @@ and preserve source attribution and licensing.
 
 Direct strategy; primary owns authoring, verification and bookkeeping. No model
 delegation is used. Scoped host enforcement of delegation is not observed.
-There is no authored milestone plan; this card is the bounded outcome.
+Initial plan discovery returned absent; the first binding attempt therefore
+refused. A bounded one-milestone plan was then adopted for this card and bound
+to the clarified user mandate.
 No live installation, consumer migration or push is part of this request.
+
+## Verification
+
+- Skill Creator `quick_validate.py`: valid metadata and completed instructions.
+- Repository `verify_documentation.py`: 15 RFCs, 105 cards, zero violations.
+- Local inspection: all internal references resolve within the package; the
+  source catalog covers every package; the final five files include no license,
+  notice or copied upstream payload.
+- MASK `skill validate` against a disposable local bare tap: valid payload,
+  digest `sha256:3ed870536a0f6a064cce5dd6011fc3e85e11d2bb8fbde921f0d98fa86149b5ac`.
+  Offline installation and `status --check` passed in two temporary projects;
+  both Claude and Codex links resolved all five files byte-for-byte.
+- Primary review covered new web UI, local component refinement, critique,
+  native mobile and desktop-shell requests. Platform pointers select the relevant
+  guidance; the entrypoint preserves requested scope and existing product choices.
+  This was self-review, not an independent model trial or native application test.
+
+The initial adaptation's fixture results were superseded by the original package's
+checks after the user amendment. Its second fixture install had refused a stale
+preview after the first install changed shared fixture state. Final verification
+previewed and applied each consumer sequentially and passed.

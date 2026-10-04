@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Design"
+  short_description: "Distinctive interfaces for web, mobile and desktop"
+  default_prompt: "Use $frontend-design to design and implement this interface for its target platform and audience."

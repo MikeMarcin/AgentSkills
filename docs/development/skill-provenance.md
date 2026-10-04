@@ -59,3 +59,16 @@ adapted into pack-local authoring guidance; live project adoption is separate.
 The artifact/readiness/amendment contract and composition with implement-rfc's
 existing offline kit are this library's additions. No selections, deployments or
 upstream edits are part of this source import.
+
+## Frontend design
+
+On 2026-10-04, ASK-0105 added the original `skills/frontend-design` package. The
+user supplied Anthropic's locally installed frontend-design skill as inspiration,
+then clarified that the new skill should use original instructions rather than
+copy upstream content or include its license. No upstream files are included.
+
+The skill develops general ideas about purposeful visual choices and design
+critique into an original workflow covering composition, implementation and
+verification for web, mobile and desktop. Platform references and interface
+metadata were authored for this package. This change adds the source package and
+catalog entry; it does not select or install the skill for existing consumers.
