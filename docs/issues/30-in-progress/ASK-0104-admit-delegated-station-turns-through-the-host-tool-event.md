@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0104
 title: Admit delegated station turns through the trusted host tool event
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
