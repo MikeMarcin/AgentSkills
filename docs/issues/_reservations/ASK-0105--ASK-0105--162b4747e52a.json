@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0105"
+  ],
+  "reserve_for": "frontend-design",
+  "purpose": "",
+  "created": "2026-10-04T22:55:43.691386+00:00",
+  "base": "bfcb33225b8a7b2036028f11c9e3bc600f49752d"
+}
