@@ -415,6 +415,38 @@ Both endpoints may be connected, but exactly one driver dispatches work to a
 station at a time. The lease prevents another station writer; v1 does not add a
 cross-provider turn mutex.
 
+## Desktop capability checks
+
+A provisioned task and a completed bootstrap prove task materialization, not
+desktop automation capability. Keep the launcher's exact bootstrap turn and
+temporary provisioning helper free of tool probes: bootstrap-only history is
+also used to recognize safe task migration. Check capabilities in a normal turn
+of the exact station task reached through its controller route.
+
+Before declaring computer use unavailable or asking the user to perform UI work,
+read the installed computer-use skill for the station's OS and follow its
+initialization and recovery instructions. Discover its required deferred tools
+when the runtime provides tool discovery. A browser automation surface reporting
+no native apps proves only that surface's limitation; it does not establish that
+the separate platform computer-use runtime is unavailable.
+
+If the installed Windows computer-use skill specifies `node_repl` with
+`import("@oai/sky")`, use that runtime and its documented window inventory and
+capture APIs. Browser-only `cua_repl` inventory and guessed native methods are
+not substitutes. Follow the installed skill if its runtime changes; do not
+spawn helper executables or create a custom protocol client to bypass it.
+
+Use the smallest probe needed for the requested work: enumerate windows on the
+station host, select a returned target, then inspect its state. Follow the
+platform skill's activation/refresh recovery for a minimized or stale target,
+within the user's authorized task. Report the exact task/host, runtime and
+observed outcome. Distinguish a missing required tool after discovery, package
+initialization failure, helper connection/pipe failure, empty window inventory,
+and target-specific capture failure. A failed capture of one minimized window
+does not negate successful enumeration or establish a host-wide outage. Stop
+at the installed skill's recovery boundary and report the actual remaining
+limitation; do not infer it from an unrelated runtime or a different task.
+
 ## Deferred hardening
 
 Recorded so later work starts from the same intent: a cross-provider turn
