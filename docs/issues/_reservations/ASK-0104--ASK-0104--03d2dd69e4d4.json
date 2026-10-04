@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0104"
+  ],
+  "reserve_for": "aito-native-readiness",
+  "purpose": "Preserve per-turn station admission for supported Codex delegated tool-output delivery",
+  "created": "2026-10-04T06:03:05.683929+00:00",
+  "base": "8ec9b8b35fb125457897bc76141ca64d1844c54e"
+}
