@@ -5,6 +5,19 @@ when the owner requests station status or local takeover. Ordinary unbound local
 chats use the selected execution strategy directly. Hooks remain scoped to managed
 checkouts and their durable retired endpoints.
 
+## Continue the current endpoint
+
+Ordinary authorized turns through the recorded Codex task continue under its
+expected held supervisor lease. The controller is steering that same writer;
+it does not need takeover, retirement, a new chat or Ctrl+C between turns.
+Validate the station identity, checkout, lease and each work envelope. Invoke
+takeover only when the owner requests transfer to another endpoint or local mode.
+
+Canonical launchers emit `implement-rfc.remote-station.v2`. The exact former
+`aito.implement-rfc.remote-station.v2` marker is read-compatible with the same
+identity and authority checks. Compatibility changes no registry bytes, endpoint,
+generation or lease. Other markers carrying a Codex binding remain refused.
+
 ## Inspect and resume here
 
 A replacement chat can submit prompts, inspect the recorded ownership and perform
@@ -52,8 +65,8 @@ lease owner stops its own child process group, waits for group reconciliation an
 records the result before releasing the lease. No helper kills a PID taken from a
 sidecar. Claude's owned group stop requires that positive supervisor receipt;
 untracked detached commands and other runtime writers still need manual observation.
-Legacy supervisors and native Windows lack this control and report the owning
-terminal's Ctrl+C step. Automatic owner-proxy and group stop are capability-dependent;
+For an actual ownership transfer, legacy supervisors and native Windows lack
+this control and report the owning terminal's Ctrl+C step. Automatic owner-proxy and group stop are capability-dependent;
 fixture tests do not establish native runtime support on a particular host.
 
 If a stop cannot be proved, follow the returned manual step: open the exact listed

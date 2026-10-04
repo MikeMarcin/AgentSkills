@@ -58,6 +58,25 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.assertIn('owning host', refused.stdout)
         self.assertEqual(lifecycle.load(self.repo)['mode'], 'transferring')
 
+    def test_project_prefixed_registry_preserves_existing_lifecycle_identity(self):
+        state = lifecycle.initial(self.repo, self.station)
+        lifecycle.save(self.repo, state)
+        self.station['schema'] = 'aito.implement-rfc.remote-station.v2'
+        self._write_station()
+        registry = (self.repo / '.remote-station.json').read_bytes()
+        state_bytes = lifecycle.paths(self.repo)[0].read_bytes()
+        result = self.run_control('status')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        observed = json.loads(result.stdout)
+        self.assertEqual(observed['mode'], 'managed')
+        self.assertEqual(observed['generation'], state['generation'])
+        self.assertEqual(observed['endpoint'], state['endpoints'])
+        self.assertTrue(observed['supervisor_lease']['held'])
+        accepted = self._run_guard(self._event('UserPromptSubmit', prompt=self._envelope()))
+        self.assertIn('accepted', accepted.stdout, accepted.stderr)
+        self.assertEqual((self.repo / '.remote-station.json').read_bytes(), registry)
+        self.assertEqual(lifecycle.paths(self.repo)[0].read_bytes(), state_bytes)
+
     def test_paused_or_crashed_takeover_preserves_dirty_work_and_fences_retired_endpoint(self):
         self.release()
         dirty = self.repo / 'seed.txt'

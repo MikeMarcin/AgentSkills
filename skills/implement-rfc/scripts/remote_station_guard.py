@@ -22,7 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import project_config  # noqa: E402
 import station_lifecycle as lifecycle  # noqa: E402
 
-STATION_SCHEMA = "implement-rfc.remote-station.v2"
+STATION_SCHEMA = lifecycle.STATION_SCHEMA
 TASK_ENVELOPE = "implement-rfc.remote-task.v1"
 SESSION_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 SKILL_RELATIVE = pathlib.Path(".agents/skills/implement-rfc")
@@ -91,7 +91,9 @@ def _load_station(root: pathlib.Path) -> dict[str, Any] | None:
         raise GuardRefusal("no-station", f"station registry is unreadable: {error}") from error
     if not isinstance(station, dict):
         raise GuardRefusal("no-station", "station registry is not a JSON object")
-    if station.get("schema") != STATION_SCHEMA:
+    if station.get("schema") not in lifecycle.STATION_SCHEMAS:
+        if isinstance(station.get("codex"), dict):
+            raise GuardRefusal("no-station", "Bound station registry has an unsupported schema; preserve it for source-backed repair.")
         # A station file written by an older launcher carries no Codex task
         # binding, so there is nothing to enforce against. Blocking here would
         # refuse every Codex turn in the checkout, including delegated lanes,

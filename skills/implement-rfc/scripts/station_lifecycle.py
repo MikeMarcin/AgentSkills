@@ -12,6 +12,9 @@ import project_config
 import station_lease
 
 SCHEMA = 'implement-rfc.station-lifecycle.v1'
+STATION_SCHEMA = 'implement-rfc.remote-station.v2'
+# The former AITO launcher emitted the same v2 contract with this exact prefix.
+STATION_SCHEMAS = (STATION_SCHEMA, 'aito.implement-rfc.remote-station.v2')
 
 
 class LifecycleError(ValueError):
@@ -46,7 +49,7 @@ def locked(root):
 def identity(root, station):
     context = project_config.resolve_context(repo_root=root)
     fields = ('station_id', 'station', 'project', 'branch', 'workstream')
-    if station.get('schema') != 'implement-rfc.remote-station.v2' or any(not isinstance(station.get(k), str) or not station[k] for k in fields):
+    if station.get('schema') not in STATION_SCHEMAS or any(not isinstance(station.get(k), str) or not station[k] for k in fields):
         raise LifecycleError('Station v2 identity is incomplete; preserve it and repair the recorded identity first.')
     if station['project'] != context.config['project']:
         raise LifecycleError('Station project differs from consumer context.')

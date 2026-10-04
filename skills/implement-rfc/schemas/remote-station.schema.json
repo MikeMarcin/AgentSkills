@@ -15,7 +15,7 @@
     "codex"
   ],
   "properties": {
-    "schema": {"const": "implement-rfc.remote-station.v2"},
+    "schema": {"enum": ["implement-rfc.remote-station.v2", "aito.implement-rfc.remote-station.v2"]},
     "station_id": {"type": "string", "pattern": "^stn-[0-9a-f]{8}$"},
     "station": {"$ref": "#/$defs/sessionName"},
     "project": {"$ref": "#/$defs/token"},

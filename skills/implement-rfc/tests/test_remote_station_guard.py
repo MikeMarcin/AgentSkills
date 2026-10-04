@@ -209,6 +209,30 @@ done_when: test the station guard
             "deny",
         )
 
+    def test_successive_turns_preserve_the_held_supervisor_and_binding(self) -> None:
+        registry = (self.repo / ".remote-station.json").read_bytes()
+        holder_pid = self.holder.pid
+        for index in range(2):
+            event = self._event("UserPromptSubmit", turn_id=f"turn-continuation-{index}", prompt=self._envelope())
+            accepted = self._run_guard(event)
+            self.assertIn("accepted", accepted.stdout, accepted.stderr)
+            tool = self._run_guard(self._event("PreToolUse", turn_id=event["turn_id"], tool_name="Write"))
+            self.assertEqual(tool.stdout, "", tool.stderr)
+            self._run_guard(self._event("Stop", turn_id=event["turn_id"]))
+            self.assertIsNone(self.holder.poll())
+            self.assertEqual(self.holder.pid, holder_pid)
+            self.assertEqual((self.repo / ".remote-station.json").read_bytes(), registry)
+
+    def test_unknown_bound_schema_does_not_disable_enforcement(self) -> None:
+        for marker in ("other.implement-rfc.remote-station.v2", None, [], {}):
+            with self.subTest(marker=marker):
+                self.station["schema"] = marker
+                self._write_station()
+                result = self._run_guard(self._event("PreToolUse", tool_name="Write"))
+                output = json.loads(result.stdout)["hookSpecificOutput"]
+                self.assertEqual(output["permissionDecision"], "deny")
+                self.assertIn("unsupported schema", output["permissionDecisionReason"])
+
     def test_wrong_thread_accepts_prompt_for_bounded_recovery(self) -> None:
         result = self._run_guard(
             self._event(
@@ -339,6 +363,13 @@ done_when: test the station guard
         self.assertIn('no Codex endpoint', result.stdout)
 
 
+class ProjectPrefixedStationGuardTests(RemoteStationGuardTests):
+    def setUp(self) -> None:
+        super().setUp()
+        self.station["schema"] = "aito.implement-rfc.remote-station.v2"
+        self._write_station()
+
+
 @unittest.skipIf(Draft202012Validator is None, "jsonschema is required for schema validation")
 class RemoteStationSchemaTests(unittest.TestCase):
     def test_v2_accepts_provisioned_and_legacy_direct_modes(self) -> None:
@@ -365,6 +396,24 @@ class RemoteStationSchemaTests(unittest.TestCase):
         station["claude"] = None
         station["codex"] = None
         validator.validate(station)
+
+    def test_supported_project_prefixed_v2_preserves_schema_validation(self) -> None:
+        schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema)
+        station = {
+            "schema": "aito.implement-rfc.remote-station.v2",
+            "station_id": "stn-1234abcd",
+            "station": "fx-main-mac",
+            "project": "fixture",
+            "workstream": "main",
+            "environment": "macos",
+            "branch": "main",
+            "authority": "lane-commit",
+            "codex": {"thread_id": "thr-station-1234", "thread_name": "fx-main-mac", "cli_version": "0.151.0"},
+        }
+        validator.validate(station)
+        station["schema"] = "other.implement-rfc.remote-station.v2"
+        self.assertTrue(list(validator.iter_errors(station)))
 
     def test_v1_is_rejected_after_migration(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))

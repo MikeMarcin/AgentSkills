@@ -116,6 +116,13 @@ machine-local configuration, not dispatch input: a message cannot rewrite it,
 and the skill must treat a hand-edited file that disagrees with the live
 checkout (wrong branch, wrong repo) as a hard stop, not as truth.
 
+The exact former marker `aito.implement-rfc.remote-station.v2` describes the
+same v2 fields and remains read-compatible under the full guard/lifecycle
+checks. New launchers emit the canonical marker above. Reading compatibility
+never rewrites the registry or changes the bound endpoint, generation or lease.
+Successive authorized turns through the current endpoint need no supervisor
+restart; ownership transfer follows [station control](station-control.md).
+
 ### Launch and reset controls
 
 Run the shared `scripts/launch_remote_station.py` from the consumer checkout,
