@@ -2,9 +2,10 @@
 schema: implement-rfc.card.v1
 id: ASK-0104
 title: Admit delegated station turns through the trusted host tool event
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"56 focused guard/parser cases include exact quoted native py grammar, size/malformed/duplicate/unknown payload refusal, copied helper/shell/caller-identity rejection, and direct CLI non-admission."}},{"criterion":"AC2","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Actual JaegAW PreToolUse admitted distinct host turns 01a10599-b47c-7992-93e2-5ccd9f1cbde7 and 01a1059e-51fb-78f0-8577-69d546706389 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json. Negative tests preserve lifecycle/checkout/origin/branch/base/expiry/authority/lease checks and refuse authority replacement."}},{"criterion":"AC3","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Wrong-turn tools, replay after Stop, expired requests and receipt capacity/storage failure refused in focused tests; fresh consecutive host turns each had their own actual admission. First authorization was cleared by Stop. Source/doc/diff gates passed."}},{"criterion":"AC4","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Actual JaegAW PreToolUse admitted distinct host turns 01a10599-b47c-7992-93e2-5ccd9f1cbde7 and 01a1059e-51fb-78f0-8577-69d546706389 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json."}}]
 ---
 
 # Admit delegated station turns through the trusted host tool event
@@ -96,3 +97,32 @@ AC4 remains pending until the coordinator returns the actual Windows host
 source-event receipt and two consecutive fresh delegated turns at unchanged
 station/endpoint/lease. No native acceptance is inferred from fixture tests.
 Unrelated `.mask.lock.json` is preserved; no AgentSkills push is authorized.
+
+## Actual native closeout — 2026-10-04
+
+The same registered Windows task accepted the exact resolved installed-helper
+command through actual PreToolUse on source
+`4c0f70c490445780dd8bb5805481d0da326a4bf3`. The host supplied session
+`01a10525-e3fa-7250-85cf-c27f2f84897d` and distinct turns
+`01a10599-b47c-7992-93e2-5ccd9f1cbde7` / task
+`task-20261004-native-admission-sync-0628`, then
+`01a1059e-51fb-78f0-8577-69d546706389` / task
+`task-20261004-native-ent0058-probe-0633`. Both state records name
+`admission_source: PreToolUse`; two persistent task-use receipts remain, while
+Stop removed the first turn's authorization before the second request.
+
+The first turn fast-forwarded AITO normally from `90567fdc` to `b85337da` and
+verified 168 exact package blobs and helper SHA-256
+`8b141ab07f1e9072c32a6e12307ea8ab569a213ec0034aaaef182f38edff0922`.
+The second turn configured and ran the native build/test probe. Registry,
+endpoint, authority, generation 0 and held lease PID 55408 / supervisor PID 7836
+were unchanged before and after. No caller identity, simulated event, manual
+state seed, restart or physical intervention supplied admission.
+
+Actual receipts are retained in AITO's existing run directory as
+`ent0058/native-admission-sync-receipt.json`,
+`ent0058/native-initial-probe/receipt.json` and its station-before/after logs.
+AC1–AC4 pass with those live observations and the focused source checks above.
+The product probe failed independently on optimized compiler flags; this is
+not native Natvis acceptance. Unrelated builders/Visual Studio work remain
+untouched, and global writer quiescence is not asserted.
