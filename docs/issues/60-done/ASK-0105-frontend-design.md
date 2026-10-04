@@ -2,10 +2,11 @@
 schema: implement-rfc.card.v1
 id: ASK-0105
 title: Create frontend design for web, mobile and desktop
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 metadata: {"milestone_plan":{"id":"frontend-design","path":"docs/rfcs/plans/frontend-design/milestone-plan.json"}}
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"828e33b3b1cd1f39e7ae7ab4ea0aab9e34cba4a8","evidence":{"kind":"observation","detail":"Primary content review covers new interfaces, existing refinements and critique; scope and product conventions are explicit."}},{"criterion":"AC2","outcome":"pass","revision":"828e33b3b1cd1f39e7ae7ab4ea0aab9e34cba4a8","evidence":{"kind":"observation","detail":"Internal links reach web, mobile and desktop references with input, accessibility and runtime verification guidance."}},{"criterion":"AC3","outcome":"pass","revision":"828e33b3b1cd1f39e7ae7ab4ea0aab9e34cba4a8","evidence":{"kind":"observation","detail":"Skill metadata, repository structure, internal links and complete source catalog pass; final package has five original files and no upstream license or copied payload."}},{"criterion":"AC4","outcome":"pass","revision":"828e33b3b1cd1f39e7ae7ab4ea0aab9e34cba4a8","evidence":{"kind":"observation","detail":"MASK validated digest 3ed870536a0f6a064cce5dd6011fc3e85e11d2bb8fbde921f0d98fa86149b5ac; two isolated consumers passed status --check and both Claude/Codex links matched every package file."}}]
 ---
 
 # Frontend design skill
