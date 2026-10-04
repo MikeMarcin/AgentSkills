@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0102"
+  ],
+  "reserve_for": "bootstrap-prompt-20261004",
+  "purpose": "",
+  "created": "2026-10-04T04:53:08.158416+00:00",
+  "base": "b75119cd7a39310407827c5275799ab25f84f39f"
+}
