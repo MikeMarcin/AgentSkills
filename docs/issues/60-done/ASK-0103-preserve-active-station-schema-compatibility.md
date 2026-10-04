@@ -2,9 +2,10 @@
 schema: implement-rfc.card.v1
 id: ASK-0103
 title: Preserve enforcement for existing project-prefixed station v2 bindings
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Exact canonical and former-marker guard/lifecycle enforcement passed source tests; unknown bound markers, identity/branch/authority/lease and lifecycle negatives remained refused."}},{"criterion":"AC2","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Actual JaegAW PreToolUse admitted distinct host turns 01a10599-b47c-7992-93e2-5ccd9f1cbde7 and 01a1059e-51fb-78f0-8577-69d546706389 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json. Actual takeover/retirement protections passed focused station-control cases."}},{"criterion":"AC3","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Guard/parser 56/56 and focused control 4/4 passed on final shared candidate; original compatibility control 31/31 evidence remains relevant. Portable-source, documentation and diff checks passed."}},{"criterion":"AC4","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Scoped MASK transaction committed with three actions at the approved original authoring root; both project links measured. Actual JaegAW PreToolUse admitted distinct host turns 01a10599-b47c-7992-93e2-5ccd9f1cbde7 and 01a1059e-51fb-78f0-8577-69d546706389 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json."}}]
 ---
 
 # Preserve enforcement for existing project-prefixed station v2 bindings
@@ -92,3 +93,31 @@ AC4 remains pending: the coordinator will deploy the committed candidate through
 a scoped MASK dev-link with exact source bytes, then collect actual successive
 guarded turns at the current Windows endpoint. No source push or live registry
 edit is authorized here. The unrelated `.mask.lock.json` change is preserved.
+
+## Actual native closeout — 2026-10-04
+
+The scoped MASK transaction committed all three actions through the approved
+`C:\code\git\AgentSkills` authoring root, and both consumer links were measured.
+After ASK-0104 resolved the actual Codex tool-output admission contract, the
+current task executed two distinct actual PreToolUse-admitted turns on shared
+candidate `4c0f70c490445780dd8bb5805481d0da326a4bf3`:
+`01a10599-b47c-7992-93e2-5ccd9f1cbde7` (source synchronization) and
+`01a1059e-51fb-78f0-8577-69d546706389` (native build probe). The first turn's
+authorization was cleared before the second. Station `stn-39ef5ffb`, endpoint
+`01a10525-e3fa-7250-85cf-c27f2f84897d`, generation 0, lane-commit authority,
+lease PID 55408 and supervisor PID 7836 remained unchanged. No restart, physical
+intervention or manually seeded admission occurred.
+
+The actual task audited 168 package blobs and the exact helper/guard hashes.
+Six metadata-only Git flags remain on Windows with zero content diffs; this is
+not called a clean authoring checkout. Receipts are retained in AITO's
+`code/.build/runs/implement-rfc/unattended-20261003-windows/ent0058/` as
+`native-admission-sync-receipt.json` and `native-initial-probe/receipt.json`,
+with station-before/after logs. The committed MASK receipt is retained at the
+run root as `windows-completed-mask-and-public-status.txt`.
+
+AC1–AC4 pass. The second turn exposed independent native product defects
+(`/O2` versus `/RTC1`, and project Natvis emitted as ClInclude); ENT-0058 remains
+open for those repairs and stopped-target acceptance. Unrelated builders and
+the existing containers.sln session were preserved; no global writer-quiescence
+claim is made. Unrelated `.mask.lock.json` is preserved and no source push occurred.
