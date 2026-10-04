@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0105
 title: Adapt frontend design for web, mobile and desktop
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
