@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0103"
+  ],
+  "reserve_for": "native-station-compatibility-20261004",
+  "purpose": "",
+  "created": "2026-10-04T05:12:31.889558+00:00",
+  "base": "c49a0b7b8d64954af71e2d6b0802ac8c263c86d8"
+}
