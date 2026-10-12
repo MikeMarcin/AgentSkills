@@ -43,8 +43,8 @@ fresh empty task receives one harmless bootstrap turn and is renamed again
 after that turn; this makes it durable and eligible for controller task lists.
 Controller enumeration remains a separate driver gate, especially on Windows.
 Codex Desktop and the Unix managed daemon may both
-outlive the launcher and remain independently usable; the live writer lease and
-hooks, not ownership of those processes, bound station mutation. `codex
+outlive the launcher and remain independently usable. Explicit launches use the
+writer lease; actual runtime writers still require reconciliation. `codex
 --remote` remains a diagnostic terminal client, not the registry or dispatch
 path.
 
@@ -97,12 +97,11 @@ Codex facts that matter for stations:
 - Multiple Codex sessions in different checkouts on one machine are fine;
   give each station its own build, temp, and evidence roots so caches and
   ports do not collide.
-- `.codex/hooks.json` re-asserts the guard on station prompts and before common
-  mutating tools, and clears turn state on stop. Project-hook trust is
-  human-attended through `/hooks`. OpenAI documents that specialized tool paths
-  may bypass generic hooks, so the hook remains defense in depth; Git state,
-  board state, restricted credentials, and driver-side reply validation stay
-  authoritative.
+- Station hooks are inactive by default; explicit `--enforce` opts into prompt,
+  tool and Stop checks. The project launcher exposes `status`, `takeover` and
+  `hooks off`; see [station control](station-control.md). Removing hooks does not
+  stop runtime writers. Git state, board state and driver-side reply validation
+  remain authoritative. Hook fences apply only when explicitly enabled.
 - Both Claude and Codex endpoints can remain connected, but concurrent
   cross-provider turns in one station are unsupported. Dispatch through one
   driver at a time.

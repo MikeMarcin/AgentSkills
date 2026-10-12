@@ -4,6 +4,9 @@ This directory is shared RFC workflow source. Project mode keeps facts and
 rules in the source repository; personal mode keeps them in its paired external
 tracker. A single local agent can use
 `SKILL.md`; native role adapters and remote station helpers are optional.
+The station launcher also exposes `status`, `takeover`, `hooks status` and
+`hooks off --dry-run`. Automatic station hooks are inactive; blocking enforcement
+requires explicit opt-in. See [station control](references/station-control.md).
 
 ## Policy
 

@@ -2,6 +2,9 @@
 """Launch this checkout as one named Claude and Codex remote station.
 
 usage: launch_remote_station.py [workstream] [--fresh [codex|claude|both]]
+       launch_remote_station.py status [--json] [--observe-runtime]
+       launch_remote_station.py takeover [--confirm-runtime-stopped] [--json]
+       launch_remote_station.py hooks [status|off] [--dry-run] [--json]
 
 Start or resume automatically, or use --fresh to clear context in enabled
 runtimes. Use --no-claude or --no-codex when one service is unavailable.
@@ -1157,6 +1160,7 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
         epilog=(
             "No options needed for normal use: the workstream is inferred and both "
             "sessions resume automatically. Stop with Ctrl+C before restarting. "
+            "Management: status, takeover, hooks status, hooks off --dry-run. "
             "Use --help-all for setup and troubleshooting options."
         ),
     )
@@ -1238,6 +1242,21 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] in ('status', 'takeover', 'hooks'):
+        if argv[0] == 'hooks':
+            import station_hooks
+            return station_hooks.main(argv[1:])
+        import station_control
+        management = argv[:]
+        if not any(arg == '--repo-root' or arg.startswith('--repo-root=') for arg in management):
+            management += ['--repo-root', str(pathlib.Path.cwd())]
+        if management[0] == 'takeover':
+            if '--mode' not in management and not any(arg.startswith('--mode=') for arg in management):
+                management += ['--mode', 'local']
+            if '--stop-previous' not in management:
+                management += ['--stop-previous']
+        return station_control.main(management)
     arguments = parse_arguments(argv)
     if arguments.fresh_station and arguments.reattach:
         print(

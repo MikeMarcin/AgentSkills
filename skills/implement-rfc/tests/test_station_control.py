@@ -58,6 +58,33 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.assertIn('owning host', refused.stdout)
         self.assertEqual(lifecycle.load(self.repo)['mode'], 'transferring')
 
+    def test_public_launcher_inspects_without_hidden_root_flags_and_preserves_binding(self):
+        launcher = self.repo / '.agents/skills/implement-rfc/scripts/launch_remote_station.py'
+        before = (self.repo / '.remote-station.json').read_bytes()
+        result = subprocess.run([sys.executable, '-B', str(launcher), 'status', '--json'],
+                                cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        observed = json.loads(result.stdout)
+        self.assertEqual(observed['mode'], 'managed')
+        self.assertTrue(observed['supervisor_lease']['held'])
+        self.assertEqual((self.repo / '.remote-station.json').read_bytes(), before)
+        self.assertIsNone(lifecycle.load(self.repo))
+
+    def test_public_launcher_takeover_keeps_stop_observation_required(self):
+        self.release()
+        self.station['environment'] = 'fixture'
+        self._write_station()
+        launcher = self.repo / '.agents/skills/implement-rfc/scripts/launch_remote_station.py'
+        refused = subprocess.run([sys.executable, '-B', str(launcher), 'takeover', '--json'],
+                                cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(refused.returncode, 75, refused.stdout)
+        self.assertEqual(lifecycle.load(self.repo)['mode'], 'transferring')
+        done = subprocess.run([sys.executable, '-B', str(launcher), 'takeover',
+                               '--confirm-runtime-stopped', '--json'], cwd=self.repo,
+                              capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(json.loads(done.stdout)['mode'], 'local')
+
     def test_project_prefixed_registry_preserves_existing_lifecycle_identity(self):
         state = lifecycle.initial(self.repo, self.station)
         lifecycle.save(self.repo, state)

@@ -191,7 +191,18 @@ def main(argv=None):
         root = project_config.resolve_context(repo_root=args.repo_root).source_root
         value = status(root, observe_runtime=args.observe_runtime) if args.operation == 'status' else takeover(
             root, stop_previous=args.stop_previous, confirm_runtime_stopped=args.confirm_runtime_stopped)
-        print(json.dumps(dict(value, ok=True)))
+        if args.json:
+            print(json.dumps(dict(value, ok=True)))
+        else:
+            print(f"Station: {value.get('station_id', 'none')} ({value['mode']})")
+            lease = value.get('supervisor_lease')
+            if lease is not None:
+                print('Supervisor lease: ' + ('held' if lease['held'] else 'free'))
+            print('Runtime activity: ' + value['activity']['state'])
+            if value['mode'] == 'managed':
+                print('Use status --observe-runtime for measured activity; takeover only transfers ownership to a different chat.')
+            if value['mode'] == 'transferring':
+                print(value['recovery']['manual_step'])
         return 0
     except (ValueError, OSError, guard.GuardRefusal, project_config.ProjectConfigError) as error:
         print(json.dumps(dict(schema=SCHEMA, ok=False, error=str(error), writes='deferred')))

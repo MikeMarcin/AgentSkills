@@ -21,8 +21,12 @@ or prove runtime quiescence. This owner amendment supersedes claims that every
 station turn must be admitted through automatic project hooks.
 
 Scope: canonical shared helpers, focused fixtures, station instructions and
-portable manifest. BetterPullReview's named WSL consumer may remove its station
-hooks and expose existing management helpers, with separate consumer records.
+portable manifest. Owner scope expansion: remove hooks from every registered
+Windows/WSL MASK project selecting implement-rfc. Inventory: Windows BetterPullReview,
+ManageAgentSkills, aito and bpr-windows; WSL BetterPullReview, ManageAgentSkills and
+bpr-linux. Both MASK checkouts have no station hooks. Preserve unrelated commands,
+dirty files, locked skill versions, local ownership and active runtimes. Existing
+consumer management scripts expose status/takeover, with separate consumer records.
 No push, live stop/takeover, global settings, other consumer migration or MASK
 internal-state edits. Baseline: 4c0f70c490445780dd8bb5805481d0da326a4bf3.
 
