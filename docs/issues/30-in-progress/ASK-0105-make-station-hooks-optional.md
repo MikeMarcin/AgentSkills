@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0105
 title: Remove default station tool blocking and expose station management
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
