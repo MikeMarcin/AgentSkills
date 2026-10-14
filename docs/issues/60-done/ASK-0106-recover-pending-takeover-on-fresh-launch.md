@@ -81,3 +81,44 @@ Focused results:
 Continuation: bounded source and native repair complete. Any future publication
 must use explicit owner authorization, then upgrade only the named consumer and
 verify installed bytes. Unrelated admission-helper/schema edits remain untouched.
+
+## Authorized publication and installed verification, 2026-10-13
+
+The owner then authorized publication and installation: "Do whatever you need
+to and push the changes when youre done". This extends the earlier publication
+boundary; the preceding source-only evidence remains historical.
+
+- Pushed the five source/bookkeeping commits through `5285995` to AgentSkills
+  `origin/main`. The implementation remains `70d04b1`; unrelated admission-helper
+  and schema working changes were excluded.
+- Fetched the approved WSL tap, previewed the single-skill upgrade and applied
+  the exact plan `sha256:5e7968569c889107ebbc19f7baabc9ad64b785d07aa620e106b5529ce93765fc`.
+  Actions were the project lock, two managed skill links and the state record;
+  no setup script, native-role replacement or other selection update was needed.
+- Installed both WSL BetterPullReview links at source commit `5285995` and
+  payload `sha256:728ef9c6f6cd3061b1bce99147cc0d0c348f61e9207b1c191789860ea6a3f3c3`.
+  `mask status --project /home/mmarcin/BetterPullReview --check --json` reports
+  healthy, no blockers/issues and verified deployment for both agents. This
+  verifies helper execution, not a claim that a model loaded its skill prose.
+- Committed the consumer lock as `eee96606b5`. Published only that two-field
+  change from the remote baseline as BetterPullReview `68a04d8312` on main;
+  existing local product commits were not included in the push. Merged the
+  published lock back into the source checkout as `d16ae68fd7`, preserving its
+  other work, then removed the temporary publication worktree.
+- Stopped only this task's earlier launch through its controlled supervisor;
+  it returned `controlled_stop: true` and a free lease. The first upgraded
+  restart reached Codex-ready but Claude returned an existing remote-control
+  registration error, then exited 1 after its reported 69-second drain window.
+  The subsequent identical public `--fresh` command succeeds with the installed
+  patch: Codex `01a138df-224a-7093-949d-b7876b0c702f` is ready, Claude
+  `session_01QSLgCe5FaCaZia5zPdb4FQ` is Connected. Status reports managed
+  generation 6, pending null and its held lease. This station intentionally
+  remains running for the owner.
+- Ran the composed interrupted-transfer recovery and free-lease negative tests
+  directly from the installed package: 2/2 pass. WSL consumer documentation
+  returns `DOCUMENTATION_OK`; the consumer worktree is clean. The earlier
+  source suite evidence remains applicable to the unchanged installed bytes.
+
+Publication and the named consumer deployment are complete. Claude's external
+registration expiry and the installed Codex CLI's unavailable background-terminal
+inventory remain explicit runtime limitations; neither is treated as stop proof.
