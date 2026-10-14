@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0106
 title: Recover pending takeover before acquiring a fresh station lease
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
