@@ -1,0 +1,11 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0107",
+    "ASK-0108"
+  ],
+  "reserve_for": "public-source-preparation",
+  "purpose": "",
+  "created": "2026-10-14T06:10:05.469239+00:00",
+  "base": "550f1759200d1094b563c8957ac622c73e5436e5"
+}
