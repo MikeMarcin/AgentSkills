@@ -1,0 +1,28 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "public-source-finalization",
+  "scope": {
+    "issues": [
+      "ASK-0109"
+    ]
+  },
+  "coverage": "complete",
+  "unplanned_work": [],
+  "milestones": [
+    {
+      "id": "m3",
+      "outcome": "The delivered cross-repository technical preparation has accurate public reporting, exact final candidates and an ordinary push, with owner decisions and native limitations retained.",
+      "work": [
+        {
+          "issue": "ASK-0109"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "ASK-0109 AC1 through AC4 have direct evidence; unchanged prior technical inputs and their checks are identified without claiming pending license or native acceptance.",
+        "Both final remote main revisions, scans, preserved lock bytes, remaining owner decisions and quiescent engineering command state are recorded for the coordinator."
+      ],
+      "boundary": "Final AgentSkills documentation and cross-repository reconciliation only. Ordinary push is authorized; visibility/access, unanswered license adoption, history rewriting, real deployments and model experiments remain outside this independent scope."
+    }
+  ]
+}
