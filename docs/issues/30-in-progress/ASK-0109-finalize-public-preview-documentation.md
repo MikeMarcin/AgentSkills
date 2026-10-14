@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0109"
 title: "Finalize public-preview reporting and delivered-state documentation"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"mandate":"public-prep-final-reconciliation-v1","baseline":"8c9c80f05e02e0cbaca56edfde5dab8859f2f932","external_input":"ManageAgentSkills 4ba72a7235d8a94d0d8cb386a672a51e671702bc","milestone_plan":{"id":"public-source-finalization","path":"docs/rfcs/plans/public-source-finalization/milestone-plan.json"}}
