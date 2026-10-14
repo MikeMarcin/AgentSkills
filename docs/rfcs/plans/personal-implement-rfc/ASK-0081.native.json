@@ -17,21 +17,21 @@
     "tracker_revision_unchanged": "df76ff5d03604e28ec80780f9d4396487ee93758",
     "runtime_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/codex/state/runtime/c6cefef47c40d6a210038159",
     "qualifying_dispatch": {
-      "parent_session_id": "01a0997d-e4f1-7021-bbd2-e44546657367",
+      "parent_session_id": "REDACTED-SESSION-002",
       "tool": "collaboration.spawn_agent",
       "task_name": "qualification_integrator_fresh",
       "agent_type": "rfc-integrator",
       "fork_turns": "none",
       "model_override": "omitted",
       "reasoning_effort_override": "omitted",
-      "integrator_session_id": "01a0998c-d664-7461-8b9e-0bd62be901b4",
+      "integrator_session_id": "REDACTED-SESSION-003",
       "leaf": {
         "agent_type": "rfc-utility",
         "task_name": "rfc_utility_personal_binding_verification",
         "fork_turns": "none",
         "model_override": "omitted",
         "reasoning_effort_override": "omitted",
-        "session_id": "01a0998e-28c4-7721-8535-049f997725fb",
+        "session_id": "REDACTED-SESSION-004",
         "result": "completed, independent read-only check, no descendants or active commands"
       }
     },
@@ -48,9 +48,9 @@
       "source_and_tracker_git_status": "Both clean at their initial revisions after the course."
     },
     "retained_transcripts": [
-      "/Users/jaeger/.codex/sessions/2026/09/12/rollout-2026-09-12T23-39-19-01a0997d-e4f1-7021-bbd2-e44546657367.jsonl",
-      "/Users/jaeger/.codex/sessions/2026/09/12/rollout-2026-09-12T23-55-39-01a0998c-d664-7461-8b9e-0bd62be901b4.jsonl",
-      "/Users/jaeger/.codex/sessions/2026/09/12/rollout-2026-09-12T23-57-05-01a0998e-28c4-7721-8535-049f997725fb.jsonl"
+      "/Users/EXAMPLE/.codex/sessions/2026/09/12/rollout-2026-09-12T23-39-19-REDACTED-SESSION-002.jsonl",
+      "/Users/EXAMPLE/.codex/sessions/2026/09/12/rollout-2026-09-12T23-55-39-REDACTED-SESSION-003.jsonl",
+      "/Users/EXAMPLE/.codex/sessions/2026/09/12/rollout-2026-09-12T23-57-05-REDACTED-SESSION-004.jsonl"
     ],
     "prior_attempts": "The first role and leaf loaded and read both roots, but an external artifact patch tool stalled and that turn was interrupted; no artifact was written. A second history-copying dispatch attempted unrelated computer UI access; Codex-app access was denied and Sublime Text was not approved, without granting permission. Its child completed and the parent was interrupted. A queued third non-history-copying dispatch was interrupted before a leaf. None of these attempts is used as the corrected-course acceptance proof; all descendants were accounted for."
   },
@@ -62,7 +62,7 @@
     "tracker_revision_unchanged": "1d780e0223ea148a7e07a114ac031e9648133aa1",
     "runtime_root": "/private/tmp/implement-rfc-personal-2026-09-13/native/claude/state/runtime/951970666a451c41d79f2e91",
     "qualifying_dispatch": {
-      "parent_session_id": "99fc3e94-a035-4f8b-84e4-d766215ac020",
+      "parent_session_id": "REDACTED-SESSION-012",
       "tool": "Agent",
       "subagent_type": "rfc-integrator",
       "model_override": "omitted",
@@ -91,7 +91,7 @@
       "external_artifact": "/tmp/implement-rfc-personal-2026-09-13/native/claude/state/runtime/951970666a451c41d79f2e91/native-course.json",
       "external_artifact_sha256": "ec14779f3cd55c9da43d1b310a4a0f4e4be77ae2785309006165eb64ebcdecf1"
     },
-    "retained_parent_transcript": "/Users/jaeger/.claude/projects/-private-tmp-implement-rfc-personal-2026-09-13-native-claude-consumer/99fc3e94-a035-4f8b-84e4-d766215ac020.jsonl",
+    "retained_parent_transcript": "/Users/EXAMPLE/.claude/projects/-private-tmp-implement-rfc-personal-2026-09-13-native-claude-consumer/REDACTED-SESSION-012.jsonl",
     "prior_attempts": "Two earlier interactive sessions canceled read-outside-working-directories prompts without approval. The qualifying session used Claude Code's session-scoped --add-dir for the selected skill symlink, its source target and disposable state root; no persistent permission setting changed."
   },
   "selected_live_state": {

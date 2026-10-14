@@ -10,7 +10,7 @@ acceptance: [{"criterion":"AC1","evidence":{"kind":"command","detail":"Launcher 
 
 # Recover pending takeover before acquiring a fresh station lease
 
-Owner mandate, 2026-10-13: fix BetterPullReview on JaegAW refusing
+Owner mandate, 2026-10-13: fix BetterPullReview on EXAMPLE-HOST refusing
 `python3 scripts/launch_remote_station.py --fresh` with
 `finish pending local takeover before relaunch`. The previous ASK-0105/BPR-1401
 hook removal explicitly retained that pending takeover.
@@ -29,7 +29,7 @@ the named WSL consumer through supported management; no publication or push.
   certifies a stopped runtime.
 - AC3: Launcher/takeover/lease regression tests pass on Windows and WSL using
   disposable fixtures; the source manifest and documentation gate agree.
-- AC4: The actual JaegAW pending takeover is completed after the owner's real
+- AC4: The actual EXAMPLE-HOST pending takeover is completed after the owner's real
   stop confirmation, and the public fresh-launch path is exercised. Record
   the installed payload and any remaining runtime limitation explicitly.
 
@@ -44,8 +44,8 @@ The owner confirmed the old station work is stopped in this chat. The existing
 installed helper's supported takeover returned local generation 3, pending null
 and a free lease. Then the actual public command
 `python3 scripts/launch_remote_station.py --fresh` created Codex task
-`01a138d2-16eb-7cd0-807e-a7b1997dbf07` and Claude session
-`session_012HztGHeTyv6qKQn4KKwrxx`, which reached Connected. Subsequent public
+`REDACTED-SESSION-009` and Claude session
+`REDACTED-SESSION-014`, which reached Connected. Subsequent public
 status reports managed generation 4, pending null and its held supervisor lease.
 The launcher session is intentionally running for the owner's remote station;
 there are no remaining task-owned test writers.
@@ -97,7 +97,7 @@ boundary; the preceding source-only evidence remains historical.
   no setup script, native-role replacement or other selection update was needed.
 - Installed both WSL BetterPullReview links at source commit `5285995` and
   payload `sha256:728ef9c6f6cd3061b1bce99147cc0d0c348f61e9207b1c191789860ea6a3f3c3`.
-  `mask status --project /home/mmarcin/BetterPullReview --check --json` reports
+  `mask status --project /home/EXAMPLE/BetterPullReview --check --json` reports
   healthy, no blockers/issues and verified deployment for both agents. This
   verifies helper execution, not a claim that a model loaded its skill prose.
 - Committed the consumer lock as `eee96606b5`. Published only that two-field
@@ -110,8 +110,8 @@ boundary; the preceding source-only evidence remains historical.
   restart reached Codex-ready but Claude returned an existing remote-control
   registration error, then exited 1 after its reported 69-second drain window.
   The subsequent identical public `--fresh` command succeeds with the installed
-  patch: Codex `01a138df-224a-7093-949d-b7876b0c702f` is ready, Claude
-  `session_01QSLgCe5FaCaZia5zPdb4FQ` is Connected. Status reports managed
+  patch: Codex `REDACTED-SESSION-010` is ready, Claude
+  `REDACTED-SESSION-015` is Connected. Status reports managed
   generation 6, pending null and its held lease. This station intentionally
   remains running for the owner.
 - Ran the composed interrupted-transfer recovery and free-lease negative tests

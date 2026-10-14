@@ -16,3 +16,5 @@ __pycache__/
 /.codex/agents/rfc-*.toml
 /.mask/skill-config/*/native-roles.lock.json
 .DS_Store
+/.venv/
+/.ci-mask/

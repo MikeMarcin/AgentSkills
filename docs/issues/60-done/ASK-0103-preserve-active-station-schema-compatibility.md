@@ -5,7 +5,7 @@ title: Preserve enforcement for existing project-prefixed station v2 bindings
 status: "Done"
 rfcs: []
 depends_on: []
-acceptance: [{"criterion":"AC1","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Exact canonical and former-marker guard/lifecycle enforcement passed source tests; unknown bound markers, identity/branch/authority/lease and lifecycle negatives remained refused."}},{"criterion":"AC2","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Actual JaegAW PreToolUse admitted distinct host turns 01a10599-b47c-7992-93e2-5ccd9f1cbde7 and 01a1059e-51fb-78f0-8577-69d546706389 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json. Actual takeover/retirement protections passed focused station-control cases."}},{"criterion":"AC3","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Guard/parser 56/56 and focused control 4/4 passed on final shared candidate; original compatibility control 31/31 evidence remains relevant. Portable-source, documentation and diff checks passed."}},{"criterion":"AC4","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Scoped MASK transaction committed with three actions at the approved original authoring root; both project links measured. Actual JaegAW PreToolUse admitted distinct host turns 01a10599-b47c-7992-93e2-5ccd9f1cbde7 and 01a1059e-51fb-78f0-8577-69d546706389 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json."}}]
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Exact canonical and former-marker guard/lifecycle enforcement passed source tests; unknown bound markers, identity/branch/authority/lease and lifecycle negatives remained refused."}},{"criterion":"AC2","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Actual EXAMPLE-HOST PreToolUse admitted distinct host turns REDACTED-SESSION-007 and REDACTED-SESSION-008 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json. Actual takeover/retirement protections passed focused station-control cases."}},{"criterion":"AC3","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"command","detail":"Guard/parser 56/56 and focused control 4/4 passed on final shared candidate; original compatibility control 31/31 evidence remains relevant. Portable-source, documentation and diff checks passed."}},{"criterion":"AC4","outcome":"pass","revision":"4c0f70c490445780dd8bb5805481d0da326a4bf3","evidence":{"kind":"observation","detail":"Scoped MASK transaction committed with three actions at the approved original authoring root; both project links measured. Actual EXAMPLE-HOST PreToolUse admitted distinct host turns REDACTED-SESSION-007 and REDACTED-SESSION-008 at unchanged stn-39ef5ffb/generation0/endpoint and held PID55408 lease. 168 installed source blobs and helper digest matched the committed candidate. Source FF and native probe tools executed; no restart or manual state seed. Receipts: native-admission-sync-receipt.json and native-initial-probe/receipt.json."}}]
 ---
 
 # Preserve enforcement for existing project-prefixed station v2 bindings
@@ -16,7 +16,7 @@ the same endpoint is not a takeover and needs no supervisor stop per iteration.
 
 ## Current failure
 
-AITO's newly launched `aito-main-win` writes
+AITO's newly launched `EXAMPLE-WINDOWS-STATION` writes
 `aito.implement-rfc.remote-station.v2`, while the shared guard expects
 `implement-rfc.remote-station.v2` and returns inactive. Shared lifecycle identity
 also rejects the former marker. The exact current Codex endpoint, main branch,
@@ -25,7 +25,7 @@ lease a conflicting old writer incorrectly turns ordinary station continuation
 into a physical Ctrl+C/relaunch prerequisite.
 
 Observed binding: station `stn-39ef5ffb`, task
-`01a10525-e3fa-7250-85cf-c27f2f84897d`, checkout `C:\code\git\aito` on JaegAW.
+`REDACTED-SESSION-006`, checkout `C:\code\git\aito` on EXAMPLE-HOST.
 Existing AITO helper source emits the prefixed marker; this is a source contract
 mismatch rather than an old Windows installation. Native desktop control through
 this exact task is proven separately and does not certify station authority.
@@ -70,8 +70,8 @@ Focused tests first reproduced legacy guard inactivity, lifecycle refusal and
 failed successive guarded turns. After correction, the final checks passed:
 
 ```sh
-/Users/jaeger/Documents/Personal/aito/.venv/bin/python -W error::ResourceWarning -m unittest discover -s skills/implement-rfc/tests -p test_remote_station_guard.py -v
-/Users/jaeger/Documents/Personal/aito/.venv/bin/python -W error::ResourceWarning -m unittest discover -s skills/implement-rfc/tests -p test_station_control.py -v
+/Users/EXAMPLE/Documents/Personal/aito/.venv/bin/python -W error::ResourceWarning -m unittest discover -s skills/implement-rfc/tests -p test_remote_station_guard.py -v
+/Users/EXAMPLE/Documents/Personal/aito/.venv/bin/python -W error::ResourceWarning -m unittest discover -s skills/implement-rfc/tests -p test_station_control.py -v
 python3 -B skills/implement-rfc/scripts/render_runtime_adapters.py --write-source-manifest
 python3 -B skills/implement-rfc/scripts/validate_portable_agents.py --source-only
 python3 -B scripts/verify_documentation.py --root .
@@ -101,10 +101,10 @@ The scoped MASK transaction committed all three actions through the approved
 After ASK-0104 resolved the actual Codex tool-output admission contract, the
 current task executed two distinct actual PreToolUse-admitted turns on shared
 candidate `4c0f70c490445780dd8bb5805481d0da326a4bf3`:
-`01a10599-b47c-7992-93e2-5ccd9f1cbde7` (source synchronization) and
-`01a1059e-51fb-78f0-8577-69d546706389` (native build probe). The first turn's
+`REDACTED-SESSION-007` (source synchronization) and
+`REDACTED-SESSION-008` (native build probe). The first turn's
 authorization was cleared before the second. Station `stn-39ef5ffb`, endpoint
-`01a10525-e3fa-7250-85cf-c27f2f84897d`, generation 0, lane-commit authority,
+`REDACTED-SESSION-006`, generation 0, lane-commit authority,
 lease PID 55408 and supervisor PID 7836 remained unchanged. No restart, physical
 intervention or manually seeded admission occurred.
 

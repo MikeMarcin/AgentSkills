@@ -5,13 +5,13 @@
   "producer_id": "/root/personal_qualification_integrator",
   "mandate_revision": "1",
   "selected_source": {
-    "repository": "/Users/jaeger/Documents/GitHub/AgentSkills",
+    "repository": "/Users/EXAMPLE/Documents/GitHub/AgentSkills",
     "branch": "main",
     "qualification_revision": "6c9c611d885926c3cff719a70a85fbb402b9073c",
     "qualification_acceptance_revision": "a3dcc20cedcd41a63712e407ce0a4c99d6f78612"
   },
   "mask_program": {
-    "repository": "/Users/jaeger/Documents/GitHub/ManageAgentSkills",
+    "repository": "/Users/EXAMPLE/Documents/GitHub/ManageAgentSkills",
     "branch": "main",
     "current_revision": "95ac0e88501016c8da137935ac74798f4781e41e",
     "accepted_personal_readiness_source_revision": "78cc57cdac4ea493a3e0ba38ca0e51218af7991a"

@@ -560,7 +560,7 @@
           "command": [
             "python3",
             "-B",
-            "/Users/jaeger/Documents/GitHub/AgentSkills/skills/implement-rfc/examples/milestone-plans/validate.py",
+            "/Users/EXAMPLE/Documents/GitHub/AgentSkills/skills/implement-rfc/examples/milestone-plans/validate.py",
             "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/milestone-plan.json"
           ],
           "exit_code": 0,
@@ -573,7 +573,7 @@
           "command": [
             "python3",
             "-B",
-            "/Users/jaeger/Documents/GitHub/AgentSkills/skills/implement-rfc/examples/milestone-plans/validate.py",
+            "/Users/EXAMPLE/Documents/GitHub/AgentSkills/skills/implement-rfc/examples/milestone-plans/validate.py",
             "/private/var/folders/k7/43dlvy3n3v969dd3_xqz8w4m0000gn/T/agent-skills-rfc-authoring-_ta61t82/tabletop/supplied-resume/drafts/current/milestone-plan.json",
             "--render"
           ],

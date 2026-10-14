@@ -61,7 +61,7 @@ their own bounded qualification; a POSIX quoting example is not a Windows adapte
 ## Scoped aito handoff
 
 The user authorized pausing `rfc-fvi-0054-review-hand-back` and one setup message
-to **Implement RFC-FVI-0054** (`01a0f12c-079d-7240-953a-69dcfeef3a23`). The
+to **Implement RFC-FVI-0054** (`REDACTED-SESSION-005`). The
 automation tool confirmed PAUSED while preserving the saved prompt/schedule.
 On subsequent reconciliation its local automation file was absent; it was not
 recreated. The live review retained its session, protected candidates and saved

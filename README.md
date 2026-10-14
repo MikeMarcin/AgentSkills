@@ -2,9 +2,19 @@
 
 **[Skill catalog](#available-skills) · [Use a skill](#use-the-skills-in-a-project) · [Workflow context](#configure-implement-rfc) · [Author a skill](#author-a-skill) · [Provenance](#provenance-and-current-deployment)**
 
-A private collection of canonical agent skills shared across projects and personal installations. Each skill lives under `skills/<id>/`; projects keep their own requirements and configuration while using directory links to the shared instructions.
+A collection of canonical agent skills shared across projects and personal installations. Each skill lives under `skills/<id>/`; projects keep their own requirements and configuration while using directory links to the shared instructions.
 
 The companion [ManageAgentSkills (MASK) repository](https://github.com/MikeMarcin/ManageAgentSkills) contains the CLI that validates packages, manages personal and project links and performs explicit source updates. This repository contains the skill payloads and their authoring workflow.
+
+## Preview scope
+
+This is a source preview of portable instructions and local helpers. The offline
+checks and disposable MASK installation paths are intended for contributors;
+host-specific loading, optional remote stations and live model experiments have
+separate qualification requirements. RFC-ASK-0012 native-driver acceptance and
+RFC-ASK-0014's real-code experiment remain open. The
+[preview record](docs/development/public-preview.md) names those limits, licensing
+and security-reporting preparation.
 
 ## Available skills
 
@@ -40,6 +50,7 @@ with your own:
 
 ```sh
 mask tap agentskills https://github.com/MikeMarcin/AgentSkills.git --json
+mask tap fetch agentskills --json
 mask search --json
 mask install manage-agent-skills --project /absolute/path/to/project --dry-run --json
 ```
@@ -49,8 +60,8 @@ Review the proposed actions and use the returned `data.plan_hash`:
 ```sh
 mask install manage-agent-skills --project /absolute/path/to/project --approve-plan RETURNED_HASH --json
 mask status --project /absolute/path/to/project --check --json
-# Remove this bundle contribution while retaining separately selected companions:
-mask bundle uninstall agentskills/rfc --project /absolute/path/to/project --dry-run --json
+# Remove this individually selected skill:
+mask uninstall manage-agent-skills --project /absolute/path/to/project --dry-run --json
 ```
 
 `install` and `uninstall` preserve unrelated selections. `register` prepares an
@@ -64,15 +75,9 @@ Use `mask install ID --user --dry-run --json`, followed by the same command with
 `--approve-plan HASH` instead of `--dry-run`, to select personal skills.
 Inspect with `mask list --user --json` and `mask status --user --check --json`.
 
-The initial personal selection is coauthoring, code-simplifier,
-technical-book-humanizer, instamat-image-to-pbr, and manage-agent-skills.
-TRELLIS and concept-art approval are selected by sample_studio; sprite animation is
-selected by SampleAssets. These three are not personal defaults.
-
-Consumer-specific paths and behavior belong in
-`.mask/skill-config/<skill-id>/project.md`. SAMPLE_STUDIO owns its concept-art ExampleScene
-profile. AST owns its SampleCharacter defaults, generator, local validation/build wrapper,
-and complete contributor documentation. Bundled scripts resolve relative to the
+Personal and project selections are explicit; this repository supplies no default
+consumer deployment. Keep consumer-specific paths and behavior in
+`.mask/skill-config/<skill-id>/project.md`. Bundled scripts resolve relative to the
 installed skill, while consumer paths resolve relative to the consumer.
 
 ## Configure implement-rfc
@@ -186,8 +191,13 @@ Do not edit MASK's internal registry or delete a real skill directory to bypass 
 
 ## Provenance and current deployment
 
-AgentSkills, ManageAgentSkills, SampleReview, SampleLogs, SamplePlanner and sample_studio declare implement-rfc, attended-review and wizard through MASK, with distinct consumer context. AgentSkills and MASK also declare manage-agent-skills. Verified original copies remain outside discovery roots in `.mask/bootstrap-retired/`. Generated links, adapters and backups are ignored; skill payloads, declarations and project context are versioned.
+Skill payloads, source declarations and consumer workflow context are versioned.
+Generated links, adapters and backups are ignored. Normal installations use locked
+artifacts; development links are an explicit authoring choice.
 
-See [skill provenance](docs/development/skill-provenance.md), the [dogfood record](docs/development/mask-dogfood.md) and the [retained packet assets](docs/rfcs/assets/mask-v1-2026-09-05/). Repository visibility and inherited-source licensing remain unchanged. Filesystem links and bounded script invocation have been verified; they do not establish that an already-running agent has loaded a skill.
-
-The [selected skill migration record](docs/development/selected-skill-migration-2026-09-05.md) records personal/sample_studio/AST ownership, retained backups, consumer commits, and actual verification.
+See [skill provenance](docs/development/skill-provenance.md) for original imports
+and third-party notices, and [public preview scope](docs/development/public-preview.md)
+for supported checks and pending acceptance. Historical consumer migration records
+remain in `docs/development/`; their deployment facts are not installation defaults.
+Filesystem links and bounded script invocation do not establish that an
+already-running agent has loaded a skill.

@@ -13,7 +13,12 @@ from project_fixtures import CONFIG
 class InstructionPaths(unittest.TestCase):
     def test_plan_first_projection_and_checked_continuation_in_both_hosts(self):
         skill=(ROOT/'SKILL.md').read_text()
-        self.assertLess(skill.index('Before implementation dispatch'),skill.index('**Dispatched:**'))
+        self.assertIn('**only the selected recipe entrypoint**',skill)
+        recipe=(ROOT/'references/strategies/coordinator-integrator.md').read_text()
+        self.assertLess(recipe.index('Before implementation dispatch'),recipe.index('**Dispatched:**'))
+        implementer=(ROOT/'references/strategies/coordinator-implementer.md').read_text()
+        self.assertIn('milestone_checkpoint.py bind/check',implementer)
+        self.assertIn("obligations\nand exits",implementer)
         rules=(ROOT/'references/milestone-plans.md').read_text()
         self.assertIn('same context',rules)
         self.assertIn('Card completion, commits and headings are progress',rules)
@@ -34,11 +39,11 @@ class InstructionPaths(unittest.TestCase):
                     self.assertEqual(roles[name]['delegation']['allowed_roles'],[])
 
     def test_verdicts_go_to_the_integrator_and_resume_has_a_fallback(self):
-        skill=(ROOT/'SKILL.md').read_text()
-        self.assertIn('Record whether this host exposes `SendMessage`',skill)
-        self.assertIn('Do not\nsummarise or interpret the note',skill)
-        self.assertLess(skill.index('A human verdict is engineering input'),skill.index('**Closed:**'))
-        self.assertIn('otherwise dispatch a fresh integrator',skill)
+        recipe=' '.join((ROOT/'references/strategies/coordinator-integrator.md').read_text().split())
+        self.assertIn('Record whether this host exposes `SendMessage`',recipe)
+        self.assertIn('Do not summarise or interpret the note',recipe)
+        self.assertLess(recipe.index('A human verdict is engineering input'),recipe.index('**Closed:**'))
+        self.assertIn('otherwise dispatch a fresh integrator',recipe)
         attendance=(ROOT/'references/attendance.md').read_text()
         self.assertIn('it forwards\nthe session id, the event cursor and the candidate ids',attendance)
         self.assertIn('may delegate to `rfc-worker-deep`',attendance)
@@ -76,12 +81,12 @@ class InstructionPaths(unittest.TestCase):
         self.assertIn('digest identifies',attendance)
 
     def test_progress_relay_is_a_disclosed_wake_budget_not_a_status_loop(self):
-        skill=(ROOT/'SKILL.md').read_text()
-        sentence='For an owner-requested visible run, dispatch the integrator in the background and\narm the trail digest within the wake budget in [Progress relay](references/progress-relay.md).'
-        self.assertIn(sentence,skill)
-        self.assertLess(skill.index(sentence),skill.index('**Return ready:**'))
+        recipe=(ROOT/'references/strategies/coordinator-integrator.md').read_text()
+        sentence='For an owner-requested visible run, dispatch the integrator in the background and\narm the trail digest within the wake budget in [Progress relay](../progress-relay.md).'
+        self.assertIn(sentence,recipe)
+        self.assertLess(recipe.index(sentence),recipe.index('**Return ready:**'))
         self.assertLessEqual(len(sentence.encode('utf-8'))+1,250)
-        self.assertNotIn('progress_trail',skill)  # mechanics stay behind the pointer
+        self.assertNotIn('progress_trail',recipe)  # mechanics stay behind the pointer
         relay=(ROOT/'references/progress-relay.md').read_text()
         for phrase in ('## Wake budget','zero relay wakes','`persistent: true`','`TaskStop`',
                        'Hosts without Monitor (Codex)','--since CURSOR','uses no tool',
@@ -93,7 +98,9 @@ class InstructionPaths(unittest.TestCase):
         self.assertIn('A background integrator can therefore assign slices',compatibility)
 
     def test_all_selected_role_branch_links_resolve(self):
-        selected=['SKILL.md','references/milestone-integration.md',
+        selected=['SKILL.md','references/engineering-contract.md',
+                  'references/strategies/coordinator-implementer.md',
+                  'references/strategies/coordinator-integrator.md','references/milestone-integration.md',
                   'references/delegated-execution.md','references/verification-and-closeout.md',
                   'references/attendance.md','references/model-routing.md','references/progress-relay.md']
         for rel in selected:

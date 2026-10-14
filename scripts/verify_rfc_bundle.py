@@ -64,6 +64,17 @@ def main():
         assert all(row['state'] == 'published' for row in installed['data']['setup']['actions']), installed
         status = mask('status', '--check')
         assert status['data']['healthy']
+        registry_before = (home / 'state.json').read_bytes()
+        for parent in ('.agents/skills', '.claude/skills'):
+            usage = consumer / parent / 'implement-rfc/scripts/usage.py'
+            run = subprocess.run([sys.executable, '-B', str(usage), '--mask-projects',
+                                  '--mask-python-entrypoint', str(program / 'mask.py'),
+                                  '--mask-home', str(home), '--dry-run'], cwd=base,
+                                 env=environment, capture_output=True, text=True, timeout=90)
+            assert run.returncode == 0, (run.stdout, run.stderr)
+            selected = json.loads(run.stdout)['projects']
+            assert len(selected) == 1 and selected[0]['available_now'], selected
+        assert (home / 'state.json').read_bytes() == registry_before
         assert not mask('bundle', 'install', 'agentskills/rfc')['changed']
         mask('install', 'grill-me', '--no-update')  # Preserve a separately selected companion.
         removal = mask('bundle', 'uninstall', 'agentskills/rfc', '--dry-run', '--offline')

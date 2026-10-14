@@ -27,6 +27,15 @@ class ScopeTests(unittest.TestCase):
                         {'device':p.stat().st_dev,'inode':p.stat().st_ino} if p.exists() else {'device':0,'inode':0}}
                     for p in roots]}}
 
+    def current_document(self, roots):
+        legacy = self.document(roots)
+        consumers = []
+        for row in legacy['data']['projects']:
+            consumers.append({key: value for key, value in row.items() if key != 'root_identity'})
+            consumers[-1].update(scope='project', error=None if row['available'] else {'code':'project.unavailable'})
+        return dict(legacy, schema_version=2, command='list', data={
+            'scope':'registered_local_consumers', 'consumers':consumers})
+
     def test_infer_nested_cwd(self):
         self.assertEqual(s.infer_root(self.sub),self.root)
 
@@ -58,7 +67,7 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(scope.records[0]['identity_check'],'mismatch')
 
     def test_mask_envelope_rejections(self):
-        for key,value in [('tool','other'),('schema_version',2),('ok',False),('changed',True),('command','project.register')]:
+        for key,value in [('tool','other'),('schema_version',3),('schema_version',True),('ok',False),('changed',True),('command','project.register')]:
             d=self.document([self.root]); d[key]=value
             with self.assertRaises(ValueError): s.validate_mask(d)
 
@@ -76,10 +85,33 @@ class ScopeTests(unittest.TestCase):
 
     def test_public_mask_subprocess(self):
         program=self.base/'fake_mask.py'
-        program.write_text('import json,sys\nassert sys.argv[1:]==["project","list","--json"]\nprint('+repr(json.dumps(self.document([self.root])))+')\n')
+        program.write_text('import json,sys\nassert sys.argv[1:]==["list","--all","--json"]\nprint('+repr(json.dumps(self.current_document([self.root])))+')\n')
         rows,provenance=s.mask_projects(python_entrypoint=program)
         self.assertEqual(len(rows),1)
         self.assertEqual(provenance['registered_count'],1)
+
+    def test_current_inventory_keeps_projects_and_missing_roots_excluding_personal(self):
+        missing=self.base/'missing'
+        document=self.current_document([self.root,missing])
+        document['data']['consumers'].append(dict(root=str(self.sub), scope='user', available=True))
+        rows=s.validate_mask(document)
+        self.assertEqual(len(rows),2)
+        self.assertEqual(s.ScopedProjects(rows).records[1]['attribution'],'historical_path_unverified')
+
+    def test_current_inventory_excludes_replaced_directory(self):
+        document=self.current_document([self.root])
+        document['data']['consumers'][0].update(available=False, error={'code':'project.identity_changed'})
+        scope=s.ScopedProjects(s.validate_mask(document))
+        self.assertIsNone(scope.match(str(self.root/'a')))
+        self.assertEqual(scope.records[0]['attribution'],'excluded_identity_mismatch')
+
+    def test_current_inventory_refuses_scope_and_unknown_unavailability(self):
+        for change in ('selected','scope','error'):
+            document=self.current_document([self.root])
+            if change=='selected':document['data']['scope']='selected_consumer'
+            elif change=='scope':document['data']['consumers'][0]['scope']='remote'
+            else:document['data']['consumers'][0].update(available=False,error={'code':'unknown'})
+            with self.assertRaises(ValueError):s.validate_mask(document)
 
     def test_mask_failure_does_not_fallback(self):
         program=self.base/'fake_mask.py';program.write_text('raise SystemExit(4)\n')
@@ -134,8 +166,8 @@ class ScopeTests(unittest.TestCase):
 
     def test_mask_home_forwarded(self):
         program = self.base / 'fake_mask.py'
-        argv = ['project', 'list', '--json', '--home', str(self.base)]
-        program.write_text('import json,sys\nassert sys.argv[1:] == ' + repr(argv) + '\nprint(' + repr(json.dumps(self.document([]))) + ')\n')
+        argv = ['list', '--all', '--json', '--home', str(self.base)]
+        program.write_text('import json,sys\nassert sys.argv[1:] == ' + repr(argv) + '\nprint(' + repr(json.dumps(self.current_document([]))) + ')\n')
         rows, _ = s.mask_projects(python_entrypoint=program, home=self.base)
         self.assertEqual(rows, [])
 

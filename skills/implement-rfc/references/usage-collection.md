@@ -11,8 +11,12 @@ The first selects the invocation cwd's nearest declaration inside its Git
 worktree, or the worktree itself. Outside Git, an enclosing `.mask.json` also
 selects a project. The script's installed location does not select scope. No
 implement-rfc board is required. `--mask-projects` reads the public local MASK
-registry once and keeps registrations and worktrees distinct. It does not update
-or deploy skills. Missing MASK refuses without broadening selection.
+registry once through `mask list --all --json` and keeps project registrations
+and worktrees distinct; personal registrations are excluded. Missing directories
+retain unverified historical path attribution. A reported replacement directory
+is excluded from attribution. The legacy v1 registry envelope remains readable,
+but current collection uses MASK's v2 public command. It does not update or deploy
+skills. Missing MASK refuses without broadening selection.
 
 Use `--dry-run` to inspect roots without reading history or writing an archive.
 Use `--mask-python-entrypoint /absolute/path/to/ManageAgentSkills/mask.py` if the

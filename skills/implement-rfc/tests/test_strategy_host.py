@@ -17,8 +17,8 @@ class HostTests(unittest.TestCase):
         child = tomllib.loads(host.render_implementer(selected))
         self.assertEqual((parent['model'], parent['model_reasoning_effort']), ('gpt-5.6-sol', 'low'))
         self.assertEqual(parent['agents'], dict(enabled=True, max_concurrent_threads_per_session=1,
-                                              default_subagent_model='gpt-6-astra', default_subagent_reasoning_effort='xhigh'))
-        self.assertEqual((child['model'], child['model_reasoning_effort']), ('gpt-6-astra', 'xhigh'))
+                                              default_subagent_model='gpt-6.1-sol', default_subagent_reasoning_effort='xhigh'))
+        self.assertEqual((child['model'], child['model_reasoning_effort']), ('gpt-6.1-sol', 'xhigh'))
         self.assertEqual(child['agents'], {'enabled': False})
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / 'coordinator.toml'

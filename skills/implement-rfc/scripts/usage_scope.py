@@ -78,24 +78,32 @@ def label_for(root: Path) -> str:
 
 
 def validate_mask(document: object) -> list[dict]:
-    if not isinstance(document, dict) or document.get('schema_version') != 1 or document.get('tool') != 'mask':
-        raise ValueError('Unsupported MASK JSON envelope; expected schema_version=1, tool=mask')
-    if document.get('command') != 'project.list' or document.get('ok') is not True or document.get('changed') is not False or document.get('error') is not None:
-        raise ValueError('MASK project.list did not return a successful read-only result')
+    if not isinstance(document, dict) or type(document.get('schema_version')) is not int or document.get('schema_version') not in (1, 2) or document.get('tool') != 'mask':
+        raise ValueError('Unsupported MASK JSON envelope; expected version 1 or 2, tool=mask')
+    legacy = document['schema_version'] == 1
+    if document.get('command') != ('project.list' if legacy else 'list') or document.get('ok') is not True or document.get('changed') is not False or document.get('error') is not None:
+        raise ValueError('MASK registry did not return a successful read-only result')
     data = document.get('data')
-    rows = data.get('projects') if isinstance(data, dict) else None
+    rows = data.get('projects' if legacy else 'consumers') if isinstance(data, dict) else None
+    if not legacy and (not isinstance(data, dict) or data.get('scope') != 'registered_local_consumers'):
+        raise ValueError('MASK list must cover registered local consumers')
     if not isinstance(rows, list) or len(rows) > MAX_PROJECTS:
-        raise ValueError('MASK data.projects must be a bounded list')
+        raise ValueError('MASK registry rows must be a bounded list')
     seen = set()
     result = []
     for row in rows:
         if not isinstance(row, dict) or not isinstance(row.get('root'), str) or not Path(row['root']).is_absolute():
             raise ValueError('MASK project row requires an absolute native root')
+        if not legacy:
+            if row.get('scope') not in ('project', 'user'):
+                raise ValueError('MASK consumer requires a known scope')
+            if row['scope'] == 'user':
+                continue  # --mask-projects never expands to personal history.
         if not isinstance(row.get('available'), bool):
             raise ValueError('MASK project row requires an available boolean')
         root = norm(row['root'])
         if root in seen:
-            raise ValueError('Duplicate physical root in MASK project.list')
+            raise ValueError('Duplicate physical root in MASK registry')
         seen.add(root)
         # Do not copy last_manifest, lock contents, sources, URLs or other registry data.
         identity = row.get('root_identity')
@@ -103,7 +111,14 @@ def validate_mask(document: object) -> list[dict]:
             if not isinstance(identity, dict) or any(type(identity.get(k)) is not int or identity[k] < 0 for k in ('device', 'inode')):
                 raise ValueError('Unrecognized MASK root identity')
             identity = {k: identity[k] for k in ('device', 'inode')}
-        result.append({'root': root, 'available': row['available'], 'identity': identity})
+        entry = {'root': root, 'available': row['available'], 'identity': identity}
+        if not legacy and not row['available']:
+            error = row.get('error')
+            code = error.get('code') if isinstance(error, dict) else None
+            if code not in ('project.unavailable', 'project.identity_changed'):
+                raise ValueError('Unrecognized MASK unavailable-root reason')
+            entry['identity_mismatch'] = code == 'project.identity_changed'
+        result.append(entry)
     return result
 
 
@@ -141,7 +156,7 @@ def mask_projects(*, executable: str = 'mask', python_entrypoint: Path | None = 
             command = windows_launcher_argv(launcher.read_text(encoding='utf-8'))
         else:
             command = [resolved]
-    command += ['project', 'list', '--json']
+    command += ['list', '--all', '--json']
     if home is not None:
         command += ['--home', str(home.expanduser().resolve())]
     # Output files avoid unbounded pipe capture; output size is checked before decoding.
@@ -152,7 +167,7 @@ def mask_projects(*, executable: str = 'mask', python_entrypoint: Path | None = 
                                   timeout=timeout, env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
             size = out.tell()
             if proc.returncode:
-                raise ValueError(f'MASK project.list failed (exit {proc.returncode}); no wider fallback was attempted')
+                raise ValueError(f'MASK list --all failed (exit {proc.returncode}); no wider fallback was attempted')
             if size > MAX_MASK_BYTES:
                 raise ValueError('MASK output exceeds the supported limit')
             out.seek(0)
@@ -160,9 +175,9 @@ def mask_projects(*, executable: str = 'mask', python_entrypoint: Path | None = 
     except (OSError, subprocess.TimeoutExpired, ValueError) as error:
         if isinstance(error, ValueError) and str(error).startswith('MASK'):
             raise
-        raise ValueError('MASK project.list failed or returned invalid JSON; no wider fallback was attempted') from None
+        raise ValueError('MASK list --all failed or returned invalid JSON; no wider fallback was attempted') from None
     rows = validate_mask(document)
-    return rows, {'source': 'mask project list --json', 'tool_version': str(document.get('tool_version', 'unknown'))[:60],
+    return rows, {'source': 'mask list --all --json', 'tool_version': str(document.get('tool_version', 'unknown'))[:60],
                   'registry_scope': 'local_machine_projects_only', 'registered_count': len(rows)}
 
 
@@ -198,7 +213,7 @@ class ScopedProjects:
             if label in {n for n, _ in self.primary}:
                 raise ValueError('Different project roots require distinct labels')
             exists = root.is_dir()
-            identity_state = 'not_supplied'
+            identity_state = 'mismatch' if entry.get('identity_mismatch') else 'not_supplied'
             registered = entry.get('identity')
             if registered is not None:
                 try:

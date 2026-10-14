@@ -72,7 +72,7 @@ uses installed coordinator recipe fingerprint
 Canonical source has ASK-0092's newer attendance text and fingerprint
 `sha256:b236a31fbebd1a5d2cca1db05ac16f48fcd011dbc312f2d64c00f72dffbe2b14`.
 Bind/check use the matching installed
-`/Users/jaeger/.agents/skills/implement-rfc/scripts/milestone_checkpoint.py`;
+`/Users/EXAMPLE/.agents/skills/implement-rfc/scripts/milestone_checkpoint.py`;
 candidate tests use canonical source. No installed selection/role was changed.
 
 All deterministic and evaluator commands ended. Temporary test repositories/homes/

@@ -74,24 +74,22 @@ class UsageCliTests(unittest.TestCase):
 
     @unittest.skipUnless(MASK.is_file(), 'Set MASK_TEST_PROGRAM for native registry qualification')
     def test_real_registry_worktree_and_unavailable_root(self):
-        source = self.root / 'AgentSkills'
-        source.mkdir()
-        subprocess.run(['git', 'init', '-q', str(source)], check=True)
-        subprocess.run(['git', '-C', str(source), 'remote', 'add', 'origin', str(self.root/'AgentSkills.git')], check=True)
-        (source / 'skills/example').mkdir(parents=True)
-        (source / 'skills/example/SKILL.md').write_text('---\nname: example\ndescription: Fixture\n---\n')
-        self.mask('init', '--source', source)
+        upstream = self.root / 'AgentSkills.git'
+        subprocess.run(['git', 'init', '-q', '--bare', '-b', 'main', str(upstream)], check=True)
+        self.mask('tap', 'fixture', upstream)
         self.mask('config', 'show')
-        self.mask('source', 'status')
+        self.mask('tap')
         subprocess.run(['git', '-C', str(self.project), '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'base'], check=True)
         worktree = self.root / 'worktree'
         subprocess.run(['git', '-C', str(self.project), 'worktree', 'add', '-qb', 'fixture', str(worktree)], check=True)
         missing = self.root / 'missing'
         missing.mkdir()
         for root in (self.project, worktree, missing):
-            self.mask('project', 'init', '--project', root)
-            self.mask('project', 'register', root)
-            self.mask('project', 'show', '--project', root)
+            if root == missing:
+                subprocess.run(['git', 'init', '-q', str(root)], check=True)
+            preview = self.mask('register', root, '--dry-run')
+            self.mask('register', root, '--approve-plan', preview['data']['plan_hash'])
+            self.mask('list', '--project', root)
         missing.rename(self.root / 'retained-missing')
         result = self.run_usage(SCRIPT, '--mask-projects', '--mask-python-entrypoint', MASK, '--mask-home', self.home, '--dry-run')
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -103,6 +101,13 @@ class UsageCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         with zipfile.ZipFile(output) as archive:
             self.assertEqual(len(json.loads(archive.read('scopes.json'))['projects']), 3)
+        # A new directory at the old path must not acquire the old registration's history.
+        missing.mkdir()
+        result = self.run_usage(SCRIPT, '--mask-projects', '--mask-python-entrypoint', MASK,
+                                '--mask-home', self.home, '--dry-run')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rows = json.loads(result.stdout)['projects']
+        self.assertEqual(sum(row['attribution']=='excluded_identity_mismatch' for row in rows), 1)
 
 
 if __name__ == '__main__':

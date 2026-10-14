@@ -7,7 +7,7 @@
       "revision": "39f02b7c654699e76233b8cfe6f966d915ca74b9",
       "evidence": {
         "kind": "command",
-        "detail": "[\"env\", \"MASK_PROGRAM=/Users/jaeger/Documents/GitHub/ManageAgentSkills\", \"python3\", \"-B\", \"skills/author-rfc/tests/test_portable_handoff.py\"]",
+        "detail": "[\"env\", \"MASK_PROGRAM=/Users/EXAMPLE/Documents/GitHub/ManageAgentSkills\", \"python3\", \"-B\", \"skills/author-rfc/tests/test_portable_handoff.py\"]",
         "exit_code": 0,
         "elapsed_seconds": 10.847,
         "stdout_tail": "",

@@ -16,15 +16,15 @@ repository instructions and current owner mandate govern later work.
 
 ## Observed failure
 
-On 2026-10-03/04, AITO's fresh native-Windows station `aito-main-win` on JaegAW
+On 2026-10-03/04, AITO's fresh native-Windows station `EXAMPLE-WINDOWS-STATION` on EXAMPLE-HOST
 was provisioned with `authority: lane-commit` but refused later authorized file
 work because its bootstrap user message said:
 
 > Do not inspect or modify files. Reply exactly STATION READY.
 
 The current task was resolved from `C:\code\git\aito\.remote-station.json`
-as `01a10525-e3fa-7250-85cf-c27f2f84897d`, reached through the Desktop Remote
-host `remote-control:env_e_6a925c2980dc832da3493cea2cb4d944`. Its response
+as `REDACTED-SESSION-006`, reached through the Desktop Remote
+host `remote-control:EXAMPLE-HOST`. Its response
 treated the unqualified bootstrap sentence as a continuing owner restriction
 and requested a direct owner instruction despite the coordinator's authorized
 work request. The owner clarified: “I did not create a read-only station I dont

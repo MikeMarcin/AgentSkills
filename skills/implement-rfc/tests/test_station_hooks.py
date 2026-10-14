@@ -109,7 +109,7 @@ class StationHookRemovalTests(unittest.TestCase):
                 'hooks', 'off', '--dry-run', '--json'], cwd=root, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             parsed = json.loads(result.stdout)
-            self.assertEqual(Path(parsed['path']), root / '.codex/hooks.json')
+            self.assertEqual(Path(parsed['path']), root.resolve() / '.codex/hooks.json')
             self.assertFalse(parsed['changed'])
 
 

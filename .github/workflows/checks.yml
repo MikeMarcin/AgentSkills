@@ -1,0 +1,46 @@
+name: Source checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Documentation and portable source
+        run: |
+          python -B scripts/verify_documentation.py --root .
+          python -B skills/implement-rfc/scripts/validate_portable_agents.py --source-only
+      - name: Private source preparation scope
+        if: github.event.repository.private
+        run: |
+          echo 'Private preparation: companion repository checks are not run by CI. Run them locally with --mask-program.'
+          python -B scripts/run_tests.py
+      - name: Checkout public MASK companion
+        if: '!github.event.repository.private'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: MikeMarcin/ManageAgentSkills
+          path: .ci-mask
+          persist-credentials: false
+      - name: Public source and integration checks
+        if: '!github.event.repository.private'
+        run: |
+          python -B scripts/run_tests.py --mask-program .ci-mask
+          python -B scripts/verify_mask_examples.py --mask-program .ci-mask
+          python -B scripts/verify_rfc_bundle.py --mask-program .ci-mask
+          python -B scripts/verify_selected_skill_imports.py --mask-program .ci-mask
