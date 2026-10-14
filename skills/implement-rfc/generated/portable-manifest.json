@@ -1,14 +1,6 @@
 {
   "files": [
     {
-      "path": "README.md",
-      "sha256": "2737bf2cece60839971027183cb9d6041ef7921ab2ed02446457c4c7fe2052b2"
-    },
-    {
-      "path": "SKILL.md",
-      "sha256": "b69702e9560a0190f0c62b0215ca7dca8c1351437c8b53363b8f3ec049472676"
-    },
-    {
       "path": "agents/openai.yaml",
       "sha256": "12b40a0311763ccebf45c2d882de6720099375992567c1b3b817be1f9d290f75"
     },
@@ -41,16 +33,16 @@
       "sha256": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065"
     },
     {
+      "path": "examples/milestone-plans/milestone-plan.json",
+      "sha256": "0e3d22c33f730254a78d6e8f036a351ffab01d7948357f273c0879fa717c3784"
+    },
+    {
       "path": "examples/milestone-plans/MILESTONES.md",
       "sha256": "8e6d264656b7facc48e11d82ddfc37f7673312b3c8ce3cc9a72dee47c7fde7bd"
     },
     {
       "path": "examples/milestone-plans/README.md",
       "sha256": "18b41598b577b89fbe9ba699771424c7a6487c9e2014f42bb284d6dde80cc979"
-    },
-    {
-      "path": "examples/milestone-plans/milestone-plan.json",
-      "sha256": "0e3d22c33f730254a78d6e8f036a351ffab01d7948357f273c0879fa717c3784"
     },
     {
       "path": "examples/milestone-plans/validate.py",
@@ -67,6 +59,10 @@
     {
       "path": "mask-workflow.json",
       "sha256": "8a51463e9274b68a95c4f5db33db208dccc8a8a787f616c1ae425aa2205ef5d3"
+    },
+    {
+      "path": "README.md",
+      "sha256": "2f54cb0c1be30ce497f75daa3902719efda18f175b0a8bca2a23af603c513e8d"
     },
     {
       "path": "references/attendance.md",
@@ -142,7 +138,7 @@
     },
     {
       "path": "references/remote-routing.md",
-      "sha256": "ac9cfc2e01f289c61cd7616950b321acc67f919567de5f8395ef2314b97765ce"
+      "sha256": "996ddbd8441637fe45e5e4e7a72a5c50b6a47428faea7cb29a4ee73f203aca39"
     },
     {
       "path": "references/role-adoption.md",
@@ -154,11 +150,11 @@
     },
     {
       "path": "references/runtime-compatibility.md",
-      "sha256": "07bbce3e4d178e857ed06d469d6320a2560fef6d769b455783517efe1675833b"
+      "sha256": "4fd1b1ecd0f9f9715c8a7e2d2ffb937560f57f87c691aa2d808b152151070541"
     },
     {
       "path": "references/station-control.md",
-      "sha256": "9c068ea359c96dc99f9f9d9b09ccc73d3835c214b5bc04e05524c160f492650a"
+      "sha256": "2872cce7144556c7406315234df613501bf5d083e12a57c13332c143d6e083cc"
     },
     {
       "path": "references/strategies/coordinator-implementer.md",
@@ -189,12 +185,12 @@
       "sha256": "166277c1dba4de2c7c202c1b152f27b2e7d4f9058f0bfae42d7c93c38a0f9592"
     },
     {
-      "path": "references/strategy-study/README.md",
-      "sha256": "6c92a8c71b7c6ed531cd540c54b372ae78bf3bfe1886545b42d1fb05f26f08d2"
-    },
-    {
       "path": "references/strategy-study/prompts.md",
       "sha256": "10eac03908dfcdbec2e810b3b3634e65be9306672f55e7597fc907b2828479b4"
+    },
+    {
+      "path": "references/strategy-study/README.md",
+      "sha256": "6c92a8c71b7c6ed531cd540c54b372ae78bf3bfe1886545b42d1fb05f26f08d2"
     },
     {
       "path": "references/strategy-study/readout.md",
@@ -286,7 +282,7 @@
     },
     {
       "path": "scripts/launch_remote_station.py",
-      "sha256": "849083c029cc0dfe5b9eda1d068e1b3640669c64ac673f2d856008dfd2a15c83"
+      "sha256": "11beda19e4ac64a1c1372fad0beecb2f7dc8edb18fe51327eaf6ab6fc26c14d9"
     },
     {
       "path": "scripts/milestone_checkpoint.py",
@@ -354,7 +350,7 @@
     },
     {
       "path": "scripts/remote_station_guard.py",
-      "sha256": "33e04d5e637d69143e502e8070b16b52c25b63e079c22ad4fd47b618b1fa3f99"
+      "sha256": "72a4d646e2e18fe7ea03995655428e453fa5812ab2b0d5526b0052ed2bf1dd45"
     },
     {
       "path": "scripts/render_runtime_adapters.py",
@@ -390,7 +386,11 @@
     },
     {
       "path": "scripts/station_control.py",
-      "sha256": "1a6ab326d617e2a37c292f43f6747bd1a648fd5665788aa73592f7cdc39c620c"
+      "sha256": "fc5ccddcba5858d2d9998de518adb3c998191192f96e27a59798a87a970d7d7f"
+    },
+    {
+      "path": "scripts/station_hooks.py",
+      "sha256": "2e7afcb2036b47f261552c09a224dcd08e17d2994eadaa4e08bdf2dfa5bc6b4d"
     },
     {
       "path": "scripts/station_lease.py",
@@ -453,6 +453,10 @@
       "sha256": "dee945f83fd36fcdea7e2995896ce2b1a4e0c2784b48d445be77ec5079346342"
     },
     {
+      "path": "SKILL.md",
+      "sha256": "b69702e9560a0190f0c62b0215ca7dca8c1351437c8b53363b8f3ec049472676"
+    },
+    {
       "path": "tests/project_fixtures.py",
       "sha256": "ecb0d67da547e9cc8dc50f6a0b5c44e4ab285bb6b21f77d580d1ba96eddafea3"
     },
@@ -490,7 +494,7 @@
     },
     {
       "path": "tests/test_launch_remote_station.py",
-      "sha256": "3772044b515874b656787551332300dc04629a4ea9a227b4fa468a49e1d2b246"
+      "sha256": "6a479ec3d31bcdd76564efe4e3a59324ec083284f182944fcb9dd078d440383e"
     },
     {
       "path": "tests/test_mask_workflow.py",
@@ -574,7 +578,7 @@
     },
     {
       "path": "tests/test_remote_station_guard.py",
-      "sha256": "18053c331c97f4a3932cc4dda71a7d9d3179814490659b55ba230426544aab62"
+      "sha256": "0e6f64a64c31002e0be8424032897ae6e6f1b7da28b7a2603d9a25d08962d824"
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
@@ -614,7 +618,11 @@
     },
     {
       "path": "tests/test_station_control.py",
-      "sha256": "51c98846add00b8d74661ed077ab5ae568dad6aa29076f0e47c750762619101c"
+      "sha256": "be849c220b8032b670f7f40b58db78bd68c28bf0165339c0d7fc04f5bb9ee3cb"
+    },
+    {
+      "path": "tests/test_station_hooks.py",
+      "sha256": "2734b94537fa17a23b3150f46bd3baa3b9018ef6b3d343e3ac9937aa5aba5c3f"
     },
     {
       "path": "tests/test_station_lease.py",
@@ -669,6 +677,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "4af2ddd5f51feb37",
+  "portable_digest": "e71e99a4c7a2850d",
   "schema": "implement-rfc.portable-manifest.v1"
 }

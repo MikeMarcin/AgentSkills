@@ -1,9 +1,52 @@
 # Managed station control
 
-Use this procedure when a hook reports managed or retired station ownership, or
-when the owner requests station status or local takeover. Ordinary unbound local
-chats use the selected execution strategy directly. Hooks remain scoped to managed
-checkouts and their durable retired endpoints.
+Use this procedure for station status, ownership transfer or hook removal.
+Station hooks are inactive by default, including existing hook commands without
+flags. Ordinary authorized chats follow repository instructions and the selected
+execution strategy. The owner removed automatic hook enforcement on 2026-10-11
+because it obstructed ordinary work and MASK recovery.
+
+## Project commands
+
+From the consumer checkout, use its existing station management script:
+
+```sh
+python3 scripts/launch_remote_station.py status
+python3 scripts/launch_remote_station.py status --observe-runtime --json
+python3 scripts/launch_remote_station.py hooks status
+python3 scripts/launch_remote_station.py hooks off --dry-run
+python3 scripts/launch_remote_station.py hooks off
+```
+
+Use `py -3` on Windows. If a project has no wrapper, use the installed skill's
+`scripts/launch_remote_station.py` from the consumer root. `hooks off` removes
+only implement-rfc station commands from `.codex/hooks.json`, preserving unrelated
+hooks and settings. Reload project hooks in the host after removal. Hook inspection
+and removal need neither a valid station binding nor working MASK readiness.
+
+Removing hooks does not stop a writer or transfer ownership. Reconcile actual
+runtime writers before running conflicting work in their checkout. Status reports
+ownership and lease facts; a free lease alone does not prove that runtime stopped.
+Use takeover only to transfer work to another endpoint or local mode:
+
+```sh
+python3 scripts/launch_remote_station.py takeover --json
+```
+
+A direct owner instruction to resume here authorizes the scoped stop and transfer.
+The command supplies the consumer root, local mode and previous-owner stop option.
+If it reports manual stop steps, observe the listed stops before retrying with
+`takeover --confirm-runtime-stopped --json`. That flag records a real human
+observation, never a guess based on a stale record.
+
+## Explicit hook enforcement
+
+Blocking hooks require deliberately adding `--enforce` to the guard invocation.
+The launcher and MASK setup do not install or enable them. This optional mode
+retains endpoint, turn admission and retired-endpoint checks described below;
+those hook fences do not exist when enforcement is disabled. Hooks are not a
+complete security boundary. Human instructions, supervisor leases, Git and board
+validation remain the workflow's authority.
 
 ## Continue the current endpoint
 
@@ -18,7 +61,7 @@ Canonical launchers emit `implement-rfc.remote-station.v2`. The exact former
 identity and authority checks. Compatibility changes no registry bytes, endpoint,
 generation or lease. Other markers carrying a Codex binding remain refused.
 
-### Delegated tool-output turns
+### Delegated tool-output turns with enforcement enabled
 
 Some Codex app versions deliver `send_message_to_thread` as a tool-output item,
 which does not invoke UserPromptSubmit. If that route has no prompt admission,
@@ -60,9 +103,9 @@ recovery; do not delete receipts, seed turn records or relax hooks to continue.
 
 ## Inspect and resume here
 
-A replacement chat can submit prompts, inspect the recorded ownership and perform
-bounded recovery while the old writer is reconciled. Run the helper through the
-installed skill, with the exact consumer root:
+A replacement chat can inspect ownership and perform recovery while the old writer
+is reconciled. The project commands above are preferred. The underlying helper
+remains available for older installed launchers, with the explicit consumer root:
 
 ```sh
 python3 /absolute/consumer/.agents/skills/implement-rfc/scripts/station_control.py status --repo-root /absolute/consumer --json
@@ -82,8 +125,9 @@ stop and transfer. Execute it without asking the owner to repeat that authorizat
 python3 /absolute/consumer/.agents/skills/implement-rfc/scripts/station_control.py takeover --repo-root /absolute/consumer --json --mode local --stop-previous
 ```
 
-The prompt hook provides recovery context; it does not parse prose into mutation
-authority. For guarded replacement tools, use exactly the argument order above.
+The optional prompt hook provides recovery context; it does not parse prose into
+mutation authority. Guarded recovery accepts public launcher commands and helper
+flags in any order.
 Bounded inspection also permits `git -C ROOT status --short`,
 `git -C ROOT diff --no-ext-diff --no-textconv --stat`,
 `git -C ROOT log -5 --oneline`, `git -C ROOT rev-parse HEAD`, and `cat` of up to five
@@ -132,7 +176,7 @@ serializes transfers and launch publication with an OS lock, then acquires the
 supervisor lease before publishing local ownership. Repeated takeover is idempotent;
 interrupted transfers reuse their durable receipts and original obligations.
 
-Local mode permits ordinary new chats. Retired endpoints remain fenced even if the
+With enforcement enabled, local mode permits ordinary new chats. Retired endpoints remain fenced even if the
 station registry is removed or its `codex` field becomes null. Managed identity
 changes refuse recovery; restore the recorded registry rather than erasing state or
 removing locks. Metadata age never removes a lock or retires a writer.
@@ -140,3 +184,12 @@ removing locks. Metadata age never removes a lock or retires a writer.
 To manage the checkout again, launch an explicit fresh runtime context with the
 existing launcher's `--fresh` controls. The new generation retains the old endpoint
 revocations. Old chat history stays available; takeover does not archive it.
+
+If a takeover is still pending, `--fresh` retries it before acquiring the new
+supervisor lease. Recovery retains its original stop obligations and receipts;
+it replaces both retired contexts. When automatic stop proof is unavailable,
+observe the listed runtime and background-command stops, then use
+`scripts/launch_remote_station.py --fresh --confirm-runtime-stopped`. This records
+the same real human observation as the takeover confirmation above. Normal or
+partial-context launches leave a pending transfer in place and name the public
+recovery command.

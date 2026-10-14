@@ -2,6 +2,9 @@
 """Launch this checkout as one named Claude and Codex remote station.
 
 usage: launch_remote_station.py [workstream] [--fresh [codex|claude|both]]
+       launch_remote_station.py status [--json] [--observe-runtime]
+       launch_remote_station.py takeover [--confirm-runtime-stopped] [--json]
+       launch_remote_station.py hooks [status|off] [--dry-run] [--json]
 
 Start or resume automatically, or use --fresh to clear context in enabled
 runtimes. Use --no-claude or --no-codex when one service is unavailable.
@@ -1091,6 +1094,13 @@ def internal_supervisor_arguments(arguments: argparse.Namespace) -> list[str]:
 
 
 def run_under_lease(arguments: argparse.Namespace, context: StationContext) -> int:
+    # Recovery may need to stop the old supervisor and acquire its lease. Do it
+    # before creating our supervisor, which would otherwise stop or block itself.
+    try:
+        recover_pending_takeover(arguments, context)
+    except (ValueError, OSError) as refusal:
+        print(f"station refused: {refusal}", file=sys.stderr)
+        return 2
     command = [
         sys.executable,
         str(station_lease_path(context)),
@@ -1125,6 +1135,33 @@ def run_under_lease(arguments: argparse.Namespace, context: StationContext) -> i
     return completed.returncode
 
 
+def recover_pending_takeover(arguments: argparse.Namespace, context: StationContext) -> None:
+    with lifecycle.locked(context.root):
+        prior = lifecycle.load(context.root)
+        if prior is None or prior['mode'] != 'transferring':
+            return
+        lifecycle.validate(context.root, load_station_file(context.station_file), prior)
+        # A transfer retires both endpoints. Replacing only one would attempt to
+        # activate the other retired context after successfully stopping it.
+        fresh = arguments.fresh_station or (
+            arguments.new_codex_session and arguments.new_claude_session)
+        if not fresh:
+            raise lifecycle.LifecycleError(
+                'A local takeover is pending. Use --fresh to replace both retired '
+                'contexts, or run scripts/launch_remote_station.py takeover --json '
+                'to continue locally.')
+    import station_control
+    print('Fresh station: completing the pending takeover before acquiring the new lease.', flush=True)
+    try:
+        station_control.takeover(
+            context.root, stop_previous=True,
+            confirm_runtime_stopped=arguments.confirm_runtime_stopped)
+    except (ValueError, station_control.guard.GuardRefusal) as error:
+        raise lifecycle.LifecycleError(
+            f'{error}\nAfter observing the listed runtime stops, retry '
+            'scripts/launch_remote_station.py --fresh --confirm-runtime-stopped.') from error
+
+
 def run_legacy_no_server(context: StationContext) -> int:
     existing = load_station_file(context.station_file)
     atomic_write_json(
@@ -1157,6 +1194,7 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
         epilog=(
             "No options needed for normal use: the workstream is inferred and both "
             "sessions resume automatically. Stop with Ctrl+C before restarting. "
+            "Management: status, takeover, hooks status, hooks off --dry-run. "
             "Use --help-all for setup and troubleshooting options."
         ),
     )
@@ -1216,6 +1254,10 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
         help=advanced_help("Claude permission mode; default bypassPermissions avoids unattended prompts"),
     )
     advanced.add_argument(
+        "--confirm-runtime-stopped", action="store_true",
+        help=advanced_help("with --fresh, record your observation that the old station work stopped"),
+    )
+    advanced.add_argument(
         "--fresh-station", action="store_true",
         help=advanced_help("legacy identity reset: discard bindings and inferred machine suffix"),
     )
@@ -1230,6 +1272,10 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
         parser.error("service selection requires normal station mode; omit --no-server")
     parsed.new_codex_session |= not parsed.no_codex and parsed.fresh in ("codex", "both")
     parsed.new_claude_session |= not parsed.no_claude and parsed.fresh in ("claude", "both")
+    if parsed.confirm_runtime_stopped and not (
+        parsed.fresh_station or (parsed.new_codex_session and parsed.new_claude_session)
+    ):
+        parser.error("--confirm-runtime-stopped requires a fresh launch of both contexts")
     if parsed.reattach and parsed.new_claude_session:
         parser.error("cannot request fresh Claude context and require Claude resumption together")
     if parsed.no_server and (parsed.new_codex_session or parsed.new_claude_session):
@@ -1238,6 +1284,21 @@ def parse_arguments(argv: list[str] | None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] in ('status', 'takeover', 'hooks'):
+        if argv[0] == 'hooks':
+            import station_hooks
+            return station_hooks.main(argv[1:])
+        import station_control
+        management = argv[:]
+        if not any(arg == '--repo-root' or arg.startswith('--repo-root=') for arg in management):
+            management += ['--repo-root', str(pathlib.Path.cwd())]
+        if management[0] == 'takeover':
+            if '--mode' not in management and not any(arg.startswith('--mode=') for arg in management):
+                management += ['--mode', 'local']
+            if '--stop-previous' not in management:
+                management += ['--stop-previous']
+        return station_control.main(management)
     arguments = parse_arguments(argv)
     if arguments.fresh_station and arguments.reattach:
         print(

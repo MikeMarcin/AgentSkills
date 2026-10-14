@@ -58,6 +58,33 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.assertIn('owning host', refused.stdout)
         self.assertEqual(lifecycle.load(self.repo)['mode'], 'transferring')
 
+    def test_public_launcher_inspects_without_hidden_root_flags_and_preserves_binding(self):
+        launcher = self.repo / '.agents/skills/implement-rfc/scripts/launch_remote_station.py'
+        before = (self.repo / '.remote-station.json').read_bytes()
+        result = subprocess.run([sys.executable, '-B', str(launcher), 'status', '--json'],
+                                cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        observed = json.loads(result.stdout)
+        self.assertEqual(observed['mode'], 'managed')
+        self.assertTrue(observed['supervisor_lease']['held'])
+        self.assertEqual((self.repo / '.remote-station.json').read_bytes(), before)
+        self.assertIsNone(lifecycle.load(self.repo))
+
+    def test_public_launcher_takeover_keeps_stop_observation_required(self):
+        self.release()
+        self.station['environment'] = 'fixture'
+        self._write_station()
+        launcher = self.repo / '.agents/skills/implement-rfc/scripts/launch_remote_station.py'
+        refused = subprocess.run([sys.executable, '-B', str(launcher), 'takeover', '--json'],
+                                cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(refused.returncode, 75, refused.stdout)
+        self.assertEqual(lifecycle.load(self.repo)['mode'], 'transferring')
+        done = subprocess.run([sys.executable, '-B', str(launcher), 'takeover',
+                               '--confirm-runtime-stopped', '--json'], cwd=self.repo,
+                              capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        self.assertEqual(json.loads(done.stdout)['mode'], 'local')
+
     def test_project_prefixed_registry_preserves_existing_lifecycle_identity(self):
         state = lifecycle.initial(self.repo, self.station)
         lifecycle.save(self.repo, state)
@@ -258,6 +285,71 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
             self.assertEqual(launcher.supervise(arguments(new_codex_session=True), context), 0)
         self.assertEqual(lifecycle.load(self.repo)['mode'], 'managed')
         self.assertIn('retired', self._run_guard(self._event('PreToolUse', tool_name='Write')).stdout)
+
+    def test_fresh_outer_launcher_recovers_interrupted_takeover_before_publication(self):
+        import contextlib
+        import launch_remote_station as launcher
+        from test_launch_remote_station import arguments
+        self.release()
+        original = lifecycle.save
+        def interrupted(root, state):
+            if state['mode'] == 'local':
+                raise OSError('interrupted local publication')
+            original(root, state)
+        with patch.object(lifecycle, 'save', side_effect=interrupted), self.assertRaises(OSError):
+            control.takeover(self.repo, stop_previous=True, runtime_stop_adapter=self.proof)
+        pending = lifecycle.load(self.repo)
+        registry = (self.repo / '.remote-station.json').read_bytes()
+        context = launcher.StationContext(root=self.repo.resolve(), workstream='main', branch='main',
+            name=self.station['station'], environment='macos', authority='lane-commit',
+            lease_role='project-integrator', station_file=self.repo / '.remote-station.json',
+            project_context=project_config.resolve_context(repo_root=self.repo))
+        options = arguments(new_codex_session=True, new_claude_session=True)
+        original_run = subprocess.run
+        def start_new_supervisor(command, **kwargs):
+            if len(command) < 2 or not str(command[1]).endswith('station_lease.py'):
+                return original_run(command, **kwargs)
+            self.assertEqual(lifecycle.load(self.repo)['mode'], 'local')
+            self.assertEqual((self.repo / '.remote-station.json').read_bytes(), registry)
+            with patch.object(launcher, 'provision_codex', return_value=contextlib.nullcontext({
+                'thread_id':'fresh-thread', 'thread_name':self.station['station'], 'cli_version':'0.151.0'})), \
+                    patch.object(launcher, 'run_claude', return_value=0):
+                result = launcher.supervise(options, context)
+            return subprocess.CompletedProcess([], result)
+        with patch.object(launcher.subprocess, 'run', side_effect=start_new_supervisor):
+            self.assertEqual(launcher.run_under_lease(options, context), 0)
+        current = lifecycle.load(self.repo)
+        self.assertEqual(current['mode'], 'managed')
+        self.assertEqual(current['generation'], pending['generation'] + 2)
+        self.assertEqual(current['history'][-1]['transfer']['id'], pending['transfer']['id'])
+        self.assertTrue(lifecycle.retired(current, self.station['codex']['thread_id']))
+
+    def test_takeover_retry_refreshes_negative_supervisor_proof(self):
+        self.release()
+        with patch.object(station_lease, 'stop_supervisor', return_value={'controlled_stop': False}), \
+                patch.object(control, 'runtime_stop', side_effect=lifecycle.LifecycleError('not stopped')), \
+                self.assertRaises(lifecycle.LifecycleError):
+            control.takeover(self.repo, stop_previous=True)
+        pending = lifecycle.load(self.repo)
+        self.assertFalse(pending['transfer']['supervisor_proof']['controlled_stop'])
+        def stop_runtime(root, station, supervisor):
+            self.assertTrue(supervisor['controlled_stop'])
+            return self.proof(station)
+        with patch.object(station_lease, 'stop_supervisor', return_value={'controlled_stop': True}), \
+                patch.object(control, 'runtime_stop', side_effect=stop_runtime):
+            result = control.takeover(self.repo, stop_previous=True)
+        self.assertEqual(result['mode'], 'local')
+        self.assertEqual(lifecycle.load(self.repo)['history'][-1]['transfer']['id'], pending['transfer']['id'])
+
+    def test_negative_retry_with_only_a_free_lease_keeps_stop_unproven(self):
+        self.release()
+        for unused in range(2):
+            with patch.object(control, 'runtime_stop', side_effect=lifecycle.LifecycleError('runtime unproven')), \
+                    self.assertRaises(lifecycle.LifecycleError):
+                control.takeover(self.repo, stop_previous=True)
+        pending = lifecycle.load(self.repo)
+        self.assertFalse(pending['transfer']['supervisor_proof']['controlled_stop'])
+        self.assertIsNone(pending['transfer']['runtime_proof'])
 
 
 class OwnerRuntimeAdapterTests(unittest.TestCase):

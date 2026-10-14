@@ -7,6 +7,7 @@ import importlib.util
 import contextlib
 import io
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,7 @@ except ModuleNotFoundError:  # pragma: no cover - optional dependency
     Draft202012Validator = None
 
 PACK = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PACK / 'scripts'))
 GUARD = PACK / "scripts" / "remote_station_guard.py"
 LEASE = PACK / "scripts" / "station_lease.py"
 PROJECT_CONFIG_MODULE = PACK / "scripts" / "project_config.py"
@@ -381,12 +383,41 @@ done_when: test the station guard
 
     def _run_guard(self, event: dict) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, str(GUARD)],
+            [sys.executable, str(GUARD), '--enforce'],
             input=json.dumps(event),
             capture_output=True,
             text=True,
             check=False,
         )
+
+    def test_default_hooks_are_inactive_even_for_replacement_tools_and_invalid_input(self):
+        for event in (self._event('UserPromptSubmit', prompt=self._envelope()),
+                      self._event('PreToolUse', session_id='replacement', tool_name='Bash',
+                                  tool_input={'command': 'mask repair --json'}),
+                      self._event('Stop'), {'malformed': True}):
+            result = subprocess.run([sys.executable, '-B', str(GUARD)],
+                                    input=json.dumps(event), capture_output=True, text=True)
+            self.assertEqual((result.returncode, result.stdout, result.stderr), (0, '', ''))
+        self.assertFalse((self.repo / '.git/implement-rfc-remote-station-turns').exists())
+        import station_lifecycle
+        self.assertIsNone(station_lifecycle.load(self.repo))
+
+    def test_public_recovery_accepts_flag_order_and_refuses_shell_suffixes(self):
+        import remote_station_guard as guard
+        wrapper = self.repo / 'scripts/launch_remote_station.py'
+        wrapper.parent.mkdir()
+        wrapper.write_text('# fixture project wrapper\n')
+        for args in (['status'], ['status', '--json', '--observe-runtime'],
+                     ['takeover'], ['takeover', '--confirm-runtime-stopped', '--json'],
+                     ['hooks', 'off', '--dry-run', '--json']):
+            command = shlex.join([sys.executable, str(wrapper), *args])
+            self.assertTrue(guard._bounded_recovery_command(self.repo.resolve(), command))
+            self.assertFalse(guard._bounded_recovery_command(self.repo.resolve(), command + '; git reset --hard'))
+        helper = GUARD.with_name('station_control.py')
+        self.assertTrue(guard._bounded_recovery_command(self.repo.resolve(), shlex.join([
+            sys.executable, str(helper), 'status', '--json', '--repo-root', str(self.repo)])))
+        self.assertFalse(guard._bounded_recovery_command(self.repo.resolve(), shlex.join([
+            sys.executable, str(wrapper), 'takeover', '--repo-root', str(self.repo.parent)])))
 
     def test_valid_turn_allows_writer_tools_until_stop(self) -> None:
         accepted = self._run_guard(

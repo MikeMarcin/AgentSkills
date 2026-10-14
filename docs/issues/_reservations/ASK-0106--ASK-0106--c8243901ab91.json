@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0106"
+  ],
+  "reserve_for": "station-fresh-recovery-20261013",
+  "purpose": "",
+  "created": "2026-10-14T05:08:47.681336+00:00",
+  "base": "4bdf12d49f0572e23d5d877b9655d977a4381ee0"
+}

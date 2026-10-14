@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0105"
+  ],
+  "reserve_for": "station-hook-ergonomics-20261011",
+  "purpose": "",
+  "created": "2026-10-12T03:09:43.467680+00:00",
+  "base": "4c0f70c490445780dd8bb5805481d0da326a4bf3"
+}

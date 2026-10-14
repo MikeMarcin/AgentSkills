@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codex hook guard for a checkout bound to a remote station.
+"""Optional Codex station enforcement; inactive unless invoked with --enforce.
 
 Project facts come from the guarded checkout's own
 the consumer .mask/skill-config/implement-rfc/project.json.
@@ -508,8 +508,8 @@ def _handle_prompt(
         _hook_context('UserPromptSubmit',
                       f'Managed station belongs to Codex task {expected_thread}. '
                       'This replacement chat may inspect status and recover it; writes remain deferred. '
-                      'A human instruction to resume here authorizes station_control.py takeover '
-                      '--mode local --stop-previous without another confirmation. Use the exact helper '
+                      'A human instruction to resume here authorizes scripts/launch_remote_station.py takeover '
+                      'without another confirmation. Use the project launcher '
                       'and its reported stop/recovery steps; prompt text itself changes no ownership.')
         return
 
@@ -538,6 +538,40 @@ def _read_only_command_denied(command: str) -> bool:
     return any(pattern.search(command) for pattern in READ_ONLY_DENIED_COMMANDS)
 
 
+def _recovery_arguments(argv, root, public):
+    if not argv or argv[0] not in ('status', 'takeover', 'hooks'):
+        return False
+    operation, rest = argv[0], argv[1:]
+    if operation == 'hooks':
+        if not public:
+            return False
+        if rest and rest[0] in ('status', 'off'):
+            rest = rest[1:]
+    allowed = {'--json', '--repo-root'}
+    if operation == 'status':
+        allowed.add('--observe-runtime')
+    elif operation == 'takeover':
+        allowed |= {'--mode', '--stop-previous', '--confirm-runtime-stopped'}
+    else:
+        allowed.add('--dry-run')
+    seen = set()
+    while rest:
+        flag, rest = rest[0], rest[1:]
+        if flag not in allowed or flag in seen:
+            return False
+        seen.add(flag)
+        if flag in ('--repo-root', '--mode'):
+            if not rest:
+                return False
+            value, rest = rest[0], rest[1:]
+            if flag == '--repo-root' and pathlib.Path(value).resolve() != root:
+                return False
+            if flag == '--mode' and value != 'local':
+                return False
+    return public or ('--repo-root' in seen and (operation == 'status' or
+                       {'--mode', '--stop-previous'} <= seen))
+
+
 def _bounded_recovery_command(root, command):
     try:
         argv = shlex.split(command)
@@ -557,15 +591,18 @@ def _bounded_recovery_command(root, command):
             rest = rest[1:]
         if rest[:1] == ['-B']:
             rest = rest[1:]
-        if not rest or pathlib.Path(rest[0]).resolve() != pathlib.Path(__file__).with_name('station_control.py').resolve():
+        if not rest:
             return False
-        rest = rest[1:]
-        if len(rest) >= 3 and rest[1] == '--repo-root':
-            rest[2] = str(pathlib.Path(rest[2]).resolve())
-        base = ['--repo-root', str(root), '--json']
-        return rest in ([ 'status', *base ], [ 'status', *base, '--observe-runtime' ],
-                        [ 'takeover', *base, '--mode', 'local', '--stop-previous' ],
-                        [ 'takeover', *base, '--mode', 'local', '--stop-previous', '--confirm-runtime-stopped' ])
+        supplied = pathlib.Path(rest[0])
+        supplied = supplied if supplied.is_absolute() else root / supplied
+        script = supplied.resolve()
+        trusted = pathlib.Path(__file__).resolve().parent
+        wrapper = root / 'scripts/launch_remote_station.py'
+        public = script == trusted / 'launch_remote_station.py' or (
+            wrapper.is_file() and not wrapper.is_symlink() and script == wrapper.resolve())
+        if not public and script != trusted / 'station_control.py':
+            return False
+        return _recovery_arguments(rest[1:], root, public)
     if len(argv) >= 3 and argv[:2] == ['git', '-C'] and pathlib.Path(argv[2]).resolve() == root:
         return argv[3:] in (['status', '--short'], ['diff', '--no-ext-diff', '--no-textconv', '--stat'],
                             ['log', '-5', '--oneline'], ['rev-parse', 'HEAD'])
@@ -586,7 +623,10 @@ def _replacement_tool(root, event, detail):
     command = str(tool_input.get('command', tool_input.get('cmd', ''))) if isinstance(tool_input, dict) else ''
     if event.get('tool_name') == 'Bash' and _bounded_recovery_command(root, command):
         return
-    _deny_tool(detail + ' Use exact station_control.py status/takeover or bounded Git inspection; defer other writes.')
+    _deny_tool(detail + ' Station enforcement is explicitly enabled. '
+               'Use scripts/launch_remote_station.py status to inspect, '
+               'takeover to transfer ownership, or hooks off to remove station hooks. '
+               'Removing hooks does not stop the previous writer.')
 
 
 def _handle_tool(
@@ -635,6 +675,11 @@ def _handle_tool(
 
 
 def main() -> int:
+    # Old project configurations call this with no flags. Leave them inert so
+    # ordinary chats and MASK repairs cannot be trapped by stale station state.
+    # Deliberately guarded stations must opt in at the hook command itself.
+    if sys.argv[1:] != ['--enforce']:
+        return 0
     try:
         event = json.load(sys.stdin)
     except (json.JSONDecodeError, OSError):
