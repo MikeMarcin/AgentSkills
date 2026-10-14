@@ -90,7 +90,7 @@ are retained in merge `e93d84d`. Remote ASK-0105 keeps the optional station-hook
 card; the local frontend-design card was remapped to reserved ASK-0107. Original
 reservation receipts and source acceptance revisions remain as provenance, with
 the collision resolution annotated. ASK-0108 tracks this bounded preparation.
-[ASK-0109](../issues/30-in-progress/ASK-0109-finalize-public-preview-documentation.md)
+[ASK-0109](../issues/60-done/ASK-0109-finalize-public-preview-documentation.md)
 tracks the final reporting correction and cross-repository reconciliation while
 ASK-0108 retains the owner license decision. The pre-existing consumer lockfile
 edit is excluded from preparation commits.
