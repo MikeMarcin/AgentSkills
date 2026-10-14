@@ -1,2 +1,4 @@
-# Runtime helpers use the Python standard library. Schema tests require this.
+# Workflow helper tests use the standard library plus schema validation.
 jsonschema>=4.18,<5
+# The sprite validator creates and inspects disposable image fixtures.
+Pillow>=10,<13

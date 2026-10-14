@@ -21,6 +21,7 @@ python3 -m venv .venv
 ```
 
 On Windows, use `.venv\Scripts\python.exe` in place of `.venv/bin/python`.
+The dependency file supplies jsonschema and Pillow for schema and image fixtures.
 The test driver requires jsonschema so schema validation cannot disappear behind
 dependency skips. Native platform tests still skip where the platform is unavailable.
 These checks launch no models and use disposable fixture roots.
