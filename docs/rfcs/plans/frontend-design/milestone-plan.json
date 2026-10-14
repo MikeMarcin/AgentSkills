@@ -3,7 +3,7 @@
   "id": "frontend-design",
   "scope": {
     "issues": [
-      "ASK-0105"
+      "ASK-0107"
     ]
   },
   "milestones": [
@@ -12,12 +12,12 @@
       "outcome": "An original portable frontend design skill covers web, mobile and desktop and is available in the source catalog.",
       "work": [
         {
-          "issue": "ASK-0105"
+          "issue": "ASK-0107"
         }
       ],
       "depends_on": [],
       "exit_criteria": [
-        "The skill and platform references satisfy AC1 through AC4 of ASK-0105, including the user amendment to include no upstream files or license."
+        "The skill and platform references satisfy AC1 through AC4 of ASK-0107, including the user amendment to include no upstream files or license."
       ],
       "boundary": "Source package, catalog and provenance, focused validation, and direct local closeout."
     }

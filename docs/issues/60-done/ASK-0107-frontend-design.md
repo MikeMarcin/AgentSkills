@@ -1,6 +1,6 @@
 ---
 schema: implement-rfc.card.v1
-id: ASK-0105
+id: ASK-0107
 title: Create frontend design for web, mobile and desktop
 status: "Done"
 rfcs: []
@@ -60,3 +60,10 @@ The initial adaptation's fixture results were superseded by the original package
 checks after the user amendment. Its second fixture install had refused a stale
 preview after the first install changed shared fixture state. Final verification
 previewed and applied each consumer sequentially and passed.
+
+## Live ID reconciliation
+
+Originally allocated as ASK-0105 on the local frontend-design branch. The fetched
+main independently used ASK-0105 for optional station hooks. Reserved ASK-0107
+now identifies this card; the original commits and acceptance revisions remain
+unchanged. The remote station card retains ASK-0105.

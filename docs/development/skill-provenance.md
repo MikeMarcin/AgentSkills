@@ -62,7 +62,7 @@ upstream edits are part of this source import.
 
 ## Frontend design
 
-On 2026-10-04, ASK-0105 added the original `skills/frontend-design` package. The
+On 2026-10-04, ASK-0107 added the original `skills/frontend-design` package. The
 user supplied Anthropic's locally installed frontend-design skill as inspiration,
 then clarified that the new skill should use original instructions rather than
 copy upstream content or include its license. No upstream files are included.
