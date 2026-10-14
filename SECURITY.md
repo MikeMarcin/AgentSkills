@@ -21,6 +21,7 @@ details, check the repository's
 [Security page](https://github.com/MikeMarcin/AgentSkills/security) for a private
 reporting option. If it is unavailable, open an issue containing only a request for
 a private contact channel. Include affected paths, candidate revision and a
-sanitized description; share credentials and exploit details only after a private
-channel is established. Enabling GitHub's private reporting remains a maintainer
-step when the repository becomes public.
+sanitized description. Share sanitized reproduction details only after a private
+channel is established. Never send live credentials through any channel.
+Enabling GitHub's private reporting remains a maintainer step when the repository
+becomes public.

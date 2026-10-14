@@ -1,10 +1,11 @@
 # Public source preview
 
 This preparation covers the canonical skill library, local helper code, contributor
-checks and documented MASK installation paths. It does not change repository
-visibility or install into real consumers. An ordinary push of the checked private AgentSkills candidate is authorized so
-CI can run during the companion milestone. Final cross-repository acceptance,
-license adoption and the public switch remain coordinator obligations.
+checks and documented MASK installation paths. The technical preparation is
+committed and pushed in AgentSkills and ManageAgentSkills, with local companion
+integration evidence recorded. Repository-wide license selection and adoption
+remain pending. Repository visibility is a separate owner action after those
+decisions; this preparation has not changed visibility or installed real consumers.
 
 The library has no stable release/support matrix. Optional remote stations,
 provider routes, native driver loading and model experiments are experimental.
@@ -34,11 +35,20 @@ checks select a local ManageAgentSkills checkout explicitly and use disposable
 projects and local bare remotes. They do not edit a real registry, contact hosted
 models or exercise a live consumer migration.
 
-CI runs the self-contained Linux/Python 3.11 checks while this repository is
-private. Once public, its workflow requires the public MASK checkout and the
-composed CLI/bundle/import checks. A dependency checkout failure is a failure,
-not an undisclosed skip. The initial GitHub run and unavailable native-platform
-acceptance are distinct from local verification evidence.
+Private CI runs the self-contained Linux/Python 3.11 checks. Local checks already
+exercise the real MASK CLI, bundle and selected-import paths through disposable
+consumers. Once public, CI requires the public MASK checkout and those composed
+checks; a dependency checkout failure fails the job. Private CI, local companion
+evidence and post-switch public CI establish separate results. None closes the
+unavailable native-platform acceptance.
+
+After **both** repositories are public, the owner must manually dispatch each
+repository's **Source checks** workflow on `main`: AgentSkills
+[checks.yml](../../.github/workflows/checks.yml) and ManageAgentSkills
+[verify.yml](https://github.com/MikeMarcin/ManageAgentSkills/blob/main/.github/workflows/verify.yml).
+Visibility changes alone do not trigger the configured `push`, `pull_request` or
+`workflow_dispatch` events. Confirm both new public runs pass their required
+companion checkout and integration steps before recording public CI acceptance.
 
 ## Privacy and evidence
 
@@ -55,9 +65,11 @@ recorded inputs; privacy editing does not recertify those old runs. Exact curren
 execution checkpoints remain in ignored/private runtime storage.
 
 Immutable imported packets and Git history were preserved. Current cleanup does
-not erase earlier metadata from commits or retained archives. The final release
-audit reports remaining historical exposure separately; no history rewriting is
-authorized by this source preparation.
+not erase earlier metadata from commits or retained archives. The companion
+ManageAgentSkills checkout retains personal path metadata in immutable packet
+files. The final preparation audit distinguishes those tracked files from historical exposure; source scans
+are evidence within their rules, not a guarantee that all private metadata or
+credentials are absent. No history rewriting is authorized by this preparation.
 
 The [provenance record](skill-provenance.md) identifies imports and known adapted
 sources. Author-rfc, grill-rfc and grill-me retain Matt Pocock's MIT licenses;
@@ -75,4 +87,7 @@ are retained in merge `e93d84d`. Remote ASK-0105 keeps the optional station-hook
 card; the local frontend-design card was remapped to reserved ASK-0107. Original
 reservation receipts and source acceptance revisions remain as provenance, with
 the collision resolution annotated. ASK-0108 tracks this bounded preparation.
-The pre-existing consumer lockfile edit is excluded from preparation commits.
+[ASK-0109](../issues/30-in-progress/ASK-0109-finalize-public-preview-documentation.md)
+tracks the final reporting correction and cross-repository reconciliation while
+ASK-0108 retains the owner license decision. The pre-existing consumer lockfile
+edit is excluded from preparation commits.
