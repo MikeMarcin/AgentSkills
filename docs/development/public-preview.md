@@ -67,7 +67,8 @@ execution checkpoints remain in ignored/private runtime storage.
 Immutable imported packets and Git history were preserved. Current cleanup does
 not erase earlier metadata from commits or retained archives. The companion
 ManageAgentSkills checkout retains personal path metadata in immutable packet
-files. The final preparation audit distinguishes those tracked files from historical exposure; source scans
+files. The final preparation audit distinguishes those tracked files from
+historical exposure; source scans
 are evidence within their rules, not a guarantee that all private metadata or
 credentials are absent. No history rewriting is authorized by this preparation.
 
@@ -79,6 +80,8 @@ repository must preserve these notices and the recorded origin of older imports.
 
 Current bounded results are recorded in
 [public-source preparation verification](public-source-preparation-verification.json).
+The [final preparation record](public-source-finalization.md) binds M3 reporting,
+the companion CI correction and retained privacy/acceptance limits.
 
 ## Reconciliation
 
