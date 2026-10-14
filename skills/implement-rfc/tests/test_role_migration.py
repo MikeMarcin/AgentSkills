@@ -12,7 +12,7 @@ from test_render_runtime_adapters import VALIDATOR_MODULE, ROUTING, PROJECT
 renderer = VALIDATOR_MODULE.renderer
 
 
-class RoleMigrationTests(unittest.TestCase):
+class RoleMigrationTests(adapter_tests.MaskPathsFixture, unittest.TestCase):
     run_renderer = adapter_tests.RenderRuntimeAdaptersTests.run_renderer
 
     def legacy(self, root):

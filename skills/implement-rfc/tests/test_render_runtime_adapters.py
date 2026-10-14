@@ -31,7 +31,8 @@ VALIDATOR_MODULE = importlib.util.module_from_spec(VALIDATOR_SPEC)
 VALIDATOR_SPEC.loader.exec_module(VALIDATOR_MODULE)
 
 
-class RenderRuntimeAdaptersTests(unittest.TestCase):
+class MaskPathsFixture:
+    """Unit fixtures advertise MASK-owned paths without an installed companion."""
     def setUp(self):
         from unittest.mock import patch
         self.mask_temp = tempfile.TemporaryDirectory()
@@ -47,6 +48,8 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
         value = dict(data=dict(workflow=dict(paths=dict(native_role_lock=canonical, retired_native_role_locks=retired))))
         self.mask_stub.write_text('import json, sys\nassert sys.argv[1:] == ["capabilities", "--json"]\nprint(' + repr(json.dumps(value)) + ')\n')
 
+
+class RenderRuntimeAdaptersTests(MaskPathsFixture, unittest.TestCase):
     def run_renderer(self, repo_root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
         if not (repo_root / ".git").exists():
             init_repo(repo_root)
@@ -400,7 +403,7 @@ class RenderRuntimeAdaptersTests(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-class ProfileTests(unittest.TestCase):
+class ProfileTests(MaskPathsFixture, unittest.TestCase):
     def test_explicit_override_is_capability_checked(self):
         import render_runtime_adapters as renderer
         roles = renderer.load_json(SKILL_DIR / 'config/roles.json')['roles']
@@ -463,8 +466,9 @@ class ProfileTests(unittest.TestCase):
                                       approval=approval, attempt=2)
 
 
-class IntegratorRoutingTests(unittest.TestCase):
+class IntegratorRoutingTests(MaskPathsFixture, unittest.TestCase):
     def setUp(self):
+        super().setUp()
         self.renderer = VALIDATOR_MODULE.renderer
         self.roles = self.renderer.validate_roles(self.renderer.load_json(SKILL_DIR / 'config/roles.json'))
         self.profiles = {'schema': 'implement-rfc.routing-profiles.v1', 'profiles': {'baseline': {}}}
