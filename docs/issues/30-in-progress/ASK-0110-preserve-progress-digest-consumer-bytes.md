@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0110"
 title: "Preserve every consumer byte during the read-only progress digest"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"mandate":"public-prep-final-reconciliation-v1","baseline":"652e528ff87b82fe5e227d7b6c6e199336c2a4db","failed_ci":"38532937786","milestone_plan":{"id":"public-source-progress-repair","path":"docs/rfcs/plans/public-source-progress-repair/milestone-plan.json"}}
