@@ -1,0 +1,28 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "public-source-preparation",
+  "scope": {
+    "issues": [
+      "ASK-0108"
+    ]
+  },
+  "coverage": "complete",
+  "unplanned_work": [],
+  "milestones": [
+    {
+      "id": "agentskills-preview",
+      "outcome": "Reconciled AgentSkills source is ready for a public preview within its documented acceptance limits.",
+      "work": [
+        {
+          "issue": "ASK-0108"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "AC1 through AC5 of ASK-0108 have direct evidence; pending owner licensing or publication decisions remain explicit.",
+        "Owned commands are stopped, unrelated lock bytes preserved, and candidate commits plus next coordinator action are recorded."
+      ],
+      "boundary": "AgentSkills main source, documentation, tests, CI and live preparation records; final aggregate verification/push belongs to the coordinator."
+    }
+  ]
+}
