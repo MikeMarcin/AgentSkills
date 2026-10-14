@@ -2,11 +2,10 @@
 schema: implement-rfc.card.v1
 id: ASK-0108
 title: Prepare reconciled AgentSkills for public source preview
-status: "Parked"
+status: "Ready"
 rfcs: []
 depends_on: []
 metadata: {"milestone_plan":{"id":"public-source-preparation","path":"docs/rfcs/plans/public-source-preparation/milestone-plan.json"}}
-parked_on: "human-review"
 acceptance: [{"criterion":"AC1","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC2","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC3","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC4","outcome":"pending","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"docs/development/public-source-preparation-verification.json; AC4 privacy/provenance complete, repository license selection/adoption pending."}},{"criterion":"AC5","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}}]
 ---
 
