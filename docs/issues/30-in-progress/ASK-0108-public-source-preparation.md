@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0108
 title: Prepare reconciled AgentSkills for public source preview
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"milestone_plan":{"id":"public-source-preparation","path":"docs/rfcs/plans/public-source-preparation/milestone-plan.json"}}
