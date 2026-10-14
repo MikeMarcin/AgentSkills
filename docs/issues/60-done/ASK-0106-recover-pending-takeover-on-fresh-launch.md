@@ -2,9 +2,10 @@
 schema: implement-rfc.card.v1
 id: ASK-0106
 title: Recover pending takeover before acquiring a fresh station lease
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
+acceptance: [{"criterion":"AC1","evidence":{"kind":"command","detail":"Launcher checks and composed interrupted-transfer fixture verify recovery before lease, endpoint retirement, identity mismatch and refusal without stop proof."},"outcome":"pass","revision":"70d04b19d79b9fc82e8fd233923266c4fa5dafa2"},{"criterion":"AC2","evidence":{"kind":"command","detail":"Focused retry tests refresh negative supervisor proof and preserve transfer identity; free leases leave runtime proof null. Durable interrupted-transfer tests pass."},"outcome":"pass","revision":"70d04b19d79b9fc82e8fd233923266c4fa5dafa2"},{"criterion":"AC3","evidence":{"kind":"command","detail":"WSL launcher 68 and takeover 51 tests pass. Windows launcher 68 pass; initial takeover harness recursion corrected and all three new regressions pass. Existing checks pass, one POSIX test skipped on Windows. Portable validation, manifest and documentation gate pass."},"outcome":"pass","revision":"70d04b19d79b9fc82e8fd233923266c4fa5dafa2"},{"criterion":"AC4","evidence":{"kind":"observation","detail":"With owner stop confirmation, actual WSL public takeover cleared pending state; public --fresh reached Codex ready and Claude Connected. Status: managed generation4, pending null, intended station supervisor lease held. Installed payload remains 4bdf12d; source deployment not claimed."},"outcome":"pass","revision":"70d04b19d79b9fc82e8fd233923266c4fa5dafa2"}]
 ---
 
 # Recover pending takeover before acquiring a fresh station lease
