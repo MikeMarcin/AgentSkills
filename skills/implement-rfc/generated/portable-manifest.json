@@ -458,7 +458,7 @@
     },
     {
       "path": "tests/project_fixtures.py",
-      "sha256": "ecb0d67da547e9cc8dc50f6a0b5c44e4ab285bb6b21f77d580d1ba96eddafea3"
+      "sha256": "7af10cd326600db6946babd1f702b9aa3a8deb6de3b56da98dcaff93bca2e04e"
     },
     {
       "path": "tests/test_audit_board.py",
@@ -566,7 +566,7 @@
     },
     {
       "path": "tests/test_progress_trail.py",
-      "sha256": "bdf180003dd1829830e1559eee8a35317b7831a5de343ab50ffc04797a4088bd"
+      "sha256": "69d7bbb3c3ddf0d7f3666ddb2aced8716cebcef935c596101643e378823e12f4"
     },
     {
       "path": "tests/test_project_config.py",
@@ -677,6 +677,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "79ad743c3406b41a",
+  "portable_digest": "27799b3cab107de6",
   "schema": "implement-rfc.portable-manifest.v1"
 }
