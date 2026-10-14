@@ -1,0 +1,28 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "public-source-progress-repair",
+  "scope": {
+    "issues": [
+      "ASK-0110"
+    ]
+  },
+  "coverage": "complete",
+  "unplanned_work": [],
+  "milestones": [
+    {
+      "id": "m3-progress-repair",
+      "outcome": "The one-shot progress digest preserves all linked-consumer bytes with a diagnosed cause and deterministic regression coverage.",
+      "work": [
+        {
+          "issue": "ASK-0110"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "ASK-0110 AC1 through AC3 have direct evidence, without removing whole-tree preservation assertions or native/human limitations.",
+        "The exact correction is ordinarily pushed and source checks/scans/command ownership are recorded before M3 writer release."
+      ],
+      "boundary": "The named M3 progress-digest CI failure and its focused correction/closeout only; no model experiment, real consumer deployment, visibility/access or unanswered license adoption."
+    }
+  ]
+}
