@@ -34,7 +34,9 @@ def tree_digest(root: Path) -> str:
 class ProgressTrailTests(unittest.TestCase):
     def consumer(self, base: Path, token: str, config: dict | None):
         root = base / token
-        facts = init_repo(root, token=token)
+        # Detached maintenance can remove its lock after a fixture commit returns.
+        # Keep fixture writers quiescent across the whole-tree preservation checks.
+        facts = init_repo(root, token=token, auto_maintenance=False)
         if config is not None:
             facts = write_context(root, config=config)
             git(root, "add", ".mask")

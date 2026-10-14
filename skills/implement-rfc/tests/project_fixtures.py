@@ -57,9 +57,11 @@ def git(root: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
-def init_repo(root: Path, *, token: str = "fixture") -> dict:
+def init_repo(root: Path, *, token: str = "fixture", auto_maintenance: bool = True) -> dict:
     root.mkdir(parents=True, exist_ok=True)
     git(root, "init", "-b", "main")
+    if not auto_maintenance:
+        git(root, "config", "maintenance.auto", "false")
     git(root, "config", "user.name", "fixture")
     git(root, "config", "user.email", "fixture@example.invalid")
     facts = write_context(root, token=token)
