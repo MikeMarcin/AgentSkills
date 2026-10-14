@@ -1,3 +1,26 @@
+# Skill provenance and licensing
+
+On 2026-10-14 the owner adopted the root [MIT License](../../LICENSE) for original
+contributions to AgentSkills and ManageAgentSkills. That grant covers this
+library's original instructions, helpers and documentation; it does not replace
+third-party copyright or license notices or change the origin of retained imports.
+
+Author-rfc, grill-rfc and grill-me retain Matt Pocock's complete MIT notice in
+their package `LICENSE` files. Writing-for-agents retains the complete upstream
+notice in its package [README](../../skills/writing-for-agents/README.md).
+Those files and retained reference notices remain byte-identical at adoption.
+Preserve the applicable notices when copying or distributing adapted content.
+Each skill package also carries the complete original-contribution MIT notice,
+so an individual MASK installation retains it. For author-rfc, grill-rfc and
+grill-me it is named `LICENSE.original`, alongside the unchanged upstream
+`LICENSE`; other packages use `LICENSE`. Writing-for-agents retains its upstream
+notice separately in the unchanged package README.
+Historical seed and import records below continue to describe their original
+sources and verification; the root license is not a new verification of those
+upstream rights or an alteration of their provenance.
+
+## Original workflow import
+
 implement-rfc imported unchanged from supplied SRV portable archive. Original archive SHA-256: 1043f25111969b1270870b566a705f22e6f6cb253d1a4ff0de3a0c2461cc4a90. All 39 retained source files compared byte-for-byte to the supplied clean seed. See docs/rfcs/assets/mask-v1-2026-09-05/SEED-PROVENANCE.json. This import precedes shared-consumer adaptation.
 
 On 2026-09-05, ASK-0007 refreshed the canonical skill from the local

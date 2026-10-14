@@ -1,6 +1,10 @@
 {
   "files": [
     {
+      "path": "LICENSE",
+      "sha256": "fd359e0880c5abf44da78e805b6219d84793944859b8ae80341238facb3eaddb"
+    },
+    {
       "path": "README.md",
       "sha256": "2f54cb0c1be30ce497f75daa3902719efda18f175b0a8bca2a23af603c513e8d"
     },
@@ -677,6 +681,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "27799b3cab107de6",
+  "portable_digest": "f1685314ae5ac2da",
   "schema": "implement-rfc.portable-manifest.v1"
 }

@@ -6,6 +6,10 @@ Do not treat a detailed RFC packet as completed work. Record actual baseline/int
 
 Use existing Git authentication and avoid adding credentials to skills, config, output or logs. Public projects must keep their contributor contract readable without access to private skill content.
 
+Original contributions use the repository's [MIT License](LICENSE). Preserve
+third-party copyright and license notices and record adapted sources in
+[skill provenance](docs/development/skill-provenance.md).
+
 When changing shared skill content, edit the canonical AgentSkills source through ordinary Git, not a per-project copy. MASK deploys links and has no automatic commit/push or writeback synchronization. Bootstrap and retired-copy provenance remain in `docs/development/`; active deployment uses MASK.
 
 ## Local checks

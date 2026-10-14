@@ -1,5 +1,9 @@
 # Final public-source preparation evidence
 
+The M3 record below preserves its original licensing wait and verification history.
+The owner subsequently chose MIT; [M4 adoption](#m4-mit-adoption) supersedes that
+wait. Native and post-visibility public CI boundaries remain open.
+
 M3 / ASK-0109 and ASK-0110, mandate
 `public-prep-final-reconciliation-v1`, coordinator-implementer recipe revision 2.
 This records the technical follow-up to [M1 evidence](public-source-preparation-verification.json),
@@ -118,3 +122,31 @@ Final ordinary pushes, exact remote revisions, engineering command quiescence an
 writer release are recorded in the coordinator's durable M3 handoff. Repository
 visibility/access and the existing coordinator-owned license review server remain
 separate owner resources.
+
+## M4 MIT adoption
+
+On 2026-10-14 the owner selected MIT for original code, skills and documentation
+in both repositories. Mandate `public-prep-mit-adoption-v1` authorizes adoption
+and ordinary main pushes. The [root MIT license](../../LICENSE) implements that
+choice; [skill provenance](skill-provenance.md) defines the original/third-party
+scope. Existing package and retained reference notices are preserved byte for
+byte, including writing-for-agents' README notice.
+
+MASK's individual-package distribution excludes the repository root. All 18
+packages therefore carry the original-contribution MIT notice: `LICENSE` where
+none existed, and `LICENSE.original` beside the three unchanged upstream license
+files. Only the implement-rfc portable manifest is regenerated for the added file.
+No executable implementation, test assertion or consumer declaration changed.
+
+Accepted input `2d334e676654ef16a0790267e75e06da3ddadc37` passed exact private CI
+[38535602545](https://github.com/MikeMarcin/AgentSkills/actions/runs/38535602545):
+736 cases, five skips, zero failures. That runtime evidence remains applicable
+to unchanged code. Focused M4 checks and final source/push identities are recorded
+with ASK-0108's closeout and the coordinator handoff. Earlier M1/M3 pending-license
+statements remain historical observations rather than current readiness claims.
+
+The licensing wait is resolved. Visibility and private security-reporting activation
+remain owner actions; after both repositories are public, manually dispatch both
+Source checks workflows and confirm their public companion steps. Open native,
+model-experiment and visible-run cards are unaffected. The unrelated lock edit
+retains the SHA-256 recorded above. No real deployment repair is part of adoption.

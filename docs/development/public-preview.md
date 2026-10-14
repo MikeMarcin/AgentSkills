@@ -3,9 +3,10 @@
 This preparation covers the canonical skill library, local helper code, contributor
 checks and documented MASK installation paths. The technical preparation is
 committed and pushed in AgentSkills and ManageAgentSkills, with local companion
-integration evidence recorded. Repository-wide license selection and adoption
-remain pending. Repository visibility is a separate owner action after those
-decisions; this preparation has not changed visibility or installed real consumers.
+integration evidence recorded. The owner adopted MIT for original contributions
+in both repositories on 2026-10-14; existing third-party notices remain intact.
+Repository visibility is a separate owner action; this preparation has not
+changed visibility or installed real consumers.
 
 The library has no stable release/support matrix. Optional remote stations,
 provider routes, native driver loading and model experiments are experimental.
@@ -20,7 +21,7 @@ policy enforcement, model loading, overnight reliability or subscription savings
 | [RFC-ASK-0014](../rfcs/RFC-ASK-0014-selectable-execution-strategies.md) | Implementing. M1–M3 have recorded acceptance; M4's owner-selected real matched block remains unrun. [ASK-0087](../issues/10-backlog/ASK-0087-close-execution-strategies.md) remains open. |
 | [ASK-0073](../issues/30-in-progress/ASK-0073-coordinator-progress-relay.md) | The real visible-run observation is still required; public preparation does not claim it. |
 | [ASK-0102](../issues/20-ready/ASK-0102-scope-station-bootstrap-prompt-to-one-turn.md) | Bootstrap instruction correction remains Ready and outside this preparation slice. |
-| Repository license | Owner selection is pending. No repository-wide license is silently granted by this preparation. Existing third-party notices remain. |
+| Repository license | MIT adopted for original contributions on 2026-10-14. The [root license](../../LICENSE) and [provenance scope](skill-provenance.md) preserve third-party terms and notices. |
 | Private security reporting | Not enabled. [SECURITY.md](../../SECURITY.md) describes the available reporting path and public activation step. |
 
 These limits are compatible with a source preview when disclosed; they are not
@@ -75,8 +76,8 @@ credentials are absent. No history rewriting is authorized by this preparation.
 The [provenance record](skill-provenance.md) identifies imports and known adapted
 sources. Author-rfc, grill-rfc and grill-me retain Matt Pocock's MIT licenses;
 writing-for-agents retains the complete notice in its package README. The original
-frontend-design package contains no upstream payload. License selection for this
-repository must preserve these notices and the recorded origin of older imports.
+frontend-design package contains no upstream payload. The adopted root MIT license
+preserves these notices and the recorded origin of older imports.
 
 Current bounded results are recorded in
 [public-source preparation verification](public-source-preparation-verification.json).
@@ -92,5 +93,5 @@ reservation receipts and source acceptance revisions remain as provenance, with
 the collision resolution annotated. ASK-0108 tracks this bounded preparation.
 [ASK-0109](../issues/60-done/ASK-0109-finalize-public-preview-documentation.md)
 tracks the final reporting correction and cross-repository reconciliation while
-ASK-0108 retains the owner license decision. The pre-existing consumer lockfile
+ASK-0108 records the adopted owner MIT decision. The pre-existing consumer lockfile
 edit is excluded from preparation commits.

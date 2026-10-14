@@ -191,6 +191,10 @@ Do not edit MASK's internal registry or delete a real skill directory to bypass 
 
 ## Provenance and current deployment
 
+Original contributions are licensed under the [MIT License](LICENSE), adopted
+by the owner on 2026-10-14. Adapted third-party material retains its original
+copyright and license notices; the root license does not replace those notices.
+
 Skill payloads, source declarations and consumer workflow context are versioned.
 Generated links, adapters and backups are ignored. Normal installations use locked
 artifacts; development links are an explicit authoring choice.
