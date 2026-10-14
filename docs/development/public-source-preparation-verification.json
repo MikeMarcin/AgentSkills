@@ -2,7 +2,7 @@
   "schema": "agentskills.public-source-preparation.v1",
   "mandate_revision": "public-prep-agent-skills-push-v2",
   "assignment": "M1 / AgentSkills main / ASK-0108 / agentskills-preview",
-  "candidate_source_revision": "10d588824042a42cf2e29cbf3791c359d99bd501",
+  "candidate_source_revision": "1047372e302f1d9680d661e7e204190cc3eb1fe7",
   "reconciliation_revision": "e93d84da14ba2f9af2bd4e24e8ce84a820def5e4",
   "mask_candidate_revision": "f49ac404bdb1366637841ee42e35cb34b13b6eaa",
   "environment": {
@@ -55,7 +55,7 @@
       "result": "Two real public CLI scenarios pass using disposable fixtures."
     },
     {
-      "command": "python -B scripts/verify_rfc_bundle.py --mask-program MASK_CHECKOUT --source-revision 6457f6d",
+      "command": "python -B scripts/verify_rfc_bundle.py --mask-program MASK_CHECKOUT --source-revision 1047372",
       "outcome": "pass",
       "result": "Four-skill bundle; all18 packages preserved; guarded setup; installed usage collection through both adapters leaves registry state unchanged; safe uninstall/reinstall and aggregate upgrade."
     },
@@ -67,14 +67,14 @@
     {
       "command": "python -B scripts/run_tests.py",
       "outcome": "verified-parts",
-      "result": "All seven constituent suite commands passed; driver requires jsonschema, forwards MASK_TEST_PROGRAM plus MASK_PROGRAM when explicitly selected. Missing dependency and missing program controls refuse. The entire driver was not redundantly rerun after the full module check."
+      "result": "Initial private GitHub run exposed26 implicit MASK fixture failures; repaired fixtures pass all36 affected cases in a fresh clean environment. Replacement complete-driver CI result is recorded below. Missing dependency and invalid program controls refuse."
     },
     {
       "command": "git diff --check",
       "outcome": "pass"
     }
   ],
-  "reused_evidence": "Helper source inputs are identical across6457f6d,ce8c342 and10d5888; later commits add Pillow declaration and authoring test-driver environment forwarding. Other skill inputs were unchanged. Bundle/import evidence binds the stated committed candidates rather than inventing an unchanged HEAD.",
+  "reused_evidence": "Full local679-helper and57-other-suite results retain unchanged production inputs. After the CI fixture correction, all36 affected cases reran against the exact corrected tests with MASK absent. Public bundle composition is rechecked on1047372. No unrelated behavior is skipped to hide the dependency defect.",
   "initial_failures_and_repairs": [
     "Stale instruction assertions moved to selected strategy references and normalize incidental line wrapping.",
     "Default routed implementer expectation corrected to canonical gpt-6.1-sol/xhigh.",
@@ -108,7 +108,7 @@
   "pending": [
     "Owner repository-license selection/adoption",
     "Final cross-repository source freeze, secret/history audit and public readiness closure; ordinary AgentSkills push delegated to M1.",
-    "GitHub CI execution after push; public companion checkout requires both public sources",
+    "Coordinator CI observation for the corrected private-source run; public companion checks require both public sources and are tested locally.",
     "RFC-ASK-0012 native Claude/Codex acceptance and owner course decisions",
     "RFC-ASK-0014 M4 real-code experiment",
     "ASK-0073 real visible-run observation; ASK-0102 bootstrap correction"
@@ -117,5 +117,22 @@
   "unrelated_lock_sha256": "65216945daf3d6b0916a9711633aca24833620ba3a7926a3b1972cb09e4a12b9",
   "publication": "No visibility, credential/access or real consumer migration in M1. Ordinary push is authorized under the recorded sequencing amendment; exact push result is in the private coordinator handoff.",
   "verification_mandate_revision": "public-prep-user-amendment-push-v1",
-  "sequencing_amendment": "Coordinator delegates ordinary non-force AgentSkills push after technical checks and exact outgoing-candidate secret scan; final readiness/license/public visibility still pending."
+  "sequencing_amendment": "Coordinator delegates ordinary non-force AgentSkills push after technical checks and exact outgoing-candidate secret scan; final readiness/license/public visibility still pending.",
+  "ci_correction": {
+    "failed_run": "https://github.com/MikeMarcin/AgentSkills/actions/runs/38524147808",
+    "failed_source_revision": "589d289184d1fc8148aa4519a7950ef2bdbcc51a",
+    "failure_count": 26,
+    "cause": "Four unit-test classes did not all activate the existing disposable MASK capability stub; implicit local PATH discovery hid the dependency. All26 entries share this cause.",
+    "correction_revision": "1047372e302f1d9680d661e7e204190cc3eb1fe7",
+    "repair": "Share the existing stub through a non-TestCase mixin; preserve all behavioral assertions and case counts. Genuine real-MASK integration remains explicitly selected.",
+    "isolated_recheck": {
+      "cases": 36,
+      "failures": 0,
+      "skips": 0,
+      "conditions": "Fresh clone outside the companion checkout; all MASK_* and IMPLEMENT_RFC_* variables absent; PATH contains system commands only and no mask executable. Both affected modules pass."
+    },
+    "replacement_run": "https://github.com/MikeMarcin/AgentSkills/actions/runs/38525246006",
+    "replacement_result": "success",
+    "result_scope": "Observed status at preparation handoff; coordinator owns later CI observation. No known local failure remains."
+  }
 }

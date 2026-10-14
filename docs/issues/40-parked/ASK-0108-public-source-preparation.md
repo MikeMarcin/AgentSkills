@@ -2,11 +2,12 @@
 schema: implement-rfc.card.v1
 id: ASK-0108
 title: Prepare reconciled AgentSkills for public source preview
-status: "In Progress"
+status: "Parked"
 rfcs: []
 depends_on: []
 metadata: {"milestone_plan":{"id":"public-source-preparation","path":"docs/rfcs/plans/public-source-preparation/milestone-plan.json"}}
 acceptance: [{"criterion":"AC1","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC2","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC3","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC4","outcome":"pending","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"docs/development/public-source-preparation-verification.json; AC4 privacy/provenance complete, repository license selection/adoption pending."}},{"criterion":"AC5","outcome":"pass","revision":"10d588824042a42cf2e29cbf3791c359d99bd501","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}}]
+parked_on: "human-review"
 ---
 
 # Public source preparation
@@ -86,3 +87,28 @@ M2 prepares MASK. This does not certify licensing or public readiness and does
 not change visibility. The authored boundary was checked and amended, preserving
 all work selectors and exits; current binding is renewed for this mandate.
 Final cross-repository scan, license adoption and readiness remain M3 obligations.
+
+## CI correction before final handoff
+
+The first private CI run at589d289 failed26 assertions despite the local broad
+pass. All26 entries stemmed from the same fixture ownership defect: only one
+rendering class activated the disposable MASK capability stub, while profile,
+integrator and migration fixtures depended implicitly on an installed `mask`.
+Factored that existing stub into a shared non-TestCase mixin for all four classes.
+Every assertion and case count remains; genuine real-MASK integration is separate.
+
+Correction1047372: both affected modules (36 cases) pass in a fresh clone outside
+the companion repository, with all MASK/IMPLEMENT_RFC variables absent and a
+system-only PATH on which `mask` is unavailable. The source manifest and docs
+gates pass. Initial acceptance/history remains recorded; this correction is
+required for the private-source CI claim, not a waiver or a skipped behavior.
+The card was explicitly reopened/claimed for repair; licensing remains pending
+and its independent prepared candidate is unaffected by these test-only inputs.
+
+The corrected committed bundle composition also passes at1047372, including
+installed usage through both adapters and preserved registry bytes. Ordinary
+non-force push of1047372 is confirmed. Corrected CI run
+[38525246006](https://github.com/MikeMarcin/AgentSkills/actions/runs/38525246006)
+is `success` at this handoff; the coordinator owns later observation.
+No known local failure remains. The outgoing exact-candidate Gitleaks default
+rules scan reports zero findings; earlier historical blob/ZIP evidence is reused.
