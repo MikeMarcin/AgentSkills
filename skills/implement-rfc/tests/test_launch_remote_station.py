@@ -34,6 +34,7 @@ def arguments(**overrides: object) -> argparse.Namespace:
         "pair_codex": False,
         "no_server": False,
         "_supervise": False,
+        "confirm_runtime_stopped": False,
         "permission_mode": "bypassPermissions",
     }
     values.update(overrides)
@@ -640,6 +641,75 @@ class LauncherTests(unittest.TestCase):
         self.assertIn("--continue", command)
         self.assertEqual(command[command.index("--station") + 1], self.context.name)
 
+    def test_pending_fresh_recovery_finishes_before_the_new_lease_starts(self) -> None:
+        import station_control
+        order = []
+        with (
+            mock.patch.object(launcher.lifecycle, 'load', return_value={'mode': 'transferring'}),
+            mock.patch.object(launcher.lifecycle, 'validate'),
+            mock.patch.object(station_control, 'takeover', side_effect=lambda *a, **kw: order.append('recover')) as takeover,
+            mock.patch.object(launcher.subprocess, 'run', side_effect=lambda *a, **kw: (
+                order.append('lease') or subprocess.CompletedProcess([], 0))),
+        ):
+            self.assertEqual(launcher.run_under_lease(arguments(
+                new_codex_session=True, new_claude_session=True,
+                confirm_runtime_stopped=True), self.context), 0)
+        self.assertEqual(order, ['recover', 'lease'])
+        takeover.assert_called_once_with(self.context.root, stop_previous=True,
+                                         confirm_runtime_stopped=True)
+
+    def test_unproven_fresh_recovery_does_not_start_a_new_supervisor(self) -> None:
+        import station_control
+        output = io.StringIO()
+        with (
+            mock.patch.object(launcher.lifecycle, 'load', return_value={'mode': 'transferring'}),
+            mock.patch.object(launcher.lifecycle, 'validate'),
+            mock.patch.object(station_control, 'takeover', side_effect=launcher.lifecycle.LifecycleError('runtime unproven')),
+            mock.patch.object(launcher.subprocess, 'run') as run,
+            contextlib.redirect_stderr(output),
+        ):
+            self.assertEqual(launcher.run_under_lease(arguments(
+                new_codex_session=True, new_claude_session=True), self.context), 2)
+        run.assert_not_called()
+        self.assertIn('--fresh --confirm-runtime-stopped', output.getvalue())
+
+    def test_pending_normal_or_partial_launch_requires_full_context_replacement(self) -> None:
+        import station_control
+        for options in ({}, {'new_codex_session': True}, {'new_claude_session': True}):
+            with (
+                self.subTest(options=options),
+                mock.patch.object(launcher.lifecycle, 'load', return_value={'mode': 'transferring'}),
+                mock.patch.object(launcher.lifecycle, 'validate'),
+                mock.patch.object(station_control, 'takeover') as takeover,
+                mock.patch.object(launcher.subprocess, 'run') as run,
+                contextlib.redirect_stderr(io.StringIO()),
+            ):
+                self.assertEqual(launcher.run_under_lease(arguments(**options), self.context), 2)
+            takeover.assert_not_called()
+            run.assert_not_called()
+
+    def test_pending_identity_mismatch_refuses_before_runtime_stop(self) -> None:
+        import station_control
+        with (
+            mock.patch.object(launcher.lifecycle, 'load', return_value={'mode': 'transferring'}),
+            mock.patch.object(launcher.lifecycle, 'validate', side_effect=launcher.lifecycle.LifecycleError('wrong identity')),
+            mock.patch.object(station_control, 'takeover') as takeover,
+            mock.patch.object(launcher.subprocess, 'run') as run,
+            contextlib.redirect_stderr(io.StringIO()),
+        ):
+            self.assertEqual(launcher.run_under_lease(arguments(fresh_station=True), self.context), 2)
+        takeover.assert_not_called()
+        run.assert_not_called()
+
+    def test_launch_stop_confirmation_requires_both_fresh_contexts(self) -> None:
+        parsed = launcher.parse_arguments(['--fresh', '--confirm-runtime-stopped'])
+        self.assertTrue(parsed.confirm_runtime_stopped)
+        # Confirmation belongs to the pre-lease recovery, never the new child.
+        self.assertNotIn('--confirm-runtime-stopped', launcher.internal_supervisor_arguments(parsed))
+        for flags in ([], ['--fresh', 'codex'], ['--fresh', 'claude'], ['--fresh', '--no-codex']):
+            with self.subTest(flags=flags), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                launcher.parse_arguments([*flags, '--confirm-runtime-stopped'])
+
     def test_new_claude_session_is_forwarded_to_the_supervisor(self) -> None:
         command = launcher.internal_supervisor_arguments(
             arguments(new_claude_session=True)
@@ -1242,7 +1312,7 @@ class LinkedConsumerLaunchTests(unittest.TestCase):
             for token in ("alpha", "beta"):
                 root = Path(temporary) / token
                 init_repo(root, token=token)
-                git(root, "remote", "add", "origin", str(Path(temporary) / (token + ".git")))
+                git(root, "remote", "add", "origin", (Path(temporary) / (token + ".git")).as_posix())
                 link = root / ".agents/skills/implement-rfc"
                 link.parent.mkdir(parents=True)
                 link.symlink_to(source, target_is_directory=True)

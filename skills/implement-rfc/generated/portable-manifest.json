@@ -154,7 +154,7 @@
     },
     {
       "path": "references/station-control.md",
-      "sha256": "020ef60b033631fb185ec39b337f55786724e0e59ce342424a3938eeb28c91c8"
+      "sha256": "2872cce7144556c7406315234df613501bf5d083e12a57c13332c143d6e083cc"
     },
     {
       "path": "references/strategies/coordinator-implementer.md",
@@ -282,7 +282,7 @@
     },
     {
       "path": "scripts/launch_remote_station.py",
-      "sha256": "c3a644d3c46b46322fffbb44038bfc80a64c6a8dd65453a5c33fdcab8223b909"
+      "sha256": "11beda19e4ac64a1c1372fad0beecb2f7dc8edb18fe51327eaf6ab6fc26c14d9"
     },
     {
       "path": "scripts/milestone_checkpoint.py",
@@ -386,7 +386,7 @@
     },
     {
       "path": "scripts/station_control.py",
-      "sha256": "ec6c7ed0a5cd9a46655846a09fd39b59f37be0e6bcd44800a4aadce82ef99f9d"
+      "sha256": "fc5ccddcba5858d2d9998de518adb3c998191192f96e27a59798a87a970d7d7f"
     },
     {
       "path": "scripts/station_hooks.py",
@@ -494,7 +494,7 @@
     },
     {
       "path": "tests/test_launch_remote_station.py",
-      "sha256": "3772044b515874b656787551332300dc04629a4ea9a227b4fa468a49e1d2b246"
+      "sha256": "6a479ec3d31bcdd76564efe4e3a59324ec083284f182944fcb9dd078d440383e"
     },
     {
       "path": "tests/test_mask_workflow.py",
@@ -618,7 +618,7 @@
     },
     {
       "path": "tests/test_station_control.py",
-      "sha256": "8930eb840be901ab043010c8695613463374e8afc0efcb3b2ee53acaf160185b"
+      "sha256": "be849c220b8032b670f7f40b58db78bd68c28bf0165339c0d7fc04f5bb9ee3cb"
     },
     {
       "path": "tests/test_station_hooks.py",
@@ -677,6 +677,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "9ccdc97699cab002",
+  "portable_digest": "e71e99a4c7a2850d",
   "schema": "implement-rfc.portable-manifest.v1"
 }

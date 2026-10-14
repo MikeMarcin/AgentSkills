@@ -184,3 +184,12 @@ removing locks. Metadata age never removes a lock or retires a writer.
 To manage the checkout again, launch an explicit fresh runtime context with the
 existing launcher's `--fresh` controls. The new generation retains the old endpoint
 revocations. Old chat history stays available; takeover does not archive it.
+
+If a takeover is still pending, `--fresh` retries it before acquiring the new
+supervisor lease. Recovery retains its original stop obligations and receipts;
+it replaces both retired contexts. When automatic stop proof is unavailable,
+observe the listed runtime and background-command stops, then use
+`scripts/launch_remote_station.py --fresh --confirm-runtime-stopped`. This records
+the same real human observation as the takeover confirmation above. Normal or
+partial-context launches leave a pending transfer in place and name the public
+recovery command.

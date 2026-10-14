@@ -139,7 +139,7 @@ def takeover(root, *, stop_previous, confirm_runtime_stopped=False, runtime_stop
                 # Stop a trusted supervisor if possible, but its released lease alone
                 # cannot stand in for an independently owned Desktop/runtime writer.
                 supervisor = state['transfer'].get('supervisor_proof')
-                if supervisor is None:
+                if supervisor is None or supervisor.get('controlled_stop') is not True:
                     stopped = station_lease.stop_supervisor(root, lease_role(station), context, station['station'])
                     supervisor = dict(controlled_stop=stopped.get('controlled_stop') is True,
                                       endpoints=state['endpoints'], generation=state['generation'])
