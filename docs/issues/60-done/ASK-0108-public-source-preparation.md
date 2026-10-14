@@ -2,11 +2,11 @@
 schema: implement-rfc.card.v1
 id: ASK-0108
 title: Prepare reconciled AgentSkills for public source preview
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 metadata: {"milestone_plan":{"id":"public-source-preparation","path":"docs/rfcs/plans/public-source-preparation/milestone-plan.json"}}
-acceptance: [{"criterion":"AC1","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC2","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Corrected CI38525246006 passes at1047372; all36 affected fixture cases pass with MASK absent; docs/development/public-source-preparation-verification.json records original failure and correction."}},{"criterion":"AC3","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC4","outcome":"pending","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"docs/development/public-source-preparation-verification.json; AC4 privacy/provenance complete, repository license selection/adoption pending."}},{"criterion":"AC5","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}}]
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC2","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Corrected CI38525246006 passes at1047372; all36 affected fixture cases pass with MASK absent; docs/development/public-source-preparation-verification.json records original failure and correction."}},{"criterion":"AC3","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC4","outcome":"pass","revision":"0bf8059c2b81bf29dec269067e0f216f9dfe6960","evidence":{"kind":"artifact","path":"docs/development/public-source-finalization.md","detail":"Owner MIT selection on 2026-10-14 adopted for original contributions; root and per-package scope verified, all upstream notices preserved. Historical privacy/provenance evidence retained. Mandate public-prep-mit-adoption-v1."}},{"criterion":"AC5","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}}]
 ---
 
 # Public source preparation
@@ -122,3 +122,22 @@ license statements and M3 delegation above describe their historical checkpoints
 this amendment supersedes that wait without changing earlier results. Existing
 native, experimental and post-visibility public companion CI obligations remain
 on their own live records. No visibility or real deployment action is authorized.
+
+## M4 adoption and verification
+
+MIT is adopted for original contributions at `0bf8059c2b81bf29dec269067e0f216f9dfe6960`. The root notice matches
+the reviewed text, and every pre-existing third-party notice remains unchanged.
+Current README/contributor/license-scope statements describe adoption; the earlier
+license waits remain historical and are explicitly superseded.
+
+Focused source/documentation gates, local links and whitespace pass. Exact outgoing
+content, tracked-tree and commit-metadata secret scans report zero findings.
+Accepted unchanged runtime evidence is reused from final M3 private CI, retaining
+its real skips and prior failures/corrections. The companion's 18 exact packaged
+original-contribution MIT notices are verified, including representative public
+installations through both adapters. Full evidence is in
+[the M4 record](../../development/public-source-finalization.md#m4-mit-adoption);
+final ordinary pushes and remote identities belong to the coordinator handoff.
+Only AC4's owner-license wait is newly resolved; existing passing criteria retain
+their original acceptance revisions. No broader RFC/native/public-CI closure is
+claimed. All unattended milestone work completes before writer release.

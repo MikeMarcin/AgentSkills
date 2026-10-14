@@ -150,3 +150,18 @@ remain owner actions; after both repositories are public, manually dispatch both
 Source checks workflows and confirm their public companion steps. Open native,
 model-experiment and visible-run cards are unaffected. The unrelated lock edit
 retains the SHA-256 recorded above. No real deployment repair is part of adoption.
+
+M4 license source candidate: `0bf8059c2b81bf29dec269067e0f216f9dfe6960`. The root license exactly matches the
+reviewed standard MIT text with the repository-contributor copyright. Focused
+documentation checks pass (15 RFCs / 110 cards); changed local Markdown links and
+whitespace pass. Existing notice-file hashes match the accepted inputs. Outgoing
+commit content, the exact tracked tree and new commit metadata report zero
+Gitleaks findings with forced default rules, empty ignore and full redaction.
+Final bookkeeping/push identities and scan receipts remain in the durable handoff.
+
+At this exact source candidate, all 18 frozen packages validate and their
+materialized, verified disposable artifacts retain the complete original MIT
+notice. Real public tap/fetch/install/status also preserves exact original and
+upstream notices through both adapters for code-simplifier, writing-for-agents
+and grill-me (six links). This checks package distribution; it does not certify
+native host loading. All temporary consumers, stores and bare remotes are removed.
