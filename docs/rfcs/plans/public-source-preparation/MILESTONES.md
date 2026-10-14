@@ -19,4 +19,4 @@ Reconciled AgentSkills source is ready for a public preview within its documente
 - AC1 through AC5 of ASK-0108 have direct evidence; pending owner licensing or publication decisions remain explicit.
 - Owned commands are stopped, unrelated lock bytes preserved, and candidate commits plus next coordinator action are recorded.
 
-**Boundary:** AgentSkills main source, documentation, tests, CI and live preparation records; final aggregate verification/push belongs to the coordinator.
+**Boundary:** AgentSkills main source, documentation, tests, CI and live preparation records; ordinary non-force push after exact-candidate secret checking is authorized here. Final cross-repository acceptance, licensing adoption and visibility stay with the coordinator.

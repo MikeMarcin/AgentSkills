@@ -2,8 +2,9 @@
 
 This preparation covers the canonical skill library, local helper code, contributor
 checks and documented MASK installation paths. It does not change repository
-visibility or install into real consumers. Push and final cross-repository checks
-are handled by the release coordinator after both source candidates are ready.
+visibility or install into real consumers. An ordinary push of the checked private AgentSkills candidate is authorized so
+CI can run during the companion milestone. Final cross-repository acceptance,
+license adoption and the public switch remain coordinator obligations.
 
 The library has no stable release/support matrix. Optional remote stations,
 provider routes, native driver loading and model experiments are experimental.
@@ -63,6 +64,9 @@ sources. Author-rfc, grill-rfc and grill-me retain Matt Pocock's MIT licenses;
 writing-for-agents retains the complete notice in its package README. The original
 frontend-design package contains no upstream payload. License selection for this
 repository must preserve these notices and the recorded origin of older imports.
+
+Current bounded results are recorded in
+[public-source preparation verification](public-source-preparation-verification.json).
 
 ## Reconciliation
 

@@ -1,0 +1,121 @@
+{
+  "schema": "agentskills.public-source-preparation.v1",
+  "mandate_revision": "public-prep-agent-skills-push-v2",
+  "assignment": "M1 / AgentSkills main / ASK-0108 / agentskills-preview",
+  "candidate_source_revision": "10d588824042a42cf2e29cbf3791c359d99bd501",
+  "reconciliation_revision": "e93d84da14ba2f9af2bd4e24e8ce84a820def5e4",
+  "mask_candidate_revision": "f49ac404bdb1366637841ee42e35cb34b13b6eaa",
+  "environment": {
+    "platform": "macOS",
+    "python": "3.14.7",
+    "dependencies": {
+      "jsonschema": "4.26.0",
+      "Pillow": "12.3.0"
+    }
+  },
+  "helper_tests": {
+    "modules": 54,
+    "cases": 679,
+    "passed": 677,
+    "skips": 2,
+    "failures": [],
+    "skip_reasons": [
+      "Two test_usage_windows cases require native Windows; macOS is not substitute qualification."
+    ],
+    "command": "python -B -m unittest discover -s skills/implement-rfc/tests -p test_*.py -v",
+    "execution": "Each module ran in its own subprocess; four concurrent fixture-only processes. Full logs and argv are in private runtime storage."
+  },
+  "other_skill_tests": {
+    "cases": 57,
+    "suites": {
+      "attended-review": 27,
+      "author-rfc": 2,
+      "wizard": 11,
+      "trellis-image-to-3d": 12,
+      "sprite-sheet-animation-updater": 1,
+      "concept-art-approval-pipeline": 4
+    },
+    "failures": 0,
+    "skips": 0
+  },
+  "public_checks": [
+    {
+      "command": "python -B scripts/verify_documentation.py --root .",
+      "outcome": "pass",
+      "result": "15 RFCs, 108 cards; zero structural violations; also passed in fresh local clone."
+    },
+    {
+      "command": "python -B skills/implement-rfc/scripts/validate_portable_agents.py --source-only",
+      "outcome": "pass",
+      "result": "Portable source valid; also passed in fresh local clone."
+    },
+    {
+      "command": "python -B scripts/verify_mask_examples.py --mask-program MASK_CHECKOUT",
+      "outcome": "pass",
+      "result": "Two real public CLI scenarios pass using disposable fixtures."
+    },
+    {
+      "command": "python -B scripts/verify_rfc_bundle.py --mask-program MASK_CHECKOUT --source-revision 6457f6d",
+      "outcome": "pass",
+      "result": "Four-skill bundle; all18 packages preserved; guarded setup; installed usage collection through both adapters leaves registry state unchanged; safe uninstall/reinstall and aggregate upgrade."
+    },
+    {
+      "command": "python -B scripts/verify_selected_skill_imports.py --mask-program MASK_CHECKOUT --source-revision ce8c342",
+      "outcome": "pass",
+      "result": "Public tap/fetch/search/install/status/uninstall through two disposable consumers and both adapters; installed offline tool tests pass."
+    },
+    {
+      "command": "python -B scripts/run_tests.py",
+      "outcome": "verified-parts",
+      "result": "All seven constituent suite commands passed; driver requires jsonschema, forwards MASK_TEST_PROGRAM plus MASK_PROGRAM when explicitly selected. Missing dependency and missing program controls refuse. The entire driver was not redundantly rerun after the full module check."
+    },
+    {
+      "command": "git diff --check",
+      "outcome": "pass"
+    }
+  ],
+  "reused_evidence": "Helper source inputs are identical across6457f6d,ce8c342 and10d5888; later commits add Pillow declaration and authoring test-driver environment forwarding. Other skill inputs were unchanged. Bundle/import evidence binds the stated committed candidates rather than inventing an unchanged HEAD.",
+  "initial_failures_and_repairs": [
+    "Stale instruction assertions moved to selected strategy references and normalize incidental line wrapping.",
+    "Default routed implementer expectation corrected to canonical gpt-6.1-sol/xhigh.",
+    "Real usage registration test uses current public register/list commands.",
+    "Usage registry adapter uses public MASK v2 list --all JSON, preserves legacy v1 reader, excludes personal scope and replaced roots; missing historical paths stay unverified.",
+    "Station hook fixture compares canonical temporary roots on macOS.",
+    "Import verifier uses current public commands and pinned artifacts; Pillow test dependency is declared."
+  ],
+  "privacy": {
+    "mutable_document_paths_sanitized": 21,
+    "native_session_identities_sanitized": 15,
+    "preserved": [
+      "Immutable packets",
+      "Git history",
+      "Git revisions and actual outcomes",
+      "Compatibility protocol literals"
+    ],
+    "note": "Sanitized runtime records are historical evidence projections, not replayable unchanged checkpoints. Exact current checkpoints and detailed logs stay private."
+  },
+  "licensing": {
+    "status": "owner-selection-pending",
+    "repository_license_added": false,
+    "retained_notices": [
+      "skills/author-rfc/LICENSE",
+      "skills/grill-rfc/LICENSE",
+      "skills/grill-me/LICENSE",
+      "skills/writing-for-agents/README.md"
+    ],
+    "provenance": "docs/development/skill-provenance.md"
+  },
+  "pending": [
+    "Owner repository-license selection/adoption",
+    "Final cross-repository source freeze, secret/history audit and public readiness closure; ordinary AgentSkills push delegated to M1.",
+    "GitHub CI execution after push; public companion checkout requires both public sources",
+    "RFC-ASK-0012 native Claude/Codex acceptance and owner course decisions",
+    "RFC-ASK-0014 M4 real-code experiment",
+    "ASK-0073 real visible-run observation; ASK-0102 bootstrap correction"
+  ],
+  "command_state": "All task-owned tests and verification commands completed. Only an explicitly handed-off loopback license-review server may remain active.",
+  "unrelated_lock_sha256": "65216945daf3d6b0916a9711633aca24833620ba3a7926a3b1972cb09e4a12b9",
+  "publication": "No visibility, credential/access or real consumer migration in M1. Ordinary push is authorized under the recorded sequencing amendment; exact push result is in the private coordinator handoff.",
+  "verification_mandate_revision": "public-prep-user-amendment-push-v1",
+  "sequencing_amendment": "Coordinator delegates ordinary non-force AgentSkills push after technical checks and exact outgoing-candidate secret scan; final readiness/license/public visibility still pending."
+}
