@@ -22,6 +22,7 @@ def main():
         if not program.is_file():
             parser.error('--mask-program must name a checkout containing mask.py.')
         environment['MASK_TEST_PROGRAM'] = str(program)
+        environment['MASK_PROGRAM'] = str(program.parent)
     for skill, directory, pattern in (
         ('implement-rfc', 'tests', 'test_*.py'),
         ('attended-review', 'tests', 'test_*.py'),
