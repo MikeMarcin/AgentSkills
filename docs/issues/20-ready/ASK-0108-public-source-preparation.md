@@ -2,12 +2,11 @@
 schema: implement-rfc.card.v1
 id: ASK-0108
 title: Prepare reconciled AgentSkills for public source preview
-status: "Parked"
+status: "Ready"
 rfcs: []
 depends_on: []
 metadata: {"milestone_plan":{"id":"public-source-preparation","path":"docs/rfcs/plans/public-source-preparation/milestone-plan.json"}}
 acceptance: [{"criterion":"AC1","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC2","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Corrected CI38525246006 passes at1047372; all36 affected fixture cases pass with MASK absent; docs/development/public-source-preparation-verification.json records original failure and correction."}},{"criterion":"AC3","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}},{"criterion":"AC4","outcome":"pending","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"docs/development/public-source-preparation-verification.json; AC4 privacy/provenance complete, repository license selection/adoption pending."}},{"criterion":"AC5","outcome":"pass","revision":"1047372e302f1d9680d661e7e204190cc3eb1fe7","evidence":{"kind":"artifact","detail":"Direct bounded evidence and composed-path results in docs/development/public-source-preparation-verification.json; exact source identities preserved."}}]
-parked_on: "human-review"
 ---
 
 # Public source preparation
@@ -112,3 +111,14 @@ non-force push of1047372 is confirmed. Corrected CI run
 is `success` at this handoff; the coordinator owns later observation.
 No known local failure remains. The outgoing exact-candidate Gitleaks default
 rules scan reports zero findings; earlier historical blob/ZIP evidence is reused.
+
+## M4 licensing mandate amendment
+
+On 2026-10-14 the owner chose MIT for original material in both AgentSkills and
+ManageAgentSkills. Mandate `public-prep-mit-adoption-v1` assigns one implementer
+the remaining license adoption, notice preservation, focused source/documentation
+checks and ordinary non-force main pushes in both repositories. Earlier pending
+license statements and M3 delegation above describe their historical checkpoints;
+this amendment supersedes that wait without changing earlier results. Existing
+native, experimental and post-visibility public companion CI obligations remain
+on their own live records. No visibility or real deployment action is authorized.
