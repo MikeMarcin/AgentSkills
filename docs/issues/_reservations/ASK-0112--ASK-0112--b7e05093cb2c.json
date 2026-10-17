@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0112"
+  ],
+  "reserve_for": "tracker-generated-output-scan",
+  "purpose": "Keep link repair out of ignored generated output during Pinax closeout",
+  "created": "2026-10-17T19:31:30.491090+00:00",
+  "base": "e0ef5c7fdeb883786ec549c03e92ad39ba0439e6"
+}
