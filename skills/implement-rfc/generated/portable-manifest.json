@@ -78,7 +78,7 @@
     },
     {
       "path": "references/bookkeeping.md",
-      "sha256": "f67ff1572c65f70770ea6db00ed557161239f183cdae722189942dead3f3299a"
+      "sha256": "ada0f932d31326c4428aee2a9fcd774acca660c6a857ffc8a737cbc74abfeab1"
     },
     {
       "path": "references/bounded-execution.md",
@@ -258,7 +258,7 @@
     },
     {
       "path": "scripts/allocation.py",
-      "sha256": "40f7133fc00292277047a8cf0d9622bbf705175026472253c5ec4c68c5d809d8"
+      "sha256": "1d4721a9e154f6d4e8df56b9c7c0864fd6d01eae276c2f80889252e0360689a2"
     },
     {
       "path": "scripts/audit_board.py",
@@ -481,6 +481,10 @@
       "sha256": "4b2fc53bce99ab08c2d354a6647d29a786b0af177d4dd78ebb5f6c2f601974ba"
     },
     {
+      "path": "tests/test_counter_retirement.py",
+      "sha256": "fa2b913f97523ebd8ce6ee4c864d50db0aff77bcfa7e5517c1bcbf566dafde62"
+    },
+    {
       "path": "tests/test_execution_strategy.py",
       "sha256": "3cf238cecf897ca78233d8796921d2d319e7ec5f38c32ea066d97a055b7a5877"
     },
@@ -681,6 +685,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "f1685314ae5ac2da",
+  "portable_digest": "1c6545e6cf228763",
   "schema": "implement-rfc.portable-manifest.v1"
 }
