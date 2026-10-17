@@ -80,7 +80,8 @@ def inspect_counters(root: Path, config: dict, cards: dict) -> tuple[dict, list,
             info['high_water'][area] = max(info['high_water'].get(area, 0), int(n))
         for area, historic in info['high_water'].items():
             if area not in counters:
-                error(location, f'missing historically allocated counter {area}')
+                # Current cards/reservations require counters above. A removed
+                # category needs no tombstone; allocation resumes from history.
                 continue
             current, path = counters[area]
             waived = any(o['area'] == area and historic <= o['waived_through'] and current >= o['floor']
@@ -105,7 +106,8 @@ def allocate(root: Path, config: dict, *, area: str | None, count: int, reserve_
             area = next(iter(counters))
         if area not in counters:
             if area and re.fullmatch(r'[A-Z]{2,8}', area) and config['next_id']['mode'] == 'per-area':
-                counters[area] = (1, board.safe_path(root, root / config['next_id']['path'] / area))
+                start = history['high_water'].get(area, 1)
+                counters[area] = (start, board.safe_path(root, root / config['next_id']['path'] / area))
             else:
                 raise board.BoardError(root, 'area', 'select an area explicitly (new areas require per-area mode)')
         start, path = counters[area]

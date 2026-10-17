@@ -109,6 +109,11 @@ than silently ignoring history. Explicitly increase allocation.history_limit
 when justified. Shallow/missing Git history cannot establish unseen remote
 allocations; fetch the integrator's known refs before cross-machine allocation.
 
+A per-area category with no remaining cards or reservations needs no counter
+file. If allocated again, it resumes at its historical next-ID high water,
+including other refs. Removing a counter never resets that category to one.
+Single-file boards still require their counter, and present counters cannot rewind.
+
 A deliberate historical override is configured under allocation.rewind_overrides
 as `{area,floor,waived_through,date,reason}`. It never waives live/reserved IDs or
 a later high-water value. Do not add overrides merely to silence a real collision.
