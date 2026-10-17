@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0111"
 title: "Allow complete category removal without losing allocation history"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0003"]
 depends_on: []
 ---
