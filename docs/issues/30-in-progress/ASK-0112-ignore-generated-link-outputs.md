@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0112"
 title: "Keep board link repair out of ignored generated output"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: ["ASK-0111"]
 ---
