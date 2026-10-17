@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0111"
+  ],
+  "reserve_for": "pinax-counter-cleanup",
+  "purpose": "Allow retired categories to omit counters while resuming historical allocation safely",
+  "created": "2026-10-17T19:18:22.091663+00:00",
+  "base": "d859ff1f87d83488b860ff0032131c0a1101af8a"
+}
