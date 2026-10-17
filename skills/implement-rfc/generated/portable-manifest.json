@@ -78,7 +78,7 @@
     },
     {
       "path": "references/bookkeeping.md",
-      "sha256": "ada0f932d31326c4428aee2a9fcd774acca660c6a857ffc8a737cbc74abfeab1"
+      "sha256": "349a647f3e97f037c14470afa285d22da39165c7bcedb8055cc13bd94db98e71"
     },
     {
       "path": "references/bounded-execution.md",
@@ -286,7 +286,7 @@
     },
     {
       "path": "scripts/issue_board.py",
-      "sha256": "a09c629e12e69e182f70ee8d84b9382f3988b0eaefdd092b27ea6ab016d4ea49"
+      "sha256": "a254e690c319035e84a323802db422ed903c86a66abee6434bbd161449fd51e1"
     },
     {
       "path": "scripts/launch_remote_station.py",
@@ -498,7 +498,7 @@
     },
     {
       "path": "tests/test_issue_board.py",
-      "sha256": "45ea8711d7cda5a2ccfb0d71c51fd2180f2264db4a4faf09ce9f84487df8ac59"
+      "sha256": "216a04e4dc1a4b0105eed02f2a51a75d43d50450c547e060d1e549d3ae17a2cc"
     },
     {
       "path": "tests/test_launch_remote_station.py",
@@ -685,6 +685,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "1c6545e6cf228763",
+  "portable_digest": "f59428d5b96a3256",
   "schema": "implement-rfc.portable-manifest.v1"
 }

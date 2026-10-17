@@ -123,14 +123,21 @@ def queue(root: Path, config: dict, rfcs: list[str], platform: str, include: lis
 
 
 def markdown_paths(root: Path, rules: dict) -> list[Path]:
-    paths = set()
-    for relative in rules['link_roots']:
-        path = board.safe_path(root, root / relative)
-        if path.is_file() and path.suffix == '.md':
-            paths.add(path)
-        elif path.is_dir():
-            paths.update(path.rglob('*.md'))
-    return sorted(board.safe_path(root, path) for path in paths)
+    roots = rules['link_roots']
+    for relative in roots:
+        board.safe_path(root, root / relative)
+    if not roots:
+        return []
+    result = subprocess.run(['git', '-C', str(root), 'ls-files', '--cached', '--others',
+                             '--exclude-standard', '-z', '--',
+                             *(':(literal)' + relative for relative in roots)],
+                            env=project_config.git_environment(), capture_output=True,
+                            text=True, timeout=30)
+    if result.returncode:
+        raise board.BoardError(root, 'links', 'Git Markdown inventory failed')
+    paths = {board.safe_path(root, root / name) for name in result.stdout.split('\0')
+             if name and Path(name).suffix == '.md'}
+    return sorted(path for path in paths if path.is_file())
 
 
 def protected(root: Path, path: Path, rules: dict) -> bool:

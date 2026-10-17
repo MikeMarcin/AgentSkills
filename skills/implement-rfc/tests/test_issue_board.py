@@ -431,6 +431,28 @@ class BoardTests(unittest.TestCase):
         staged = subprocess.check_output(['git', '-C', str(self.root), 'diff', '--cached', '--name-only'])
         self.assertEqual(staged, b'')
 
+    def test_link_scan_ignores_generated_output_but_keeps_tracked_and_untracked_docs(self):
+        self.card(lane='ready')
+        target = 'tracker/cards/ready/XYZ-0001-fixture.md'
+        ignored = self.root / 'tracker/generated/export.md'
+        ignored.parent.mkdir()
+        content = f'[card](../../{target})\n'
+        ignored.write_text(content)
+        tracked = ignored.with_name('tracked.md')
+        tracked.write_text(content)
+        subprocess.run(['git', '-C', str(self.root), 'add', str(tracked)], check=True)
+        (self.root / '.gitignore').write_text('tracker/generated/\n')
+        untracked = self.root / 'README.md'
+        untracked.write_text(f'[card]({target})\n')
+        paths = cli.markdown_paths(self.root, self.config['bookkeeping'])
+        self.assertNotIn(ignored, paths)
+        self.assertIn(tracked, paths)
+        self.assertIn(untracked, paths)
+        self.public('move', 'XYZ-0001', '--to', 'working')
+        self.assertEqual(ignored.read_text(), content)
+        self.assertIn('cards/working/XYZ-0001-fixture.md', tracked.read_text())
+        self.assertIn('cards/working/XYZ-0001-fixture.md', untracked.read_text())
+
     def test_repeated_move_does_not_normalize_links(self):
         self.card(lane='ready')
         path = self.root / 'README.md'

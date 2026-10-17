@@ -96,7 +96,8 @@ status and the error before retrying. Never reset unrelated work to recover.
 `bookkeeping` config names live link roots and protected/explicitly editable
 patterns. Keep immutable imported packets outside editable roots. Repair actual
 Markdown links, including relative links on the moved card; do not rewrite code
-examples or historical prose.
+examples or historical prose. Link inventory includes tracked and non-ignored
+untracked Markdown inside those roots; ignored generated output is not rewritten.
 
 ## Counters and history
 
