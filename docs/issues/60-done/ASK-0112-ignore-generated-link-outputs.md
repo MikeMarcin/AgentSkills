@@ -2,9 +2,10 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0112"
 title: "Keep board link repair out of ignored generated output"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: ["ASK-0111"]
+acceptance: [{"criterion":"AC01","outcome":"pass","revision":"91a1174835b4e4da7ad18772f5d576c7de84949a","evidence":{"kind":"observation","detail":"Public fixture leaves ignored generated Markdown byte-identical and repairs both tracked (even if ignored by a later rule) and ordinary untracked references within configured roots."}},{"criterion":"AC02","outcome":"pass","revision":"91a1174835b4e4da7ad18772f5d576c7de84949a","evidence":{"kind":"observation","detail":"33 issue-board and 11 unified-workflow tests pass, including path safety, protected links, rollback, stale reads and claim/finish. Portable source manifest regenerated and validation passes. No concurrency checks relaxed."}}]
 ---
 
 RFC_BASE_SHA: `eac8951b2e892b3ad0fb03c7239829b676151ea9`
