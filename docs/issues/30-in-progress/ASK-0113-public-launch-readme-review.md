@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0113"
 title: "Review the README for public launch"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
