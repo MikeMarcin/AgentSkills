@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0113"
+  ],
+  "reserve_for": "public-launch-readme-review",
+  "purpose": "",
+  "created": "2026-10-19T17:31:25.937436+00:00",
+  "base": "0a5b1e49c10977f0431c06b4fdf09128789590c3"
+}
