@@ -43,7 +43,7 @@ and security-reporting preparation.
 
 ## Use the skills in a project
 
-Clone this repository and install MASK using its [setup guide](https://github.com/MikeMarcin/ManageAgentSkills#install-once). MASK requires Python 3.11+, Git and native directory symlink support. If its launcher is unavailable, use a known supported interpreter with `/absolute/path/to/ManageAgentSkills/mask.py`.
+Install MASK using its [setup guide](https://github.com/MikeMarcin/ManageAgentSkills#install-once). MASK fetches this library from Git; you only need a separate AgentSkills clone to contribute. MASK requires Python 3.11+, Git and native directory symlink support. If its launcher is unavailable, use a known supported interpreter with `/absolute/path/to/ManageAgentSkills/mask.py`.
 
 Approve the tap and preview the requested installation. Replace the project path
 with your own:
@@ -67,7 +67,7 @@ mask uninstall manage-agent-skills --project /absolute/path/to/project --dry-run
 `install` and `uninstall` preserve unrelated selections. `register` prepares an
 existing declaration in a fresh clone or worktree.
 
-Commit `.mask.json` and consumer context; ignore generated entries under `.agents/skills/` and `.claude/skills/`. Preserve unrelated real skills.
+Commit `.mask.json`, `.mask.lock.json` and consumer context so other checkouts can restore the same selections and versions. Ignore generated entries under `.agents/skills/` and `.claude/skills/`. Preserve unrelated real skills.
 
 ## Personal selections and project context
 
@@ -140,7 +140,7 @@ python3 /absolute/path/to/project/.agents/skills/implement-rfc/scripts/project_c
 python3 /absolute/path/to/project/.agents/skills/implement-rfc/scripts/audit_board.py --repo-root /absolute/path/to/project
 ```
 
-The resolver selects an explicit `--repo-root` first, then `IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation working directory's Git worktree root. Missing or mismatched context refuses. It does not select a consumer from the resolved skill symlink. Cards use the canonical multi-RFC schema; see the [board command contract](skills/implement-rfc/references/bookkeeping.md). Native role adapters are optional and generated separately; see the [workflow instructions](skills/implement-rfc/SKILL.md).
+The resolver selects an explicit `--repo-root` first, then `IMPLEMENT_RFC_PROJECT_ROOT`, then the invocation working directory's Git worktree root. Missing or mismatched context refuses. It does not select a consumer from the resolved skill symlink. Cards use the canonical multi-RFC schema; see the [board command contract](skills/implement-rfc/references/bookkeeping.md). Native role requirements depend on the selected strategy; the default `coordinator-implementer` requires the `rfc-implementer` adapter, prepared by MASK's reviewed setup. See the [workflow instructions](skills/implement-rfc/SKILL.md).
 
 ## Author a skill
 
@@ -159,7 +159,11 @@ Write the instructions an agent needs to perform the task.
 
 Use a portable lowercase ID such as `example-skill`. MASK's package convention accepts single-line plain or quoted `name` and `description` scalars. Keep supporting files inside the package; linked, special and case-colliding entries are rejected. Validation is passive and does not execute skill code. [writing-for-agents](skills/writing-for-agents/SKILL.md) covers writing the description and instructions.
 
-Edit canonical files here, leaving project-specific facts in consumer context. Validate the package with `mask skill validate example-skill --json` against a machine configured to use this checkout. To inspect every package, use `mask skill validate --all --json`.
+Edit canonical files here, leaving project-specific facts in consumer context.
+`mask skill validate example-skill --json` validates the version in a fetched tap,
+not uncommitted files in your working tree. After publishing a source revision,
+run `mask tap fetch agentskills --json` before validating it. To inspect every
+fetched package, use `mask skill validate --all --json`.
 
 For changes to the shared workflow, run this check from the repository root:
 
