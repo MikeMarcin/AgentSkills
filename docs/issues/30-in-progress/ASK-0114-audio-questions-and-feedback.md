@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0114"
 title: "Audio questions and durable feedback"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0016"]
 depends_on: []
 priority: "P1"
