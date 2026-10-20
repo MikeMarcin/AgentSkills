@@ -1,0 +1,28 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "attended-review-waveforms",
+  "scope": {
+    "issues": [
+      "ASK-0117"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "default-previews",
+      "outcome": "Agents normally prepare exact-clip waveform previews for audio review and add spectrograms when they help the listening decision, with explicit graceful limitations.",
+      "work": [
+        {
+          "issue": "ASK-0117"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "WAVE01 guidance is reachable before preparation and WAVE02 demonstrates exact-clip default waveforms through the portable public path.",
+        "WAVE03 focused checks, explicit local commits and truthful quiescent closeout are recorded."
+      ],
+      "boundary": "Source-only attended-review instructions and small stdlib example; preserve completed RFC-ASK-0016 and ASK-0116 acceptance and native limits. No deployment, consumer migration, runtime feature or push."
+    }
+  ],
+  "coverage": "complete",
+  "unplanned_work": []
+}
