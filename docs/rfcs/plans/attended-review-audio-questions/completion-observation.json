@@ -1,0 +1,138 @@
+{
+  "run_id": "audio-2026-10-19",
+  "segment_id": "implementation-1",
+  "mandate_revision": "audio-source-v1",
+  "selection": {
+    "schema": "implement-rfc.strategy-selection.v1",
+    "strategy": "coordinator-implementer",
+    "topology_id": "coordinator-implementer",
+    "recipe_revision": "2",
+    "recipe_fingerprint": "sha256:b236a31fbebd1a5d2cca1db05ac16f48fcd011dbc312f2d64c00f72dffbe2b14",
+    "routing": {},
+    "requirement_profile": "coordinator-implementer",
+    "owners": {
+      "engineering": "implementer",
+      "bookkeeping": "implementer",
+      "product_edits": "implementer"
+    },
+    "delegation": "recipe",
+    "instruction_paths": [
+      "references/engineering-contract.md",
+      "references/strategies/coordinator-implementer.md"
+    ],
+    "configuration_complete": true,
+    "missing_routes": [],
+    "host_load": "not_verified"
+  },
+  "binding": {
+    "plan_id": "attended-review-audio-questions",
+    "plan_path": "docs/rfcs/plans/attended-review-audio-questions/milestone-plan.json",
+    "milestone_id": "audio-feedback",
+    "definition_fingerprint": "sha256:861569ac082786e879d8448e520ae8fccd76eb449ba13daf2d444eac757c12b5",
+    "obligations": [
+      {
+        "id": "ASK-0114:*",
+        "source": "ASK-0114",
+        "selector": null,
+        "source_fingerprint": "sha256:3849ff3d93c6f037b9a7e79642ce18f0fe4f261071d7279b1d8c1b94808b692a"
+      },
+      {
+        "id": "ASK-0115:*",
+        "source": "ASK-0115",
+        "selector": null,
+        "source_fingerprint": "sha256:a31d0489075cfa11142f605a2fc1d9b7d23b776e14f7edf2dd1ceed4ccc63a82"
+      }
+    ],
+    "obligation_fingerprint": "sha256:00373a941e5caa2b5ad7417d04c32e323229a76960185181837212020e4936f4",
+    "exit_criteria": [
+      {
+        "id": "audio-feedback:exit:1",
+        "text": "AC01\u2013AC08 are demonstrated through focused public CLI/HTTP and native-browser fixture evidence."
+      },
+      {
+        "id": "audio-feedback:exit:2",
+        "text": "Legacy fingerprints and version-1 imports remain supported; new formats preserve feedback without false acceptance."
+      },
+      {
+        "id": "audio-feedback:exit:3",
+        "text": "Canonical contract, example, acceptance records and source-only closeout agree; task commands and writers are quiescent."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "milestone": "audio-feedback",
+  "disposition": "pack-complete",
+  "candidate_revision": "7d0d213cabebfca70fd527822cec72be729164b6",
+  "handoff_ref": "docs/rfcs/plans/attended-review-audio-questions/continuation.md",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/rfcs/plans/attended-review-audio-questions/verification.md",
+    "docs/rfcs/plans/attended-review-audio-questions/browser-evidence.md",
+    "docs/rfcs/plans/attended-review-audio-questions/focused-tests.json",
+    "docs/rfcs/plans/attended-review-audio-questions/fixture-corroboration.json"
+  ],
+  "acceptance_records": [
+    {
+      "id": "ASK-0114:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-audio-questions/verification.md",
+        "docs/rfcs/plans/attended-review-audio-questions/browser-evidence.md",
+        "docs/rfcs/plans/attended-review-audio-questions/focused-tests.json",
+        "docs/rfcs/plans/attended-review-audio-questions/fixture-corroboration.json"
+      ]
+    },
+    {
+      "id": "ASK-0115:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-audio-questions/verification.md",
+        "docs/rfcs/plans/attended-review-audio-questions/browser-evidence.md",
+        "docs/rfcs/plans/attended-review-audio-questions/focused-tests.json",
+        "docs/rfcs/plans/attended-review-audio-questions/fixture-corroboration.json"
+      ]
+    },
+    {
+      "id": "audio-feedback:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-audio-questions/verification.md",
+        "docs/rfcs/plans/attended-review-audio-questions/browser-evidence.md",
+        "docs/rfcs/plans/attended-review-audio-questions/focused-tests.json",
+        "docs/rfcs/plans/attended-review-audio-questions/fixture-corroboration.json"
+      ]
+    },
+    {
+      "id": "audio-feedback:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-audio-questions/verification.md",
+        "docs/rfcs/plans/attended-review-audio-questions/browser-evidence.md",
+        "docs/rfcs/plans/attended-review-audio-questions/focused-tests.json",
+        "docs/rfcs/plans/attended-review-audio-questions/fixture-corroboration.json"
+      ]
+    },
+    {
+      "id": "audio-feedback:exit:3",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-audio-questions/verification.md",
+        "docs/rfcs/plans/attended-review-audio-questions/browser-evidence.md",
+        "docs/rfcs/plans/attended-review-audio-questions/focused-tests.json",
+        "docs/rfcs/plans/attended-review-audio-questions/fixture-corroboration.json"
+      ]
+    }
+  ],
+  "continuation": {
+    "intent": "stop",
+    "next_milestone": null,
+    "reason": "target-complete",
+    "detail": "One integrated source-only milestone complete; both scoped cards Done and RFC Auto-Verified. Native file-URL and Windows qualification unperformed and outside the source-only host claim."
+  },
+  "ownership": "quiescent"
+}
