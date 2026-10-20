@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0116"
+  ],
+  "reserve_for": "attended-review-navigation-2026-10-19",
+  "purpose": "",
+  "created": "2026-10-20T03:48:16.327502+00:00",
+  "base": "d19d11a84d841ec1aecf8c44d52cd27bc740e777"
+}
