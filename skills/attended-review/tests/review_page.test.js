@@ -41,6 +41,7 @@ function page(seed=snapshot,settings={}){
    backend.handed_back=true;backend.sequence++;
    response={decided:backend.candidates.filter(c=>c.decision).map(c=>c.id),pending:backend.candidates.filter(c=>!c.decision).map(c=>c.id),feedback_pending:backend.candidates.filter(c=>!c.decision&&c.feedback).map(c=>c.id)};
   }
+  if(url==='/api/status')response={...backend,candidates:[...backend.candidates].sort((a,b)=>(a.phase!=='ready')-(b.phase!=='ready')||Boolean(a.decision)-Boolean(b.decision)||(a.id===b.id?0:a.id<b.id?-1:1))};
   return {ok:true,json:async()=>structuredClone(response)};
  };
  const context={console,document,fetch,location:{hash:'',protocol:settings.live?'http:':'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);}},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),setTimeout:()=>1,clearTimeout(){},setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
@@ -70,6 +71,15 @@ function page(seed=snapshot,settings={}){
  }
  storage.clear();const one=page({...snapshot,candidates:[candidate('only')]});
  assert.equal(one.get('next').disabled,true);assert.match(one.get('navigation-status').textContent,/leave this question pending/);
+ // The public host moves an answered question behind every ready unanswered
+ // item. Navigation still follows its stable place, including after reload.
+ storage.clear();const ordered={...snapshot,candidates:[candidate('brief'),candidate('clip-A'),candidate('clip-B')]};
+ const reordered=page(ordered,{live:true});await reordered.ready;
+ await reordered.run("select('clip-A')");await reordered.get('accept').click();
+ assert.equal(reordered.run('state.candidates.map(c=>c.id).join()'),'brief,clip-B,clip-A');
+ await reordered.get('next').click();assert.equal(reordered.run('current'),'clip-B');
+ const reload=page(JSON.parse(reordered.run('JSON.stringify(state)')),{live:true});await reload.ready;
+ await reload.run("select('clip-A')");await reload.get('next').click();assert.equal(reload.run('current'),'clip-B');
  // Both handback buttons run one handler. A failed draft on a previous question
  // blocks handback; retry saves it before the public handback request.
  for(const entry of ['finish','finish-answer']){
@@ -127,5 +137,5 @@ function page(seed=snapshot,settings={}){
   await p.run(`select(${JSON.stringify(audioId)})`);p.get('note').value='Offline unanswered feedback for exact clip';p.run('edit()');await p.run('flush()');
   fs.writeFileSync(process.argv[3],p.run('JSON.stringify(packet())'));
  }
- console.log('PASS: answered/pending next-question order, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery');
+ console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -303,9 +303,12 @@ async function select(id){
  else el('queue').open=false;
  el('title').focus({preventScroll:true});el('title').scrollIntoView({block:'start'});
 }
+// Status groups answered items separately. IDs keep navigation stable as those
+// groups change, including after reload and in an offline snapshot.
+function queueCandidates(){return [...state.candidates].sort((a,b)=>a.id===b.id?0:a.id<b.id?-1:1);}
 function nextQuestion(){
- const index=state.candidates.findIndex(c=>c.id===current);
- const ordered=index<0?state.candidates:[...state.candidates.slice(index+1),...state.candidates.slice(0,index)];
+ const items=queueCandidates(),index=items.findIndex(c=>c.id===current);
+ const ordered=index<0?items:[...items.slice(index+1),...items.slice(0,index)];
  return ordered.find(c=>c.id!==current&&c.phase==='ready'&&!decision(c));
 }
 async function chooseNext(){const next=nextQuestion();if(next&&!saving&&!handingBack&&!state.handed_back)await select(next.id);}
@@ -315,7 +318,7 @@ const plural=(n,word)=>`${n} ${word}${n===1?'':'s'}`;
 function drawRail(){
  const list=el('list');list.replaceChildren();
  const groups=[['Ready to answer',c=>c.phase==='ready'&&!decision(c),'ready'],['Waiting on preparation',c=>c.phase!=='ready'&&!decision(c),'waiting'],['Answered',c=>Boolean(decision(c)),'answered']];
- for(const [name,test] of groups){const items=state.candidates.filter(test);if(!items.length)continue;list.append(make('h3',null,`${name} (${items.length})`));
+ for(const [name,test] of groups){const items=queueCandidates().filter(test);if(!items.length)continue;list.append(make('h3',null,`${name} (${items.length})`));
   for(const c of items){const d=decision(c),b=make('button','row');const stateName=d?d.outcome:c.phase==='ready'?'ready':'waiting';b.dataset.state=stateName;b.setAttribute('aria-current',c.id===current?'true':'false');b.append(make('span','mark',d?(d.outcome==='reject'?'✕':'✓'):c.phase==='ready'?'○':'…'),make('span','name',c.title));b.onclick=()=>select(c.id);list.append(b);}}
 }
 function copyRow(what,value,done){const step=make('div','step'),row=make('div','copyrow'),code=make('code',null,value),copy=make('button',null,'Copy');if(what)step.append(make('p','what',what));copy.onclick=async()=>{try{await navigator.clipboard.writeText(value);say(done);}catch(e){const range=document.createRange();range.selectNodeContents(code);getSelection().removeAllRanges();getSelection().addRange(range);say('Copy the selected text using your keyboard.');}};row.append(code,copy);step.append(row);return step;}
@@ -330,7 +333,7 @@ function draw(){
  const readyText=make('span',ready?'due':null);readyText.append(make('b',null,String(ready)),` ready to answer`);progress.append(readyText,', ',make('b',null,String(done)),' answered, ',make('b',null,String(waiting)),' waiting on preparation.',state.paused?' Paused.':'');
  el('queue-summary').replaceChildren('Queue: ',make('span','count',`${ready} ready`),`, ${done} answered, ${waiting} waiting`);
  drawRail();
- if(!current)current=state.candidates.find(c=>c.phase==='ready'&&!decision(c))?.id;
+ if(!current)current=queueCandidates().find(c=>c.phase==='ready'&&!decision(c))?.id;
  const c=candidate();el('card').hidden=!c;el('empty').hidden=Boolean(c);
  if(!c){el('empty').textContent=!state.candidates.length?'Nothing to review yet. Your driver has not added any candidates.':ready?'Pick an item from the queue to begin.':waiting?'Nothing is ready yet. Preparation is still running; items move into the queue as they become ready.':'Every candidate is answered. Finish and hand back when you are done, or pick an answered item in the queue to change it.';return;}
  const next=nextQuestion();el('next').disabled=!next||saving||handingBack||Boolean(state.handed_back);
