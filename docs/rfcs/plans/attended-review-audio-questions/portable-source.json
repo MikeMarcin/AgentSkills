@@ -1,0 +1,13 @@
+{
+  "criterion": "RFC-ASK-0016-AC08",
+  "outcome": "pass",
+  "revision": "2eff4c355c470cce9a629b488abb0d0e487fec19",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"skills/implement-rfc/scripts/validate_portable_agents.py\", \"--source-only\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.078,
+    "stdout_tail": "portable source valid\n",
+    "stderr_tail": ""
+  }
+}
