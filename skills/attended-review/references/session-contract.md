@@ -73,9 +73,25 @@ Use the same candidate model and queue, with `question_type: "audio"` and an
 `audio` object. Required text fields are `url` (inline `data:audio/...`), `purpose`
 and `scope`; optional text fields are `variant`, `context`, `listen_for` and
 `reject_if`. Existing `title`, `criteria` and `content` carry the question and
-listening criteria. `media` can add producer-prepared waveform/spectrogram images;
-put judgment material in these identity-bound fields, and descriptive provenance
-in `metadata`. No diagnostic generation or media toolchain is required.
+listening criteria.
+
+Include a waveform preview for every audio clip by default; the user need not ask.
+Reuse a trustworthy preview of the exact supplied clip, or prepare one with existing
+available tools before `init`/`prepare`. Add a spectrogram when it helps judge
+frequency content, noise, pitch or timbre. Choose readable time and
+amplitude/frequency scales and label any excerpt so its relation to the clip is
+clear. Preserve the reviewed audio bytes; preview preparation grants no authority
+to normalize, trim or otherwise transform the clip, or to install dependencies.
+
+Embed these producer-prepared images in `media` as self-contained inline data URLs.
+They participate in candidate identity alongside the other judgment material;
+descriptive provenance belongs in `metadata`. Check that each image represents its
+exact clip and renders before publishing the candidate. If a trustworthy preview
+or suitable tooling is unavailable, state the missing preview and reason concisely
+in visible `content`, then continue with the playable review material. A missing
+preview alone does not block review. Diagnostic images supplement listening and
+establish no human verdict. The helper displays supplied images; its runtime
+remains standard-library-only and generates no diagnostics.
 
 Each audio question accepts or rejects one exact clip for that purpose. It cannot
 have selection `options`. Optional `comparison_group` text links alternatives in

@@ -1,8 +1,13 @@
 # Portable mixed audio example
 
 `mixed_audio.py` generates an inline version-2 manifest using six synthetic PCM
-tones, one ordinary brief and an intentionally invalid clip. It needs only Python
-3.11+; it fetches nothing and does not prepare real assets.
+tones with inline SVG waveforms, one ordinary brief and an intentionally invalid
+clip. Each waveform shows the full clip's minimum/maximum sample envelope at the
+full PCM amplitude scale; the sustained tones therefore look similar. The example's
+listening task does not call for a spectrogram. The broken clip explains why it has
+no waveform. Preparation needs only Python 3.11+; it fetches nothing and does not
+prepare real assets. Follow [Audio questions](../references/session-contract.md#audio-questions-manifest-version-2)
+for the preparation rules for real clips.
 
 Create a disposable consumer and shared fixture registry outside your source
 checkout. Link the canonical `attended-review` package into that consumer's
