@@ -17,7 +17,7 @@ Own `skills/attended-review/**` and scoped RFC/plan/evidence records. Preserve u
 
 Acceptance: RFC-ASK-0016 AC01–AC08, with independent per-clip answers and no inferred sibling rejections.
 
-RFC_BASE_SHA: `7cc31bbd61c08c8445afd52df9fed8997b7069ab`
+RFC_BASE_SHA: 7cc31bbd61c08c8445afd52df9fed8997b7069ab
 
 Planned local cards: ASK-0114, ASK-0115.
 
