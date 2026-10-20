@@ -35,7 +35,9 @@ media transformation, candidate identity or feedback storage format changed.
 - `python3 -B skills/implement-rfc/scripts/validate_portable_agents.py --source-only`
   passed; relevant role source is unchanged by the navigation correction.
 - Documentation validation after follow-up linkage correction: 16 RFCs, 116 cards,
-  zero structural violations. `git diff --check` passed.
+  zero structural violations. The [terminal gate](terminal-documentation.json)
+  passes after ASK-0116 is Done at `17a4406`. Scoped board validation and target-only
+  plan discovery pass. `git diff --check` passed.
 - Coordinator's native browser recheck at the exact final candidate: select answered
   Launcher A, use the lower Next question, arrive at Launcher B with `#title`
   focused and its top at viewport coordinate 0. Enter "Keep Launcher B pending;

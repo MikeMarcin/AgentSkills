@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0116-NAV03-terminal",
+  "outcome": "pass",
+  "revision": "17a440607500532f59c43e90d35d4cfeea841870",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.225,
+    "stdout_tail": "16 RFCs, 116 cards; 0 structural violations\n",
+    "stderr_tail": ""
+  }
+}

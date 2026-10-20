@@ -10,7 +10,11 @@ Result: NAV01–NAV03 pass at source candidate
 `a7518cca7e2526dec8bf5eef5d87291232081af3`. Source commits `be9072d` and `a7518cc`;
 allocation `f0d9a12`, plan adoption `d80ea87`, claim `678e428`. Final closeout and
 completion-check commits follow this source candidate without changing its source
-bytes. Changed source paths: `skills/attended-review/assets/review.html` and
+bytes. Evidence/acceptance commit: `dc0cfd2`; ASK-0116 Done: `17a4406`.
+`completion-check.json` returns `report-closeout` against `17a4406`; this checks
+consistency, while actual engineering acceptance remains in `acceptance.json`.
+Final terminal documentation gate passes at `17a4406` with 16 RFCs, 116 cards and
+zero violations. Changed source paths: `skills/attended-review/assets/review.html` and
 `skills/attended-review/tests/review_page.test.js`. Other changed paths are only
 ASK-0116, its reservation/counter, and this follow-up plan/evidence directory.
 
