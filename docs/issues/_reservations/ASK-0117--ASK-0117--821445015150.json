@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0117"
+  ],
+  "reserve_for": "waveform-guidance-source-v1",
+  "purpose": "Default diagnostic preparation guidance for audio review",
+  "created": "2026-10-20T04:00:29.997275+00:00",
+  "base": "d72887ef3d79d71e4029d3146b85bdf55fbbf55d"
+}
