@@ -1,0 +1,13 @@
+{
+  "criterion": "RFC-ASK-0016-AC08",
+  "outcome": "pass",
+  "revision": "2eff4c355c470cce9a629b488abb0d0e487fec19",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.202,
+    "stdout_tail": "16 RFCs, 115 cards; 0 structural violations\n",
+    "stderr_tail": ""
+  }
+}
