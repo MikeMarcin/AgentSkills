@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0115"
 title: "Close audio questions and feedback RFC"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0016"]
 depends_on: ["ASK-0114"]
 closeout_for: ["RFC-ASK-0016"]
