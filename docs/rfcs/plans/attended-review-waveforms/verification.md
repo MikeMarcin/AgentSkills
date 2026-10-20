@@ -70,6 +70,11 @@ were added for the prose change.
 Before plan adoption, discovery/preparation refused the not-yet-created live-plan
 pointer. The bounded proposal was adopted explicitly; discovery then succeeded.
 The retained preparation receipt is a refusal, not a passing preparation claim.
+After Done, the board shortened the relative ASK-0116 link. Because this card's
+plain Acceptance label makes binding include its whole body, the initial completion
+check required reconciliation. Comparing the card bodies showed only that repaired
+link; WAVE01–WAVE03 and scope are unchanged. With commands quiescent, the checkpoint
+was renewed against the actual Done card without changing any requirement.
 The first raster check and contact-sheet montage failed because the local
 ImageMagick has no configured font inventory. Selecting existing Helvetica rendered
 the original SVG; image append produced the contact sheet. A one-off verification
@@ -87,3 +92,5 @@ RFC-ASK-0016 and ASK-0116 acceptance are unchanged. Native Windows, offline file
 playback and observed installed-skill loading remain unperformed and unclaimed.
 No deployment, consumer migration, Faraday/profile/session change, installation,
 publication, push or permission change occurred. No required human review remains.
+
+Terminal documentation and scoped board checks at `eea2808d041d04e946561bf6ed9d84702ddc61fe` pass: 16 RFCs, 117 cards, zero violations.

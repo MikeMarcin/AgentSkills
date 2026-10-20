@@ -25,6 +25,11 @@ No protected task candidate remains. No required human review or independent
 acceptance is pending. Native Windows/offline file-URL/installed loading limits
 remain unchanged, unperformed and unclaimed.
 
-Next action: finish ASK-0117 with the recorded passing acceptance, check milestone
-completion and terminal documentation, then report to the coordinator. No successor
-milestone is part of this assignment. No deployment or consumer adoption authorized.
+ASK-0117 is Done at `eea2808d041d04e946561bf6ed9d84702ddc61fe`. Terminal documentation
+and scoped board validation pass at that commit. The checkpoint was renewed after
+Done's relative-link repair, with identical acceptance criteria and mandate, because
+the original binding covered the full card body. Completion is checked against
+that exact Done revision; helper consistency is not engineering acceptance.
+
+Next action: coordinator reports the completed source result. No successor milestone
+is part of this assignment. No deployment or consumer adoption authorized.

@@ -1,0 +1,104 @@
+{
+  "run_id": "waveform-guidance-2026-10-19",
+  "segment_id": "implementation-1",
+  "mandate_revision": "waveform-guidance-source-v1",
+  "selection": {
+    "schema": "implement-rfc.strategy-selection.v1",
+    "strategy": "coordinator-implementer",
+    "topology_id": "coordinator-implementer",
+    "recipe_revision": "2",
+    "recipe_fingerprint": "sha256:b236a31fbebd1a5d2cca1db05ac16f48fcd011dbc312f2d64c00f72dffbe2b14",
+    "routing": {},
+    "requirement_profile": "coordinator-implementer",
+    "owners": {
+      "engineering": "implementer",
+      "bookkeeping": "implementer",
+      "product_edits": "implementer"
+    },
+    "delegation": "recipe",
+    "instruction_paths": [
+      "references/engineering-contract.md",
+      "references/strategies/coordinator-implementer.md"
+    ],
+    "configuration_complete": true,
+    "missing_routes": [],
+    "host_load": "not_verified"
+  },
+  "binding": {
+    "plan_id": "attended-review-waveforms",
+    "plan_path": "docs/rfcs/plans/attended-review-waveforms/milestone-plan.json",
+    "milestone_id": "default-previews",
+    "definition_fingerprint": "sha256:32b6e5c92304e521e3717b7cca4a10bdc8dca42550b542f7460b5d1b213b27b6",
+    "obligations": [
+      {
+        "id": "ASK-0117:*",
+        "source": "ASK-0117",
+        "selector": null,
+        "source_fingerprint": "sha256:769f3d4f5285343eb956ee096d7522ac87fbe51d3c31d6f5cbc0a8ec3a93bb6a"
+      }
+    ],
+    "obligation_fingerprint": "sha256:876a8be925522e1398951c749c205879fc5ebbb9321ea2ebb17cb4c9e0fbc0be",
+    "exit_criteria": [
+      {
+        "id": "default-previews:exit:1",
+        "text": "WAVE01 guidance is reachable before preparation and WAVE02 demonstrates exact-clip default waveforms through the portable public path."
+      },
+      {
+        "id": "default-previews:exit:2",
+        "text": "WAVE03 focused checks, explicit local commits and truthful quiescent closeout are recorded."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "milestone": "default-previews",
+  "disposition": "pack-complete",
+  "candidate_revision": "eea2808d041d04e946561bf6ed9d84702ddc61fe",
+  "handoff_ref": "docs/rfcs/plans/attended-review-waveforms/continuation.md",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/rfcs/plans/attended-review-waveforms/verification.md",
+    "docs/rfcs/plans/attended-review-waveforms/example-checks.json",
+    "docs/rfcs/plans/attended-review-waveforms/example-waveforms.png"
+  ],
+  "acceptance_records": [
+    {
+      "id": "ASK-0117:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-waveforms/verification.md",
+        "docs/rfcs/plans/attended-review-waveforms/example-checks.json",
+        "docs/rfcs/plans/attended-review-waveforms/example-waveforms.png"
+      ]
+    },
+    {
+      "id": "default-previews:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-waveforms/verification.md",
+        "docs/rfcs/plans/attended-review-waveforms/example-checks.json",
+        "docs/rfcs/plans/attended-review-waveforms/example-waveforms.png"
+      ]
+    },
+    {
+      "id": "default-previews:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-waveforms/verification.md",
+        "docs/rfcs/plans/attended-review-waveforms/example-checks.json",
+        "docs/rfcs/plans/attended-review-waveforms/example-waveforms.png"
+      ]
+    }
+  ],
+  "continuation": {
+    "intent": "stop",
+    "next_milestone": null,
+    "reason": "target-complete",
+    "detail": "ASK-0117 source guidance and small example complete, accepted and Done. Historical acceptance and native limits preserved; all commands finished and task fixtures removed. No successor milestone."
+  },
+  "ownership": "quiescent"
+}
