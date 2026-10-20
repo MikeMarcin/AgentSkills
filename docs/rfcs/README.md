@@ -39,3 +39,5 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0014 | Implementing | Selectable execution strategies and real-code experiments |
 
 | RFC-ASK-0015 | Auto-Verified | Portable RFC authoring and optional grilling |
+
+| RFC-ASK-0016 | Implementing | Audio questions and durable feedback |
