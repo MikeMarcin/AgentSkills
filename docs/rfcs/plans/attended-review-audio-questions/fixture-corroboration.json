@@ -1,0 +1,385 @@
+[
+  {
+    "fixture": "consumer-a",
+    "session": "a496eafa027fe444753902472e445a2f",
+    "sequence": 39,
+    "handed_back": "2026-10-20T03:17:44.124439+00:00",
+    "events": [
+      {
+        "sequence": 36,
+        "time": "2026-10-20T03:14:44.571745+00:00",
+        "kind": "playback-error",
+        "candidate": "broken",
+        "diagnostic": {
+          "candidate": "broken",
+          "fingerprint": "35e7d7f3dc6286d64859c425bbdd300aa920187b246df489bca610f659aa69e7",
+          "diagnostic_id": "9084f1c4-1e78-49c0-b9ad-ccb0d6cadaea",
+          "message": "Could not load or decode Decode failure \u2014 negative control. Playback has not succeeded."
+        }
+      },
+      {
+        "sequence": 39,
+        "time": "2026-10-20T03:17:44.124448+00:00",
+        "kind": "handed-back",
+        "decided": [
+          "death-C"
+        ],
+        "pending": [
+          "brief",
+          "broken",
+          "death-A",
+          "death-B",
+          "launcher-A",
+          "launcher-B",
+          "launcher-C"
+        ],
+        "feedback_pending": [
+          "brief",
+          "launcher-A",
+          "launcher-B"
+        ]
+      }
+    ],
+    "candidates": [
+      {
+        "id": "brief",
+        "fingerprint": "effeb9c5c544ed508890171f16b36b2a97a188ca48482cd34a2fa83ea48a3eef",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": {
+          "candidate": "brief",
+          "fingerprint": "effeb9c5c544ed508890171f16b36b2a97a188ca48482cd34a2fa83ea48a3eef",
+          "feedback_id": "5dc7fd76-fa92-442d-a83b-aeac4d4841a1",
+          "note": "Ordinary question feedback before any verdict.",
+          "attachments": [],
+          "saved_at": "2026-10-20T03:13:25.637138+00:00",
+          "actor": "human"
+        },
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "launcher-A",
+        "fingerprint": "649642311eaede9d2ccaf5d4b102716b9dd98f3e9799791f44d925f1ff4dfdc5",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": {
+          "candidate": "launcher-A",
+          "fingerprint": "649642311eaede9d2ccaf5d4b102716b9dd98f3e9799791f44d925f1ff4dfdc5",
+          "feedback_id": "bf2c1511-9019-453d-bfe2-5d9c094e2e29",
+          "note": "Launcher A playback feedback remains undecided. [0:00.0] ",
+          "attachments": [],
+          "saved_at": "2026-10-20T03:14:06.719433+00:00",
+          "actor": "human"
+        },
+        "superseded": null,
+        "feedback_history": [
+          {
+            "candidate": "launcher-A",
+            "fingerprint": "649642311eaede9d2ccaf5d4b102716b9dd98f3e9799791f44d925f1ff4dfdc5",
+            "feedback_id": "dedc1d95-e896-4ca5-9760-49eb864f68e8",
+            "note": "Launcher A feedback only; undecided.",
+            "attachments": [],
+            "saved_at": "2026-10-20T03:13:44.267385+00:00",
+            "actor": "human"
+          },
+          {
+            "candidate": "launcher-A",
+            "fingerprint": "649642311eaede9d2ccaf5d4b102716b9dd98f3e9799791f44d925f1ff4dfdc5",
+            "feedback_id": "b6ccf222-9d40-41ef-8ca2-ebb79c8faa71",
+            "note": "Launcher A playback feedback remains undecided.",
+            "attachments": [],
+            "saved_at": "2026-10-20T03:13:58.218391+00:00",
+            "actor": "human"
+          }
+        ],
+        "playback_errors": null
+      },
+      {
+        "id": "launcher-B",
+        "fingerprint": "0cb78399640ca50882ac7014b4912cf9e00dfe377e5b8d669252817c8f3b6416",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": {
+          "candidate": "launcher-B",
+          "fingerprint": "0cb78399640ca50882ac7014b4912cf9e00dfe377e5b8d669252817c8f3b6416",
+          "feedback_id": "d481393c-ae9c-4653-bbc0-de822d8ec0ae",
+          "note": "Launcher B recoverable edit while the host is stopped.",
+          "attachments": [],
+          "saved_at": "2026-10-20T03:17:23.587183+00:00",
+          "actor": "human"
+        },
+        "superseded": null,
+        "feedback_history": [
+          {
+            "candidate": "launcher-B",
+            "fingerprint": "0cb78399640ca50882ac7014b4912cf9e00dfe377e5b8d669252817c8f3b6416",
+            "feedback_id": "96f35b49-d472-4491-9c3f-cc0bcac258e7",
+            "note": "Launcher B saved feedback before host restart.",
+            "attachments": [],
+            "saved_at": "2026-10-20T03:15:27.704853+00:00",
+            "actor": "human"
+          }
+        ],
+        "playback_errors": null
+      },
+      {
+        "id": "launcher-C",
+        "fingerprint": "65e4544e7025e00bfc09d3b1a89045aa4b8c493b8069f21337834407f7f5616a",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "death-A",
+        "fingerprint": "e222a984de4d7c356f344a9fdcf32234b46bd3e93c405463ac4bd10a39cd9895",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "death-B",
+        "fingerprint": "6fbbba482ed83c4d0622de20a62b902ea818d660fa556d5d6361f703c7c0dba1",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "death-C",
+        "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+        "phase": "ready",
+        "protected": true,
+        "decision": {
+          "candidate": "death-C",
+          "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+          "decision_id": "1a56b498-e700-48a1-980f-b79e2fffdc6f",
+          "note": "Reject for death; consider for non-death pain. Revised feedback.",
+          "attachments": [],
+          "outcome": "reject",
+          "saved_at": "2026-10-20T03:14:44.168133+00:00",
+          "actor": "human"
+        },
+        "feedback": {
+          "candidate": "death-C",
+          "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+          "feedback_id": "answer:1a56b498-e700-48a1-980f-b79e2fffdc6f",
+          "note": "Reject for death; consider for non-death pain. Revised feedback.",
+          "attachments": [],
+          "saved_at": "2026-10-20T03:14:44.168131+00:00",
+          "actor": "human"
+        },
+        "superseded": [
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "decision_id": "8bb140da-ac1a-4922-af1b-9bb11c7a0996",
+            "note": "Reject for death; consider this for non-death pain.",
+            "attachments": [],
+            "outcome": "reject",
+            "saved_at": "2026-10-20T03:14:29.304955+00:00",
+            "actor": "human"
+          },
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "decision_id": "8bb140da-ac1a-4922-af1b-9bb11c7a0996",
+            "note": "Reject for death; consider this for non-death pain.",
+            "attachments": [],
+            "outcome": "reject",
+            "saved_at": "2026-10-20T03:14:29.304968+00:00",
+            "actor": "human"
+          },
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "decision_id": "8bb140da-ac1a-4922-af1b-9bb11c7a0996",
+            "note": "Reject for death; consider for non-death pain. Revised feedback.",
+            "attachments": [],
+            "outcome": "reject",
+            "saved_at": "2026-10-20T03:14:35.160828+00:00",
+            "actor": "human"
+          },
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "decision_id": "1a56b498-e700-48a1-980f-b79e2fffdc6f",
+            "note": "Reject for death; consider for non-death pain. Revised feedback.",
+            "attachments": [],
+            "outcome": "reject",
+            "saved_at": "2026-10-20T03:14:44.168117+00:00",
+            "actor": "human"
+          }
+        ],
+        "feedback_history": [
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "feedback_id": "643881eb-4d87-4804-9758-7a87a3ef9785",
+            "note": "Reject for death; consider this for non-death pain.",
+            "attachments": [],
+            "saved_at": "2026-10-20T03:14:29.290228+00:00",
+            "actor": "human"
+          },
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "feedback_id": "answer:8bb140da-ac1a-4922-af1b-9bb11c7a0996",
+            "note": "Reject for death; consider this for non-death pain.",
+            "attachments": [],
+            "saved_at": "2026-10-20T03:14:29.304966+00:00",
+            "actor": "human"
+          },
+          {
+            "candidate": "death-C",
+            "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+            "feedback_id": "a3a84f98-6db3-40cd-a03c-eb146983377a",
+            "note": "Reject for death; consider for non-death pain. Revised feedback.",
+            "attachments": [],
+            "saved_at": "2026-10-20T03:14:35.160818+00:00",
+            "actor": "human"
+          }
+        ],
+        "playback_errors": null
+      },
+      {
+        "id": "broken",
+        "fingerprint": "35e7d7f3dc6286d64859c425bbdd300aa920187b246df489bca610f659aa69e7",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": [
+          {
+            "candidate": "broken",
+            "fingerprint": "35e7d7f3dc6286d64859c425bbdd300aa920187b246df489bca610f659aa69e7",
+            "diagnostic_id": "9084f1c4-1e78-49c0-b9ad-ccb0d6cadaea",
+            "message": "Could not load or decode Decode failure \u2014 negative control. Playback has not succeeded."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "fixture": "consumer-b",
+    "session": "0e54f8888d4c65c3d9c71c60d42232be",
+    "sequence": 25,
+    "handed_back": null,
+    "events": [],
+    "candidates": [
+      {
+        "id": "brief",
+        "fingerprint": "effeb9c5c544ed508890171f16b36b2a97a188ca48482cd34a2fa83ea48a3eef",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "launcher-A",
+        "fingerprint": "649642311eaede9d2ccaf5d4b102716b9dd98f3e9799791f44d925f1ff4dfdc5",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": {
+          "candidate": "launcher-A",
+          "fingerprint": "649642311eaede9d2ccaf5d4b102716b9dd98f3e9799791f44d925f1ff4dfdc5",
+          "feedback_id": "462bfb2d-398d-458d-8b64-db8c86c7fe64",
+          "note": "Committed-candidate smoke: retain this feedback during playback.",
+          "attachments": [],
+          "saved_at": "2026-10-20T03:21:41.966156+00:00",
+          "actor": "human"
+        },
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "launcher-B",
+        "fingerprint": "0cb78399640ca50882ac7014b4912cf9e00dfe377e5b8d669252817c8f3b6416",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "launcher-C",
+        "fingerprint": "65e4544e7025e00bfc09d3b1a89045aa4b8c493b8069f21337834407f7f5616a",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "death-A",
+        "fingerprint": "e222a984de4d7c356f344a9fdcf32234b46bd3e93c405463ac4bd10a39cd9895",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "death-B",
+        "fingerprint": "6fbbba482ed83c4d0622de20a62b902ea818d660fa556d5d6361f703c7c0dba1",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "death-C",
+        "fingerprint": "d0fff36936f0180ae6026d5a62dba3feb7677f8e8069ae89c41f364d696964ba",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      },
+      {
+        "id": "broken",
+        "fingerprint": "35e7d7f3dc6286d64859c425bbdd300aa920187b246df489bca610f659aa69e7",
+        "phase": "ready",
+        "protected": true,
+        "decision": null,
+        "feedback": null,
+        "superseded": null,
+        "feedback_history": null,
+        "playback_errors": null
+      }
+    ]
+  }
+]

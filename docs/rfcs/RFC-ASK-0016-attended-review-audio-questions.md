@@ -1,7 +1,8 @@
 ---
 id: "RFC-ASK-0016"
 title: "Audio questions and durable feedback in attended-review"
-status: "Implementing"
+status: "Auto-Verified"
+metadata: {"milestone_plan":{"id":"attended-review-audio-questions","path":"docs/rfcs/plans/attended-review-audio-questions/milestone-plan.json"}}
 ---
 
 # Audio questions and durable feedback in attended-review
@@ -208,3 +209,7 @@ live tracker entries are created during this authoring task.
 ## Execution authority
 
 Accepted for implementation by the owner on 2026-10-19. Source-only mandate revision `audio-source-v1`; owner decision above remains authoritative. Original draft retained unchanged under `drafts/`. Live work: ASK-0114; closeout: ASK-0115.
+
+## Verification and execution record
+
+Source acceptance AC01–AC08 passed at `2eff4c355c470cce9a629b488abb0d0e487fec19`. See [acceptance and limits](plans/attended-review-audio-questions/verification.md) and [browser evidence](plans/attended-review-audio-questions/browser-evidence.md). Native file-URL playback and Windows qualification remain unperformed; no consumer deployment or Faraday migration occurred.
