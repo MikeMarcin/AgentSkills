@@ -1,0 +1,12 @@
+{
+  "source_candidate": "a7518cca7e2526dec8bf5eef5d87291232081af3",
+  "fixture_host_pid": 52633,
+  "pid_absent": true,
+  "port": 54356,
+  "port_closed": true,
+  "managed_serve_exit_code": 0,
+  "temporary_fixture_removed": true,
+  "background_commands": [],
+  "repository_writers": "implementer only; coordinator screenshot writer completed",
+  "handed_off_servers": []
+}

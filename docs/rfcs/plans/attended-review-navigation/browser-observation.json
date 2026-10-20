@@ -1,0 +1,98 @@
+{
+  "source_candidate": "a7518cca7e2526dec8bf5eef5d87291232081af3",
+  "fixture_kind": "disposable synthetic mixed questions with tall content, source symlink and isolated registry",
+  "session": "3a06993c82fd45c40fdc4ad8f8d6cfc2",
+  "sequence": 28,
+  "handed_back": "2026-10-20T03:53:20.606242+00:00",
+  "candidates": [
+    {
+      "id": "brief",
+      "fingerprint": "f52d9ee93bbb8ebce5b93dae12adb11ccda099d2526694cad417db77c9000a2a",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": null
+    },
+    {
+      "id": "broken",
+      "fingerprint": "3c4c7358121bc793e34a34958258bc121c587ef9a4227ba36375d6a1e465c9b3",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": null
+    },
+    {
+      "id": "death-A",
+      "fingerprint": "0ae4dc677663747fdd1d93b8e3af83690ab84abb3b75a372703440176d74bbd2",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": null
+    },
+    {
+      "id": "death-B",
+      "fingerprint": "53f53d83c99d1c8314b69995b629bfc928880f35b20473ee9dce36641c9b1a50",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": null
+    },
+    {
+      "id": "death-C",
+      "fingerprint": "8866c7e314e255a181843310dfbcf4ba9d7b04b02a145c52b3424c02c05237ff",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": null
+    },
+    {
+      "id": "launcher-B",
+      "fingerprint": "d2bc7395dd5fa06f0981e54ecf2ce7aad6f8f0926db3480fed85360954a85659",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": {
+        "candidate": "launcher-B",
+        "fingerprint": "d2bc7395dd5fa06f0981e54ecf2ce7aad6f8f0926db3480fed85360954a85659",
+        "feedback_id": "caeca8c1-fa26-438c-ac13-c168677c995f",
+        "note": "Keep Launcher B pending; retain this feedback while moving on.",
+        "attachments": [],
+        "saved_at": "2026-10-20T03:53:06.922035+00:00",
+        "actor": "human"
+      }
+    },
+    {
+      "id": "launcher-C",
+      "fingerprint": "2f9f457c2d7e258a2a2b98c110865e205578affe4176b8392e0404d6654bac80",
+      "phase": "ready",
+      "protected": true,
+      "decision": null,
+      "feedback": null
+    },
+    {
+      "id": "launcher-A",
+      "fingerprint": "585c8c6be49d68df53623dd0eb0e4b1836cf589db5cc67421b5f33e20988ed07",
+      "phase": "ready",
+      "protected": true,
+      "decision": {
+        "candidate": "launcher-A",
+        "fingerprint": "585c8c6be49d68df53623dd0eb0e4b1836cf589db5cc67421b5f33e20988ed07",
+        "decision_id": "cffcfa56-2158-41b0-95e0-f0196d06a50d",
+        "note": "",
+        "attachments": [],
+        "outcome": "accept",
+        "saved_at": "2026-10-20T03:51:46.742360+00:00",
+        "actor": "human"
+      },
+      "feedback": {
+        "candidate": "launcher-A",
+        "fingerprint": "585c8c6be49d68df53623dd0eb0e4b1836cf589db5cc67421b5f33e20988ed07",
+        "feedback_id": "answer:cffcfa56-2158-41b0-95e0-f0196d06a50d",
+        "note": "",
+        "attachments": [],
+        "saved_at": "2026-10-20T03:51:46.742373+00:00",
+        "actor": "human"
+      }
+    }
+  ]
+}

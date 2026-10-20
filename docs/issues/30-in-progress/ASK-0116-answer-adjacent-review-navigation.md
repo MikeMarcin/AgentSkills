@@ -3,10 +3,10 @@ schema: "implement-rfc.card.v1"
 id: "ASK-0116"
 title: "Navigate and hand back beside review answers"
 status: "In Progress"
-rfcs: ["RFC-ASK-0016"]
+rfcs: []
 depends_on: ["ASK-0114", "ASK-0115"]
 priority: "P1"
-metadata: {"milestone_plan":{"id":"attended-review-navigation","path":"docs/rfcs/plans/attended-review-navigation/milestone-plan.json"}}
+metadata: {"milestone_plan":{"id":"attended-review-navigation","path":"docs/rfcs/plans/attended-review-navigation/milestone-plan.json"},"related_rfc":"RFC-ASK-0016"}
 ---
 
 # Navigate and hand back beside review answers
@@ -21,6 +21,9 @@ change or push. Baseline: d19d11a84d841ec1aecf8c44d52cd27bc740e777. Own only
 `skills/attended-review/assets/review.html`, its focused page tests, and this
 bounded follow-up's tracker/plan/evidence. Original completed audio RFC, plan and
 acceptance remain historical and unchanged.
+
+Related completed design: [RFC-ASK-0016](../../rfcs/RFC-ASK-0016-attended-review-audio-questions.md).
+This independent follow-up adds no unfinished obligation to its historical closeout.
 
 Acceptance:
 

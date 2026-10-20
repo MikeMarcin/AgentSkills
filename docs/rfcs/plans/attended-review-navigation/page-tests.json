@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0116-NAV01-NAV02",
+  "outcome": "pass",
+  "revision": "be9072d210c9d0f896c98d5797e29353fd4a0150",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"node\", \"skills/attended-review/tests/review_page.test.js\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.191,
+    "stdout_tail": "PASS: answered/pending next-question order, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery\n",
+    "stderr_tail": ""
+  }
+}
