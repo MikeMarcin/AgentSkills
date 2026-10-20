@@ -177,41 +177,124 @@ textarea::placeholder{color:var(--chalk-faint)}
       <section class="ask"><h3>What to check</h3><ul id="criteria"></ul></section>
       <div id="content" class="prose"></div>
       <div id="launch"></div><div id="copy-values"></div><div id="wizard"></div>
-      <div id="media"></div>
+      <div id="audio-context" class="prose"></div><div id="comparison" class="controls"></div><div id="media"></div><p id="playback-error" role="alert"></p><div id="audio-controls" class="controls" hidden><button id="replay">Replay from beginning</button><label><input id="loop" type="checkbox"> Loop this clip</label><button id="timestamp">Insert playback time in feedback</button></div>
       <section id="checked" class="checked" hidden><h3>Already checked by your driver</h3><ul id="observations"></ul><p class="aside">Objective evidence, not a verdict. The decision below is yours.</p></section>
       <div id="options" class="choices"></div>
       <section class="answer"><h3>Your answer</h3>
         <div id="verdict" hidden></div><p id="standing" hidden></p>
         <textarea id="note" placeholder="Why, in your own words. Optional." aria-label="Your note about this candidate"></textarea>
         <div class="pictures-in"><label for="images">Screenshots: paste one into the note, or choose files</label><input id="images" type="file" accept="image/*" multiple aria-label="Attach screenshots to this answer"></div>
-        <div id="attachments"></div>
+        <div id="attachments"></div><p id="feedback-status" role="status"></p><div class="controls"><button id="save-feedback">Save feedback</button><button id="clear-feedback">Clear feedback</button></div>
         <div class="controls" aria-label="This candidate"><span class="group">This candidate:</span><button id="accept" class="accept">Accept</button><button id="reject" class="reject">Reject</button><button id="clear" class="quiet">Clear my answer</button><button id="skip" class="quiet">Answer later</button></div>
       </section>
       <details class="provenance"><summary>Where this candidate came from</summary><dl id="provenance"></dl></details>
     </article>
   </main>
 </div>
-<details id="fallback"><summary>Offline fallback and partial export</summary><p>Every completed decision can be exported now. Pending and skipped items stay pending. Copy this JSON or download it, then give it to your driver for import.</p><p id="generated"></p><div class="controls"><button id="export">Export decisions</button><button id="copy">Copy JSON</button><button id="download">Download JSON</button></div><textarea id="transfer" aria-label="Decision JSON"></textarea><p id="storage"></p></details>
+<details id="fallback"><summary>Offline fallback and partial export</summary><p>Every answer and saved or recoverable draft feedback can be exported now. Pending and skipped items stay pending. Copy this JSON or download it, then give it to your driver for import.</p><p id="generated"></p><div class="controls"><button id="export">Export answers and feedback</button><button id="copy">Copy JSON</button><button id="download">Download JSON</button></div><textarea id="transfer" aria-label="Decision JSON"></textarea><p id="storage"></p></details>
 <div id="viewer" hidden role="dialog" aria-label="Image at full size"><div class="bar"><span id="viewer-label"></span><button id="viewer-close">Close</button></div><div class="surface"><img id="viewer-image" alt=""></div></div>
 <script>
 'use strict';
 const embedded=/*SESSION_DATA*/null;
-let state=embedded, current=null, local=[], saving=false, pending=[];
+let state=embedded, current=null, local=[], drafts={}, diagnostics=[], saving=false, pending=[], editorKey=null, editorFeedbackId=null, mediaKey=null, saveTimer=null, saveChain=Promise.resolve();
 const token=new URLSearchParams(location.hash.slice(1)).get('token');
 const online=!embedded&&location.protocol==='http:';
 const el=id=>document.getElementById(id);
 const say=text=>el('notice').textContent=text;
-const cacheKey=()=>`attended-review:${state.session}`;
-function restore(){try{local=JSON.parse(localStorage.getItem(cacheKey())||'[]').filter(d=>state.candidates.some(c=>c.id===d.candidate&&c.fingerprint===d.fingerprint));}catch(e){local=[];el('storage').textContent='Browser storage is unavailable. Export decisions before closing this page.';}}
-function persist(){try{localStorage.setItem(cacheKey(),JSON.stringify(local));}catch(e){el('storage').textContent='Browser storage is unavailable. Export decisions before closing this page.';}}
-function decision(c){return c.decision||local.find(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint);}
-function packet(){const byId=new Map();for(const c of state.candidates){const d=decision(c);if(d){const clean={};for(const k of ['candidate','fingerprint','decision_id','outcome','selected','note','attachments'])if(k in d)clean[k]=d[k];byId.set(c.id,clean);}}return {schema_version:1,session:state.session,decisions:[...byId.values()]};}
+const uid=()=>globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const key=c=>`${c.id}:${c.fingerprint}`;
+const cacheKey=()=>`attended-review:${state.session}:v2`;
+function restore(){try{const cached=JSON.parse(localStorage.getItem(cacheKey())||'null')||{decisions:JSON.parse(localStorage.getItem(`attended-review:${state.session}`)||'[]')};local=cached.decisions||[];drafts=cached.drafts||{};diagnostics=cached.diagnostics||[];}catch(e){el('storage').textContent='Browser storage is unavailable. Export feedback and answers before closing this page.';}}
+function persist(){try{localStorage.setItem(cacheKey(),JSON.stringify({decisions:local,drafts,diagnostics}));}catch(e){el('storage').textContent='Browser storage is unavailable. Export feedback and answers before closing this page.';}}
+function decision(c){const d=local.find(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint);return d?(d.outcome==='withdrawn'?null:d):c.decision;}
+function feedback(c){return drafts[key(c)]||c.feedback||c.decision||{note:'',attachments:[]};}
+function packet(){
+ const decisions=[],feedbacks=[];
+ for(const c of state.candidates){
+  const d=local.find(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint)||c.decision;
+  if(d){
+   const clean={};
+   for(const k of ['candidate','fingerprint','decision_id','outcome','selected','note','attachments'])if(k in d)clean[k]=d[k];
+   decisions.push(clean);
+  }
+  const f=feedback(c);
+  const changed=!d||d.outcome==='withdrawn'||f.note!==d.note||JSON.stringify(f.attachments||[])!==JSON.stringify(d.attachments||[]);
+  if(f.feedback_id&&changed)feedbacks.push({candidate:c.id,fingerprint:c.fingerprint,feedback_id:f.feedback_id,note:f.note||'',attachments:f.attachments||[]});
+ }
+ // A replaced candidate must not silently erase an unsubmitted local draft.
+ for(const draft of Object.values(drafts)){
+  if(!state.candidates.some(c=>key(c)===`${draft.candidate}:${draft.fingerprint}`)){
+   const {candidate,fingerprint,feedback_id,note,attachments}=draft;
+   feedbacks.push({candidate,fingerprint,feedback_id,note,attachments});
+  }
+ }
+ return {schema_version:2,session:state.session,decisions,feedback:feedbacks,diagnostics};
+}
+function receive(next){
+ const c=state?candidate():null,replacement=next.candidates.find(v=>v.id===current);
+ if(c&&replacement&&replacement.fingerprint!==c.fingerprint&&drafts[key(c)]?.dirty){
+  say('This candidate changed. Your older draft is retained; export it before reloading the new candidate.');
+  return;
+ }
+ state=next;
+}
 async function api(path,body){const r=await fetch(path,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const v=await r.json();if(!r.ok)throw Error(v.error||`HTTP ${r.status}`);return v;}
 function candidate(){return state.candidates.find(c=>c.id===current);}
-function chooseNext(){const available=state.candidates.filter(c=>c.phase==='ready'&&!decision(c));const index=available.findIndex(c=>c.id===current);current=available.length?available[(index+1)%available.length].id:null;select(current);}
-// A verdict already given comes back with its own words and pictures, so a
-// reviewer can read what they said and change it rather than guess.
-function select(id){current=id;const c=candidate(),d=c?decision(c):null;el('note').value=d?.note||'';pending=(d?.attachments||[]).map(a=>({...a}));el('images').value='';el('options').replaceChildren();draw();if(!c)return;if(wide.matches)el('list').querySelector('[aria-current="true"]')?.scrollIntoView({block:'nearest'});else{el('queue').open=false;el('card').scrollIntoView({block:'start'});}}
+function stopPlayback(){for(const node of el('media').querySelectorAll('audio,video'))node.pause();}
+function loadEditor(c){
+ if(!c||editorKey===key(c))return;
+ editorKey=key(c);editorFeedbackId=c.feedback?.feedback_id||null;
+ const f=feedback(c);
+ el('note').value=f.note||'';pending=(f.attachments||[]).map(a=>({...a}));
+ el('images').value='';el('options').replaceChildren();
+ for(const option of c.options||[]){
+  const label=document.createElement('label'),input=document.createElement('input');
+  input.type='checkbox';input.value=option;input.checked=decision(c)?.selected?.includes(option)||false;
+  label.append(input,document.createTextNode(option));el('options').append(label);
+ }
+}
+function edit(){
+ const c=candidate();if(!c)return;
+ const old=drafts[key(c)];
+ drafts[key(c)]={candidate:c.id,fingerprint:c.fingerprint,feedback_id:uid(),note:el('note').value,
+  attachments:pending.map(a=>({...a})),expected_feedback_id:old?old.expected_feedback_id:editorFeedbackId,dirty:true};
+ persist();feedbackStatus();clearTimeout(saveTimer);saveTimer=setTimeout(()=>flush(c),500);
+}
+function feedbackStatus(){
+ const c=candidate();if(!c)return;
+ const f=drafts[key(c)];let message;
+ if(f?.error)message='Save failed. Your local draft is retained. Retry Save feedback or export it.';
+ else if(f?.dirty)message=online?'Feedback waiting to save…':'Feedback retained in this browser; export to record it with your driver.';
+ else if(c.feedback)message='Feedback saved.';
+ else message=online?'Feedback saves independently of your answer.':'Browser storage is a convenience; export before closing.';
+ el('feedback-status').textContent=message;
+}
+function flush(c=candidate()){
+ clearTimeout(saveTimer);if(!c)return Promise.resolve(true);
+ const task=async()=>{
+  const f=drafts[key(c)];if(!f?.dirty)return true;
+  if(!online){persist();return true;}
+  el('feedback-status').textContent='Saving feedback…';
+  const sent={...f};delete sent.dirty;delete sent.error;
+  try{
+   await api('/api/decisions',{schema_version:2,session:state.session,decisions:[],feedback:[sent]});
+   receive(await api('/api/status'));
+   const fresh=state.candidates.find(v=>key(v)===key(c)),feedbackId=fresh?.feedback?.feedback_id||null;
+   if(editorKey===key(c))editorFeedbackId=feedbackId;
+   if(drafts[key(c)]?.feedback_id===sent.feedback_id)delete drafts[key(c)];
+   else if(drafts[key(c)])drafts[key(c)].expected_feedback_id=feedbackId;
+   persist();draw();return true;
+  }catch(e){
+   if(drafts[key(c)])drafts[key(c)].error=e.message;
+   persist();feedbackStatus();
+   say(`Feedback was not confirmed saved: ${e.message}. The draft is available in partial export.`);
+   return false;
+  }
+ };
+ const result=saveChain.then(task,task);saveChain=result.catch(()=>false);return result;
+}
+async function select(id){const previous=candidate();await flush(previous);stopPlayback();current=id;editorKey=null;draw();if(!candidate())return;if(wide.matches)el('list').querySelector('[aria-current="true"]')?.scrollIntoView({block:'nearest'});else{el('queue').open=false;el('card').scrollIntoView({block:'start'});}}
+function chooseNext(){const items=state.candidates.filter(c=>c.phase==='ready'&&!decision(c)),index=items.findIndex(c=>c.id===current);select(items.length?items[(index+1)%items.length].id:null);}
 const make=(tag,className,text)=>{const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;};
 const plural=(n,word)=>`${n} ${word}${n===1?'':'s'}`;
 // The rail groups the queue by what the reviewer can do about each item.
@@ -238,19 +321,25 @@ function draw(){
  if(!c){el('empty').textContent=!state.candidates.length?'Nothing to review yet. Your driver has not added any candidates.':ready?'Pick an item from the queue to begin.':waiting?'Nothing is ready yet. Preparation is still running; items move into the queue as they become ready.':'Every candidate is answered. Finish and hand back when you are done, or pick an answered item in the queue to change it.';return;}
  el('identity').replaceChildren(make('span','id',c.id),`  revision ${c.revision}`);el('title').textContent=c.title;el('content').textContent=c.content||'';el('content').hidden=!c.content;
  el('criteria').replaceChildren();for(const text of c.criteria){el('criteria').append(make('li',null,text));}
- el('media').replaceChildren();for(const m of c.media||[]){const figure=make('figure'),node=document.createElement(m.kind==='image'?'img':m.kind);node.src=m.url;node.alt=m.label||'';if(m.kind!=='image')node.controls=true;else{node.title='Show at full size';node.onclick=()=>view(m.url,m.label||'');}figure.append(node);if(m.label)figure.append(make('figcaption',null,m.label));el('media').append(figure);}
+ loadEditor(c);feedbackStatus();
+ const nextMediaKey=key(c);
+ if(mediaKey!==nextMediaKey){stopPlayback();mediaKey=nextMediaKey;el('media').replaceChildren();el('audio-context').replaceChildren();el('playback-error').textContent='';el('loop').checked=false;
+ const a=c.question_type==='audio'?c.audio:null;el('audio-controls').hidden=!a;
+ if(a){for(const [label,value] of [['Variant',a.variant],['Purpose',a.purpose],['Scope',a.scope],['Playback context',a.context],['Listen for',a.listen_for],['Reject if',a.reject_if]])if(value)el('audio-context').append(make('p',null,`${label}: ${value}`));}
+ for(const m of [...(a?[{kind:'audio',url:a.url,label:a.variant||c.title}]:[]),...(c.media||[])]){const figure=make('figure'),node=document.createElement(m.kind==='image'?'img':m.kind);node.src=m.url;node.alt=m.label||'';if(m.kind!=='image'){node.controls=true;node.preload='metadata';node.onplay=()=>{for(const other of el('media').querySelectorAll('audio,video'))if(other!==node)other.pause();};node.onerror=()=>playbackError(c,`Could not load or decode ${m.label||'this clip'}. Playback has not succeeded.`);}else{node.title='Show at full size';node.onclick=()=>view(m.url,m.label||'');}figure.append(node);if(m.label)figure.append(make('figcaption',null,m.label));el('media').append(figure);}
+ const failures=[...(c.playback_errors||[]),...diagnostics.filter(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint)];if(failures.length)el('playback-error').textContent=failures.at(-1).message;
+ }
+ el('comparison').replaceChildren();if(c.question_type==='audio'&&c.comparison_group){el('comparison').append(make('span','group','Compare clips (each has its own answer):'));for(const sibling of state.candidates.filter(v=>v.question_type==='audio'&&v.comparison_group===c.comparison_group)){const b=make('button',null,sibling.audio.variant||sibling.title);b.disabled=sibling.id===c.id;b.onclick=()=>select(sibling.id);el('comparison').append(b);}}
  const observations=(c.observations||[]).filter(o=>o.evidence);el('checked').hidden=!observations.length;el('observations').replaceChildren();
  for(const o of observations){const li=make('li');if(o.time){const t=document.createElement('time');t.dateTime=o.time;t.textContent=o.time.replace('T',' ').replace(/\.\d+.*$/,'');li.append(t);}li.append(o.evidence);el('observations').append(li);}
  el('wizard').replaceChildren();if(c.wizard){el('wizard').append(make('p',null,c.wizard.instructions||'Follow the companion wizard, then return here for your decision.'));if(c.wizard.url){try{const url=new URL(c.wizard.url);if(['http:','https:','file:'].includes(url.protocol)){const a=document.createElement('a');a.href=url.href;a.textContent='Open manual steps';a.target='_blank';a.rel='noopener noreferrer';el('wizard').append(a);}}catch(e){}}}
- const oldOptions=new Set([...el('options').querySelectorAll('input:checked')].map(v=>v.value));
- el('options').replaceChildren();for(const option of c.options||[]){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.value=option;input.checked=oldOptions.has(option);label.append(input,document.createTextNode(option));el('options').append(label);}
  el('options').hidden=!(c.options||[]).length;
  const d=decision(c),enabled=c.phase==='ready'&&c.protected&&!saving&&!state.handed_back;
  el('accept').textContent=(c.options?'Save selection':'Accept')+(d&&d.outcome!=='accept'?' instead':'');
  el('reject').textContent='Reject'+(d&&d.outcome!=='reject'?' instead':'');
  el('accept').disabled=el('reject').disabled=!enabled;
  el('clear').disabled=!enabled||!d;el('clear').hidden=!d;
- el('images').disabled=!enabled;
+ el('images').disabled=el('note').disabled=el('save-feedback').disabled=el('clear-feedback').disabled=!enabled;
  el('attachments').replaceChildren();
  for(const a of pending){const figure=make('figure'),image=document.createElement('img');image.src=a.data;image.alt=a.name;figure.append(image,make('figcaption',null,a.name));el('attachments').append(figure);}
  // The note is part of the verdict, so the verdict says it back.
@@ -268,30 +357,33 @@ function closeViewer(){el('viewer').hidden=true;el('viewer-image').src='';}
 el('viewer-close').onclick=closeViewer;
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!el('viewer').hidden)closeViewer();});
 async function record(outcome){
- const c=candidate();if(!c)return;
- const d={candidate:c.id,fingerprint:c.fingerprint,decision_id:globalThis.crypto?.randomUUID?.()||`${Date.now()}-${Math.random().toString(36).slice(2)}`,outcome,note:el('note').value};
- if(outcome!=='withdrawn'&&pending.length)d.attachments=pending.map(a=>({name:a.name,data:a.data}));
+ const c=candidate();if(!c)return;if(!await flush(c)){say('Save or export the retained feedback draft before changing this answer.');return;}
+ const d={candidate:c.id,fingerprint:c.fingerprint,decision_id:uid(),outcome,note:el('note').value,attachments:pending.map(a=>({...a})),expected_feedback_id:candidate()?.feedback?.feedback_id||null};
  if(outcome==='select'){d.selected=[...el('options').querySelectorAll('input:checked')].map(v=>v.value);if(!d.selected.length){say('Select at least one option.');return;}}
  saving=true;draw();
- try{if(online){await api('/api/decisions',{schema_version:1,session:state.session,decisions:[d]});state=await api('/api/status');say(outcome==='withdrawn'?'Decision cleared. Decide again whenever you are ready.':'Decision saved. It is shown under Your answer; change or clear it whenever you like, or pick the next item.');}else{local=local.filter(v=>!(v.candidate===d.candidate&&v.fingerprint===d.fingerprint));if(outcome!=='withdrawn')local.push(d);persist();say(outcome==='withdrawn'?'Decision cleared in this browser.':'Decision retained in this browser. Export whenever you are ready to stop.');}select(c.id);}catch(e){say(`Decision was not confirmed saved: ${e.message}. Retry; a matching repeated import is safe.`);}finally{saving=false;draw();}
+ try{if(online){await api('/api/decisions',{schema_version:2,session:state.session,decisions:[d]});receive(await api('/api/status'));}else{local=local.filter(v=>!(v.candidate===c.id&&v.fingerprint===c.fingerprint));local.push(d);persist();}say(outcome==='withdrawn'?'Answer cleared. Feedback is retained.':online?'Answer saved. Other clips keep their own answers.':'Answer retained in this browser; export to your driver.');}catch(e){say(`Answer was not confirmed saved: ${e.message}. Feedback drafts remain available.`);}finally{saving=false;draw();}
 }
-el('accept').onclick=()=>record(candidate()?.options?'select':'accept');el('reject').onclick=()=>record('reject');el('skip').onclick=chooseNext;
-el('clear').onclick=()=>record('withdrawn');
-el('finish').onclick=async()=>{
- const decided=state.candidates.filter(decision),pending=state.candidates.filter(c=>!decision(c));
- const summary=`${decided.length} answered${decided.length?': '+decided.map(c=>`${c.title} — ${decision(c).outcome}`).join('; '):''}. ${pending.length} left unanswered.`;
- try{
-  if(online){await api('/api/hand-back',{});state=await api('/api/status');say(`Handed back. ${summary} Your answers are saved; you can close this tab.`);}
-  else{el('export').click();say(`${summary} Your answers are in the box below: copy or download it and give it to your driver, then close this tab.`);el('fallback').open=true;}
- }catch(e){say(`Could not hand back: ${e.message}. Your saved answers are unaffected.`);}
- draw();};
+el('accept').onclick=()=>record(candidate()?.options?'select':'accept');el('reject').onclick=()=>record('reject');el('skip').onclick=chooseNext;el('clear').onclick=()=>record('withdrawn');
+el('note').oninput=edit;el('save-feedback').onclick=()=>flush();el('clear-feedback').onclick=()=>{el('note').value='';pending=[];edit();draw();flush();};
+el('replay').onclick=()=>{const node=el('media').querySelector('audio');if(node){node.currentTime=0;node.play().catch(()=>playbackError(candidate(),'Playback could not start. Try the player controls.'));}};
+el('loop').onchange=()=>{const node=el('media').querySelector('audio');if(node)node.loop=el('loop').checked;};
+el('timestamp').onclick=()=>{const node=el('media').querySelector('audio');if(node){const t=node.currentTime;el('note').value+=`${el('note').value?' ':''}[${Math.floor(t/60)}:${(t%60).toFixed(1).padStart(4,'0')}] `;edit();el('note').focus();}};
+async function playbackError(c,message){
+ if(candidate()&&key(candidate())===key(c))el('playback-error').textContent=message;
+ if(diagnostics.some(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint&&d.message===message))return;
+ const d={candidate:c.id,fingerprint:c.fingerprint,diagnostic_id:uid(),message};
+ diagnostics.push(d);persist();
+ if(online)try{await api('/api/decisions',{schema_version:2,session:state.session,decisions:[],diagnostics:[d]});}
+ catch(e){say('Playback error retained locally. Export it if the host is unavailable.');}
+}
+el('finish').onclick=async()=>{stopPlayback();if(!await flush()){el('fallback').open=true;say('Handback stopped because feedback is unsaved. Retry Save feedback or export the local draft.');return;}try{if(online){const result=await api('/api/hand-back',{});receive(await api('/api/status'));say(`Handed back: ${result.decided.length} answered, ${result.pending.length} unanswered, including ${result.feedback_pending.length} with feedback.`);}else{el('export').click();el('fallback').open=true;say('Copy or download the partial answers and feedback for your driver. Unanswered clips remain pending.');}}catch(e){say(`Could not hand back: ${e.message}. Export your retained draft if needed.`);}draw();};
 // A screenshot is on the clipboard, not on disk. Pasting one into the note
 // attaches it, under the same bounds a chosen file has.
-async function attach(files){for(const file of files){if(pending.length>=4){say('Four images is the bound for one answer.');break;}if(file.size>3*1024*1024){say(`${file.name||'that image'} is larger than 3 MB; use a smaller one.`);continue;}try{pending.push({name:file.name||`pasted-${pending.length+1}.png`,data:await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file);})});}catch(e){say('That image could not be read.');}}draw();}
+async function attach(files){for(const file of files){if(pending.length>=4){say('Four images is the bound for one answer.');break;}if(file.size>3*1024*1024){say(`${file.name||'that image'} is larger than 3 MB; use a smaller one.`);continue;}try{pending.push({name:file.name||`pasted-${pending.length+1}.png`,data:await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file);})});}catch(e){say('That image could not be read.');}}edit();draw();}
 el('note').onpaste=async event=>{const files=[...(event.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));if(!files.length)return;event.preventDefault();await attach(files);say(`${plural(files.length,'image')} attached to this answer.`);};
 el('images').onchange=async()=>{const files=[...el('images').files];el('images').value='';await attach(files);};
-el('start').onclick=async()=>{try{if(online){await api('/api/start',{interrupt:true});state=await api('/api/status');}say('Review ready items now. Skips remain pending.');chooseNext();}catch(e){say(e.message);}};
-el('pause').onclick=async()=>{try{if(online){await api('/api/pause',{});state=await api('/api/status');}say(online?'Session paused. Prepared candidates remain protected.':'You can stop now. Export partial decisions first; undecided items remain pending.');draw();}catch(e){say(e.message);}};
+el('start').onclick=async()=>{try{if(online){await api('/api/start',{interrupt:true});receive(await api('/api/status'));}say('Review ready items now. Skips remain pending.');chooseNext();}catch(e){say(e.message);}};
+el('pause').onclick=async()=>{stopPlayback();if(!await flush())return;try{if(online){await api('/api/pause',{});receive(await api('/api/status'));}say(online?'Session paused. Prepared candidates remain protected.':'You can stop now. Export partial decisions first; undecided items remain pending.');draw();}catch(e){say(e.message);}};
 el('export').onclick=()=>{el('transfer').value=JSON.stringify(packet(),null,2);};
 el('copy').onclick=async()=>{el('export').click();try{await navigator.clipboard.writeText(el('transfer').value);say('Decision JSON copied.');}catch(e){el('transfer').select();say('Copy the selected JSON using your keyboard.');}};
 el('download').onclick=()=>{el('export').click();const blob=new Blob([el('transfer').value],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='attended-decisions.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
@@ -301,6 +393,7 @@ function stamp(){if(!state)return;const when=state.generated_at;el('generated').
 const wide=matchMedia('(min-width:900px)');
 function fold(){el('queue').open=wide.matches;}
 wide.addEventListener('change',fold);fold();
-async function boot(){try{if(online){state=await api('/api/status');history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');if(!online)restore();stamp();draw();if(online)setInterval(async()=>{if(saving)return;try{const next=await api('/api/status');if(next.sequence!==state.sequence){state=next;draw();}}catch(e){say('Live host is unavailable. Reopen it with your driver; saved decisions remain on disk.');}},1500);}catch(e){say(e.message);}}
+async function boot(){try{if(online){receive(await api('/api/status'));history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');restore();stamp();draw();if(online)setInterval(async()=>{if(saving)return;try{const next=await api('/api/status');if(next.sequence!==state.sequence){receive(next);draw();}}catch(e){say('Live host is unavailable. Reopen it with your driver; saved decisions remain on disk.');}},1500);}catch(e){say(e.message);}}
+window.addEventListener('pagehide',()=>{stopPlayback();persist();});
 boot();
 </script></html>

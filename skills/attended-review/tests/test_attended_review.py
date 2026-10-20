@@ -61,6 +61,158 @@ class ReviewTests(unittest.TestCase):
         path.write_text(json.dumps({"schema_version": 1, "candidates": list(candidates)}))
         return self.cli("init", "--manifest", str(path), root=root)
 
+    def init_v2(self, *candidates):
+        path = self.base / "manifest-v2.json"
+        path.write_text(json.dumps({"schema_version": 2, "candidates": list(candidates)}))
+        return self.cli("init", "--manifest", str(path))
+
+    def audio(self, cid="A", **fields):
+        return self.candidate(cid, question_type="audio", comparison_group="death",
+            audio={"url": "data:audio/wav;base64,UklGRg==", "purpose": "Death cue",
+                   "scope": "Creative fit only", "context": "Once on death"}, **fields)
+
+    def feedback_packet(self, state, cid="A", feedback_id="feedback-1", **fields):
+        item = next(c for c in state["candidates"] if c["id"] == cid)
+        return {"schema_version": 2, "session": state["session"], "decisions": [],
+                "feedback": [{"candidate": cid, "fingerprint": item["fingerprint"],
+                              "feedback_id": feedback_id, "note": "Consider for pain", **fields}]}
+
+    def test_v2_unanswered_feedback_survives_restart_and_partial_handback(self):
+        self.init_v2(self.audio(), self.audio("B"), self.candidate("brief"))
+        state = self.cli("prepare")
+        payload = self.feedback_packet(state, note="Reject for death; consider for pain")
+        self.assertEqual(self.intake(payload)["feedback_saved"], ["A"])
+        self.assertEqual(self.intake(payload)["feedback_saved"], [])
+        self.cli("pause")
+        current = self.cli("status", "--after", str(state["sequence"]))
+        a = next(c for c in current["candidates"] if c["id"] == "A")
+        self.assertIsNone(a["decision"])
+        self.assertIn("consider for pain", a["feedback"]["note"])
+        self.assertTrue(any(e["kind"] == "feedback" for e in current["events"]))
+        result = self.cli("hand-back")
+        self.assertEqual(result["decided"], [])
+        self.assertEqual(result["feedback_pending"], ["A"])
+        self.assertEqual(set(result["pending"]), {"A", "B", "brief"})
+        self.assertTrue(all(c["protected"] for c in self.cli("status")["candidates"]))
+
+    def test_v2_feedback_revision_retains_answer_and_withdrawal_retains_feedback(self):
+        self.init_v2(self.audio(), self.audio("B")); state = self.cli("prepare")
+        decision = self.decision(state, outcome="reject", note="Reject for death")
+        decision["schema_version"] = 2
+        self.intake(decision)
+        self.intake(self.feedback_packet(state, feedback_id="revised", note="Reject for death; consider for pain"))
+        item = next(c for c in self.cli("status", "--full")["candidates"] if c["id"] == "A")
+        self.assertEqual(item["decision"]["outcome"], "reject")
+        self.assertEqual(item["decision"]["note"], "Reject for death; consider for pain")
+        self.assertTrue(any(d.get("note") == "Reject for death" for d in item["superseded"]))
+        # Replaying the original answer after a feedback edit cannot revert it.
+        self.assertEqual(self.intake(decision)["accepted"], [])
+        withdrawal = self.decision(state, outcome="withdrawn", decision_id="withdraw-v2")
+        withdrawal["schema_version"] = 2
+        self.intake(withdrawal)
+        self.assertEqual(self.intake(withdrawal)["accepted"], [])
+        item = next(c for c in self.cli("status", "--full")["candidates"] if c["id"] == "A")
+        self.assertIsNone(item["decision"])
+        self.assertIn("consider for pain", item["feedback"]["note"])
+        self.intake(self.feedback_packet(state, feedback_id="clear", note="", attachments=[]))
+        item = next(c for c in self.cli("status", "--full")["candidates"] if c["id"] == "A")
+        self.assertEqual(item["feedback"]["note"], "")
+        self.assertTrue(any("pain" in f.get("note", "") for f in item["feedback_history"]))
+
+    def test_v2_atomic_mixed_intake_retry_and_stale_feedback_conflict(self):
+        self.init_v2(self.audio(), self.audio("B")); state = self.cli("prepare")
+        packet = self.feedback_packet(state, expected_feedback_id=None)
+        packet["decisions"] = self.decision(state, "B")["decisions"]
+        packet["feedback"].append({"candidate": "missing"})
+        self.assertEqual(self.intake(packet, success=False).returncode, 1)
+        self.assertTrue(all(c["feedback"] is None and c["decision"] is None for c in self.cli("status")["candidates"]))
+        packet["feedback"].pop(); self.intake(packet)
+        self.assertEqual(self.intake(packet)["accepted"], [])
+        old = self.feedback_packet(state, feedback_id="older-tab", expected_feedback_id=None, note="Stale edit")
+        self.assertEqual(self.intake(old, success=False).returncode, 1)
+        self.assertIn("Consider for pain", json.dumps(self.cli("status")))
+        altered = self.feedback_packet(state, note="ID reused with different words")
+        self.assertEqual(self.intake(altered, success=False).returncode, 1)
+
+    def test_v2_audio_material_identity_and_legacy_identity_remain_distinct(self):
+        legacy = self.candidate()
+        # Captured from the pre-implementation helper at RFC_BASE_SHA 7cc31bb.
+        expected = "be5163de18a49e2a5ff8dbf9fb6750939090980c8e24ee5382eff0040be94f71"
+        self.init(legacy); state = self.cli("prepare")
+        self.assertEqual(state["candidates"][0]["fingerprint"], expected)
+        self.intake(self.decision(state))  # Existing version-1 import.
+        self.cli("resume-development", "--all")
+        candidate = self.audio(); self.init_v2(candidate); old = self.cli("prepare")
+        self.intake(self.feedback_packet(old))
+        changed = {**candidate, "comparison_group": "another-navigation-group"}
+        self.assertEqual(self.init_v2(changed)["candidates"][0]["fingerprint"], old["candidates"][0]["fingerprint"])
+        for field, value in (("purpose", "Pain cue"), ("url", "data:audio/wav;base64,bmV3")):
+            replacement = {**changed, "audio": {**changed["audio"], field: value}}
+            path = self.base / "replacement.json";path.write_text(json.dumps({"schema_version": 2, "candidates": [replacement]}))
+            self.assertEqual(self.cli("init", "--manifest", str(path), success=False).returncode, 1)
+            self.cli("resume-development", "--candidate", "A")
+            self.init_v2(replacement); self.cli("prepare")
+            self.assertEqual(self.intake(self.feedback_packet(old), success=False).returncode, 1)
+            self.assertIsNone(self.cli("status")["candidates"][0]["feedback"])
+            changed = replacement
+        self.assertTrue(review_module.Session(self.root, self.registry).load()["history"])
+
+    def test_v2_http_feedback_diagnostics_and_handback_only_wait(self):
+        self.init_v2(self.audio(), self.audio("B")); state = self.cli("prepare")
+        _, host = self.host()
+        packet = self.feedback_packet(state)
+        packet["diagnostics"] = [{"candidate": "A", "fingerprint": state["candidates"][0]["fingerprint"],
+                                  "diagnostic_id": "decode-1", "message": "Could not decode clip"}]
+        with self.handback_waiter(state["sequence"]) as waiter:
+            with self.request(host, "/api/decisions", packet) as response:
+                self.assertEqual(json.load(response)["feedback_saved"], ["A"])
+            with self.assertRaises(subprocess.TimeoutExpired):
+                waiter.communicate(timeout=0.3)
+            self.cli("hand-back")
+            out, err = waiter.communicate(timeout=5)
+        self.assertEqual(waiter.returncode, 0, err)
+        self.assertEqual(json.loads(out)["events"][0]["feedback_pending"], ["A"])
+        self.cli("stop")
+        current = self.cli("status")
+        self.assertIsNone(current["candidates"][0]["decision"])
+        self.assertEqual(current["candidates"][0]["playback_errors"][0]["message"], "Could not decode clip")
+        self.assertEqual(self.intake(packet)["diagnostics_saved"], [])
+
+    def test_v2_offline_page_packet_imports_through_public_cli(self):
+        import shutil
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("Node is used only for deterministic page tests, not the runtime")
+        self.init_v2(self.audio(), self.audio("B")); self.cli("prepare")
+        snapshot = self.cli("status", "--full")
+        snapshot_path = self.base / "snapshot.json";snapshot_path.write_text(json.dumps(snapshot))
+        packet_path = self.base / "offline-export.json"
+        result = subprocess.run([node, str(SCRIPT.parents[1] / "tests/review_page.test.js"),
+                                 str(snapshot_path), str(packet_path)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        result = self.cli("import", "--file", str(packet_path))
+        self.assertEqual(result["feedback_saved"], ["A"])
+        self.assertEqual(result["accepted"], [])
+        self.assertEqual(self.cli("import", "--file", str(packet_path))["feedback_saved"], [])
+        self.assertIsNone(self.cli("status")["candidates"][0]["decision"])
+
+    def test_v2_formats_refuse_silent_loss_and_keep_bounds(self):
+        self.init(self.candidate()); state = self.cli("prepare")
+        packet = self.feedback_packet(state);packet["schema_version"] = 1
+        self.assertEqual(self.intake(packet, success=False).returncode, 1)
+        for invalid in (self.audio(options=["A", "B"]), self.candidate(question_type="audio")):
+            path = self.base / "invalid.json";path.write_text(json.dumps({"schema_version": 2, "candidates": [invalid]}))
+            self.assertEqual(self.cli("init", "--manifest", str(path), success=False).returncode, 1)
+        packet = self.feedback_packet(state, attachments=[{"name": "bad", "data": "data:image/png;base64," + "a" * (4 * 1024 * 1024)}])
+        self.assertEqual(self.intake(packet, success=False).returncode, 1)
+        old_path = self.root / ".mask/attended-review/session.json"
+        old = json.loads(old_path.read_text());old["schema_version"] = 1
+        old.pop("runtime_format", None);old.pop("minimum_helper_version", None)
+        old_path.write_text(json.dumps(old));before = old_path.read_bytes()
+        self.cli("status");self.assertEqual(old_path.read_bytes(), before)
+        self.intake(self.feedback_packet(state))
+        self.assertEqual(json.loads(old_path.read_text())["runtime_format"], "attended-review.state.v2")
+
     def test_external_state_keeps_preparation_and_protection_on_source(self):
         state = self.base / "external"
         manifest = self.base / "external-manifest.json"

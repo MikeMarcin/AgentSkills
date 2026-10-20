@@ -21,7 +21,7 @@ import threading
 import time
 import urllib.request
 
-VERSION = 1
+VERSION = 2
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
 
@@ -114,7 +114,7 @@ def require_text(value, label):
 
 def canonical(candidate):
     """Only review material binds a decision; HEAD and preparation metadata do not."""
-    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch", "copy")
+    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch", "copy", "question_type", "audio")
     material = {k: candidate[k] for k in keys if k in candidate}
     if "wizard" in candidate:
         material["wizard_instructions"] = candidate["wizard"].get("instructions", "")
@@ -122,15 +122,17 @@ def canonical(candidate):
 
 
 def manifest(value):
-    if not isinstance(value, dict) or value.get("schema_version") != VERSION:
-        raise ReviewError("manifest schema_version must be 1")
+    if not isinstance(value, dict) or value.get("schema_version") not in (1, VERSION):
+        raise ReviewError("manifest schema_version must be 1 or 2")
     if not isinstance(value.get("candidates"), list):
         raise ReviewError("manifest candidates must be an array")
     ids = set()
     for item in value["candidates"]:
         if not isinstance(item, dict):
             raise ReviewError("candidate must be an object")
-        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch", "copy"}
+        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch", "copy", "question_type", "audio", "comparison_group"}
+        if value["schema_version"] == 1 and set(item).intersection({"question_type", "audio", "comparison_group"}):
+            raise ReviewError("audio questions require manifest schema_version 2")
         if set(item) - allowed:
             raise ReviewError(f"Unknown candidate fields: {sorted(set(item) - allowed)}")
         cid = require_text(item.get("id"), "candidate id")
@@ -163,6 +165,25 @@ def manifest(value):
                 url = medium.get("url", "")
                 if not isinstance(url, str) or not url.startswith(f"data:{medium['kind']}/"):
                     raise ReviewError("inline media data URLs keep HTML fully portable")
+        if "question_type" in item and item["question_type"] not in ("review", "audio"):
+            raise ReviewError("question_type must be review or audio")
+        if "comparison_group" in item:
+            require_text(item["comparison_group"], "comparison_group")
+        if item.get("question_type") == "audio":
+            audio = item.get("audio")
+            fields = {"url", "purpose", "scope", "context", "listen_for", "reject_if", "variant"}
+            if not isinstance(audio, dict) or set(audio) - fields:
+                raise ReviewError("audio requires inline clip, purpose and scope, with optional listening context")
+            for key in ("url", "purpose", "scope"):
+                require_text(audio.get(key), f"audio {key}")
+            if not audio["url"].startswith("data:audio/"):
+                raise ReviewError("audio clip must be an inline audio data URL")
+            if any(not isinstance(v, str) for v in audio.values()):
+                raise ReviewError("audio presentation values must be text")
+            if "options" in item:
+                raise ReviewError("audio questions have independent accept/reject answers")
+        elif "audio" in item:
+            raise ReviewError("audio requires question_type audio")
         versions = item.get("resource_versions", {})
         if not isinstance(versions, dict) or any(k not in item["resources"] or not isinstance(v, str) or not v for k, v in versions.items()):
             raise ReviewError("resource_versions maps declared resources to stable candidate versions")
@@ -236,6 +257,7 @@ class Session:
                 state = read_json(self.path)
                 if state is not None and state.get("checkout") != str(self.root):
                     raise ReviewError("session state belongs to another source checkout")
+                self.check_version(state)
                 resources = read_json(self.registry / "resources.json", {})
                 before_state = json.dumps(state, sort_keys=True)
                 before_resources = json.dumps(resources, sort_keys=True)
@@ -261,7 +283,19 @@ class Session:
                 raise ReviewError("No attended session; run init with a manifest")
             if state.get("checkout") != str(self.root):
                 raise ReviewError("session state belongs to another source checkout")
+            self.check_version(state)
             return state
+
+    @staticmethod
+    def check_version(state):
+        if state is not None and state.get("schema_version") not in (1, VERSION):
+            raise ReviewError("Unsupported session state; resume with a compatible attended-review helper")
+
+    @staticmethod
+    def upgrade(state):
+        state["schema_version"] = VERSION
+        state["runtime_format"] = "attended-review.state.v2"
+        state["minimum_helper_version"] = VERSION
 
     @staticmethod
     def event(state, kind, **fields):
@@ -303,7 +337,10 @@ class Session:
                 if state is not None and state.get("checkout") != str(self.root):
                     raise ReviewError("session state belongs to another source checkout")
                 if state is None:
-                    state = {"schema_version": VERSION, "id": secrets.token_hex(16), "checkout": str(self.root), "sequence": 0, "events": [], "candidates": {}, "history": [], "paused": False, "host": None}
+                    state = {"schema_version": 1, "id": secrets.token_hex(16), "checkout": str(self.root), "sequence": 0, "events": [], "candidates": {}, "history": [], "paused": False, "host": None}
+                self.check_version(state)
+                if value["schema_version"] == 2:
+                    self.upgrade(state)
                 for candidate in value["candidates"]:
                     cid = candidate["id"]
                     fingerprint = canonical(candidate)
@@ -317,6 +354,8 @@ class Session:
                         # Changing protection/preparation definitions must be deliberate too.
                         if previous.get("protected") and any(previous.get(k) != candidate.get(k) for k in ("resources", "resource_versions", "paths", "prepare")):
                             raise ReviewError(f"{cid} protection changed; release it before updating")
+                        if "comparison_group" not in candidate:
+                            previous.pop("comparison_group", None)
                         previous.update(candidate)
                     else:
                         state["candidates"][cid] = {**candidate, "fingerprint": fingerprint, "phase": "waiting", "protected": False, "decision": None, "observations": []}
@@ -327,9 +366,9 @@ class Session:
 
     def status(self, after=None, full=False):
         state = self.load()
-        result = {"session": state["id"], "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"], "handed_back": state.get("handed_back"), "candidates": []}
+        result = {"schema_version": state["schema_version"], "session": state["id"], "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"], "handed_back": state.get("handed_back"), "candidates": []}
         for item in state["candidates"].values():
-            record = {k: item.get(k) for k in ("id", "title", "revision", "fingerprint", "phase", "protected", "decision")}
+            record = {k: item.get(k) for k in ("id", "title", "revision", "fingerprint", "phase", "protected", "decision", "feedback", "playback_errors")}
             if item.get("superseded"):
                 record["superseded"] = item["superseded"]
             if item.get("error"):
@@ -448,64 +487,139 @@ class Session:
             self.event(state, "observation", candidate=cid, evidence=evidence)
         return self.status()
 
+    @staticmethod
+    def validate_feedback(value):
+        if not isinstance(value.get("note", ""), str):
+            raise ReviewError("feedback note must be text")
+        attachments = value.get("attachments", [])
+        if not isinstance(attachments, list) or len(attachments) > MAXIMUM_ATTACHMENTS:
+            raise ReviewError(f"feedback carries at most {MAXIMUM_ATTACHMENTS} attachments")
+        for attachment in attachments:
+            if not isinstance(attachment, dict) or set(attachment) - {"name", "data"}:
+                raise ReviewError("an attachment is a name and an inline data URL")
+            require_text(attachment.get("name"), "attachment name")
+            data = attachment.get("data", "")
+            if not isinstance(data, str) or not data.startswith("data:image/"):
+                raise ReviewError("attachments are inline image data URLs")
+            if len(data) > MAXIMUM_ATTACHMENT_BYTES:
+                raise ReviewError("attachment exceeds the per-image bound")
+
+    @staticmethod
+    def repeated(item, key, record, id_key, history):
+        records = [*item.get(history, []), item.get(key)]
+        if key == "decision":
+            records.extend(item.get("superseded", []))
+        matches = [previous for previous in records if previous and previous.get(id_key) == record[id_key]]
+        if any({k: v for k, v in previous.items() if k not in ("saved_at", "actor")} == record for previous in matches):
+            return True
+        if matches:
+            raise ReviewError(f"{id_key} was already used for different content")
+        return False
+
+    def save_feedback(self, state, item, clean, update_answer=True):
+        self.upgrade(state)
+        previous = item.get("feedback")
+        if previous:
+            item.setdefault("feedback_history", []).append(previous)
+        saved = {**clean, "saved_at": now(), "actor": "human"}
+        item["feedback"] = saved
+        if update_answer and item.get("decision"):
+            item.setdefault("superseded", []).append(item["decision"])
+            item["decision"] = {**item["decision"], "note": clean.get("note", ""),
+                                "attachments": clean.get("attachments", []), "saved_at": now()}
+        self.event(state, "feedback", candidate=item["id"], feedback=saved)
+
     def intake(self, payload):
-        if not isinstance(payload, dict) or payload.get("schema_version") != VERSION or not isinstance(payload.get("decisions"), list):
-            raise ReviewError("decision payload requires schema_version 1 and decisions array")
+        if len(json.dumps(payload).encode("utf-8")) > MAXIMUM_REQUEST_BYTES:
+            raise ReviewError("Intake exceeds the 20 MiB request bound")
+        version = payload.get("schema_version") if isinstance(payload, dict) else None
+        if version not in (1, VERSION) or not isinstance(payload.get("decisions"), list):
+            raise ReviewError("intake requires schema_version 1 or 2 and decisions array")
+        if version == 1 and set(payload).intersection({"feedback", "diagnostics"}):
+            raise ReviewError("feedback-aware intake requires schema_version 2")
+        feedback = payload.get("feedback", [])
+        diagnostics = payload.get("diagnostics", [])
+        if not isinstance(feedback, list) or not isinstance(diagnostics, list):
+            raise ReviewError("feedback and diagnostics must be arrays")
+        accepted, saved_feedback, saved_diagnostics = [], [], []
         with self.transaction() as (state, _):
             if state is None or payload.get("session") != state["id"]:
-                raise ReviewError("Decision belongs to a different session")
-            accepted = []
-            for decision in payload["decisions"]:
-                if not isinstance(decision, dict):
-                    raise ReviewError("decision must be an object")
-                item = self.item(state, decision.get("candidate"))
-                if decision.get("fingerprint") != item["fingerprint"]:
-                    raise ReviewError(f"Stale decision for {item['id']}; prepare the current candidate")
-                require_text(decision.get("decision_id"), "decision_id")
-                if decision.get("outcome") not in ("accept", "reject", "select", "withdrawn"):
-                    raise ReviewError("outcome must be accept, reject, select or withdrawn; skip/pause are not verdicts")
-                if not isinstance(decision.get("note", ""), str):
-                    raise ReviewError("decision note must be text")
-                attachments = decision.get("attachments", [])
-                if not isinstance(attachments, list) or len(attachments) > MAXIMUM_ATTACHMENTS:
-                    raise ReviewError(f"a verdict carries at most {MAXIMUM_ATTACHMENTS} attachments")
-                for attachment in attachments:
-                    if not isinstance(attachment, dict) or set(attachment) - {"name", "data"}:
-                        raise ReviewError("an attachment is a name and an inline data URL")
-                    require_text(attachment.get("name"), "attachment name")
-                    data = attachment.get("data", "")
-                    if not isinstance(data, str) or not data.startswith("data:image/"):
-                        raise ReviewError("attachments are inline image data URLs")
-                    if len(data) > MAXIMUM_ATTACHMENT_BYTES:
-                        raise ReviewError("attachment exceeds the per-image bound")
-                if "options" in item and decision["outcome"] == "accept":
-                    raise ReviewError("Selection group requires select or reject")
-                if decision["outcome"] == "select":
-                    selected = decision.get("selected")
-                    if "options" not in item or not isinstance(selected, list) or not selected or any(not isinstance(v, str) for v in selected) or len(selected) != len(set(selected)) or any(v not in item["options"] for v in selected):
-                        raise ReviewError("selected must name nonempty unique group options")
-                clean = {k: decision[k] for k in ("candidate", "fingerprint", "decision_id", "outcome", "selected", "note", "attachments") if k in decision}
-                if item["phase"] != "ready" or not item.get("protected"):
-                    raise ReviewError(f"{item['id']} is not prepared/protected")
-                # A reviewer who pressed the wrong button, or thought better of
-                # a verdict, can say so. The verdict they land on is the record
-                # and every earlier one is kept beside it, so changing a mind
-                # costs nothing and hides nothing.
-                if item.get("decision"):
-                    previous = {k: v for k, v in item["decision"].items() if k not in ("saved_at", "actor")}
-                    if previous == clean:
+                raise ReviewError("Intake belongs to a different session")
+            if version == 2:
+                self.upgrade(state)
+            # The transaction publishes only after every supplied entry validates.
+            for kind, entries, id_key in (("decision", payload["decisions"], "decision_id"),
+                                           ("feedback", feedback, "feedback_id"),
+                                           ("diagnostic", diagnostics, "diagnostic_id")):
+                for entry in entries:
+                    if not isinstance(entry, dict):
+                        raise ReviewError(f"{kind} must be an object")
+                    item = self.item(state, entry.get("candidate"))
+                    if entry.get("fingerprint") != item["fingerprint"]:
+                        raise ReviewError(f"Stale {kind} for {item['id']}; prepare the current candidate")
+                    if item["phase"] != "ready" or not item.get("protected"):
+                        raise ReviewError(f"{item['id']} is not prepared/protected")
+                    require_text(entry.get(id_key), id_key)
+                    keys = ("candidate", "fingerprint", id_key)
+                    if kind == "diagnostic":
+                        require_text(entry.get("message"), "playback error message")
+                        if len(entry["message"]) > 2000:
+                            raise ReviewError("playback error message exceeds 2000 characters")
+                        clean = {k: entry[k] for k in (*keys, "message")}
+                        previous = next((v for v in item.get("playback_errors", []) if v["diagnostic_id"] == clean[id_key]), None)
+                        if previous:
+                            if previous != clean:
+                                raise ReviewError("diagnostic_id was already used for different content")
+                            continue
+                        self.upgrade(state)
+                        item.setdefault("playback_errors", []).append(clean)
+                        self.event(state, "playback-error", candidate=item["id"], diagnostic=clean)
+                        saved_diagnostics.append(item["id"])
                         continue
-                    item.setdefault("superseded", []).append(item["decision"])
-                if clean["outcome"] == "withdrawn":
-                    item["decision"] = None
-                    self.event(state, "decision", candidate=item["id"], decision=None, withdrawn=True)
+                    self.validate_feedback(entry)
+                    fields = (*keys, "note", "attachments")
+                    if kind == "decision":
+                        if entry.get("outcome") not in ("accept", "reject", "select", "withdrawn"):
+                            raise ReviewError("outcome must be accept, reject, select or withdrawn")
+                        if "options" in item and entry["outcome"] == "accept":
+                            raise ReviewError("Selection group requires select or reject")
+                        if entry["outcome"] == "select":
+                            selected = entry.get("selected")
+                            if "options" not in item or not isinstance(selected, list) or not selected or any(not isinstance(v, str) for v in selected) or len(selected) != len(set(selected)) or any(v not in item["options"] for v in selected):
+                                raise ReviewError("selected must name nonempty unique group options")
+                        fields += ("outcome", "selected")
+                    clean = {k: entry[k] for k in fields if k in entry}
+                    history = "decision_history" if kind == "decision" else "feedback_history"
+                    if self.repeated(item, kind, clean, id_key, history):
+                        continue
+                    current_id = (item.get("feedback") or {}).get("feedback_id")
+                    if "expected_feedback_id" in entry and entry["expected_feedback_id"] != current_id:
+                        raise ReviewError("Feedback changed elsewhere; export your draft before reconciling")
+                    if kind == "feedback":
+                        self.save_feedback(state, item, clean)
+                        saved_feedback.append(item["id"])
+                        continue
+                    item.setdefault("decision_history", []).append(clean)
+                    if item.get("decision"):
+                        item.setdefault("superseded", []).append(item["decision"])
+                        if clean["outcome"] == "withdrawn" and not item.get("feedback"):
+                            previous = item["decision"]
+                            self.save_feedback(state, item, {"candidate": item["id"], "fingerprint": item["fingerprint"],
+                                "feedback_id": "retained:" + clean[id_key], "note": previous.get("note", ""),
+                                "attachments": previous.get("attachments", [])}, update_answer=False)
+                    # Withdrawal changes only the answer; keep current feedback.
+                    if clean["outcome"] == "withdrawn":
+                        item["decision"] = None
+                    else:
+                        item["decision"] = {**clean, "saved_at": now(), "actor": "human"}
+                        if version == 2 or "note" in clean or "attachments" in clean:
+                            self.save_feedback(state, item, {"candidate": item["id"], "fingerprint": item["fingerprint"],
+                                "feedback_id": "answer:" + clean[id_key], "note": clean.get("note", ""),
+                                "attachments": clean.get("attachments", [])}, update_answer=False)
+                    self.event(state, "decision", candidate=item["id"], decision=item["decision"], withdrawn=clean["outcome"] == "withdrawn")
                     accepted.append(item["id"])
-                    continue
-                clean.update(saved_at=now(), actor="human")
-                item["decision"] = clean
-                self.event(state, "decision", candidate=item["id"], decision=clean)
-                accepted.append(item["id"])
-        return {"accepted": accepted, "sequence": self.load()["sequence"]}
+        return {"accepted": accepted, "feedback_saved": saved_feedback, "diagnostics_saved": saved_diagnostics,
+                "sequence": self.load()["sequence"]}
 
     def hand_back(self):
         """The reviewer has finished. Nothing is decided here; the driver is told."""
@@ -514,9 +628,10 @@ class Session:
                 raise ReviewError("No session")
             decided = sorted(cid for cid, item in state["candidates"].items() if item.get("decision"))
             pending = sorted(cid for cid, item in state["candidates"].items() if not item.get("decision"))
+            feedback_pending = sorted(cid for cid in pending if state["candidates"][cid].get("feedback"))
             state["handed_back"] = now()
-            self.event(state, "handed-back", decided=decided, pending=pending)
-        return {"handed_back": self.load()["handed_back"], "decided": decided, "pending": pending}
+            self.event(state, "handed-back", decided=decided, pending=pending, feedback_pending=feedback_pending)
+        return {"handed_back": self.load()["handed_back"], "decided": decided, "pending": pending, "feedback_pending": feedback_pending}
 
     def wait(self, after=None, kinds=("handed-back", "decision"), timeout=None, interval=0.5):
         """Block until the human acts; host orchestration determines whether the driver resumes.
