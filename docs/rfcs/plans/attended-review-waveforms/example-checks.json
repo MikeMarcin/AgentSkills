@@ -1,0 +1,22 @@
+{
+  "candidate_revision": "a1d3d6cf7af83e51a4111b144673940f01cb4cd2",
+  "result": "pass",
+  "valid_clips": 6,
+  "samples_checked_per_clip": 96000,
+  "envelope_columns_checked_per_clip": 600,
+  "preview_pngs_rendered": 6,
+  "original_audio_bytes_unchanged": true,
+  "media_affects_fingerprint": true,
+  "public_path": "example CLI -> init -> prepare -> html -> resume-development --all -> status",
+  "symlinked_consumers": 2,
+  "isolated_sessions": [
+    "72a618d6d1d41b56930785e90556e1d9",
+    "49ca42214b4ef0db3b62403a9b89b1c5"
+  ],
+  "prepared_candidates_per_consumer": 8,
+  "answers_recorded": 0,
+  "offline_media_preserved": true,
+  "all_fixture_protections_released": true,
+  "rasterizer": "Existing ImageMagick with existing system Helvetica font; generic font and contact-sheet montage attempts failed on font configuration, append succeeded; no source change or installation needed",
+  "native_browser_qualification": "not performed; no renderer/runtime change"
+}

@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0117"
 title: "Prepare audio waveform previews by default"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: "P2"
 metadata: {"milestone_plan":{"id":"attended-review-waveforms","path":"docs/rfcs/plans/attended-review-waveforms/milestone-plan.json"},"related_rfc":"RFC-ASK-0016","related_issues":["ASK-0116"]}
+acceptance: [{"criterion":"ASK-0117-WAVE01","outcome":"pass","revision":"a1d3d6cf7af83e51a4111b144673940f01cb4cd2","evidence":{"kind":"artifact","detail":"Decisive audio branch reaches one authoritative default and useful-spectrogram/fallback rule before preparation; self-tabletop and pruning review recorded.","path":"docs/rfcs/plans/attended-review-waveforms/verification.md"}},{"criterion":"ASK-0117-WAVE02","outcome":"pass","revision":"a1d3d6cf7af83e51a4111b144673940f01cb4cd2","evidence":{"kind":"artifact","detail":"Six exact-PCM SVGs numerically verified and rendered; two isolated symlinked consumers retain previews through public preparation/offline HTML, with no inferred answers.","path":"docs/rfcs/plans/attended-review-waveforms/verification.md"}},{"criterion":"ASK-0117-WAVE03","outcome":"pass","revision":"a1d3d6cf7af83e51a4111b144673940f01cb4cd2","evidence":{"kind":"artifact","detail":"Focused structure/portable-source checks and self-review pass; historical acceptance/limits preserved, fixtures released and removed, commands quiescent.","path":"docs/rfcs/plans/attended-review-waveforms/verification.md"}}]
 ---
 
 # Prepare audio waveform previews by default
@@ -20,7 +21,7 @@ one non-delegating implementer on AgentSkills main. Baseline:
 Source-only scope: attended-review entrypoint, session contract, portable mixed-audio
 example and these scoped records. Related completed design:
 [RFC-ASK-0016](../../rfcs/RFC-ASK-0016-attended-review-audio-questions.md); completed
-navigation follow-up: [ASK-0116](../60-done/ASK-0116-answer-adjacent-review-navigation.md).
+navigation follow-up: [ASK-0116](ASK-0116-answer-adjacent-review-navigation.md).
 Their historical acceptance and native qualification limits remain unchanged.
 No deployment, consumer migration, Faraday/profile/session changes, dependency
 installation, general media pipeline, runtime feature or push.

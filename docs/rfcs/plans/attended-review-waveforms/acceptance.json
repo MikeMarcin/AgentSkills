@@ -1,0 +1,36 @@
+{
+  "approved": true,
+  "decision": "done",
+  "records": [
+    {
+      "criterion": "ASK-0117-WAVE01",
+      "outcome": "pass",
+      "revision": "a1d3d6cf7af83e51a4111b144673940f01cb4cd2",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Decisive audio branch reaches one authoritative default and useful-spectrogram/fallback rule before preparation; self-tabletop and pruning review recorded.",
+        "path": "docs/rfcs/plans/attended-review-waveforms/verification.md"
+      }
+    },
+    {
+      "criterion": "ASK-0117-WAVE02",
+      "outcome": "pass",
+      "revision": "a1d3d6cf7af83e51a4111b144673940f01cb4cd2",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Six exact-PCM SVGs numerically verified and rendered; two isolated symlinked consumers retain previews through public preparation/offline HTML, with no inferred answers.",
+        "path": "docs/rfcs/plans/attended-review-waveforms/verification.md"
+      }
+    },
+    {
+      "criterion": "ASK-0117-WAVE03",
+      "outcome": "pass",
+      "revision": "a1d3d6cf7af83e51a4111b144673940f01cb4cd2",
+      "evidence": {
+        "kind": "artifact",
+        "detail": "Focused structure/portable-source checks and self-review pass; historical acceptance/limits preserved, fixtures released and removed, commands quiescent.",
+        "path": "docs/rfcs/plans/attended-review-waveforms/verification.md"
+      }
+    }
+  ]
+}
