@@ -1,0 +1,18 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "attended-review-navigation",
+  "scope": {"issues": ["ASK-0116"]},
+  "milestones": [{
+    "id": "answer-navigation",
+    "outcome": "A reviewer can move to the next question and hand back beside the answer controls without searching the sidebar or returning to the masthead.",
+    "work": [{"issue": "ASK-0116"}],
+    "depends_on": [],
+    "exit_criteria": [
+      "NAV01 and NAV02 pass focused real-page behavior verification for answered/pending navigation, viewport/focus, shared handback and retained drafts on save failure.",
+      "NAV03 passes focused regression and documentation checks; exact source candidate, local commits and quiescent ownership are recorded."
+    ],
+    "boundary": "Source-only HTML/test follow-up and scoped records; completed RFC-ASK-0016 acceptance is preserved. No deployment, consumer migration, Faraday session mutation or push."
+  }],
+  "coverage": "complete",
+  "unplanned_work": []
+}
