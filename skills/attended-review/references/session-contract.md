@@ -216,6 +216,20 @@ editor. Browser storage failures warn that export is required. Offline storage i
 only a convenience until the driver imports the partial version-2 export; offline
 answer withdrawal is exported explicitly even for an answer embedded in the page.
 
+The live page reads the whole session once. Inline images can make it megabytes
+long, and re-reading all of it after every answer, over a slow tailnet link,
+held Accept, Reject and Next disabled until it arrived. So every later read
+(after an answer, a note save, pause, start or handback, and the 1.5-second poll)
+asks `/api/status?material=omit`: each candidate's `media` and `audio`, which its
+fingerprint binds, are left out and named in `material_omitted`, and the page
+keeps the copy it holds for that fingerprint. Earlier answers and notes
+(`decision_history`, `feedback_history`, `superseded`) are left out too. A
+candidate whose fingerprint the page has not seen brings one full read. A poll
+also names the sequence it holds (`after=SEQUENCE`) and is told only that
+nothing changed; one poll runs at a time, and a reply older than the page's
+state is ignored. A reply the page abandons by reloading or closing is dropped
+quietly by the host.
+
 Optional `diagnostics` entries hold candidate, fingerprint, `diagnostic_id` and a
 nonempty `message` of at most 2000 characters. They record playback errors only,
 with the same identity/prepared-state validation and idempotent operation rules.

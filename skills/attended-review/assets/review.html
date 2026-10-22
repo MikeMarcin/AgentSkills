@@ -255,7 +255,7 @@ textarea::placeholder{color:var(--ink-faint)}
 <script>
 'use strict';
 const embedded=/*SESSION_DATA*/null;
-let state=embedded, current=null, local=[], drafts={}, diagnostics=[], saving=false, handingBack=false, pending=[], editorKey=null, editorFeedbackId=null, mediaKey=null, saveTimer=null, saveChain=Promise.resolve();
+let state=embedded, current=null, local=[], drafts={}, diagnostics=[], saving=false, handingBack=false, polling=false, pending=[], editorKey=null, editorFeedbackId=null, mediaKey=null, saveTimer=null, saveChain=Promise.resolve();
 const token=new URLSearchParams(location.hash.slice(1)).get('token');
 const online=!embedded&&['http:','https:'].includes(location.protocol);
 const el=id=>document.getElementById(id);
@@ -293,14 +293,34 @@ function packet(){
  return {schema_version:2,session:state.session,decisions,feedback:feedbacks,diagnostics};
 }
 function receive(next){
+ // A poll that started before an answer was saved can finish after it.
+ if(state&&next.session===state.session&&next.sequence<state.sequence)return;
  const c=state?candidate():null,replacement=next.candidates.find(v=>v.id===current);
  if(c&&replacement&&replacement.fingerprint!==c.fingerprint&&drafts[key(c)]?.dirty){
   say('This candidate changed. Your older draft is retained; export it before reloading the new candidate.','error');
   return;
  }
+ for(const v of next.candidates){
+  if(!v.material_omitted)continue;
+  const held=state?.candidates.find(o=>key(o)===key(v));
+  for(const k of v.material_omitted)if(held&&k in held)v[k]=held[k];
+  delete v.material_omitted;
+ }
  state=next;
 }
 async function api(path,body){const r=await fetch(path,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const v=await r.json();if(!r.ok)throw Error(v.error||`HTTP ${r.status}`);return v;}
+// Images are inline, so a session can be megabytes long. Refreshing it after an
+// answer, or polling it, leaves out the material this page already holds for
+// each fingerprint: over a slow tailnet link a full copy each time held the
+// answer controls disabled until it arrived, and polls piled up behind it.
+// A changed candidate brings a full read. A poll names the sequence it holds.
+async function refresh(after){
+ const next=await api(`/api/status?material=omit${after===undefined?'':`&after=${after}`}`);
+ if(next.unchanged)return false;
+ const held=v=>!v.material_omitted||state?.candidates.some(o=>key(o)===key(v));
+ receive(next.candidates.every(held)?next:await api('/api/status'));
+ return true;
+}
 function candidate(){return state.candidates.find(c=>c.id===current);}
 function stopPlayback(){for(const node of el('media').querySelectorAll('audio,video'))node.pause();}
 function loadEditor(c){
@@ -353,7 +373,7 @@ function flush(c=candidate()){
   const sent={...f};delete sent.dirty;delete sent.error;
   try{
    await api('/api/decisions',{schema_version:2,session:state.session,decisions:[],feedback:[sent]});
-   receive(await api('/api/status'));
+   await refresh();
    const feedbackId=rebase(c);
    if(drafts[key(c)]?.feedback_id===sent.feedback_id)delete drafts[key(c)];
    else if(drafts[key(c)])drafts[key(c)].expected_feedback_id=feedbackId;
@@ -468,7 +488,7 @@ async function record(outcome){
  const d={candidate:c.id,fingerprint:c.fingerprint,decision_id:uid(),outcome,note:el('note').value,attachments:pending.map(a=>({...a})),expected_feedback_id:candidate()?.feedback?.feedback_id||null};
  if(outcome==='select'){d.selected=checkedOptions();if(!d.selected.length){say('Tick at least one option first.','error');return;}}
  saving=true;draw();
- try{if(online){await api('/api/decisions',{schema_version:2,session:state.session,decisions:[d]});receive(await api('/api/status'));rebase(c);}else{local=local.filter(v=>!(v.candidate===c.id&&v.fingerprint===c.fingerprint));local.push(d);persist();}say(outcome==='withdrawn'?'Answer cleared. Your note is kept.':!online?'Answer kept in this browser. Export it for your driver.':c.comparison_group?'Answer saved. Other clips keep their own answers.':'Answer saved.');}catch(e){say(`Answer was not confirmed saved: ${e.message}. Feedback drafts remain available.`,'error');}finally{saving=false;draw();}
+ try{if(online){await api('/api/decisions',{schema_version:2,session:state.session,decisions:[d]});await refresh();rebase(c);}else{local=local.filter(v=>!(v.candidate===c.id&&v.fingerprint===c.fingerprint));local.push(d);persist();}say(outcome==='withdrawn'?'Answer cleared. Your note is kept.':!online?'Answer kept in this browser. Export it for your driver.':c.comparison_group?'Answer saved. Other clips keep their own answers.':'Answer saved.');}catch(e){say(`Answer was not confirmed saved: ${e.message}. Feedback drafts remain available.`,'error');}finally{saving=false;draw();}
 }
 el('accept').onclick=()=>record(candidate()?.options?'select':'accept');el('reject').onclick=()=>record('reject');el('next').onclick=chooseNext;el('clear').onclick=()=>record('withdrawn');
 el('note').oninput=edit;el('save-feedback').onclick=()=>flush();
@@ -489,7 +509,7 @@ async function handBack(){
  try{
   for(const c of state.candidates){if(!await flush(c)){el('fallback').open=true;say('Handback stopped because feedback is unsaved. Retry the save or export the local draft.','error');return;}}
   if(online&&Object.values(drafts).some(f=>f.dirty)){el('fallback').open=true;say('Handback stopped because an older feedback draft is unsaved. Export the retained draft before handing back.','error');return;}
-  if(online){const result=await api('/api/hand-back',{});receive(await api('/api/status'));say(`Handed back: ${result.decided.length} answered, ${result.pending.length} unanswered, including ${result.feedback_pending.length} with feedback.`);}
+  if(online){const result=await api('/api/hand-back',{});await refresh();say(`Handed back: ${result.decided.length} answered, ${result.pending.length} unanswered, including ${result.feedback_pending.length} with feedback.`);}
   else{el('export').click();el('fallback').open=true;say('Copy or download the partial answers and feedback for your driver. Unanswered clips remain pending.');}
  }catch(e){say(`Could not hand back: ${e.message}. Export your retained draft if needed.`,'error');}
  finally{handingBack=false;draw();}
@@ -500,8 +520,8 @@ el('finish').onclick=el('finish-answer').onclick=handBack;
 async function attach(files){for(const file of files){if(pending.length>=4){say('Four images is the bound for one answer.');break;}if(file.size>3*1024*1024){say(`${file.name||'that image'} is larger than 3 MB; use a smaller one.`);continue;}try{pending.push({name:file.name||`pasted-${pending.length+1}.png`,data:await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsDataURL(file);})});}catch(e){say('That image could not be read.');}}edit();draw();}
 el('note').onpaste=async event=>{const files=[...(event.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));if(!files.length)return;event.preventDefault();await attach(files);say(`${plural(files.length,'image')} attached to this answer.`);};
 el('images').onchange=async()=>{const files=[...el('images').files];el('images').value='';await attach(files);};
-el('start').onclick=async()=>{try{if(online){await api('/api/start',{interrupt:true});receive(await api('/api/status'));}await chooseNext();say('Review ready items now. Skips remain pending.');}catch(e){say(e.message);}};
-el('pause').onclick=async()=>{stopPlayback();if(!await flush())return;try{if(online){await api('/api/pause',{});receive(await api('/api/status'));}say(online?'Session paused. Prepared candidates remain protected.':'You can stop now. Export partial decisions first; undecided items remain pending.');draw();}catch(e){say(e.message);}};
+el('start').onclick=async()=>{try{if(online){await api('/api/start',{interrupt:true});await refresh();}await chooseNext();say('Review ready items now. Skips remain pending.');}catch(e){say(e.message);}};
+el('pause').onclick=async()=>{stopPlayback();if(!await flush())return;try{if(online){await api('/api/pause',{});await refresh();}say(online?'Session paused. Prepared candidates remain protected.':'You can stop now. Export partial decisions first; undecided items remain pending.');draw();}catch(e){say(e.message);}};
 el('export').onclick=()=>{el('transfer').value=JSON.stringify(packet(),null,2);};
 el('copy').onclick=async()=>{el('export').click();try{await navigator.clipboard.writeText(el('transfer').value);say('Decision JSON copied.');}catch(e){el('transfer').select();say('Copy the selected JSON using your keyboard.');}};
 el('download').onclick=()=>{el('export').click();const blob=new Blob([el('transfer').value],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='attended-decisions.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
@@ -521,7 +541,14 @@ try{applyTheme(localStorage.getItem(themeKey));}catch(e){applyTheme('system');}
 const wide=matchMedia('(min-width:900px)');
 function fold(){el('queue').open=wide.matches;}
 wide.addEventListener('change',fold);fold();
-async function boot(){try{if(online){receive(await api('/api/status'));history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');restore();stamp();draw();if(online)setInterval(async()=>{if(saving)return;try{const next=await api('/api/status');if(next.sequence!==state.sequence){receive(next);draw();}}catch(e){say('Live host is unavailable. Reopen it with your driver; saved decisions remain on disk.','error');}},1500);}catch(e){say(e.message);}}
+async function boot(){try{if(online){receive(await api('/api/status'));history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');restore();stamp();draw();if(online)setInterval(poll,1500);}catch(e){say(e.message);}}
+// One poll at a time: a slow reply is never joined by another.
+async function poll(){
+ if(saving||polling)return;polling=true;
+ try{if(await refresh(state.sequence))draw();}
+ catch(e){say('Live host is unavailable. Reopen it with your driver; saved decisions remain on disk.','error');}
+ finally{polling=false;}
+}
 window.addEventListener('pagehide',()=>{stopPlayback();persist();});
 boot();
 </script></html>

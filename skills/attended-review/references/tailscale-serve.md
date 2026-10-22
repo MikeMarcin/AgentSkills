@@ -96,8 +96,9 @@ stop only the verified owned CLI process through the native process tools. Never
 reset another owner's Serve settings to recover. Tailscale itself removes the
 foreground mapping when that CLI's session ends.
 
-Focused fake-CLI, real loopback HTTP and HTTPS page regression coverage is
-supplemented by observed private HTTPS certificate validation, phone save/accept/
+Focused fake-CLI, real loopback HTTP and HTTPS page regression coverage,
+including Accept, Reject and Next through the separate review listener on a
+slow emulated link, is supplemented by observed private HTTPS certificate validation, phone save/accept/
 handback, and native macOS scoped stop with Tailscale 1.102.3. The awake Codex
 handback qualification is recorded in [Driver waiting](driver-wait.md). These
 bounded observations do not establish phone reload, native Windows lifetime,

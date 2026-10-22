@@ -20,6 +20,7 @@ import sys
 import tempfile
 import threading
 import time
+import urllib.parse
 import urllib.request
 
 VERSION = 2
@@ -42,6 +43,11 @@ MAXIMUM_ATTACHMENTS = 4
 MAXIMUM_ATTACHMENT_BYTES = 4 * 1024 * 1024
 # One verdict with its images, and headroom for the envelope around them.
 MAXIMUM_REQUEST_BYTES = 20 * 1024 * 1024
+# Presentation a candidate's fingerprint binds, and the bulk of a session: a
+# page that already holds it for that fingerprint need not download it again.
+MATERIAL = ("media", "audio")
+# Earlier answers and notes, with their images. The page shows only the current ones.
+HISTORY = ("decision_history", "feedback_history", "superseded")
 
 
 def now():
@@ -382,6 +388,28 @@ class Session:
             result["events"] = [e for e in state["events"] if e["sequence"] > after]
         if state.get("host"):
             result["host"] = state["host"]
+        return result
+
+    def page_status(self, after=None, material=True):
+        """What the live page reads.
+
+        Inline images make a session megabytes long, and a page re-reading all
+        of it after every answer, over a slow link, holds the answer controls
+        until it arrives. A poll names the sequence it holds and is told only
+        that nothing changed; a refresh can leave out what the page already
+        holds, marking each candidate whose material it left out.
+        """
+        result = self.status(full=True)
+        result.pop("host", None)
+        if after is not None and result["sequence"] == after:
+            return {"session": result["session"], "sequence": result["sequence"], "unchanged": True}
+        if not material:
+            for record in result["candidates"]:
+                omitted = [key for key in MATERIAL if key in record]
+                for key in (*MATERIAL, *HISTORY):
+                    record.pop(key, None)
+                if omitted:
+                    record["material_omitted"] = omitted
         return result
 
     def ready(self, cid, evidence=None):
@@ -888,15 +916,20 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
 
         def answer(self, status, value, content_type="application/json"):
             body = json.dumps(value).encode() if content_type == "application/json" else value.encode()
-            self.send_response(status)
-            self.send_header("Content-Type", content_type + "; charset=utf-8")
-            self.send_header("Cache-Control", "no-store")
-            self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("Referrer-Policy", "no-referrer")
-            self.send_header("Content-Security-Policy", "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            try:
+                self.send_response(status)
+                self.send_header("Content-Type", content_type + "; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.send_header("Referrer-Policy", "no-referrer")
+                self.send_header("Content-Security-Policy", "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            except (BrokenPipeError, ConnectionResetError):
+                # The page went away (reloaded or closed) before reading the
+                # reply. Nothing is lost: an intake was already published.
+                self.close_connection = True
 
         def permitted(self):
             expected = f"127.0.0.1:{self.server.server_port}"
@@ -916,7 +949,7 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
             if (origin is not None or remote and self.command == "POST") and origin != allowed_origin:
                 self.answer(403, {"error": "Unexpected origin"})
                 return False
-            if remote and self.path in {"/api/ping", "/api/stop"}:
+            if remote and urllib.parse.urlsplit(self.path).path in {"/api/ping", "/api/stop"}:
                 self.answer(403, {"error": "Local control endpoint"})
                 return False
             if self.path != "/" and not secrets.compare_digest(self.headers.get("Authorization", ""), f"Bearer {token}"):
@@ -932,10 +965,15 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
                 self.answer(200, html, "text/html")
             elif self.path == "/api/ping":
                 self.answer(200, {"token": token})
-            elif self.path == "/api/status":
-                result = session.status(full=True)
-                result.pop("host", None)
-                self.answer(200, result)
+            elif urllib.parse.urlsplit(self.path).path == "/api/status":
+                query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query, keep_blank_values=True)
+                if set(query) - {"after", "material"} or any(len(v) != 1 for v in query.values()) \
+                        or query.get("material", ["include"])[0] not in ("include", "omit") \
+                        or not re.fullmatch(r"\d{1,18}", query.get("after", ["0"])[0]):
+                    self.answer(400, {"error": "status takes after=SEQUENCE and material=include|omit"})
+                    return
+                after = int(query["after"][0]) if "after" in query else None
+                self.answer(200, session.page_status(after, query.get("material", ["include"])[0] == "include"))
             else:
                 self.answer(404, {"error": "Unknown endpoint"})
 

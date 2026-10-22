@@ -5,6 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
+const http=require('node:http');
 const html=fs.readFileSync(path.join(__dirname,'../assets/review.html'),'utf8');
 const script=html.split('<script>')[1].split('</script>')[0];
 const candidate=(id,extra={})=>({id,title:id,revision:'fixture-1',fingerprint:`fp-${id}`,phase:'ready',protected:true,criteria:['Judge exact purpose'],decision:null,...extra});
@@ -31,7 +32,7 @@ function page(seed=snapshot,settings={}){
  document={activeElement:null,documentElement:new Element('html'),getElementById:get,createElement:tag=>new Element(tag),createTextNode:text=>text,querySelector:get,addEventListener(){}};
  // A live host is the real loopback server: its intake, not this fixture,
  // decides whether a note is saved.
- const live=settings.host?async(url,options)=>{requests.push({url,body:options.body?JSON.parse(options.body):null});return globalThis.fetch(settings.host.origin+url,options);}:null;
+ const live=settings.host?.link?linked(settings.host,requests):settings.host?async(url,options)=>{requests.push({url,body:options.body?JSON.parse(options.body):null});return globalThis.fetch(settings.host.origin+url,options);}:null;
  const fetch=live||async function(url,options){
   const body=options.body?JSON.parse(options.body):null;requests.push({url,body});
   if(url==='/api/decisions'){
@@ -45,15 +46,82 @@ function page(seed=snapshot,settings={}){
    backend.handed_back=true;backend.sequence++;
    response={decided:backend.candidates.filter(c=>c.decision).map(c=>c.id),pending:backend.candidates.filter(c=>!c.decision).map(c=>c.id),feedback_pending:backend.candidates.filter(c=>!c.decision&&c.feedback).map(c=>c.id)};
   }
-  if(url==='/api/status')response={...backend,candidates:[...backend.candidates].sort((a,b)=>(a.phase!=='ready')-(b.phase!=='ready')||Boolean(a.decision)-Boolean(b.decision)||(a.id===b.id?0:a.id<b.id?-1:1))};
+  // The fixture reads status the way the host does: sorted, a poll at the
+  // current sequence is told only that, and material can be left out.
+  const [route,search]=url.split('?'),query=new URLSearchParams(search||'');
+  if(route==='/api/status'){
+   if(query.has('after')&&Number(query.get('after'))===backend.sequence)response={session:backend.session,sequence:backend.sequence,unchanged:true};
+   else response={...backend,candidates:[...backend.candidates].sort((a,b)=>(a.phase!=='ready')-(b.phase!=='ready')||Boolean(a.decision)-Boolean(b.decision)||(a.id===b.id?0:a.id<b.id?-1:1)).map(c=>{if(query.get('material')!=='omit')return c;const omitted=['media','audio'].filter(k=>k in c),v={...c};for(const k of omitted)delete v[k];return omitted.length?{...v,material_omitted:omitted}:v;})};
+  }
   return {ok:true,json:async()=>structuredClone(response)};
  };
  // With a live host the note's save debounce runs on real timers.
  const timers=settings.host?{setTimeout,clearTimeout}:{setTimeout:()=>1,clearTimeout(){}};
- const context={console,document,fetch,location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?(settings.protocol||'http:'):'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:settings.storageThrows?{getItem(){throw Error('storage denied');},setItem(){throw Error('storage denied');},removeItem(){throw Error('storage denied');}}:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);},removeItem:k=>storage.delete(k)},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
+ const context={console,document,fetch,polls:[],location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?(settings.protocol||'http:'):'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:settings.storageThrows?{getItem(){throw Error('storage denied');},setItem(){throw Error('storage denied');},removeItem(){throw Error('storage denied');}}:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);},removeItem:k=>storage.delete(k)},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(callback){context.polls.push(callback);},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
  vm.createContext(context);vm.runInContext(script.replace('/*SESSION_DATA*/null',settings.live?'null':JSON.stringify(seed)).replace('\nboot();','\nglobalThis.ready=boot();'),context);
  const run=code=>vm.runInContext(code,context);
- return {run,get,context,requests,settings,ready:context.ready};
+ return {run,get,context,requests,settings,backend,ready:context.ready};
+}
+// The real host behind a slow shared link, reached the way the browser reaches
+// it: straight to loopback, or through Serve's tailnet name, which forwards the
+// browser's Host and Origin to the separate review listener. Origin goes only on
+// POST, as a browser sends it same-origin. Each reply arrives after its size
+// over the link's rate, so a page that re-reads megabytes is slow to answer.
+function linked(host,requests){
+ return (url,options)=>new Promise((resolve,reject)=>{
+  const target=new URL(host.origin+url),body=options.body||null,started=Date.now();
+  const headers={...options.headers,...(host.authority?{Host:host.authority}:{})};
+  if(options.method==='POST')headers.Origin=host.browserOrigin||host.origin;
+  const out=http.request(target,{method:options.method,headers},response=>{
+   const chunks=[];response.on('data',c=>chunks.push(c));
+   response.on('end',()=>{
+    const text=Buffer.concat(chunks).toString('utf8'),entry={url,method:options.method,body:body?JSON.parse(body):null,bytes:text.length,status:response.statusCode,started};
+    requests.push(entry);
+    setTimeout(()=>{entry.finished=Date.now();resolve({ok:response.statusCode<300,status:response.statusCode,json:async()=>JSON.parse(text)});},text.length/host.link*1000);
+   });
+  });
+  out.on('error',reject);out.end(body);
+ });
+}
+// Accept, Reject and Next on Accept/Reject questions whose images make the
+// session megabytes long. Answering must not wait on reading every image again,
+// a poll is never joined by a second while it is slow, and the question still
+// shows its images afterwards.
+async function liveAnswers(origin,token,prefix,authority,browserOrigin){
+ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ const link=3000000,ids=[1,2,3].map(n=>`${prefix}-${n}`);
+ storage.clear();const p=page(null,{live:true,protocol:authority?'https:':'http:',host:{origin,token,authority,browserOrigin,link}});await p.ready;
+ const full=p.requests.find(r=>r.url==='/api/status');assert.ok(full&&full.status===200,'the page loaded its session');
+ const fullDelay=full.bytes/link*1000;assert.ok(full.bytes>4000000,`fixture is megabytes long (${full.bytes})`);
+ const told=()=>`${p.get('answer-notice').textContent} ${p.get('navigation-status').textContent}`;
+ const usable=()=>{for(const id of ['accept','reject'])assert.equal(p.get(id).disabled,false,`${id} is usable: ${told()}`);
+  assert.equal(p.get('next').disabled,!p.run('nextQuestion()'),`next is usable while a question is left: ${told()}`);};
+ // An unchanged session costs a poll a few bytes, and a slow poll is not joined.
+ const before=p.requests.length;const first=p.context.polls[0](),second=p.context.polls[0]();await Promise.all([first,second]);
+ const polled=p.requests.slice(before);assert.equal(polled.length,1,'one poll in flight at a time');
+ assert.ok(polled[0].bytes<1000,`an unchanged poll is short (${polled[0].bytes} bytes)`);
+ const act=async(id,expect)=>{
+  const from=p.requests.length,started=Date.now();await p.get(id).click();const elapsed=Date.now()-started;
+  const moved=p.requests.slice(from).reduce((n,r)=>n+r.bytes,0);
+  assert.ok(moved<full.bytes/4,`${id} read ${moved} bytes; the session is ${full.bytes}`);
+  assert.ok(elapsed<fullDelay,`${id} took ${elapsed}ms; one full read takes ${Math.round(fullDelay)}ms`);
+  if(expect)assert.equal(p.run('candidate().decision?.outcome'),expect,told());
+  usable();
+ };
+ await p.run(`select(${JSON.stringify(ids[0])})`);usable();
+ await act('accept','accept');assert.equal(p.get('accept').attrs['aria-pressed'],'true');assert.match(p.get('answer-notice').textContent,/Answer saved/);
+ await act('next');assert.equal(p.run('current'),ids[1]);
+ await act('reject','reject');assert.equal(p.get('reject').attrs['aria-pressed'],'true');
+ await act('next');assert.equal(p.run('current'),ids[2]);
+ await act('accept','accept');await act('reject','reject');
+ // The answered question keeps the images it was answered on.
+ assert.equal(p.get('media').querySelectorAll('img').length,1);assert.ok(p.run('candidate().media[0].url.length')>500000);
+ await p.run(`select(${JSON.stringify(ids[0])})`);assert.equal(p.run('candidate().media.length'),1);
+ // A later poll sees the answers and still leaves the images where they are.
+ const after=p.requests.length;await p.context.polls[0]();assert.ok(p.requests.slice(after).every(r=>r.bytes<full.bytes/4));
+ assert.equal(p.run(`state.candidates.filter(c=>${JSON.stringify(ids)}.includes(c.id)).map(c=>c.decision?.outcome).join()`),'accept,reject,reject');
+ await wait(0);
+ console.log(`PASS: Accept, Reject and Next answer promptly ${authority?'through the tailnet review listener':'on loopback'}; polls are short and never overlap`);
 }
 // A note typed around an answer reaches the real host with that answer, even
 // when the reviewer answers first, types, and then changes Accept to Reject.
@@ -90,6 +158,7 @@ async function liveNotes(origin,token){
 }
 (async()=>{
  if(process.argv[2]==='--host'){await liveNotes(process.argv[3],process.argv[4]);return;}
+ if(process.argv[2]==='--answers'){await liveAnswers(...process.argv.slice(3));return;}
  // Next follows original queue order even when the active question was answered.
  // Both viewport widths return focus and scroll to the question's beginning.
  for(const wide of [true,false]){
@@ -246,6 +315,22 @@ async function liveNotes(origin,token){
  assert.equal(secure.run("candidate().decision"),null);
  assert.equal(secure.run("candidate().feedback.note"),'Saved from the tailnet phone');
  assert.match(secure.get('answer-notice').textContent,/Handed back/);
+ // A refresh leaves out material the page holds; a replaced candidate's new
+ // material arrives with one full read, and an older poll never undoes an answer.
+ storage.clear();const pictured={...snapshot,candidates:[candidate('pic',{media:[{kind:'image',url:'data:image/png;base64,old',label:'old'}]}),candidate('other')]};
+ const lean=page(pictured,{live:true});await lean.ready;await lean.run("select('other')");
+ const reads=()=>lean.requests.filter(r=>r.url.startsWith('/api/status')).map(r=>r.url);
+ let seen=reads().length;await lean.get('accept').click();
+ assert.deepEqual(reads().slice(seen),['/api/status?material=omit']);
+ assert.equal(lean.run("state.candidates.find(c=>c.id==='pic').media[0].url"),'data:image/png;base64,old');
+ assert.equal(lean.run("'material_omitted' in state.candidates.find(c=>c.id==='pic')"),false);
+ seen=reads().length;await lean.context.polls[0]();assert.deepEqual(reads().slice(seen),[`/api/status?material=omit&after=${lean.backend.sequence}`]);
+ Object.assign(lean.backend.candidates.find(c=>c.id==='pic'),{fingerprint:'fp-pic-2',media:[{kind:'image',url:'data:image/png;base64,new',label:'new'}]});lean.backend.sequence++;
+ seen=reads().length;await lean.context.polls[0]();
+ assert.deepEqual(reads().slice(seen),[`/api/status?material=omit&after=${lean.backend.sequence-1}`,'/api/status']);
+ assert.equal(lean.run("state.candidates.find(c=>c.id==='pic').media[0].url"),'data:image/png;base64,new');
+ const older=lean.run('({...state,sequence:state.sequence-1,candidates:state.candidates.map(c=>({...c,decision:null}))})');
+ lean.context.older=older;lean.run('receive(older)');assert.equal(lean.run("decision(state.candidates.find(c=>c.id==='other')).outcome"),'accept');
  storage.clear();
  if(process.argv[2]){
   storage.clear();const saved=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));p=page(saved);
@@ -253,5 +338,5 @@ async function liveNotes(origin,token){
   await p.run(`select(${JSON.stringify(audioId)})`);p.get('note').value='Offline unanswered feedback for exact clip';p.run('edit()');await p.run('flush()');
   fs.writeFileSync(process.argv[3],p.run('JSON.stringify(packet())'));
  }
- console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery; self-saving note with retry only on failure, pressed decision buttons, per-image removal, options inside the decision, single hand-back banner; System/Light/Dark theme kept in this browser only and applied before first paint');
+ console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery; self-saving note with retry only on failure, pressed decision buttons, per-image removal, options inside the decision, single hand-back banner; lean refreshes that keep held material and read a replaced candidate in full; System/Light/Dark theme kept in this browser only and applied before first paint');
 })().catch(e=>{console.error(e);process.exitCode=1;});

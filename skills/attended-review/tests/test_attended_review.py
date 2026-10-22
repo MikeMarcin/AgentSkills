@@ -219,6 +219,70 @@ class ReviewTests(unittest.TestCase):
             self.assertEqual((saved[name]["decision"]["outcome"], saved[name]["decision"]["note"]), (outcome, note), name)
             self.assertEqual(saved[name]["feedback"]["note"], note, name)
 
+    def test_live_page_answers_and_moves_on_over_loopback_and_tailnet_listener(self):
+        # The owner's tailnet review: Accept/Reject questions with inline images
+        # that make the session megabytes long. Each answer must save and leave
+        # Accept, Reject and Next usable without reading the images again.
+        import shutil
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("Node is used only for deterministic page tests, not the runtime")
+        image = "data:image/png;base64," + "QUFB" * 200000
+        names = [f"{prefix}-{n}" for prefix in ("loop", "tail") for n in (1, 2, 3)]
+        self.init_v2(*(self.candidate(name, media=[{"kind": "image", "url": image, "label": name}]) for name in names))
+        self.cli("prepare")
+        page = str(SCRIPT.parents[1] / "tests/review_page.test.js")
+        _, host = self.host()
+        result = subprocess.run([node, page, "--answers", f"http://127.0.0.1:{host['port']}", host["token"], "loop"],
+                                capture_output=True, text=True, timeout=90)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.cli("stop")
+        fake, executable, env = self.fake_tailscale()
+        _, tailnet = self.tailhost(executable, env, port=8443)
+        active = json.loads((fake / "config.json").read_text())
+        target = active["Foreground"][tailnet["tailscale"]["foreground_session"]]["Web"]["review.example.ts.net:8443"]["Handlers"]["/"]["Proxy"]
+        result = subprocess.run([node, page, "--answers", target, tailnet["token"], "tail",
+                                 "review.example.ts.net:8443", "https://review.example.ts.net:8443"],
+                                capture_output=True, text=True, timeout=90)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("through the tailnet review listener", result.stdout)
+        # A query string does not open the local control endpoints to the tailnet.
+        external = {"Host": "review.example.ts.net:8443", "Origin": "https://review.example.ts.net:8443"}
+        for endpoint in ("/api/ping?token=1", "/api/stop?now=1"):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                self.request({**tailnet, "port": int(target.rsplit(":", 1)[1])}, endpoint,
+                             {} if "stop" in endpoint else None, **external)
+            self.assertEqual(caught.exception.code, 403, endpoint); caught.exception.close()
+        saved = {c["id"]: (c["decision"] or {}).get("outcome") for c in self.cli("status")["candidates"]}
+        for prefix in ("loop", "tail"):
+            self.assertEqual([saved[f"{prefix}-{n}"] for n in (1, 2, 3)], ["accept", "reject", "reject"], prefix)
+
+    def test_page_status_polls_short_and_leaves_out_held_material(self):
+        image = "data:image/png;base64," + "QUFB" * 1000
+        self.init_v2(self.candidate(media=[{"kind": "image", "url": image}]), self.audio("B"))
+        state = self.cli("prepare")
+        _, host = self.host()
+        self.intake(self.decision(state))
+        self.intake(self.decision(state, outcome="reject", decision_id="verdict-A-revised"))
+        with self.request(host, "/api/status") as response:
+            full = json.load(response)
+        held = {c["id"]: c for c in full["candidates"]}
+        self.assertEqual(held["A"]["media"][0]["url"], image)
+        with self.request(host, f"/api/status?after={full['sequence']}") as response:
+            self.assertEqual(json.load(response), {"session": full["session"], "sequence": full["sequence"], "unchanged": True})
+        with self.request(host, f"/api/status?material=omit&after={full['sequence'] - 1}") as response:
+            lean = {c["id"]: c for c in json.load(response)["candidates"]}
+        self.assertEqual(lean["A"]["material_omitted"], ["media"])
+        self.assertEqual(lean["B"]["material_omitted"], ["audio"])
+        for key in ("media", "audio", "decision_history", "feedback_history", "superseded"):
+            self.assertNotIn(key, lean["A"])
+        self.assertEqual(lean["A"]["decision"]["outcome"], "reject")
+        self.assertEqual(lean["A"]["fingerprint"], held["A"]["fingerprint"])
+        for query in ("material=all", "after=-1", "after=x", "after=1&after=2", "other=1"):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                self.request(host, "/api/status?" + query)
+            self.assertEqual(caught.exception.code, 400, query); caught.exception.close()
+
     def test_v2_formats_refuse_silent_loss_and_keep_bounds(self):
         self.init(self.candidate()); state = self.cli("prepare")
         packet = self.feedback_packet(state);packet["schema_version"] = 1
@@ -463,7 +527,7 @@ class ReviewTests(unittest.TestCase):
     def test_new_work_clears_the_previous_hand_back(self):
         self.init(self.candidate())
         state = self.cli("prepare")
-        self.intake(self.decision(state, outcome="reject"))
+        self.intake(self.decision(state, outcome="reject", decision_id="verdict-A-revised"))
         self.cli("hand-back")
         self.assertIsNotNone(self.cli("status")["handed_back"])
         # Releasing the candidate for more development means the queue will change.
