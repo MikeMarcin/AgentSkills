@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0119"
+  ],
+  "reserve_for": "remote-review-standard-2026-10-21",
+  "purpose": "",
+  "created": "2026-10-22T01:56:47.880537+00:00",
+  "base": "38d0715610fa9255fdf990067c43b669c7d54191"
+}
