@@ -7,5 +7,17 @@
   "handed_off_server": null,
   "handed_off_waiter": null,
   "protected_live_candidate": null,
-  "unrelated_work": ".mask.lock.json and pre-existing unrelated host preserved"
+  "unrelated_work": ".mask.lock.json and pre-existing unrelated host preserved",
+  "post_attended_review": {
+    "source_candidate": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+    "task_owned_processes": [],
+    "serve_status_after": {},
+    "original_phone_demo": "Coordinator stopped and removed fixture after saving receipt/cursor 12.",
+    "native_stop_smoke": "Launcher and actual native child absent; temporary fixture removed.",
+    "handed_off_server": null,
+    "handed_off_waiter": null,
+    "protected_live_candidate": null,
+    "repository_writer": "This implementer only within assigned paths; source work complete.",
+    "unrelated_work": ".mask.lock.json preserved unstaged."
+  }
 }

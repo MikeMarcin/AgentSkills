@@ -42,3 +42,23 @@ Acceptance:
   phone/native tailnet acceptance remains explicit when not supplied. Document the
   experimental transport and exact launch/stop commands; commit explicit local
   paths and hand off quiescent command/writer state.
+
+## Post-attended-review correction
+
+Assignment `/root/tailscale_phone_closeout`, segment `phone-closeout-1`, same
+`tailscale-prototype-v1` mandate. Original acceptance above is historical. The
+coordinator reconciled phone feedback, explicit ACCEPT and handback cursor 12 at
+`b42654b`; one item remained pending. The verdict concerns disposable transport
+intake only; phone reload, automatic wake and native Windows remain unverified.
+
+Native stop exposed shell-launcher process ownership: single-PID signaling left the
+real Serve child outside graceful shutdown. Final source `f52a273e4058ae58f420c19bc2d2370fe857610d`
+starts a separate POSIX process group, signals it with SIGINT and confirms eventual
+removal of the exact foreground session. Seven focused public transport checks and
+a fresh native macOS stop pass; helper exit 0, Serve {}, launcher/native child absent
+and fixture removed. See this plan's verification.md and appended acceptance.json
+records for exact candidates and the retained failed attempts.
+
+The board helper refuses reopening terminal Done cards; this correction preserves
+historical status/acceptance and appends the existing milestone's evidence without
+bypassing that guard. No server/waiter or protected disposable candidate remains.

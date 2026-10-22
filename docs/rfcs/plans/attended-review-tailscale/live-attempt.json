@@ -10,7 +10,7 @@
     "source_phase": "Working prototype before final metadata/collision/malformed-status refinements; final exact candidate tested separately.",
     "https_reachability": "pending-user-setup"
   },
-  "current_https_reachability": "verified-http-client-after-user-setup",
+  "current_https_reachability": "verified-native-phone-save-verdict-handback",
   "post_setup": {
     "source_candidate": "b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131",
     "setup": {
@@ -50,9 +50,68 @@
     "browser_limits": {
       "private_https_iab": "Navigation timed out despite successful verified HTTP-client requests.",
       "chrome": "Automation interrupted by user changes; no bypass attempted.",
-      "phone": "User has private link; manual report pending.",
+      "phone": "Phone note, explicit ACCEPT and handback reconciled; phone page reload not independently observed.",
       "automatic_waiter": "Not claimed."
     },
-    "live_demo_owner": "Coordinator; this implementer neither stopped nor modified its processes."
+    "live_demo_owner": "Coordinator stopped the original demo and removed its disposable fixture after reconciling handback cursor 12.",
+    "phone_handback": {
+      "source_candidate": "b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131",
+      "consumed_event_cursor": 12,
+      "feedback_saved": true,
+      "decision": {
+        "candidate": "phone-note",
+        "fingerprint": "cb68c92e417699c41da95de530d927e82b5dbbcd9ebd1097003cf2a26f38f421",
+        "outcome": "accept"
+      },
+      "handed_back": true,
+      "pending": [
+        "remaining"
+      ],
+      "scope": "Disposable transport intake only; no product approval or independent reload inference.",
+      "private_receipt": "/tmp/attended-review-tailscale-prototype/phone-handback-status.json"
+    }
+  },
+  "post_review_cleanup": {
+    "assignment": "/root/tailscale_phone_closeout",
+    "mandate_revision": "tailscale-prototype-v1",
+    "segment_id": "phone-closeout-1",
+    "observed_original_stop": "Local stop acknowledged; foreground helper exited 1 while owned route still appeared. A later check was empty; exact disappearance time unmeasured.",
+    "diagnosis": "Installed macOS CLI is a shell launcher without exec. Upstream Serve handles os.Interrupt and defers foreground watcher closure. Single-PID signals did not reliably reach the native child.",
+    "attempts": [
+      {
+        "source_candidate": "7cfacd7aadf26fdce652624b6c3c661dfd0744e5",
+        "mechanism": "Single-PID SIGTERM, eight-second route window",
+        "outcome": "fail",
+        "helper_exit_code": 1,
+        "stop_elapsed_seconds": 8.278,
+        "owned_mapping_present_at_exit": true,
+        "later_status_empty": true,
+        "private_receipt": "/tmp/attended-review-tailscale-prototype/post-review-native-stop-sigterm-raw.json"
+      },
+      {
+        "source_candidate": "ba14c7971afe7c9643bebc873a8fdefa3fd71910",
+        "mechanism": "Single-PID SIGINT, three-second child wait then kill, eight-second route window",
+        "outcome": "fail",
+        "helper_exit_code": 1,
+        "stop_elapsed_seconds": 11.284,
+        "owned_mapping_present_at_exit": true,
+        "later_status_empty": true,
+        "private_receipt": "/tmp/attended-review-tailscale-prototype/post-review-native-stop-single-pid-interrupt-raw.json"
+      },
+      {
+        "source_candidate": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+        "mechanism": "Owned POSIX session/process group, SIGINT, bounded eventual removal",
+        "outcome": "pass",
+        "helper_exit_code": 0,
+        "stop_elapsed_seconds": 0.238,
+        "serve_status_before_empty": true,
+        "serve_status_after_empty": true,
+        "launcher_and_native_child_gone": true,
+        "fixture_removed": true,
+        "receipt": "docs/rfcs/plans/attended-review-tailscale/post-review-native-stop.json"
+      }
+    ],
+    "timing_limit": "Observations do not establish an exact daemon expiry or cleanup-delay cause.",
+    "native_windows": "unqualified"
   }
 }

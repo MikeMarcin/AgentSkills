@@ -1,0 +1,5 @@
+{
+  "action": "report-closeout",
+  "detail": "Phone intake through cursor 12 reconciled. Bounded process-group cleanup correction verified by focused tests and real native stop; all commands and fixtures quiescent. Phone reload, automatic wake and native Windows remain unverified.",
+  "engineering_acceptance": "not-evaluated"
+}

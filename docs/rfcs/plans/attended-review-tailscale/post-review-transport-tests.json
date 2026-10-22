@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0118-TS01",
+  "outcome": "pass",
+  "revision": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"-m\", \"unittest\", \"discover\", \"-s\", \"skills/attended-review/tests\", \"-p\", \"test_attended_review.py\", \"-k\", \"tailscale\", \"-v\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 19.137,
+    "stdout_tail": "",
+    "stderr_tail": "test_tailscale_collision_and_setup_failure_preserve_config_and_reap (test_attended_review.ReviewTests.test_tailscale_collision_and_setup_failure_preserve_config_and_reap) ... ok\ntest_tailscale_concurrent_port_claim_refuses_and_preserves_other_owner (test_attended_review.ReviewTests.test_tailscale_concurrent_port_claim_refuses_and_preserves_other_owner) ... ok\ntest_tailscale_isolated_review_listener_partial_intake_and_local_control (test_attended_review.ReviewTests.test_tailscale_isolated_review_listener_partial_intake_and_local_control) ... ok\ntest_tailscale_stop_interrupts_child_for_graceful_cleanup (test_attended_review.ReviewTests.test_tailscale_stop_interrupts_child_for_graceful_cleanup) ... ok\ntest_tailscale_stop_reports_genuinely_lingering_owned_mapping (test_attended_review.ReviewTests.test_tailscale_stop_reports_genuinely_lingering_owned_mapping) ... ok\ntest_tailscale_stop_waits_for_delayed_mapping_after_child_exit (test_attended_review.ReviewTests.test_tailscale_stop_waits_for_delayed_mapping_after_child_exit) ... ok\ntest_tailscale_symlinked_consumers_attach_stop_signal_and_runtime_exit (test_attended_review.ReviewTests.test_tailscale_symlinked_consumers_attach_stop_signal_and_runtime_exit) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 19.030s\n\nOK\n"
+  }
+}

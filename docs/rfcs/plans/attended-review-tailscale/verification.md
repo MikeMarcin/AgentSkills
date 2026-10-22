@@ -4,7 +4,8 @@ Assignment `/root/tailscale_prototype`; mandate `tailscale-prototype-v1`; run
 `tailscale-prototype-2026-10-21`, segment `implementation-1`; AgentSkills main.
 ASK-0118 owns this independent ordinary-card prototype. Baseline before product
 edits: `3ef1d0f0f44192d13311c1bac0d904cb19741a7a`.
-Source candidate: `b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131`.
+Original source candidate: `b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131`.
+Post-review source candidate: `f52a273e4058ae58f420c19bc2d2370fe857610d`.
 
 The optional `serve --tailscale` owns a foreground Tailscale CLI process on an
 unused HTTPS port, mounted at `/`. The printed `url` is private HTTPS with the
@@ -60,9 +61,9 @@ CSP, size bounds, fingerprints, preparation boundaries and qualified-wait contra
   and reloaded with that feedback retained and zero verdicts. Private receipt:
   `/tmp/attended-review-tailscale-prototype/browser-smoke-status.json`. Private
   HTTPS IAB navigation timed out despite curl success; Chrome automation was
-  interrupted by user changes and no bypass was attempted. The user's manual
-  phone report remains pending. No native private HTTPS browser/phone acceptance
-  or automatic waiter is claimed.
+  interrupted by user changes and no bypass was attempted. At that evidence
+  follow-up, the user's manual phone report remained pending. The later reconciled
+  phone intake is recorded below; no automatic waiter is claimed.
 - The first added-test run exposed fixture assertions for omitted `host` when
   stopped, handback-only `feedback_pending`, and macOS `/private` path resolution.
   Assertions were corrected to the public contract; no runtime defect was inferred
@@ -71,18 +72,55 @@ CSP, size bounds, fingerprints, preparation boundaries and qualified-wait contra
 - Focused code-simplifier review simplified attach and child cleanup flow; no extra
   agent or independent review ran. Closeout review runtime: self-review only.
 
-Verified real HTTPS HTTP-client requests now establish certificate-backed private
-transport and durable partial intake after the user's manual setup. Native private
-HTTPS browser/mobile reconnection and Windows process lifetime remain unobserved.
-The coordinator owns the running demo and pending phone feedback; the original
-`cleanup.json` records the initial implementation handoff, before that demo began.
-No demo host, token or session identity is stored in Git. This evidence-only
-follow-up changes no source and repeats no behavioral suite. The prototype does
-not promise automatic model wake, friendly shared path mounts, access-rule changes
-or survival after forced process death. A hard kill of the
-Python parent can leave the Serve child alive; inspect its recorded PID and
-foreground identity and stop only that verified process. See the skill's
-[transport contract](../../../../skills/attended-review/references/tailscale-serve.md).
+## Post-attended-review correction and result
+
+Assignment `/root/tailscale_phone_closeout`, segment `phone-closeout-1`, same
+`tailscale-prototype-v1` mandate and private-transport milestone. Historical
+acceptance remains bound to its original candidate; the appended acceptance
+records bind this correction to `f52a273e4058ae58f420c19bc2d2370fe857610d`.
+
+The coordinator reconciled the actual phone receipt through event cursor 12:
+a note saved, `phone-note` received an explicit ACCEPT on fingerprint
+`cb68c92e417699c41da95de530d927e82b5dbbcd9ebd1097003cf2a26f38f421`, and handback
+left `remaining` pending. This is acceptance of the disposable transport intake,
+not product approval. It does not independently establish a phone page reload.
+The raw receipt stays private; Git contains no demo host, token, session identity
+or user quote. The original demo is stopped and its fixture removed.
+
+Real cleanup exposed an error after stop: the owned mapping still appeared after
+the child PID exited, then a later status was empty. Extending the original roughly
+two-second check to eight seconds alone failed a fresh native smoke at `7cfacd7`.
+Single-PID SIGINT at `ba14c79` also failed after its three-second wait and kill.
+The installed macOS CLI path is a shell launcher without `exec`; signaling its PID
+did not reliably stop the actual foreground child. Tailscale 1.102.3's
+[Serve source](https://github.com/tailscale/tailscale/blob/v1.102.3/cmd/tailscale/cli/serve_v2.go#L374)
+handles `os.Interrupt` and defers foreground watcher closure. This supports using
+Ctrl+C signaling; it does not establish an exact daemon expiry time.
+
+The final correction starts an owned POSIX process group and sends it SIGINT,
+retains the three-second kill fallback and an eight-second monotonic exact-session
+removal check, and leaves unrelated mappings untouched. A shell-launcher fixture
+requires SIGINT for cleanup; separate public CLI regressions cover delayed removal
+after child exit and a genuinely lingering session that still fails.
+`post-review-transport-tests.json` records all seven focused transport tests passing
+at the final exact candidate, including two linked consumers and HTTP boundaries.
+No client code changed; the earlier page regression and unchanged baseline checks
+remain applicable. Closeout review runtime: self-review only.
+
+`post-review-native-stop.json` records the final fresh native macOS pass: empty
+Serve prestate, exact owned mapping registered, local stop acknowledged, foreground
+helper exit 0 in 0.238 seconds, empty Serve status, both shell launcher and actual
+native child absent, and disposable fixture removed. Earlier failed native attempts
+remain sanitized in `live-attempt.json`. No reset/off, setup, credential, permission,
+Funnel, publication, deployment or push action occurred in this round.
+
+The board helper refuses reopening terminal Done ASK-0118. This original-milestone
+correction therefore appends evidence to its existing card without bypassing that
+guard or creating new scope. Documentation/scoped board checks accompany closeout.
+Phone reload, automatic agent wake and native Windows lifetime remain unverified.
+Forced parent death may still require verifying and stopping its owned CLI process
+group; friendly shared path mounts remain outside the prototype. No live server,
+waiter or protected disposable candidate is handed off.
 
 ## Disposable demo after user setup
 

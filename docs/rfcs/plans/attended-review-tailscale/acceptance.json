@@ -32,5 +32,52 @@
         "detail": "39 Python tests plus real-page JavaScript, docs and portable-source checks pass at the exact source candidate. Real disposable attempt reached human consent, status remained empty, fixture stopped/removed. Native HTTPS/mobile/Windows remain unobserved; no permissions or deployment performed."
       }
     }
-  ]
+  ],
+  "post_attended_review": {
+    "assignment": "/root/tailscale_phone_closeout",
+    "mandate_revision": "tailscale-prototype-v1",
+    "segment_id": "phone-closeout-1",
+    "approved": true,
+    "decision": "done",
+    "revision": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+    "records": [
+      {
+        "criterion": "ASK-0118-TS01",
+        "outcome": "pass",
+        "revision": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+        "evidence": {
+          "kind": "artifact",
+          "path": "docs/rfcs/plans/attended-review-tailscale/post-review-native-stop.json",
+          "detail": "Native macOS shell-launcher stop exits 0, removes exact owned foreground mapping and both processes; delayed-removal and lingering-session regressions pass."
+        }
+      },
+      {
+        "criterion": "ASK-0118-TS02",
+        "outcome": "pass",
+        "revision": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+        "evidence": {
+          "kind": "artifact",
+          "path": "docs/rfcs/plans/attended-review-tailscale/post-review-transport-tests.json",
+          "detail": "Focused public request-boundary, partial-intake, local-control and two-consumer checks pass. Phone demo intake at b42654b separately records note, ACCEPT and handback cursor 12; no product approval or phone reload inference."
+        }
+      },
+      {
+        "criterion": "ASK-0118-TS03",
+        "outcome": "pass",
+        "revision": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+        "evidence": {
+          "kind": "artifact",
+          "path": "docs/rfcs/plans/attended-review-tailscale/verification.md",
+          "detail": "Seven focused transport tests and fresh native cleanup pass; prior unchanged page/39-test baseline retained. Documentation and scoped board gates recorded for this closeout."
+        }
+      }
+    ],
+    "required_pending": [],
+    "unverified": [
+      "phone browser reload",
+      "automatic agent wake",
+      "native Windows process lifetime"
+    ],
+    "historical_acceptance": "Original records above remain bound to b42654b."
+  }
 }

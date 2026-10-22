@@ -1,0 +1,14 @@
+{
+  "source_candidate": "f52a273e4058ae58f420c19bc2d2370fe857610d",
+  "serve_status_before_empty": true,
+  "registered_exact_owned_session": true,
+  "stop_acknowledged": true,
+  "foreground_exit_code": 0,
+  "stop_elapsed_seconds": 0.238,
+  "serve_status_after_empty": true,
+  "launcher_and_native_child_gone": true,
+  "outcome": "pass",
+  "fixture_removed": true,
+  "task_owned_processes": [],
+  "private_raw_receipt": "/tmp/attended-review-tailscale-prototype/post-review-native-stop-raw.json"
+}
