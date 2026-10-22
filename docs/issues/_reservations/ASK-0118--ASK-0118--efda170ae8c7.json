@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0118"
+  ],
+  "reserve_for": "attended-review-tailscale-prototype",
+  "purpose": "",
+  "created": "2026-10-22T01:14:43.921612+00:00",
+  "base": "b963b02b2afa1d6d5d2dc176316495379c9d0c13"
+}
