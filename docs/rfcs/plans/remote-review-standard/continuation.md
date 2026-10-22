@@ -4,16 +4,70 @@
 
 Mandate `remote-review-standard-v2` supersedes v1's local-at-source default and
 unconditional handover wait. Assignment `/root/remote_review_standard`; same run
-`remote-review-standard-2026-10-21`, segment `amendment-1`; baseline
+`remote-review-standard-2026-10-21`, engineering segment `amendment-1`, reconciled
+closeout segment `amendment-2`; baseline
 `a52e04287e3d469bcdb67e2601d63cf502be2283`. ASK-0120 is the ordinary successor to
 terminal ASK-0119; the existing plan gains `default-transport-and-scheduling`,
 dependent on accepted v1 milestone `instructions`. This explicit mandate changes
 requirements; the historical milestone and acceptance remain intact below.
 
-Next action: claim and bind ASK-0120, update the same instruction paths for default
-Serve and useful-work/idle scheduling, then local branch tabletop and focused
-source checks. No live test, deployment, new acceptance ceremony or additional
-agent. Previous owner/commands are quiescent; dirty `.mask.lock.json` is preserved.
+Source candidate `7980d53e2a674cbe2c13fb2db212442c5e8fae61` implements DEF01–DEF03.
+ASK-0120 claimed at `26107f1`. The amendment keeps the same one-owner strategy and
+route, and binds all `ASK-0120:*` obligations and both successor exits with
+`instructions` accepted from source `9028112`/closeout `a52e042`. No live test,
+deployment, new acceptance ceremony or additional agent. Previous owner/commands
+were quiescent; dirty `.mask.lock.json` is preserved.
+
+### Amendment tabletop and self-review
+
+Local reading of SKILL step 4/6 → Driver waiting and Tailscale Serve, plus the two
+direct implement-rfc callers; no independent/native execution or wording tests.
+
+| Scenario | Observed next action from the rendered instructions | Result |
+| --- | --- | --- |
+| Reviewer at source computer | Start explicit `serve --tailscale`, publish full private HTTPS capability link; use existing setup/permissions and an unused permitted port. | Pass; source location no longer selects loopback. |
+| Explicit loopback/offline, or missing setup | Honor requested local/offline path; otherwise surface exact missing Tailscale/HTTPS requirement and deliberately fall back. No auto-install, access changes, HTTPS grants or Funnel. | Pass; bare CLI behavior and session/candidate protection remain intact. |
+| Busy agent/preparation/integration | Share usable link now, continue genuinely independent authorized work respecting protected candidates; inspect saved intake at natural work boundaries. | Pass; no blocking outer wait, heartbeat, extra polling agent or forced final answer. |
+| Handback recorded while busy | At the next natural boundary, read status from the durable consumed cursor, verify session, reconcile exact candidates and persist consumed events before dispatch. | Pass; process current handback without waiting for another click. |
+| Handback races between status and wait | Status through sequence N is reconciled without skipping events; idle waiter starts after N. A handback N+1 is still newer and returns immediately. | Pass; the checked cursor closes the check/wait gap. |
+| Idle automatic return | When only human input remains, release writers and persist command/session ownership, check status first, then qualified handback-only host wait. Partial saves remain blocked; no final answer while the outer idle call is pending. | Pass; coordinator is explicitly parked, not servicing child results. |
+| Idle runtime unavailable/interrupted | Account for and stop only the known waiter; retain server/protection and explain saved intake plus same-chat manual resume. | Pass; fallback is needed at the idle boundary, not merely because work is busy. |
+| Duplicate handback | Verify expected session/new event; reconcile and persist consumed cursor before dispatch, then ignore already-consumed delivery. | Pass; no duplicate work. |
+
+The existing awake-runtime evidence and its practical limits are unchanged. No
+source runtime, setup/configuration, CLI default, test or deployment changes.
+
+### Amendment verification and command state
+
+Both skill-creator package validators pass. The documentation gate reports 16 RFCs,
+120 cards and zero structural violations; scoped ASK-0120 board validation and plan
+discovery pass. Portable-source validation and working/staged diff checks pass on
+the committed source bytes. No full suites or live/native/wake tests were repeated.
+Self-review found no remaining local-at-source default or unconditional pre-share
+wait in the edited instruction path. The existing audio example is a deliberately
+local disposable fixture and remains unchanged, as does the historical v1 tabletop.
+
+After committing source and accounting for all writers/commands, this same owner
+renewed only the changed selected recipe fingerprint, from
+`sha256:1d35fd5ccf934976ad6b7e707e5cc739e98a92401a786d01f4d63c5c9beaa859` to
+`sha256:6a3e244394aeed7652d24753f6588c0a9408080bd24ddad0dcfc5198d5369fe4`.
+The closeout segment preserves strategy, routing, mandate and exact binding:
+definition `sha256:50e5c4f131c23e24570fb6b2f7663e88a8928d7f2d8ea50ea823c9f9a44691e3`,
+obligations `sha256:42c79ec8294d44da7f00bfb7b67d5b032a52bede51b4f678fbe906737e24f82c`.
+Checkpoint consistency returns `report-closeout`, with engineering acceptance
+`not-evaluated`; this owner judges the actual evidence. No active writer was
+hot-upgraded and no topology/model/provider change or new acceptance was introduced.
+
+Owned v2 source paths: root README, attended-review SKILL/README and its
+driver-wait/tailscale-serve/session-contract references; implement-rfc attendance
+and coordinator-implementer references plus their derived portable manifest.
+Tracker upkeep stays in ASK-0120, its reservation/counter and this existing plan,
+selection and continuation. All subprocesses completed synchronously. No review
+server, waiter, Serve route, protected candidate or delegated agent was created.
+Unrelated `.mask.lock.json` remains dirty and unstaged. No deployment, setup,
+permission/access, publication or push action. No bounded obligation is pending.
+Next action: guarded successor closeout, terminal consistency checks and coordinator
+report; the coordinator then owns any further authorized work.
 
 ## Historical v1 closeout
 

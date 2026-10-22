@@ -2,11 +2,12 @@
 schema: implement-rfc.card.v1
 id: ASK-0120
 title: Default private review transport and schedule waits around useful work
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: ["ASK-0119"]
 priority: P1
 metadata: {"milestone_plan":{"id":"remote-review-standard","path":"docs/rfcs/plans/remote-review-standard/milestone-plan.json"}}
+acceptance: [{"criterion":"ASK-0120-DEF01","outcome":"pass","revision":"7980d53e2a674cbe2c13fb2db212442c5e8fae61","evidence":{"kind":"artifact","path":"docs/rfcs/plans/remote-review-standard/continuation.md","detail":"Explicit private Serve defaults for all reviews, with deliberate local/offline choices and setup/permission/lifecycle boundaries preserved."}},{"criterion":"ASK-0120-DEF02","outcome":"pass","revision":"7980d53e2a674cbe2c13fb2db212442c5e8fae61","evidence":{"kind":"artifact","path":"docs/rfcs/plans/remote-review-standard/continuation.md","detail":"Usable link published during protected independent work; natural-boundary intake, race-safe consumed/checked cursors, idle-only qualified wait and unavailable-host fallback."}},{"criterion":"ASK-0120-DEF03","outcome":"pass","revision":"7980d53e2a674cbe2c13fb2db212442c5e8fae61","evidence":{"kind":"artifact","path":"docs/rfcs/plans/remote-review-standard/continuation.md","detail":"Eight-scenario local tabletop, both skill validators and focused documentation/board/plan/portable checks pass; no runtime/test/setup/deployment changes or new live session."}}]
 ---
 
 # Default private review transport and schedule waits around useful work
