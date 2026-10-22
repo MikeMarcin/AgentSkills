@@ -1,0 +1,11 @@
+{
+  "before": {},
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "{\"error\": \"Tailscale requires human consent; no settings were enabled: Serve is not enabled on your tailnet.\\nTo enable, visit:\\n\\n         [private consent URL returned to coordinator]\"}",
+  "after": {},
+  "host_cleared": true,
+  "fixture_removed": true,
+  "source_phase": "Working prototype before final metadata/collision/malformed-status refinements; final exact candidate tested separately.",
+  "https_reachability": "pending-user-setup"
+}

@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0118-TS03",
+  "outcome": "pass",
+  "revision": "b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.382,
+    "stdout_tail": "16 RFCs, 118 cards; 0 structural violations\n",
+    "stderr_tail": ""
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0118-TS01-TS03",
+  "outcome": "pass",
+  "revision": "b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"-m\", \"unittest\", \"discover\", \"-s\", \"skills/attended-review/tests\", \"-p\", \"test_attended_review.py\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 35.339,
+    "stdout_tail": "",
+    "stderr_tail": ".......................................\n----------------------------------------------------------------------\nRan 39 tests in 35.214s\n\nOK\n"
+  }
+}

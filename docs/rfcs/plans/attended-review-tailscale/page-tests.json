@@ -1,0 +1,13 @@
+{
+  "criterion": "ASK-0118-TS02",
+  "outcome": "pass",
+  "revision": "b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"node\", \"skills/attended-review/tests/review_page.test.js\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.077,
+    "stdout_tail": "PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery; self-saving note with retry only on failure, pressed decision buttons, per-image removal, options inside the decision, single hand-back banner; System/Light/Dark theme kept in this browser only and applied before first paint\n",
+    "stderr_tail": ""
+  }
+}
