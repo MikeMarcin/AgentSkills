@@ -31,18 +31,20 @@ For each milestone:
    recover with a fresh implementer only after accounting for the previous owner's
    work and commands.
 4. When required human acceptance is ready, require the implementer to prepare the
-   configured attended-review session and start its HTML server using that skill's
-   remote/local transport routing. After the implementer has returned a durable
-   checkpoint and released its writer ownership, follow [Attendance](../attendance.md)
-   and the configured attended-review skill's Driver waiting instructions. Arm
-   `wait --after SEQUENCE --kind handed-back` through Claude's persistent monitor
-   or keep one Codex tool call pending in a qualified runtime. The coordinator
-   owns the wait; present the complete capability URL after arming it. Partial
-   decisions stay durable without releasing it. Reuse applicable recorded runtime
-   qualification. If no qualified wait is available, give explicit manual-resume
-   instructions instead of recurring model checks. On return, verify the session, read
-   `status --after SEQUENCE`, reconcile intake and persist the consumed cursor
-   before dispatching further work.
+   configured attended-review session and start its default private Tailscale Serve
+   host, with that skill's explicit local/offline fallbacks. Read [Attendance](../attendance.md)
+   and the companion's Driver waiting instructions, then present the complete usable
+   capability URL promptly. Keep coordinating useful independent work within candidate
+   protection; inspect saved intake at natural boundaries and reconcile an existing
+   handback immediately. A blocking outer wait parks the coordinator even while
+   child agents continue; results/integration may still need its attention.
+   When human input is the sole dependency, obtain the durable checkpoint and release
+   engineering writers. Check status from the consumed cursor, reconcile any handback,
+   and otherwise arm the coordinator-owned handback-only wait from the checked cursor.
+   Follow the companion's race-safe intake and qualified Claude/Codex host procedures;
+   persist consumed cursor after reconciliation before dispatch. Reuse applicable
+   qualification; explicit manual resume applies when that idle wait is unavailable.
+   Partial decisions remain durable; no recurring model checks are required.
 5. Treat an attended-review wait as a context boundary. After hand-back, reconcile
    the recorded candidate, verdicts, protections and command state. If engineering,
    interpretation or upkeep remains, start a **fresh `rfc-implementer`** with the

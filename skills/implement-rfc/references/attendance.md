@@ -26,21 +26,22 @@ concrete failure, while independent judgeable candidates can proceed. Repair a r
 prerequisite and rerun its affected path before rebuilding that review bundle.
 Required human judgment remains pending.
 
-Use the configured attended-review skill's transport routing: private Tailscale
-Serve for remote/phone/SSH/remote-control/Dot review, loopback at the source
-computer. Present the complete capability URL and practical captured evidence.
-If a server is unavailable, use the existing offline export/import path;
-server absence does not force a different
-acceptance standard. Follow attended-review's Driver waiting instructions before
-handing over: Claude uses its persistent monitor; Codex keeps one qualified tool
-call pending on `wait --after SEQUENCE --kind handed-back`. The coordinator owns
-that wait. Partial decisions remain durable without releasing it. If the host
-cannot sustain the call, provide explicit manual resume; recurring model checks
-are not the automatic fallback. Verify the returned session and save the consumed
-cursor after reconciliation, before dispatching further work. Save each
-independent decision durably and preserve unanswered
-items. A partial review or “finish and hand back” signal is not approval of the
-remaining candidates.
+Use the configured attended-review skill's default private Tailscale Serve for
+every session; loopback/offline are explicit choices or deliberate setup fallbacks.
+Present the complete capability URL and practical evidence promptly. Read its
+Driver waiting instructions before sharing. Keep coordinating useful independent
+work that respects prepared-candidate protection, inspecting durable intake at
+natural task boundaries. A blocking outer wait parks the coordinator and delays
+its attention to agent results or integration.
+
+When only human input remains, the coordinator owns qualified automatic wait/resume:
+check status from the consumed cursor and reconcile any saved handback before
+arming `wait --after CHECKED_SEQUENCE --kind handed-back`. Follow the companion's
+race-safe cursor and Claude/Codex host procedures. Persist consumed events after
+reconciliation, before dispatch. If that idle wait is unavailable, provide explicit
+manual resume; recurring model checks are not the fallback. Partial decisions stay
+durable and unanswered items remain pending. A handback signal does not approve
+remaining candidates; transport/offline fallback changes no acceptance standard.
 
 **Prepared:** the user can inspect the actual candidate and provide the required
 decision, with exact pending items and preparation limitations visible.

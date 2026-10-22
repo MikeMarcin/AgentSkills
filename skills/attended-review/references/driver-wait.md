@@ -5,33 +5,56 @@ exit returns events to its caller; the host decides whether the driver resumes.
 An idle shell session, async hook, or final answer does not itself guarantee a
 new Codex turn. Keep durable decisions independent of that host capability.
 
-Automatic continuation on handback is the normal handover in a qualified runtime.
-Before handing over, record the source checkout/revision, state/registry paths,
-session ID, candidate revisions/fingerprints, sequence cursor, server/Serve
-identities, exact waiter command and command/cell identity, and owning driver in
-the existing private continuation. Finish independent unattended work and release
-engineering writer ownership before arming the waiter.
-Use `--kind handed-back` for the normal review boundary: partial decisions save
-immediately but leave the waiter blocked. Keep personal `--state` and cooperating
-`--registry` arguments identical on every command.
+## Share now, wait when idle
+
+Before sharing, record the source checkout/revision, state/registry paths, session
+ID, candidate revisions/fingerprints, durable consumed event cursor, server/Serve
+identities, command ownership and owning driver in the private continuation. Keep
+personal `--state` and cooperating `--registry` arguments identical on every command.
+
+Publish the complete usable private HTTPS link promptly. While genuinely useful
+independent work remains—agents, preparation, coordination or integration—keep
+coordinating that work within prepared-candidate protection. The page saves intake
+without an active waiter. Inspect `status --after CONSUMED_SEQUENCE` at natural
+task boundaries and reconcile a recorded handback then, rather than asking for a
+second click. Use those work boundaries, not a model polling loop or heartbeat.
+A pending outer Codex wait parks the coordinator: child agents can continue, but
+their results and integration may need the coordinator's attention.
+
+When human input is the sole remaining dependency, automatic wait/resume is the
+default in a qualified runtime:
+
+1. Release engineering writers and persist exact command/session/cursor ownership.
+   Before blocking, read `status --after CONSUMED_SEQUENCE` and verify the expected
+   session. Reconcile returned candidate intake and any already-recorded handback.
+   Persist the consumed cursor only after that reconciliation, before dispatching
+   further work. A latest sequence alone must not skip an unconsumed event.
+2. If handback was already recorded, process it immediately under the preserved
+   engineering strategy. Otherwise arm `wait --after CHECKED_SEQUENCE --kind
+   handed-back` from that reconciled status cursor. A handback racing between
+   status and wait remains newer than the checked cursor and returns immediately.
+3. Save the exact waiter command and command/cell identity. Follow the host path
+   below, reusing applicable qualification. Partial decisions save immediately
+   while the handback-only waiter stays blocked. In the idle Codex branch, retain
+   one pending outer call without a final answer while actively waiting.
 
 ## Claude Code
 
-Arm `wait --after SEQUENCE --kind handed-back` through `Monitor` with
-`persistent: true` before ending the turn. This preserves the existing monitor
+For the idle branch, arm `wait --after CHECKED_SEQUENCE --kind handed-back` through
+`Monitor` with `persistent: true` before ending the turn. This preserves the existing monitor
 path; a plain background shell command's ten-minute lifetime is too short for an
 overnight review. Qualify the actual host, not a rendered configuration.
 
 ## Codex with code-mode tools
 
-Keep the coordinator's turn running on one pending call. The review remains
-usable in its browser, and the chat may show as running while the model is idle.
+In the idle branch, keep the coordinator's turn running on one pending call. The
+review remains usable in its browser, and the chat may show as running while the model is idle.
 No waiting subagent, daemon, model launcher or scheduled status check is needed.
 
 Reuse the recorded qualification below for a matching awake runtime and toolchain;
 a new review session does not require a new probe. Use the following orchestration
 shape when the installed runtime exposes these tools. Substitute the reviewed
-argument array and saved sequence; execute this as one `functions.exec` cell.
+argument array and checked sequence; execute this as one `functions.exec` cell.
 Argument quoting keeps paths literal.
 The example uses a POSIX shell. Native Windows needs a qualified native argument
 adapter; do not introduce Bash or WSL to make this example run.
@@ -40,7 +63,7 @@ adapter; do not introduce Bash or WSL to make this example run.
 // @exec: {"yield_time_ms": 1000, "max_output_tokens": 1500}
 const argv = [PYTHON, "-B", SCRIPT, "--repo-root", ROOT,
   // Include the same --state and --registry arguments when the session uses them.
-  "wait", "--after", String(SEQUENCE), "--kind", "handed-back",
+  "wait", "--after", String(CHECKED_SEQUENCE), "--kind", "handed-back",
   "--timeout", "43200"];
 const quote = value => "'" + value.replaceAll("'", "'\\''") + "'";
 let result = await tools.exec_command({
@@ -103,8 +126,8 @@ remains incomplete. Keep the host awake and its tool connection live.
 ## Intake, interruption and manual resume
 
 On return, require exit 0, the expected session ID, and a `handed-back` event newer
-than the recorded cursor. Read `status --after SEQUENCE` using the same session
-location; reject a replaced session. Reconcile the exact candidate fingerprints,
+than the checked cursor. Read `status --after CONSUMED_SEQUENCE` using the same
+session location; reject a replaced session. Reconcile the exact candidate fingerprints,
 verdicts, protections and task-owned commands. Persist the consumed event cursor
 with that reconciliation before dispatching further work. Repeated delivery of
 an already consumed event must not dispatch the same work twice. Follow the
@@ -117,7 +140,8 @@ server and candidate protection intact. App closure/restart and computer sleep
 can interrupt the tool connection, so inspect durable state and command ownership
 on resume instead of promising continuation while the host is unavailable.
 
-If a qualified wait is unavailable, state plainly: decisions are saved, automatic
+When an idle wait is needed but a qualified wait is unavailable or interrupted,
+state plainly: decisions are saved, automatic
 continuation is unavailable, and after **Finish and hand back** the user should
 send `Resume the attended review` in this same chat. Read the saved session and
 cursor on that user turn. Offline exports still require the existing import step.

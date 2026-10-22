@@ -1,11 +1,12 @@
-# Private HTTPS for remote review
+# Default private HTTPS review transport
 
-Use Tailscale Serve as the standard transport when the reviewer is on a phone or
-another device, or the session runs through SSH, remote control or Dot. A remote
-review request authorizes its temporary scoped private Serve session; use that
-authority without repeatedly requesting separate transport approval. Review at the
-source computer uses loopback. The CLI's bare `serve` default remains loopback;
-select `--tailscale` for this remote branch.
+Use Tailscale Serve as the default transport for every attended-review session,
+including review at the source computer, on another device, or through SSH,
+remote control or Dot. Existing task/session authorization covers its temporary
+scoped private Serve session without repeated transport approval. Choose loopback
+or offline only when explicitly requested or as a deliberate fallback after
+missing setup. The CLI's bare `serve` behavior remains loopback; agents explicitly
+select `serve --tailscale` for the standard workflow.
 
 Tailscale must already be installed, signed in and online, with HTTPS enabled and
 the reviewer able to reach this device through existing access rules. If a
@@ -27,7 +28,7 @@ it explicitly. Omitting that flag uses this host's OS-assigned loopback port; it
 must also be permitted, and may require a different link after restart.
 The helper never opens firewall rules or changes tailnet access to make a port work.
 
-Open the complete printed `url`, including `#token=...`, on the other device.
+Open the complete printed `url`, including `#token=...`, on the reviewing device.
 `local_url` continues to work on the source machine. Treat either URL as a private
 session capability; keep tokens out of commits, public links and review content.
 The printed `tailscale` record identifies the HTTPS origin, port, owned foreground
@@ -64,10 +65,12 @@ Keep the source machine online and the foreground helper running. Saved partial
 feedback and answers live in the same durable session files; closing the browser,
 reconnecting or leaving other questions unanswered does not lose saved intake.
 Unsaved browser drafts still need retry or export, especially before changing a
-URL's origin. Before presenting the full HTTPS capability link, arm automatic
-continuation through [Driver waiting](driver-wait.md). The host must stay awake
-with the foreground helper and tool connection live; use its explicit manual-resume
-fallback when a qualified wait is unavailable.
+URL's origin. Present the full HTTPS capability link as soon as review is usable.
+Follow [Driver waiting](driver-wait.md) to keep coordinating useful independent
+work and inspect intake at natural boundaries. Arm automatic waiting only when
+human input is the sole pending dependency, after checking for a saved handback.
+The host must stay awake with the foreground helper and tool connection live;
+use the explicit manual-resume fallback if that idle wait is unavailable.
 
 Stop from the source machine with the same source/state/registry arguments:
 

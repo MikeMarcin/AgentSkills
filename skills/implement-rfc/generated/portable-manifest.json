@@ -74,7 +74,7 @@
     },
     {
       "path": "references/attendance.md",
-      "sha256": "9b71332131b554e892f0c655c7c2b06f906f23a7cbe9e6353be80ef7db796ede"
+      "sha256": "85e625534faaf403d03c59cb545591acef32ddb5f29c79a9319ad70fcd394a6d"
     },
     {
       "path": "references/bookkeeping.md",
@@ -166,7 +166,7 @@
     },
     {
       "path": "references/strategies/coordinator-implementer.md",
-      "sha256": "c32f4a2c6085acccaf5051a152c0553085bffddea59c53a8e7a48d064a2b1c01"
+      "sha256": "35d17f7e92ff70221aa7a0e20baaa6d2ec72cb4118d804e977ae995f78a85ea3"
     },
     {
       "path": "references/strategies/coordinator-integrator.md",
@@ -685,6 +685,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "0d9d6b4c7fe4ffd4",
+  "portable_digest": "80a63994aaa81e49",
   "schema": "implement-rfc.portable-manifest.v1"
 }

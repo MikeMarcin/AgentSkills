@@ -4,12 +4,15 @@ A portable Python/HTML companion for user-started human acceptance sessions. It 
 
 See [SKILL.md](SKILL.md) for the agent workflow and [session contract](references/session-contract.md) for exact JSON and commands. The core runtime has no third-party dependencies, daemon, database, Git mutation, browser-triggered process execution, Bash or WSL requirement.
 
-For phone, another-device or SSH/remote-control/Dot review, use
-[Tailscale Serve](references/tailscale-serve.md) on the existing tailnet for a
-temporary private HTTPS URL. At the source computer, use loopback. Read
-[Driver waiting](references/driver-wait.md) before handover: automatic continuation
-on handback is standard in a qualified runtime, with an explicit manual-resume
-fallback when unavailable. The host must stay awake with its tool connection live.
+Use [Tailscale Serve](references/tailscale-serve.md) on the existing tailnet by
+default for every session, including review at the source computer. Loopback and
+offline are explicit choices or deliberate fallbacks after missing setup. Share
+the complete private HTTPS link while useful independent work continues safely.
+Read [Driver waiting](references/driver-wait.md) before sharing: when human input
+is the only remaining dependency, qualified automatic wait/resume is standard.
+A blocking wait parks the coordinator; inspect saved intake at natural work
+boundaries instead while busy. Idle waiting needs an awake host and live tool
+connection, with explicit manual resume when unavailable.
 
 The session directory is `<checkout>/.mask/attended-review/`. Ignore that generated directory in the consumer. Treat its verdicts as local acceptance records and transfer the relevant evidence to the authoritative issue/RFC records through the driver. Do not commit live host tokens, full incidental logs or unrelated session history.
 
