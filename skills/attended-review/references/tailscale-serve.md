@@ -65,7 +65,10 @@ python /path/to/attended-review/scripts/attended_review.py --repo-root /path/to/
 
 Local stop, Ctrl+C, handled termination and startup/runtime failures reap the owned
 Serve child and close both listeners. Cleanup relies on Tailscale's foreground
-session lifetime; it never runs `reset`, unscoped `off`, `--bg`, or Funnel. If cleanup
+session lifetime. On POSIX, the helper sends SIGINT so Serve can close its foreground
+watcher through its Ctrl+C handler; a child that does not exit is killed after
+three seconds. Native Windows termination remains separately unqualified.
+Cleanup never runs `reset`, unscoped `off`, `--bg`, or Funnel. If cleanup
 cannot confirm removal after polling the exact session for up to eight seconds,
 inspect `tailscale serve status --json` before retrying. The local `stop` response
 acknowledges shutdown; wait for the foreground helper to finish before checking

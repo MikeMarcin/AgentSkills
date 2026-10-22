@@ -663,12 +663,22 @@ class ReviewTests(unittest.TestCase):
         original = {"Foreground": {"other": {"TCP": {"8444": {"HTTPS": True}}}}}
         fake, executable, env = self.fake_tailscale(original, mode="delayed-cleanup")
         self.init(self.candidate()); self.cli("prepare")
-        process, host = self.tailhost(executable, env, port=8443)
+        process, _ = self.tailhost(executable, env, port=8443)
         self.assertTrue(self.cli("stop")["stopped"])
         process.wait(timeout=12)
         self.assertEqual(process.returncode, 0, process.stderr.read())
         self.assertEqual(json.loads((fake / "config.json").read_text()), original)
         self.assertFalse((fake / "pending-cleanup.json").exists())
+        self.assertIsNone(self.cli("status").get("host"))
+
+    def test_tailscale_stop_interrupts_child_for_graceful_cleanup(self):
+        fake, executable, env = self.fake_tailscale(mode="requires-interrupt")
+        self.init(self.candidate()); self.cli("prepare")
+        process, _ = self.tailhost(executable, env, port=8443)
+        self.assertTrue(self.cli("stop")["stopped"])
+        process.wait(timeout=12)
+        self.assertEqual(process.returncode, 0, process.stderr.read())
+        self.assertEqual(json.loads((fake / "config.json").read_text()), {})
         self.assertIsNone(self.cli("status").get("host"))
 
     def test_tailscale_stop_reports_genuinely_lingering_owned_mapping(self):

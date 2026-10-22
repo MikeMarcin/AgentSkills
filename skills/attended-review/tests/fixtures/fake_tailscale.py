@@ -65,7 +65,8 @@ else:
     def stop(*_):
         global running
         running = False
-    signal.signal(signal.SIGTERM, stop)
+    if mode != 'requires-interrupt':
+        signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
         deadline = time.monotonic() + (.8 if mode == 'runtime-exit' else 300)

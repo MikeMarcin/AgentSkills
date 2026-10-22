@@ -841,7 +841,11 @@ class TailscaleServe:
             if self.process is None:
                 return
             if self.process.poll() is None:
-                self.process.terminate()
+                if os.name == "nt":
+                    self.process.terminate()
+                else:
+                    # Serve handles Ctrl+C by closing its foreground watcher.
+                    self.process.send_signal(signal.SIGINT)
                 try:
                     self.process.wait(timeout=3)
                 except subprocess.TimeoutExpired:
