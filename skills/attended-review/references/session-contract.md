@@ -224,7 +224,8 @@ playback activity; no driver/model loop is added.
 
 The UI has direct Accept/Reject controls (Choose selected/Reject all for
 options); the pressed control is the recorded answer, and pressing it again
-records nothing new. It has one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
+records nothing new. A System/Light/Dark theme control is a browser preference
+kept only in local storage; it is never session state, exported or logged. It has one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
 
 ## Local host and recovery boundaries
 

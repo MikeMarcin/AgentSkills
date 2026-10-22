@@ -1,36 +1,31 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Attended review</title>
+<script id="theme-boot">try{const theme=localStorage.getItem('attended-review:theme');if(theme==='light'||theme==='dark')document.documentElement.setAttribute('data-theme',theme);}catch(e){}</script>
 <style>
 /* Chalk on slate by night, slate on paper by day. Colour is spent only on
    verdicts: green accepts, red rejects, amber is what still needs an answer.
-   The same device marks both the question and the decision: a rule at the left. */
+   The same device marks both the question and the decision: a rule at the left.
+   Each token names its day and night value; color-scheme picks one, following
+   the system unless the reviewer chose a theme on the page. */
 :root{
   color-scheme:light dark;
-  --bg:#20272b;--sunk:#192024;--raised:#283035;--hover:#2f383e;
-  --line:#3a444a;--line-strong:#56636b;
-  --ink:#ebe6da;--ink-dim:#b9b2a4;--ink-faint:#908a7d;
-  --link:#9cc3df;--focus:#9cc3df;
-  --accept:#8fcaa0;--reject:#e5a093;--pending:#e4c27a;
-  --on-accept:#10241a;--on-reject:#2d1512;
-  --accept-wash:#22352a;--reject-wash:#3a221e;
-  --checker-a:#4a5258;--checker-b:#5b646a;
+  --bg:light-dark(#eef1f0,#20272b);--sunk:light-dark(#ffffff,#192024);--raised:light-dark(#f7f9f8,#283035);--hover:light-dark(#e1e7e5,#2f383e);
+  --line:light-dark(#d0d8d6,#3a444a);--line-strong:light-dark(#9aa6a4,#56636b);
+  --ink:light-dark(#1c2427,#ebe6da);--ink-dim:light-dark(#46534f,#b9b2a4);--ink-faint:light-dark(#5f6b68,#908a7d);
+  --link:light-dark(#1b5d8c,#9cc3df);--focus:light-dark(#1b5d8c,#9cc3df);
+  --accept:light-dark(#1d7040,#8fcaa0);--reject:light-dark(#b2392a,#e5a093);--pending:light-dark(#94610a,#e4c27a);
+  --on-accept:light-dark(#ffffff,#10241a);--on-reject:light-dark(#ffffff,#2d1512);
+  --accept-wash:light-dark(#e2f1e7,#22352a);--reject-wash:light-dark(#f8e4e0,#3a221e);
+  --checker-a:light-dark(#e4e8e7,#4a5258);--checker-b:light-dark(#f4f6f5,#5b646a);
   --serif:Charter,"Iowan Old Style","Bitstream Charter",Cambria,Georgia,serif;
   --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --measure:68ch;
   font:15px/1.45 var(--sans);color:var(--ink);background:var(--bg);
 }
-@media (prefers-color-scheme:light){:root{
-  --bg:#eef1f0;--sunk:#ffffff;--raised:#f7f9f8;--hover:#e1e7e5;
-  --line:#d0d8d6;--line-strong:#9aa6a4;
-  --ink:#1c2427;--ink-dim:#46534f;--ink-faint:#5f6b68;
-  --link:#1b5d8c;--focus:#1b5d8c;
-  --accept:#1d7040;--reject:#b2392a;--pending:#94610a;
-  --on-accept:#ffffff;--on-reject:#ffffff;
-  --accept-wash:#e2f1e7;--reject-wash:#f8e4e0;
-  --checker-a:#e4e8e7;--checker-b:#f4f6f5;
-}}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0 auto;max-width:1240px;padding:18px 24px 48px}
 h1,h2,h3,p,ul,dl,dd,figure{margin:0}
@@ -55,6 +50,9 @@ a{color:var(--link)}
 #progress .due b,#progress .due{color:var(--pending)}
 .controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .group{color:var(--ink-faint);margin-right:4px}
+.theme{display:inline-flex;align-items:center;gap:6px;margin-right:6px;font-size:14px;color:var(--ink-faint)}
+.theme select{font:inherit;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:5px;padding:5px 6px;cursor:pointer}
+.theme select:hover{border-color:var(--line-strong)}
 #notice{margin:0 0 12px;padding:8px 12px;border-left:3px solid var(--pending);background:var(--raised);white-space:pre-wrap}
 #notice:empty{display:none}
 .handed{margin:0 0 18px;padding:14px 18px;border:1px solid var(--line);border-left:4px solid var(--accept);border-radius:6px;background:var(--raised)}
@@ -218,7 +216,7 @@ textarea::placeholder{color:var(--ink-faint)}
 <header class="top"><h1>Attended review</h1><p id="checkout"></p><p id="mode"></p></header>
 <section class="session" aria-label="The session">
   <div class="tally"><div class="meter" aria-hidden="true"><i class="answered"></i><i class="ready"></i><i class="waiting"></i></div><p id="progress" role="status"></p></div>
-  <div class="controls" role="group" aria-label="This session"><button id="start" class="quiet">Start with what’s ready</button><button id="pause" class="quiet">Pause and come back later</button><button id="finish">Finish and hand back</button></div>
+  <div class="controls" role="group" aria-label="This session"><label class="theme">Theme <select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><button id="start" class="quiet">Start with what’s ready</button><button id="pause" class="quiet">Pause and come back later</button><button id="finish">Finish and hand back</button></div>
 </section>
 <section id="handed" class="handed" hidden><h2>Handed back to your driver</h2><p id="handed-summary"></p></section>
 <p id="notice" role="alert"></p>
@@ -508,6 +506,16 @@ el('export').onclick=()=>{el('transfer').value=JSON.stringify(packet(),null,2);}
 el('copy').onclick=async()=>{el('export').click();try{await navigator.clipboard.writeText(el('transfer').value);say('Decision JSON copied.');}catch(e){el('transfer').select();say('Copy the selected JSON using your keyboard.');}};
 el('download').onclick=()=>{el('export').click();const blob=new Blob([el('transfer').value],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='attended-decisions.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 function stamp(){if(!state)return;const when=state.generated_at;el('generated').textContent=online?'':when?`This file was written at ${new Date(when).toLocaleString()}. Anything decided in the live session after that is not in it; ask your driver to write it again.`:'';}
+// The theme is this browser's preference, not review state: it never enters the
+// session, the export or the event log. Without storage it stays System.
+const themeKey='attended-review:theme';
+function applyTheme(choice){
+ if(choice!=='light'&&choice!=='dark')choice='system';
+ if(choice==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',choice);
+ el('theme').value=choice;return choice;
+}
+el('theme').onchange=()=>{const choice=applyTheme(el('theme').value);try{if(choice==='system')localStorage.removeItem(themeKey);else localStorage.setItem(themeKey,choice);}catch(e){}};
+try{applyTheme(localStorage.getItem(themeKey));}catch(e){applyTheme('system');}
 // The rail is a sidebar on a wide window and folds away beside a narrow one,
 // which is how this page usually sits next to the application under review.
 const wide=matchMedia('(min-width:900px)');

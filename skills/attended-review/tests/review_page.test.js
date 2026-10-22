@@ -17,6 +17,7 @@ function page(seed=snapshot,settings={}){
   append(...items){this.children.push(...items);}
   replaceChildren(...items){this.children=[...items];}
   setAttribute(k,v){this.attrs[k]=v;}
+  removeAttribute(k){delete this.attrs[k];}
   focus(options){document.activeElement=this;this.focusOptions=options;}
   scrollIntoView(options){this.scrollOptions=options;this.scrollCount=(this.scrollCount||0)+1;}
   select(){}
@@ -27,7 +28,7 @@ function page(seed=snapshot,settings={}){
   querySelector(selector){return this.querySelectorAll(selector)[0];}
  }
  const get=id=>{if(!nodes.has(id))nodes.set(id,new Element('div',id));return nodes.get(id);};
- document={activeElement:null,getElementById:get,createElement:tag=>new Element(tag),createTextNode:text=>text,querySelector:get,addEventListener(){}};
+ document={activeElement:null,documentElement:new Element('html'),getElementById:get,createElement:tag=>new Element(tag),createTextNode:text=>text,querySelector:get,addEventListener(){}};
  // A live host is the real loopback server: its intake, not this fixture,
  // decides whether a note is saved.
  const live=settings.host?async(url,options)=>{requests.push({url,body:options.body?JSON.parse(options.body):null});return globalThis.fetch(settings.host.origin+url,options);}:null;
@@ -49,7 +50,7 @@ function page(seed=snapshot,settings={}){
  };
  // With a live host the note's save debounce runs on real timers.
  const timers=settings.host?{setTimeout,clearTimeout}:{setTimeout:()=>1,clearTimeout(){}};
- const context={console,document,fetch,location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?'http:':'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);}},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
+ const context={console,document,fetch,location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?'http:':'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:settings.storageThrows?{getItem(){throw Error('storage denied');},setItem(){throw Error('storage denied');},removeItem(){throw Error('storage denied');}}:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);},removeItem:k=>storage.delete(k)},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
  vm.createContext(context);vm.runInContext(script.replace('/*SESSION_DATA*/null',settings.live?'null':JSON.stringify(seed)).replace('\nboot();','\nglobalThis.ready=boot();'),context);
  const run=code=>vm.runInContext(code,context);
  return {run,get,context,requests,settings,ready:context.ready};
@@ -209,11 +210,36 @@ async function liveNotes(origin,token){
  await q.get('accept').click();assert.equal(q.run('JSON.stringify(decision(candidate()).selected)'),JSON.stringify(['A: outlined','B: filled']));
  // Offline, finishing exports, and the button says so.
  assert.equal(q.get('finish').textContent,'Finish and export');assert.match(q.get('feedback-status').textContent,/until you export/);
+ // The theme follows the system until the reviewer picks one. The choice is this
+ // browser's preference: it survives a reload, never reaches the session or the
+ // export, and without storage the page stays on System.
+ storage.clear();let t=page();const theme=x=>x.context.document.documentElement.attrs['data-theme'];
+ assert.equal(t.get('theme').value,'system');assert.equal(theme(t),undefined);
+ t.get('theme').value='dark';t.get('theme').onchange();assert.equal(theme(t),'dark');assert.equal(storage.get('attended-review:theme'),'dark');
+ t=page();assert.equal(t.get('theme').value,'dark');assert.equal(theme(t),'dark');
+ assert.doesNotMatch(t.run('JSON.stringify(packet())'),/theme|dark/);
+ t.get('theme').value='light';t.get('theme').onchange();assert.equal(theme(t),'light');
+ t.get('theme').value='system';t.get('theme').onchange();assert.equal(theme(t),undefined);assert.equal(storage.has('attended-review:theme'),false);
+ storage.set('attended-review:theme','sepia');t=page();assert.equal(t.get('theme').value,'system');assert.equal(theme(t),undefined);
+ t=page(snapshot,{storageThrows:true});assert.equal(t.get('theme').value,'system');
+ t.get('theme').value='dark';t.get('theme').onchange();assert.equal(theme(t),'dark');
+ // A live page sends no theme to the host.
+ storage.clear();t=page(snapshot,{live:true});await t.ready;t.get('theme').value='light';t.get('theme').onchange();
+ await t.run("select('A')");await t.get('accept').click();
+ assert.equal(t.requests.some(r=>JSON.stringify(r.body||'').includes('theme')),false);
+ // The head script applies a saved choice before the first paint, and ignores
+ // anything else, including storage that refuses to be read.
+ const boot=html.match(/<script id="theme-boot">([\s\S]*?)<\/script>/)[1];
+ assert.ok(html.indexOf('<script id="theme-boot">')<html.indexOf('<style>'));
+ const paint=store=>{const root=new (t.context.document.documentElement.constructor)('html');vm.runInNewContext(boot,{document:{documentElement:root},localStorage:store});return root.attrs['data-theme'];};
+ assert.equal(paint({getItem:()=> 'dark'}),'dark');assert.equal(paint({getItem:()=> 'light'}),'light');
+ assert.equal(paint({getItem:()=> 'sepia'}),undefined);assert.equal(paint({getItem(){throw Error('denied');}}),undefined);
+ storage.clear();
  if(process.argv[2]){
   storage.clear();const saved=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));p=page(saved);
   const audioId=saved.candidates.find(c=>c.question_type==='audio').id;
   await p.run(`select(${JSON.stringify(audioId)})`);p.get('note').value='Offline unanswered feedback for exact clip';p.run('edit()');await p.run('flush()');
   fs.writeFileSync(process.argv[3],p.run('JSON.stringify(packet())'));
  }
- console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery; self-saving note with retry only on failure, pressed decision buttons, per-image removal, options inside the decision, single hand-back banner');
+ console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery; self-saving note with retry only on failure, pressed decision buttons, per-image removal, options inside the decision, single hand-back banner; System/Light/Dark theme kept in this browser only and applied before first paint');
 })().catch(e=>{console.error(e);process.exitCode=1;});
