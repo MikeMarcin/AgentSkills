@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0120
 title: Default private review transport and schedule waits around useful work
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: ["ASK-0119"]
 priority: P1
