@@ -1,11 +1,58 @@
 {
-  "before": {},
-  "returncode": 1,
-  "stdout": "",
-  "stderr": "{\"error\": \"Tailscale requires human consent; no settings were enabled: Serve is not enabled on your tailnet.\\nTo enable, visit:\\n\\n         [private consent URL returned to coordinator]\"}",
-  "after": {},
-  "host_cleared": true,
-  "fixture_removed": true,
-  "source_phase": "Working prototype before final metadata/collision/malformed-status refinements; final exact candidate tested separately.",
-  "https_reachability": "pending-user-setup"
+  "initial_attempt": {
+    "before": {},
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "{\"error\": \"Tailscale requires human consent; no settings were enabled: Serve is not enabled on your tailnet.\\nTo enable, visit:\\n\\n         [private consent URL returned to coordinator]\"}",
+    "after": {},
+    "host_cleared": true,
+    "fixture_removed": true,
+    "source_phase": "Working prototype before final metadata/collision/malformed-status refinements; final exact candidate tested separately.",
+    "https_reachability": "pending-user-setup"
+  },
+  "current_https_reachability": "verified-http-client-after-user-setup",
+  "post_setup": {
+    "source_candidate": "b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131",
+    "setup": {
+      "authority": "User explicitly authorized setup and manually enabled HTTPS with Funnel unchecked.",
+      "cert_domains_present": true,
+      "serve_status_before_demo": {},
+      "evidence": "Coordinator observation; no setup action performed by this implementer."
+    },
+    "root_get": {
+      "client": "curl",
+      "http_status": 200,
+      "ssl_verify_result": 0,
+      "evidence": "Coordinator observation"
+    },
+    "https_status": {
+      "http_status": 200,
+      "tls_verified": true,
+      "candidate_count": 2
+    },
+    "https_feedback": {
+      "http_saved": true,
+      "tls_verified": true,
+      "feedback_note_present": true,
+      "verdict_absent": true
+    },
+    "local_browser": {
+      "candidate_count": 1,
+      "answered_count": 0,
+      "unanswered_with_feedback_count": 1,
+      "handed_back": true
+    },
+    "private_receipts": [
+      "/tmp/attended-review-tailscale-prototype/live-https-status.json",
+      "/tmp/attended-review-tailscale-prototype/live-https-feedback.json",
+      "/tmp/attended-review-tailscale-prototype/browser-smoke-status.json"
+    ],
+    "browser_limits": {
+      "private_https_iab": "Navigation timed out despite successful verified HTTP-client requests.",
+      "chrome": "Automation interrupted by user changes; no bypass attempted.",
+      "phone": "User has private link; manual report pending.",
+      "automatic_waiter": "Not claimed."
+    },
+    "live_demo_owner": "Coordinator; this implementer neither stopped nor modified its processes."
+  }
 }

@@ -46,6 +46,23 @@ CSP, size bounds, fingerprints, preparation boundaries and qualified-wait contra
   This live attempt used the same transport implementation before final guard,
   metadata and malformed-status refinements; final exact-candidate regression is
   in the receipts above. It establishes the first-use gate, not HTTPS reachability.
+- After the user explicitly authorized setup, they manually enabled HTTPS with
+  Funnel unchecked. The coordinator observed certificate domains configured and
+  Serve `{}` before starting a new disposable source-symlinked demo at the same
+  source candidate. Real curl HTTPS root returned HTTP 200 with certificate
+  verification result 0. Authenticated Python HTTPS `/api/status` returned 200
+  with two candidates; HTTPS feedback POST followed by GET retained the exact
+  submitted note on an unanswered candidate with no verdict. Sanitized results
+  are in `live-attempt.json`; private raw receipts are
+  `/tmp/attended-review-tailscale-prototype/live-https-status.json` and
+  `/tmp/attended-review-tailscale-prototype/live-https-feedback.json`.
+- The coordinator's real local IAB smoke saved an unanswered note, handed back,
+  and reloaded with that feedback retained and zero verdicts. Private receipt:
+  `/tmp/attended-review-tailscale-prototype/browser-smoke-status.json`. Private
+  HTTPS IAB navigation timed out despite curl success; Chrome automation was
+  interrupted by user changes and no bypass was attempted. The user's manual
+  phone report remains pending. No native private HTTPS browser/phone acceptance
+  or automatic waiter is claimed.
 - The first added-test run exposed fixture assertions for omitted `host` when
   stopped, handback-only `feedback_pending`, and macOS `/private` path resolution.
   Assertions were corrected to the public contract; no runtime defect was inferred
@@ -54,10 +71,15 @@ CSP, size bounds, fingerprints, preparation boundaries and qualified-wait contra
 - Focused code-simplifier review simplified attach and child cleanup flow; no extra
   agent or independent review ran. Closeout review runtime: self-review only.
 
-Real private HTTPS/certificate issuance, browser/mobile reconnection and native
-Windows process lifetime remain unobserved. First-use consent is a user decision.
-The prototype does not promise automatic model wake, friendly shared path mounts,
-access-rule changes or survival after forced process death. A hard kill of the
+Verified real HTTPS HTTP-client requests now establish certificate-backed private
+transport and durable partial intake after the user's manual setup. Native private
+HTTPS browser/mobile reconnection and Windows process lifetime remain unobserved.
+The coordinator owns the running demo and pending phone feedback; the original
+`cleanup.json` records the initial implementation handoff, before that demo began.
+No demo host, token or session identity is stored in Git. This evidence-only
+follow-up changes no source and repeats no behavioral suite. The prototype does
+not promise automatic model wake, friendly shared path mounts, access-rule changes
+or survival after forced process death. A hard kill of the
 Python parent can leave the Serve child alive; inspect its recorded PID and
 foreground identity and stop only that verified process. See the skill's
 [transport contract](../../../../skills/attended-review/references/tailscale-serve.md).
