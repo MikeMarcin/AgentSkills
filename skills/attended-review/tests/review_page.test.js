@@ -28,7 +28,10 @@ function page(seed=snapshot,settings={}){
  }
  const get=id=>{if(!nodes.has(id))nodes.set(id,new Element('div',id));return nodes.get(id);};
  document={activeElement:null,getElementById:get,createElement:tag=>new Element(tag),createTextNode:text=>text,querySelector:get,addEventListener(){}};
- const fetch=async(url,options)=>{
+ // A live host is the real loopback server: its intake, not this fixture,
+ // decides whether a note is saved.
+ const live=settings.host?async(url,options)=>{requests.push({url,body:options.body?JSON.parse(options.body):null});return globalThis.fetch(settings.host.origin+url,options);}:null;
+ const fetch=live||async function(url,options){
   const body=options.body?JSON.parse(options.body):null;requests.push({url,body});
   if(url==='/api/decisions'){
    if(settings.failFeedback&&body.feedback?.length)return {ok:false,json:async()=>({error:'fixture save unavailable'})};
@@ -44,12 +47,48 @@ function page(seed=snapshot,settings={}){
   if(url==='/api/status')response={...backend,candidates:[...backend.candidates].sort((a,b)=>(a.phase!=='ready')-(b.phase!=='ready')||Boolean(a.decision)-Boolean(b.decision)||(a.id===b.id?0:a.id<b.id?-1:1))};
   return {ok:true,json:async()=>structuredClone(response)};
  };
- const context={console,document,fetch,location:{hash:'',protocol:settings.live?'http:':'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);}},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),setTimeout:()=>1,clearTimeout(){},setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
+ // With a live host the note's save debounce runs on real timers.
+ const timers=settings.host?{setTimeout,clearTimeout}:{setTimeout:()=>1,clearTimeout(){}};
+ const context={console,document,fetch,location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?'http:':'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);}},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
  vm.createContext(context);vm.runInContext(script.replace('/*SESSION_DATA*/null',settings.live?'null':JSON.stringify(seed)).replace('\nboot();','\nglobalThis.ready=boot();'),context);
  const run=code=>vm.runInContext(code,context);
  return {run,get,context,requests,settings,ready:context.ready};
 }
+// A note typed around an answer reaches the real host with that answer, even
+// when the reviewer answers first, types, and then changes Accept to Reject.
+async function liveNotes(origin,token){
+ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ const debounce=()=>wait(800);
+ const type=(p,text)=>{p.get('note').value=text;p.get('note').oninput();};
+ const open=async id=>{storage.clear();const p=page(null,{live:true,host:{origin,token}});await p.ready;await p.run(`select(${JSON.stringify(id)})`);return p;};
+ const answer=p=>p.run('JSON.stringify(candidate().decision)');
+ const told=p=>`${p.get('feedback-status').textContent} ${p.get('answer-notice').textContent}`;
+ const settled=(p,outcome,note)=>{
+  const d=JSON.parse(answer(p));assert.equal(d?.outcome,outcome,told(p));assert.equal(d.note,note,told(p));
+  assert.equal(p.run('candidate().feedback.note'),note);
+  assert.doesNotMatch(p.get('feedback-status').textContent,/Save failed/);
+  assert.doesNotMatch(p.get('answer-notice').textContent,/not confirmed|Save or export/);
+ };
+ let p=await open('typed');type(p,'Limit the edit to the selected lines');await debounce();
+ await p.get('reject').click();settled(p,'reject','Limit the edit to the selected lines');
+ p=await open('quick');type(p,'Rejected before the save timer ran');
+ await p.get('reject').click();settled(p,'reject','Rejected before the save timer ran');
+ p=await open('switched');await p.get('accept').click();settled(p,'accept','');
+ type(p,'On reflection, only the selected lines');await debounce();
+ assert.equal(JSON.parse(answer(p)).note,'On reflection, only the selected lines',told(p));
+ await p.get('reject').click();settled(p,'reject','On reflection, only the selected lines');
+ p=await open('revised');type(p,'First thought');await p.get('accept').click();settled(p,'accept','First thought');
+ type(p,'Second thought');await p.get('reject').click();settled(p,'reject','Second thought');
+ p=await open('after');await p.get('reject').click();settled(p,'reject','');
+ type(p,'Written after rejecting');await debounce();settled(p,'reject','Written after rejecting');
+ // The same reviewer reloading the page keeps editing the saved note.
+ p=await open('after');assert.equal(p.get('note').value,'Written after rejecting');
+ type(p,'Written after rejecting, then revised');await debounce();await p.get('accept').click();
+ settled(p,'accept','Written after rejecting, then revised');
+ console.log('PASS: live host keeps the note typed before, between and after Accept and Reject');
+}
 (async()=>{
+ if(process.argv[2]==='--host'){await liveNotes(process.argv[3],process.argv[4]);return;}
  // Next follows original queue order even when the active question was answered.
  // Both viewport widths return focus and scroll to the question's beginning.
  for(const wide of [true,false]){

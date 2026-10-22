@@ -196,6 +196,28 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(self.cli("import", "--file", str(packet_path))["feedback_saved"], [])
         self.assertIsNone(self.cli("status")["candidates"][0]["decision"])
 
+    def test_live_page_keeps_the_note_across_accept_and_reject(self):
+        import shutil
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("Node is used only for deterministic page tests, not the runtime")
+        names = ("typed", "quick", "switched", "revised", "after")
+        self.init_v2(*(self.candidate(name) for name in names)); self.cli("prepare")
+        _, host = self.host()
+        result = subprocess.run([node, str(SCRIPT.parents[1] / "tests/review_page.test.js"), "--host",
+                                 f"http://127.0.0.1:{host['port']}", host["token"]],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        saved = {c["id"]: c for c in self.cli("status", "--full")["candidates"]}
+        expected = {"typed": ("reject", "Limit the edit to the selected lines"),
+                    "quick": ("reject", "Rejected before the save timer ran"),
+                    "switched": ("reject", "On reflection, only the selected lines"),
+                    "revised": ("reject", "Second thought"),
+                    "after": ("accept", "Written after rejecting, then revised")}
+        for name, (outcome, note) in expected.items():
+            self.assertEqual((saved[name]["decision"]["outcome"], saved[name]["decision"]["note"]), (outcome, note), name)
+            self.assertEqual(saved[name]["feedback"]["note"], note, name)
+
     def test_v2_formats_refuse_silent_loss_and_keep_bounds(self):
         self.init(self.candidate()); state = self.cli("prepare")
         packet = self.feedback_packet(state);packet["schema_version"] = 1

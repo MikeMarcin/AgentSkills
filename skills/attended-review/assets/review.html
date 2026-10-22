@@ -272,6 +272,14 @@ function feedbackStatus(){
  else message=online?'Feedback saves independently of your answer.':'Browser storage is a convenience; export before closing.';
  el('feedback-status').textContent=message;
 }
+// The host files every saved note, including the one an answer carries, as the
+// candidate's current feedback. The next edit revises that one; an edit based
+// on anything older reads as a change made elsewhere and is refused.
+function rebase(c){
+ const feedbackId=state.candidates.find(v=>key(v)===key(c))?.feedback?.feedback_id||null;
+ if(editorKey===key(c))editorFeedbackId=feedbackId;
+ return feedbackId;
+}
 function flush(c=candidate()){
  clearTimeout(saveTimer);if(!c)return Promise.resolve(true);
  const task=async()=>{
@@ -282,8 +290,7 @@ function flush(c=candidate()){
   try{
    await api('/api/decisions',{schema_version:2,session:state.session,decisions:[],feedback:[sent]});
    receive(await api('/api/status'));
-   const fresh=state.candidates.find(v=>key(v)===key(c)),feedbackId=fresh?.feedback?.feedback_id||null;
-   if(editorKey===key(c))editorFeedbackId=feedbackId;
+   const feedbackId=rebase(c);
    if(drafts[key(c)]?.feedback_id===sent.feedback_id)delete drafts[key(c)];
    else if(drafts[key(c)])drafts[key(c)].expected_feedback_id=feedbackId;
    persist();draw();return true;
@@ -380,7 +387,7 @@ async function record(outcome){
  const d={candidate:c.id,fingerprint:c.fingerprint,decision_id:uid(),outcome,note:el('note').value,attachments:pending.map(a=>({...a})),expected_feedback_id:candidate()?.feedback?.feedback_id||null};
  if(outcome==='select'){d.selected=[...el('options').querySelectorAll('input:checked')].map(v=>v.value);if(!d.selected.length){say('Select at least one option.');return;}}
  saving=true;draw();
- try{if(online){await api('/api/decisions',{schema_version:2,session:state.session,decisions:[d]});receive(await api('/api/status'));}else{local=local.filter(v=>!(v.candidate===c.id&&v.fingerprint===c.fingerprint));local.push(d);persist();}say(outcome==='withdrawn'?'Answer cleared. Feedback is retained.':online?'Answer saved. Other clips keep their own answers.':'Answer retained in this browser; export to your driver.');}catch(e){say(`Answer was not confirmed saved: ${e.message}. Feedback drafts remain available.`);}finally{saving=false;draw();}
+ try{if(online){await api('/api/decisions',{schema_version:2,session:state.session,decisions:[d]});receive(await api('/api/status'));rebase(c);}else{local=local.filter(v=>!(v.candidate===c.id&&v.fingerprint===c.fingerprint));local.push(d);persist();}say(outcome==='withdrawn'?'Answer cleared. Feedback is retained.':online?'Answer saved. Other clips keep their own answers.':'Answer retained in this browser; export to your driver.');}catch(e){say(`Answer was not confirmed saved: ${e.message}. Feedback drafts remain available.`);}finally{saving=false;draw();}
 }
 el('accept').onclick=()=>record(candidate()?.options?'select':'accept');el('reject').onclick=()=>record('reject');el('next').onclick=chooseNext;el('clear').onclick=()=>record('withdrawn');
 el('note').oninput=edit;el('save-feedback').onclick=()=>flush();el('clear-feedback').onclick=()=>{el('note').value='';pending=[];edit();draw();flush();};

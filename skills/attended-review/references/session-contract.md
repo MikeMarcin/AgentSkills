@@ -185,8 +185,12 @@ arrays. An unanswered comment is a feedback entry, never a synthetic verdict:
 
 Feedback saves before an answer, across navigation, pause, page reload and host
 restart. It does not increase the answered count. Submitting an answer includes the
-current feedback. Editing feedback on an answered question preserves its outcome,
-retaining prior feedback and submitted answer content in history. Clearing feedback
+current feedback, and the host files the answer's note as the current feedback
+(`answer:` plus its `decision_id`). The page bases the next edit on that entry, so
+a note typed after Accept or Reject, or before changing one to the other, is
+saved with the answer rather than refused as a change made elsewhere. Editing
+feedback on an answered question preserves its outcome, retaining prior feedback
+and submitted answer content in history. Clearing feedback
 is an explicit empty note/attachment save; clearing an answer preserves feedback.
 Reuse suggestions do not approve another use, create tasks or authorize integration.
 
