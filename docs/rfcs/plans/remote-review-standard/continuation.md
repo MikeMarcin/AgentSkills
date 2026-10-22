@@ -1,5 +1,22 @@
 # Remote review standard continuation
 
+## Current amendment
+
+Mandate `remote-review-standard-v2` supersedes v1's local-at-source default and
+unconditional handover wait. Assignment `/root/remote_review_standard`; same run
+`remote-review-standard-2026-10-21`, segment `amendment-1`; baseline
+`a52e04287e3d469bcdb67e2601d63cf502be2283`. ASK-0120 is the ordinary successor to
+terminal ASK-0119; the existing plan gains `default-transport-and-scheduling`,
+dependent on accepted v1 milestone `instructions`. This explicit mandate changes
+requirements; the historical milestone and acceptance remain intact below.
+
+Next action: claim and bind ASK-0120, update the same instruction paths for default
+Serve and useful-work/idle scheduling, then local branch tabletop and focused
+source checks. No live test, deployment, new acceptance ceremony or additional
+agent. Previous owner/commands are quiescent; dirty `.mask.lock.json` is preserved.
+
+## Historical v1 closeout
+
 Assignment `/root/remote_review_standard`; mandate `remote-review-standard-v1`;
 run `remote-review-standard-2026-10-21`; engineering segment `instructions-1`,
 reconciled closeout segment `instructions-2`; AgentSkills main.
