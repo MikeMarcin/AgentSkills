@@ -852,11 +852,16 @@ class TailscaleServe:
             # Removal belongs to Tailscale's foreground-session lifetime. Never
             # run reset/off against configuration another owner may now use.
             if self.session_id:
-                for _ in range(20):
+                # The daemon can retain a foreground mapping briefly after its
+                # CLI exits. Allow eventual removal of this exact session only.
+                deadline = time.monotonic() + 8
+                while True:
                     if self.session_id not in (self.query("serve", "status", "--json").get("Foreground") or {}):
                         return
-                    time.sleep(.1)
-                raise ReviewError(f"Tailscale foreground session {self.session_id} still appears; inspect serve status before retrying")
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        raise ReviewError(f"Tailscale foreground session {self.session_id} still appears; inspect serve status before retrying")
+                    time.sleep(min(.1, remaining))
         finally:
             self.output.close()
             self.logs.cleanup()

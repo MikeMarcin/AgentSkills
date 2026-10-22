@@ -34,7 +34,16 @@ with (root / 'commands.jsonl').open('a') as stream:
 if args == ['status', '--json']:
     print(json.dumps({'BackendState': 'Running', 'Self': {'Online': True, 'DNSName': 'review.example.ts.net.'}}))
 elif args == ['serve', 'status', '--json']:
-    print(config_path.read_text())
+    with config() as value:
+        pending = root / 'pending-cleanup.json'
+        if pending.exists():
+            cleanup = json.loads(pending.read_text())
+            if time.monotonic() >= cleanup['remove_at']:
+                value.get('Foreground', {}).pop(cleanup['identity'], None)
+                if not value.get('Foreground'):
+                    value.pop('Foreground', None)
+                pending.unlink()
+        print(json.dumps(value))
 else:
     assert args[0:2] == ['serve', '--bg=false'], args
     assert len(args) == 4 and args[2].startswith('--https=') and args[3].startswith('http://127.0.0.1:'), args
@@ -63,7 +72,11 @@ else:
         while running and time.monotonic() < deadline:
             time.sleep(.02)
     finally:
-        with config() as value:
-            value.get('Foreground', {}).pop(identity, None)
-            if not value.get('Foreground'):
-                value.pop('Foreground', None)
+        if mode == 'delayed-cleanup':
+            (root / 'pending-cleanup.json').write_text(json.dumps({
+                'identity': identity, 'remove_at': time.monotonic() + 2.5}))
+        elif mode != 'lingering-cleanup':
+            with config() as value:
+                value.get('Foreground', {}).pop(identity, None)
+                if not value.get('Foreground'):
+                    value.pop('Foreground', None)

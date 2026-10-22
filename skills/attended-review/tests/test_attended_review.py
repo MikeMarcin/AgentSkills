@@ -659,6 +659,35 @@ class ReviewTests(unittest.TestCase):
                          {"Foreground": {"racing-owner": {"TCP": {"8443": {"HTTPS": True}}}}})
         self.assertIsNone(self.cli("status").get("host"))
 
+    def test_tailscale_stop_waits_for_delayed_mapping_after_child_exit(self):
+        original = {"Foreground": {"other": {"TCP": {"8444": {"HTTPS": True}}}}}
+        fake, executable, env = self.fake_tailscale(original, mode="delayed-cleanup")
+        self.init(self.candidate()); self.cli("prepare")
+        process, host = self.tailhost(executable, env, port=8443)
+        self.assertTrue(self.cli("stop")["stopped"])
+        process.wait(timeout=12)
+        self.assertEqual(process.returncode, 0, process.stderr.read())
+        self.assertEqual(json.loads((fake / "config.json").read_text()), original)
+        self.assertFalse((fake / "pending-cleanup.json").exists())
+        self.assertIsNone(self.cli("status").get("host"))
+
+    def test_tailscale_stop_reports_genuinely_lingering_owned_mapping(self):
+        original = {"Foreground": {"other": {"TCP": {"8444": {"HTTPS": True}}}}}
+        fake, executable, env = self.fake_tailscale(original, mode="lingering-cleanup")
+        self.init(self.candidate()); self.cli("prepare")
+        process, host = self.tailhost(executable, env, port=8443)
+        self.assertTrue(self.cli("stop")["stopped"])
+        process.wait(timeout=12)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn(f"foreground session {host['tailscale']['foreground_session']} still appears", process.stderr.read())
+        current = json.loads((fake / "config.json").read_text())
+        self.assertIn(host["tailscale"]["foreground_session"], current["Foreground"])
+        self.assertEqual(current["Foreground"]["other"], original["Foreground"]["other"])
+        commands = [json.loads(line) for line in (fake / "commands.jsonl").read_text().splitlines()]
+        self.assertTrue(all(command == ["status", "--json"] or command == ["serve", "status", "--json"]
+                            or command[:2] == ["serve", "--bg=false"] for command in commands))
+        self.assertIsNone(self.cli("status").get("host"))
+
     def test_tailscale_symlinked_consumers_attach_stop_signal_and_runtime_exit(self):
         fake, executable, env = self.fake_tailscale()
         roots = [self.root, self.base / "other-consumer"]
