@@ -11,6 +11,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import signal
 import socket
@@ -731,8 +732,142 @@ def host_request(host, path, payload=None):
         return json.loads(response.read())
 
 
-def serve(session):
+class TailscaleServe:
+    """Own one CLI foreground session, never the node's persistent configuration."""
+
+    def __init__(self, executable, port):
+        self.executable = executable
+        self.port = port
+        self.process = None
+        self.logs = tempfile.TemporaryDirectory(prefix="attended-review-tailscale-")
+        self.log_path = Path(self.logs.name) / "serve.log"
+        self.output = self.log_path.open("wb")
+        self.session_id = None
+
+    def query(self, *args):
+        try:
+            result = subprocess.run([self.executable, *args], stdin=subprocess.DEVNULL,
+                                    capture_output=True, text=True, timeout=3)
+        except subprocess.TimeoutExpired as exc:
+            raise ReviewError("Tailscale status timed out") from exc
+        if result.returncode:
+            raise ReviewError(f"Tailscale status failed: {result.stderr.strip()}")
+        value = json.loads(result.stdout)
+        if not isinstance(value, dict):
+            raise ReviewError("Unsupported Tailscale status response")
+        return value
+
+    def log(self):
+        with self.log_path.open("rb") as stream:
+            stream.seek(max(0, self.log_path.stat().st_size - 6000))
+            return stream.read().decode("utf-8", errors="replace").strip()
+
+    @staticmethod
+    def occupied(config, port):
+        # Inspect both persistent and every foreground/VIP mapping. Conservatively
+        # refuse any use of this port rather than replacing even a sibling path.
+        for key in ("TCP", "Web", "AllowFunnel"):
+            mappings = config.get(key) or {}
+            if not isinstance(mappings, dict):
+                raise ReviewError("Unsupported Tailscale Serve configuration")
+            if any(str(entry).rsplit(":", 1)[-1] == str(port) for entry in mappings):
+                return True
+        for key in ("Foreground", "Services"):
+            children = config.get(key) or {}
+            if not isinstance(children, dict):
+                raise ReviewError("Unsupported Tailscale Serve configuration")
+            for child in children.values():
+                if not isinstance(child, dict):
+                    raise ReviewError("Unsupported Tailscale Serve configuration")
+                if TailscaleServe.occupied(child, port):
+                    return True
+        return False
+
+    def start(self, local_port):
+        config = self.query("serve", "status", "--json")
+        if self.occupied(config, self.port):
+            raise ReviewError(f"Tailscale port {self.port} already has a mapping; choose another --tailscale-port")
+        status = self.query("status", "--json")
+        node = status.get("Self")
+        if not isinstance(node, dict):
+            raise ReviewError("Tailscale must provide this node's status")
+        dns = node.get("DNSName", "")
+        if not isinstance(dns, str):
+            raise ReviewError("Tailscale must provide this node's full ts.net DNS name")
+        dns = dns.rstrip(".")
+        if status.get("BackendState") != "Running" or not node.get("Online"):
+            raise ReviewError("Tailscale must already be running and online")
+        if not re.fullmatch(r"[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.ts\.net", dns):
+            raise ReviewError("Tailscale must provide this node's full ts.net DNS name")
+        self.authority = dns + (f":{self.port}" if self.port != 443 else "")
+        self.origin = f"https://{self.authority}"
+        target = f"http://127.0.0.1:{local_port}"
+        self.process = subprocess.Popen(
+            [self.executable, "serve", "--bg=false", f"--https={self.port}", target],
+            stdin=subprocess.DEVNULL, stdout=self.output, stderr=subprocess.STDOUT)
+        deadline = time.monotonic() + 8
+        previous = set((config.get("Foreground") or {}))
+        while time.monotonic() < deadline:
+            if self.process.poll() is not None:
+                raise ReviewError(f"Tailscale Serve exited before readiness: {self.log()}")
+            log = self.log()
+            if "https://login.tailscale.com/" in log:
+                raise ReviewError(f"Tailscale requires human consent; no settings were enabled: {log}")
+            current = self.query("serve", "status", "--json")
+            foreground = current.get("Foreground") or {}
+            if not isinstance(foreground, dict) or any(not isinstance(owned, dict) for owned in foreground.values()):
+                raise ReviewError("Unsupported Tailscale foreground configuration")
+            for identity, owned in foreground.items():
+                web = owned.get("Web") or {}
+                if not isinstance(web, dict):
+                    raise ReviewError("Unsupported Tailscale foreground configuration")
+                endpoint = web.get(f"{dns}:{self.port}") or {}
+                if not isinstance(endpoint, dict):
+                    raise ReviewError("Unsupported Tailscale foreground configuration")
+                handlers = endpoint.get("Handlers")
+                if (identity not in previous and handlers == {"/": {"Proxy": target}}
+                        and (owned.get("TCP") or {}).get(str(self.port)) == {"HTTPS": True}
+                        and not owned.get("AllowFunnel")):
+                    self.session_id = identity
+                    others = {**current, "Foreground": {key: value for key, value in current["Foreground"].items() if key != identity}}
+                    if self.occupied(others, self.port):
+                        raise ReviewError(f"Tailscale port {self.port} was claimed concurrently; owned route will be stopped")
+                    return
+            time.sleep(.1)
+        raise ReviewError(f"Tailscale Serve did not register the expected foreground route: {self.log()}")
+
+    def close(self):
+        try:
+            if self.process is None:
+                return
+            if self.process.poll() is None:
+                self.process.terminate()
+                try:
+                    self.process.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    self.process.kill()
+                    self.process.wait(timeout=3)
+            else:
+                self.process.wait()
+            # Removal belongs to Tailscale's foreground-session lifetime. Never
+            # run reset/off against configuration another owner may now use.
+            if self.session_id:
+                for _ in range(20):
+                    if self.session_id not in (self.query("serve", "status", "--json").get("Foreground") or {}):
+                        return
+                    time.sleep(.1)
+                raise ReviewError(f"Tailscale foreground session {self.session_id} still appears; inspect serve status before retrying")
+        finally:
+            self.output.close()
+            self.logs.cleanup()
+
+
+def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscale"):
+    if tailscale_port is not None and (not tailscale or not 1 <= tailscale_port <= 65535):
+        raise ReviewError("--tailscale-port requires --tailscale and a port between 1 and 65535")
     token = secrets.token_urlsafe(32)
+    transport = None
+    transport_ready = threading.Event()
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -751,12 +886,24 @@ def serve(session):
 
         def permitted(self):
             expected = f"127.0.0.1:{self.server.server_port}"
-            if self.headers.get("Host") != expected:
+            authority = self.headers.get("Host")
+            remote = self.server.remote
+            allowed_origin = f"http://{expected}"
+            if remote:
+                if not transport_ready.is_set():
+                    self.answer(403, {"error": "Transport is starting or stopping"})
+                    return False
+                expected = transport.authority
+                allowed_origin = transport.origin
+            if authority != expected:
                 self.answer(403, {"error": "Unexpected host"})
                 return False
             origin = self.headers.get("Origin")
-            if origin is not None and origin != f"http://{expected}":
+            if (origin is not None or remote and self.command == "POST") and origin != allowed_origin:
                 self.answer(403, {"error": "Unexpected origin"})
+                return False
+            if remote and self.path in {"/api/ping", "/api/stop"}:
+                self.answer(403, {"error": "Local control endpoint"})
                 return False
             if self.path != "/" and not secrets.compare_digest(self.headers.get("Authorization", ""), f"Bearer {token}"):
                 self.answer(403, {"error": "Missing session token"})
@@ -807,8 +954,10 @@ def serve(session):
                 self.answer(400, {"error": str(exc)})
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    server.remote = False
     host = {"port": server.server_port, "token": token, "pid": os.getpid(), "hostname": socket.gethostname()}
     host["url"] = f"http://127.0.0.1:{host['port']}/#token={token}"
+    host["local_url"] = host["url"]
     with session.transaction() as (state, _):
         if state is None:
             server.server_close()
@@ -817,21 +966,60 @@ def serve(session):
         if previous:
             try:
                 ping = host_request(previous, "/api/ping")
-                if isinstance(ping, dict) and ping.get("token") == previous["token"]:
-                    server.server_close()
-                    print(json.dumps({"attached": True, **previous}), flush=True)
-                    return
             except (OSError, ValueError):
-                pass
+                ping = None
+            if isinstance(ping, dict) and ping.get("token") == previous["token"]:
+                server.server_close()
+                prior_transport = previous.get("tailscale")
+                if tailscale and (not prior_transport or tailscale_port is not None and prior_transport["port"] != tailscale_port):
+                    raise ReviewError("Existing host has a different transport; stop it locally before restarting with --tailscale")
+                print(json.dumps({"attached": True, **previous}), flush=True)
+                return
         state["host"] = host
-    print(json.dumps({"hosting": True, **host}), flush=True)
+    servers = [server]
+    if tailscale:
+        # A distinct loopback listener makes local control unreachable through
+        # Serve even when a remote caller forges the original Host header.
+        proxy = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        proxy.remote = True
+        servers.append(proxy)
+    workers = [threading.Thread(target=item.serve_forever, kwargs={"poll_interval": .1}) for item in servers]
+    def interrupted(*_):
+        raise KeyboardInterrupt
+    previous_term = signal.signal(signal.SIGTERM, interrupted)
+    for worker in workers:
+        worker.start()
     try:
-        server.serve_forever(poll_interval=.2)
+        if tailscale:
+            transport = TailscaleServe(tailscale_bin, tailscale_port or server.server_port)
+            transport.start(proxy.server_port)
+            transport_ready.set()
+            host["url"] = f"{transport.origin}/#token={token}"
+            host["tailscale"] = {"origin": transport.origin, "port": transport.port,
+                                 "foreground_session": transport.session_id, "pid": transport.process.pid}
+            with session.transaction() as (state, _):
+                state["host"] = host
+        print(json.dumps({"hosting": True, **host}), flush=True)
+        while workers[0].is_alive():
+            workers[0].join(timeout=.2)
+            if transport and transport.process.poll() is not None:
+                raise ReviewError(f"Tailscale Serve stopped; reopen serve to resume: {transport.log()}")
     finally:
-        server.server_close()
-        with session.transaction() as (state, _):
-            if state and (state.get("host") or {}).get("token") == token:
-                state["host"] = None
+        transport_ready.clear()
+        for item in servers:
+            item.shutdown()
+        for worker in workers:
+            worker.join()
+        for item in servers:
+            item.server_close()
+        signal.signal(signal.SIGTERM, previous_term)
+        try:
+            if transport:
+                transport.close()
+        finally:
+            with session.transaction() as (state, _):
+                if state and (state.get("host") or {}).get("token") == token:
+                    state["host"] = None
 
 
 def main(argv=None):
@@ -853,7 +1041,11 @@ def main(argv=None):
     p = sub.add_parser("start"); p.add_argument("--keep-preparing", action="store_true")
     p = sub.add_parser("resume-development"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[]); p.add_argument("--candidate", action="append", default=[]); p.add_argument("--all", action="store_true"); p.add_argument("--preparation-stopped", action="store_true", help="Recovery attestation: driver has verified the interrupted preparation command tree is stopped")
     p = sub.add_parser("conflicts"); p.add_argument("--paths", nargs="*", default=[]); p.add_argument("--resources", nargs="*", default=[])
-    sub.add_parser("serve"); sub.add_parser("stop")
+    p = sub.add_parser("serve")
+    p.add_argument("--tailscale", action="store_true", help="Experimental private HTTPS transport using an owned foreground Tailscale Serve session")
+    p.add_argument("--tailscale-port", type=int, help="Unused HTTPS port on this node; defaults to the loopback host's ephemeral port")
+    p.add_argument("--tailscale-bin", default="tailscale", help="Tailscale executable path")
+    sub.add_parser("stop")
     args = parser.parse_args(argv)
     try:
         session = Session(args.repo_root, args.registry, args.state)
@@ -871,11 +1063,13 @@ def main(argv=None):
         elif command == "start": result = session.pause(False, not args.keep_preparing)
         elif command == "resume-development": result = session.resume_development(args.paths, args.resources, args.candidate, args.all, args.preparation_stopped)
         elif command == "conflicts": result = session.conflicts(args.paths, args.resources)
-        elif command == "serve": serve(session); return 0
+        elif command == "serve": serve(session, args.tailscale, args.tailscale_port, args.tailscale_bin); return 0
         elif command == "stop":
             host = session.load().get("host")
             result = host_request(host, "/api/stop", {}) if host else {"stopped": False, "reason": "No host"}
         print(json.dumps(result))
+        return 0
+    except KeyboardInterrupt:
         return 0
     except (ReviewError, OSError, ValueError) as exc:
         failure = {"error": str(exc)}

@@ -543,6 +543,153 @@ class ReviewTests(unittest.TestCase):
         self.cli("stop")
         self.assertTrue(self.cli("status")["candidates"][0]["decision"])
 
+    def fake_tailscale(self, config=None, mode=""):
+        if os.name == "nt":
+            self.skipTest("Executable fixture uses a POSIX shebang; native Windows remains unqualified")
+        root = self.base / "fake-tailscale"
+        root.mkdir()
+        (root / "config.json").write_text(json.dumps(config or {}))
+        (root / "mode").write_text(mode)
+        fixture = Path(__file__).parent / "fixtures" / "fake_tailscale.py"
+        executable = root / "tailscale"
+        executable.write_text(f"#!{sys.executable}\n" + fixture.read_text())
+        executable.chmod(0o700)
+        return root, executable, {**os.environ, "FAKE_TAILSCALE_ROOT": str(root)}
+
+    def tailhost(self, executable, env, root=None, port=None, script=SCRIPT):
+        args = self.args("serve", "--tailscale", "--tailscale-bin", str(executable), root=root)
+        args[2] = str(script)
+        if port is not None:
+            args += ["--tailscale-port", str(port)]
+        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+        self.hosts.append((process, root))
+        value = json.loads(process.stdout.readline())
+        return process, value
+
+    def test_tailscale_isolated_review_listener_partial_intake_and_local_control(self):
+        fake, executable, env = self.fake_tailscale({"TCP": {"443": {"HTTPS": True}},
+            "Web": {"review.example.ts.net:443": {"Handlers": {"/existing": {"Text": "keep"}}}}})
+        original = json.loads((fake / "config.json").read_text())
+        self.init(self.candidate(), self.candidate("B")); state = self.cli("prepare")
+        process, host = self.tailhost(executable, env, port=8443)
+        self.assertTrue(host["url"].startswith("https://review.example.ts.net:8443/#token="))
+        self.assertTrue(host["local_url"].startswith("http://127.0.0.1:"))
+        active = json.loads((fake / "config.json").read_text())
+        target = active["Foreground"][host["tailscale"]["foreground_session"]]["Web"]["review.example.ts.net:8443"]["Handlers"]["/"]["Proxy"]
+        proxy_port = int(target.rsplit(":", 1)[1])
+        proxy = {**host, "port": proxy_port}
+        external = {"Host": "review.example.ts.net:8443", "Origin": "https://review.example.ts.net:8443"}
+        with self.request(proxy, "/", **external) as response:
+            self.assertEqual(response.status, 200)
+            self.assertIn("frame-ancestors 'none'", response.headers["Content-Security-Policy"])
+        with self.request(proxy, "/api/decisions", self.feedback_packet(state), **external):
+            pass
+        # Reconnect and read durable unanswered feedback without assigning a verdict.
+        with self.request(proxy, "/api/status", **external) as response:
+            current = json.load(response)
+        self.assertEqual(current["candidates"][0]["feedback"]["note"], "Consider for pain")
+        self.assertIsNone(current["candidates"][0]["decision"])
+        for changed in ({"Host": f"127.0.0.1:{proxy_port}"}, {"Origin": "http://review.example.ts.net:8443"},
+                        {"Origin": "https://evil.invalid"}, {"Authorization": "Bearer wrong"},
+                        {"Host": "evil.invalid", "X-Forwarded-Host": "review.example.ts.net:8443"}):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                self.request(proxy, "/api/decisions", self.decision(state), **{**external, **changed})
+            self.assertEqual(caught.exception.code, 403); caught.exception.close()
+        req = urllib.request.Request(target + "/api/decisions", data=json.dumps(self.decision(state)).encode(),
+            headers={"Host": external["Host"], "Authorization": "Bearer " + host["token"]})
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            urllib.request.urlopen(req, timeout=3)
+        self.assertEqual(caught.exception.code, 403); caught.exception.close()
+        for endpoint in ("/api/ping", "/api/stop"):
+            for authority in (external["Host"], f"127.0.0.1:{host['port']}"):
+                with self.assertRaises(urllib.error.HTTPError) as caught:
+                    self.request(proxy, endpoint, {} if endpoint.endswith("stop") else None,
+                                 **{**external, "Host": authority})
+                self.assertEqual(caught.exception.code, 403); caught.exception.close()
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            self.request(host, "/api/status", **external)
+        self.assertEqual(caught.exception.code, 403); caught.exception.close()
+        with self.request(proxy, "/api/hand-back", {}, **external) as response:
+            self.assertEqual(json.load(response)["feedback_pending"], ["A"])
+        self.assertTrue(self.cli("serve")["attached"])
+        mismatch = subprocess.run(self.args("serve", "--tailscale", "--tailscale-port", "8444", "--tailscale-bin", str(executable)),
+                                  capture_output=True, text=True, env=env, timeout=5)
+        self.assertEqual(mismatch.returncode, 1)
+        self.assertIn("different transport", mismatch.stderr)
+        self.assertIsNone(process.poll())
+        attached_process, attached = self.tailhost(executable, env, port=8443)
+        attached_process.wait(timeout=3)
+        self.assertTrue(attached["attached"])
+        self.cli("stop"); process.wait(timeout=4)
+        self.assertEqual(process.returncode, 0, process.stderr.read())
+        self.assertEqual(json.loads((fake / "config.json").read_text()), original)
+        self.assertEqual(self.cli("status")["candidates"][0]["feedback"]["note"], "Consider for pain")
+
+    def test_tailscale_collision_and_setup_failure_preserve_config_and_reap(self):
+        fake, executable, env = self.fake_tailscale({"Foreground": {"other": {"TCP": {"8443": {"HTTPS": True}}}}})
+        original = json.loads((fake / "config.json").read_text())
+        self.init(self.candidate()); self.cli("prepare")
+        args = self.args("serve", "--tailscale", "--tailscale-port", "8443", "--tailscale-bin", str(executable))
+        collision = subprocess.run(args, env=env, capture_output=True, text=True, timeout=15)
+        self.assertEqual(collision.returncode, 1)
+        self.assertIn("already has a mapping", collision.stderr)
+        self.assertEqual(json.loads((fake / "config.json").read_text()), original)
+        commands = [json.loads(line) for line in (fake / "commands.jsonl").read_text().splitlines()]
+        self.assertTrue(all(command == ["serve", "status", "--json"] for command in commands))
+        for mode in ("consent", "fail"):
+            (fake / "mode").write_text(mode)
+            failed = subprocess.run(self.args("serve", "--tailscale", "--tailscale-port", "8444", "--tailscale-bin", str(executable)),
+                                    env=env, capture_output=True, text=True, timeout=15)
+            self.assertEqual(failed.returncode, 1, failed.stdout)
+            self.assertIn("human consent" if mode == "consent" else "fixture startup failure", failed.stderr)
+            if mode == "consent":
+                self.assertIn("https://login.tailscale.com/f/serve?node=disposable", failed.stderr)
+            self.assertEqual(json.loads((fake / "config.json").read_text()), original)
+            self.assertIsNone(json.loads((self.root / ".mask/attended-review/session.json").read_text()).get("host"))
+
+    def test_tailscale_concurrent_port_claim_refuses_and_preserves_other_owner(self):
+        fake, executable, env = self.fake_tailscale(mode="race")
+        self.init(self.candidate()); self.cli("prepare")
+        result = subprocess.run(self.args("serve", "--tailscale", "--tailscale-port", "8443", "--tailscale-bin", str(executable)),
+                                env=env, capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("claimed concurrently", result.stderr)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(json.loads((fake / "config.json").read_text()),
+                         {"Foreground": {"racing-owner": {"TCP": {"8443": {"HTTPS": True}}}}})
+        self.assertIsNone(self.cli("status").get("host"))
+
+    def test_tailscale_symlinked_consumers_attach_stop_signal_and_runtime_exit(self):
+        fake, executable, env = self.fake_tailscale()
+        roots = [self.root, self.base / "other-consumer"]
+        roots[1].mkdir()
+        hosts = []
+        for root in roots:
+            link = root / ".agents" / "skills" / "attended-review"
+            link.parent.mkdir(parents=True)
+            link.symlink_to(SCRIPT.parent.parent, target_is_directory=True)
+            installed = link / "scripts" / "attended_review.py"
+            self.init(self.candidate(), root=root); self.cli("prepare", root=root)
+            hosts.append(self.tailhost(executable, env, root=root, script=installed))
+        (p1, h1), (p2, h2) = hosts
+        self.assertNotEqual(h1["tailscale"]["port"], h2["tailscale"]["port"])
+        self.assertNotEqual(h1["port"], h2["port"])
+        self.cli("stop", root=roots[0]); p1.wait(timeout=4)
+        self.assertIsNone(p2.poll())
+        with self.request(h2, "/api/status") as response:
+            self.assertEqual(json.load(response)["checkout"], str(roots[1].resolve()))
+        p2.terminate(); p2.wait(timeout=4)
+        self.assertEqual(p2.returncode, 0, p2.stderr.read())
+        self.assertEqual(json.loads((fake / "config.json").read_text()), {})
+        # A disappeared transport ends the local host instead of advertising a dead URL.
+        (fake / "mode").write_text("runtime-exit")
+        process, host = self.tailhost(executable, env)
+        process.wait(timeout=4)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("Tailscale Serve stopped", process.stderr.read())
+        self.assertIsNone(json.loads((self.root / ".mask/attended-review/session.json").read_text()).get("host"))
+        self.assertEqual(json.loads((fake / "config.json").read_text()), {})
+
     def test_selective_release_preserves_static_and_completed_verdict(self):
         self.init(self.candidate(paths=["src/ui/**"], resources=["device:phone"]), self.candidate("B"), self.candidate("C", paths=["src/core"]))
         state = self.cli("prepare")

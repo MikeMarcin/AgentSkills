@@ -50,7 +50,7 @@ function page(seed=snapshot,settings={}){
  };
  // With a live host the note's save debounce runs on real timers.
  const timers=settings.host?{setTimeout,clearTimeout}:{setTimeout:()=>1,clearTimeout(){}};
- const context={console,document,fetch,location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?'http:':'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:settings.storageThrows?{getItem(){throw Error('storage denied');},setItem(){throw Error('storage denied');},removeItem(){throw Error('storage denied');}}:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);},removeItem:k=>storage.delete(k)},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
+ const context={console,document,fetch,location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?(settings.protocol||'http:'):'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:settings.storageThrows?{getItem(){throw Error('storage denied');},setItem(){throw Error('storage denied');},removeItem(){throw Error('storage denied');}}:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);},removeItem:k=>storage.delete(k)},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(){},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
  vm.createContext(context);vm.runInContext(script.replace('/*SESSION_DATA*/null',settings.live?'null':JSON.stringify(seed)).replace('\nboot();','\nglobalThis.ready=boot();'),context);
  const run=code=>vm.runInContext(code,context);
  return {run,get,context,requests,settings,ready:context.ready};
@@ -234,6 +234,18 @@ async function liveNotes(origin,token){
  const paint=store=>{const root=new (t.context.document.documentElement.constructor)('html');vm.runInNewContext(boot,{document:{documentElement:root},localStorage:store});return root.attrs['data-theme'];};
  assert.equal(paint({getItem:()=> 'dark'}),'dark');assert.equal(paint({getItem:()=> 'light'}),'light');
  assert.equal(paint({getItem:()=> 'sepia'}),undefined);assert.equal(paint({getItem(){throw Error('denied');}}),undefined);
+ storage.clear();
+ // HTTPS is the same online intake: an unanswered note survives a reconnect,
+ // then handback preserves it without synthesizing a verdict.
+ storage.clear();const secure=page(snapshot,{live:true,protocol:'https:'});await secure.ready;
+ assert.equal(secure.run('online'),true);await secure.run("select('A')");
+ secure.get('note').value='Saved from the tailnet phone';secure.run('edit()');await secure.run('flush()');
+ assert.equal(secure.requests.find(r=>r.body?.feedback?.length).url,'/api/decisions');
+ await secure.get('finish-answer').click();
+ assert.ok(secure.requests.some(r=>r.url==='/api/hand-back'));
+ assert.equal(secure.run("candidate().decision"),null);
+ assert.equal(secure.run("candidate().feedback.note"),'Saved from the tailnet phone');
+ assert.match(secure.get('answer-notice').textContent,/Handed back/);
  storage.clear();
  if(process.argv[2]){
   storage.clear();const saved=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));p=page(saved);

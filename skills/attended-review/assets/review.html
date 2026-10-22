@@ -257,7 +257,7 @@ textarea::placeholder{color:var(--ink-faint)}
 const embedded=/*SESSION_DATA*/null;
 let state=embedded, current=null, local=[], drafts={}, diagnostics=[], saving=false, handingBack=false, pending=[], editorKey=null, editorFeedbackId=null, mediaKey=null, saveTimer=null, saveChain=Promise.resolve();
 const token=new URLSearchParams(location.hash.slice(1)).get('token');
-const online=!embedded&&location.protocol==='http:';
+const online=!embedded&&['http:','https:'].includes(location.protocol);
 const el=id=>document.getElementById(id);
 // One message, said where the reviewer is looking: beside the decision while a
 // question is open, at the top of the page otherwise. Failures are marked so
