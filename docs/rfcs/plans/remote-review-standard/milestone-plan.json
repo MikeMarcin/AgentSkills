@@ -1,0 +1,18 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "remote-review-standard",
+  "scope": {"issues": ["ASK-0119"]},
+  "milestones": [{
+    "id": "instructions",
+    "outcome": "Remote attended reviews use temporary private Tailscale Serve and qualified automatic handback continuation by default, with local loopback and explicit unavailable-host recovery preserved.",
+    "work": [{"issue": "ASK-0119"}],
+    "depends_on": [],
+    "exit_criteria": [
+      "RS01 and RS02 instructions consistently route remote/local review, preserve authorization and lifecycle boundaries, and use qualified automatic handback intake or explicit manual resume.",
+      "RS03 sanitized observed qualification, local branch tabletop, focused source checks and explicit-path commits are recorded; all task-owned writers and commands are quiescent."
+    ],
+    "boundary": "Documentation policy and bounded evidence/tracker upkeep only. No runtime, deployment, live session, setup, tailnet, access, publication or push changes."
+  }],
+  "coverage": "complete",
+  "unplanned_work": []
+}
