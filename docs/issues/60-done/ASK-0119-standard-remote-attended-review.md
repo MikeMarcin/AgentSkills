@@ -2,11 +2,12 @@
 schema: implement-rfc.card.v1
 id: ASK-0119
 title: Standard remote attended review with automatic handback continuation
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: P1
 metadata: {"milestone_plan":{"id":"remote-review-standard","path":"docs/rfcs/plans/remote-review-standard/milestone-plan.json"}}
+acceptance: [{"criterion":"ASK-0119-RS01","outcome":"pass","revision":"9028112456bceb9cc806d38a687aa51d17a71c90","evidence":{"kind":"artifact","path":"docs/rfcs/plans/remote-review-standard/continuation.md","detail":"Remote/private Serve and local/loopback routing with scoped authorization and unchanged setup/access/lifecycle boundaries."}},{"criterion":"ASK-0119-RS02","outcome":"pass","revision":"9028112456bceb9cc806d38a687aa51d17a71c90","evidence":{"kind":"artifact","path":"docs/rfcs/plans/remote-review-standard/continuation.md","detail":"Qualified normal automatic handback, durable exact-candidate intake and consumed cursor, explicit unavailable-host manual resume; Claude monitor preserved."}},{"criterion":"ASK-0119-RS03","outcome":"pass","revision":"9028112456bceb9cc806d38a687aa51d17a71c90","evidence":{"kind":"artifact","path":"docs/rfcs/plans/remote-review-standard/continuation.md","detail":"Sanitized observed qualification retained alongside historical failures; local branch tabletop and focused skill/docs/board/portable checks pass, explicit source-only commits and no live processes."}}]
 ---
 
 # Standard remote attended review with automatic handback continuation
