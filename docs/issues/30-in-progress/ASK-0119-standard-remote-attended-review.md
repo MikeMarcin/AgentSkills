@@ -2,7 +2,7 @@
 schema: implement-rfc.card.v1
 id: ASK-0119
 title: Standard remote attended review with automatic handback continuation
-status: Ready
+status: "In Progress"
 rfcs: []
 depends_on: []
 priority: P1
