@@ -1,0 +1,120 @@
+{
+  "run_id": "tailscale-prototype-2026-10-21",
+  "segment_id": "implementation-1",
+  "mandate_revision": "tailscale-prototype-v1",
+  "selection": {
+    "schema": "implement-rfc.strategy-selection.v1",
+    "strategy": "coordinator-implementer",
+    "topology_id": "coordinator-implementer",
+    "recipe_revision": "2",
+    "recipe_fingerprint": "sha256:b236a31fbebd1a5d2cca1db05ac16f48fcd011dbc312f2d64c00f72dffbe2b14",
+    "routing": {},
+    "requirement_profile": "coordinator-implementer",
+    "owners": {
+      "engineering": "implementer",
+      "bookkeeping": "implementer",
+      "product_edits": "implementer"
+    },
+    "delegation": "recipe",
+    "instruction_paths": [
+      "references/engineering-contract.md",
+      "references/strategies/coordinator-implementer.md"
+    ],
+    "configuration_complete": true,
+    "missing_routes": [],
+    "host_load": "not_verified"
+  },
+  "binding": {
+    "plan_id": "attended-review-tailscale",
+    "plan_path": "docs/rfcs/plans/attended-review-tailscale/milestone-plan.json",
+    "milestone_id": "private-transport",
+    "definition_fingerprint": "sha256:8b7187f14ea7ca9b78e965a7b599ef70517dd0e646315d8811987af8ab67ba14",
+    "obligations": [
+      {
+        "id": "ASK-0118:*",
+        "source": "ASK-0118",
+        "selector": null,
+        "source_fingerprint": "sha256:9aae030f5140ee5966918c7df7e59a521c8c4fb83f1b56e2dcc4edc3642d3bf1"
+      }
+    ],
+    "obligation_fingerprint": "sha256:aaeca0739c8e330ae8440ad90d35b4bbf19a8c58c79f4e11de0ab7d7fb37e65a",
+    "exit_criteria": [
+      {
+        "id": "private-transport:exit:1",
+        "text": "TS01 and TS02 pass focused public CLI/HTTP/page checks for optional foreground Serve, collision refusal, cleanup, exact Host/Origin/token boundaries, partial saves and local attach/stop."
+      },
+      {
+        "id": "private-transport:exit:2",
+        "text": "TS03 passes two symlinked disposable consumer isolation checks, focused regression and docs gates; a real disposable Serve attempt is recorded with any first-use human consent or native/mobile gap explicit."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "milestone": "private-transport",
+  "disposition": "pack-complete",
+  "candidate_revision": "9e18ffee511acc382d003a60a999d50c02ca72ca",
+  "handoff_ref": "docs/rfcs/plans/attended-review-tailscale/continuation.md",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/rfcs/plans/attended-review-tailscale/verification.md",
+    "docs/rfcs/plans/attended-review-tailscale/acceptance.json",
+    "docs/rfcs/plans/attended-review-tailscale/public-tests.json",
+    "docs/rfcs/plans/attended-review-tailscale/page-tests.json",
+    "docs/rfcs/plans/attended-review-tailscale/live-attempt.json",
+    "docs/rfcs/plans/attended-review-tailscale/cleanup.json",
+    "docs/rfcs/plans/attended-review-tailscale/terminal-documentation.json"
+  ],
+  "acceptance_records": [
+    {
+      "id": "ASK-0118:*",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-tailscale/verification.md",
+        "docs/rfcs/plans/attended-review-tailscale/acceptance.json",
+        "docs/rfcs/plans/attended-review-tailscale/public-tests.json",
+        "docs/rfcs/plans/attended-review-tailscale/page-tests.json",
+        "docs/rfcs/plans/attended-review-tailscale/live-attempt.json",
+        "docs/rfcs/plans/attended-review-tailscale/cleanup.json",
+        "docs/rfcs/plans/attended-review-tailscale/terminal-documentation.json"
+      ]
+    },
+    {
+      "id": "private-transport:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-tailscale/verification.md",
+        "docs/rfcs/plans/attended-review-tailscale/acceptance.json",
+        "docs/rfcs/plans/attended-review-tailscale/public-tests.json",
+        "docs/rfcs/plans/attended-review-tailscale/page-tests.json",
+        "docs/rfcs/plans/attended-review-tailscale/live-attempt.json",
+        "docs/rfcs/plans/attended-review-tailscale/cleanup.json",
+        "docs/rfcs/plans/attended-review-tailscale/terminal-documentation.json"
+      ]
+    },
+    {
+      "id": "private-transport:exit:2",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/attended-review-tailscale/verification.md",
+        "docs/rfcs/plans/attended-review-tailscale/acceptance.json",
+        "docs/rfcs/plans/attended-review-tailscale/public-tests.json",
+        "docs/rfcs/plans/attended-review-tailscale/page-tests.json",
+        "docs/rfcs/plans/attended-review-tailscale/live-attempt.json",
+        "docs/rfcs/plans/attended-review-tailscale/cleanup.json",
+        "docs/rfcs/plans/attended-review-tailscale/terminal-documentation.json"
+      ]
+    }
+  ],
+  "continuation": {
+    "intent": "stop",
+    "next_milestone": null,
+    "reason": "target-complete",
+    "detail": "Bounded ASK-0118 source prototype complete with exact-candidate checks and quiescent ownership. Native private HTTPS/mobile demo awaits user first-use consent, explicitly outside source acceptance; coordinator has setup URL and disposable commands."
+  },
+  "ownership": "quiescent"
+}
