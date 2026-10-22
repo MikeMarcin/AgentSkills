@@ -6,6 +6,7 @@ import json
 import re
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -673,8 +674,12 @@ class ReviewTests(unittest.TestCase):
 
     def test_tailscale_stop_interrupts_child_for_graceful_cleanup(self):
         fake, executable, env = self.fake_tailscale(mode="requires-interrupt")
+        # Match the native macOS launcher, which waits for its child without exec.
+        launcher = fake / "launcher"
+        launcher.write_text(f'#!/bin/sh\n{shlex.quote(str(executable))} "$@"\n')
+        launcher.chmod(0o700)
         self.init(self.candidate()); self.cli("prepare")
-        process, _ = self.tailhost(executable, env, port=8443)
+        process, _ = self.tailhost(launcher, env, port=8443)
         self.assertTrue(self.cli("stop")["stopped"])
         process.wait(timeout=12)
         self.assertEqual(process.returncode, 0, process.stderr.read())

@@ -804,7 +804,8 @@ class TailscaleServe:
         target = f"http://127.0.0.1:{local_port}"
         self.process = subprocess.Popen(
             [self.executable, "serve", "--bg=false", f"--https={self.port}", target],
-            stdin=subprocess.DEVNULL, stdout=self.output, stderr=subprocess.STDOUT)
+            stdin=subprocess.DEVNULL, stdout=self.output, stderr=subprocess.STDOUT,
+            start_new_session=os.name != "nt")
         deadline = time.monotonic() + 8
         previous = set((config.get("Foreground") or {}))
         while time.monotonic() < deadline:
@@ -844,12 +845,16 @@ class TailscaleServe:
                 if os.name == "nt":
                     self.process.terminate()
                 else:
-                    # Serve handles Ctrl+C by closing its foreground watcher.
-                    self.process.send_signal(signal.SIGINT)
+                    # Include shell launchers: Serve handles Ctrl+C by closing
+                    # its foreground watcher. This group belongs to this host.
+                    os.killpg(self.process.pid, signal.SIGINT)
                 try:
                     self.process.wait(timeout=3)
                 except subprocess.TimeoutExpired:
-                    self.process.kill()
+                    if os.name == "nt":
+                        self.process.kill()
+                    else:
+                        os.killpg(self.process.pid, signal.SIGKILL)
                     self.process.wait(timeout=3)
             else:
                 self.process.wait()
