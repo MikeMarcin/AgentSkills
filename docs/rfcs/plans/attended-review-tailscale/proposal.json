@@ -1,0 +1,28 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "attended-review-tailscale",
+  "scope": {
+    "issues": [
+      "ASK-0118"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "private-transport",
+      "outcome": "An explicitly requested review host can offer a temporary private HTTPS tailnet URL while preserving durable partial intake, strict request boundaries and independent local sessions.",
+      "work": [
+        {
+          "issue": "ASK-0118"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "TS01 and TS02 pass focused public CLI/HTTP/page checks for optional foreground Serve, collision refusal, cleanup, exact Host/Origin/token boundaries, partial saves and local attach/stop.",
+        "TS03 passes two symlinked disposable consumer isolation checks, focused regression and docs gates; a real disposable Serve attempt is recorded with any first-use human consent or native/mobile gap explicit."
+      ],
+      "boundary": "AgentSkills source prototype and bounded board/plan records only; disposable Serve exposure authorized. No publication, push, permissions, credentials, Funnel, consumer migration or MASK state changes."
+    }
+  ],
+  "coverage": "complete",
+  "unplanned_work": []
+}
