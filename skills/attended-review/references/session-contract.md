@@ -190,8 +190,9 @@ current feedback, and the host files the answer's note as the current feedback
 a note typed after Accept or Reject, or before changing one to the other, is
 saved with the answer rather than refused as a change made elsewhere. Editing
 feedback on an answered question preserves its outcome, retaining prior feedback
-and submitted answer content in history. Clearing feedback
-is an explicit empty note/attachment save; clearing an answer preserves feedback.
+and submitted answer content in history. Clearing feedback is an explicit empty
+note/attachment save: the reviewer empties the note and removes each image, and
+that edit saves like any other. Clearing an answer preserves feedback.
 Reuse suggestions do not approve another use, create tasks or authorize integration.
 
 Each feedback entry needs `feedback_id`, candidate and fingerprint; `note` defaults
@@ -207,7 +208,9 @@ Exports omit this concurrency precondition so an offline set can be deliberately
 reconciled by its driver after checking the candidate.
 
 Live text edits debounce into session saves; navigation and handback flush edits.
-A failed save retains the local draft, reports failure and offers retry/export;
+The page has no separate save button: the note's status reads saving, saved or
+not saved. A failed save retains the local draft, reports failure and offers
+retry/export;
 handback waits for a successful flush. A status refresh never replaces a dirty
 editor. Browser storage failures warn that export is required. Offline storage is
 only a convenience until the driver imports the partial version-2 export; offline
@@ -219,7 +222,9 @@ with the same identity/prepared-state validation and idempotent operation rules.
 They carry no verdict. Normal `wait --kind handed-back` ignores feedback and
 playback activity; no driver/model loop is added.
 
-The UI has direct Accept/Reject/Save selection controls, one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
+The UI has direct Accept/Reject controls (Choose selected/Reject all for
+options); the pressed control is the recorded answer, and pressing it again
+records nothing new. It has one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
 
 ## Local host and recovery boundaries
 

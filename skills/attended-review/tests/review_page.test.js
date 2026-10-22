@@ -170,11 +170,50 @@ async function liveNotes(origin,token){
  p=page(changed);await p.run("select('A')");assert.equal(p.get('note').value,'');assert.equal(p.run('packet().feedback[0].fingerprint'),'fp-A');
  storage.clear();storage.set('attended-review:offline-fixture',JSON.stringify([{candidate:'A',fingerprint:'fp-A',decision_id:'legacy-local',outcome:'accept'}]));
  p=page();await p.run("select('A')");assert.equal(p.run('decision(candidate()).outcome'),'accept');
+ // The note saves itself: no Save or Clear button competes with the decision.
+ // Its status is quiet, and only a failed save offers Retry.
+ const label=(q,id)=>q.get(id).children.filter(x=>typeof x==='string').join('');
+ storage.clear();let q=page(snapshot,{live:true,failFeedback:true});await q.ready;await q.run("select('brief')");
+ assert.equal(q.context.document.getElementById('clear-feedback').onclick,undefined);
+ assert.equal(q.get('feedback-status').textContent,'Saves as you type');assert.equal(q.get('save-feedback').hidden,true);
+ q.get('note').value='Needs a second look';q.run('edit()');assert.equal(q.get('feedback-status').textContent,'Saving…');
+ assert.equal(await q.run('flush()'),false);assert.equal(q.get('feedback-status').dataset.tone,'error');
+ assert.equal(q.get('save-feedback').hidden,false);assert.equal(q.get('answer-notice').dataset.tone,'error');
+ q.settings.failFeedback=false;assert.equal(await q.get('save-feedback').click(),true);
+ assert.equal(q.get('feedback-status').textContent,'Saved');assert.equal(q.get('save-feedback').hidden,true);
+ // Accept and Reject are the decision; the pressed one is the recorded answer,
+ // and pressing it again records nothing new.
+ assert.equal(label(q,'accept'),'Accept');assert.equal(q.get('accept').attrs['aria-pressed'],'false');
+ await q.get('reject').click();assert.equal(label(q,'reject'),'Rejected');assert.equal(q.get('reject').attrs['aria-pressed'],'true');
+ assert.equal(q.get('answer').dataset.outcome,'reject');assert.equal(q.get('clear').hidden,false);
+ const posted=()=>q.requests.filter(r=>r.url==='/api/decisions'&&r.body.decisions.length).length;
+ const before=posted();await q.get('reject').click();assert.equal(posted(),before);assert.match(q.get('answer-notice').textContent,/Already recorded/);
+ await q.get('accept').click();assert.equal(posted(),before+1);assert.equal(label(q,'accept'),'Accepted');assert.equal(q.get('reject').attrs['aria-pressed'],'false');
+ // A message belongs to the question it was said about.
+ await q.get('next').click();assert.equal(q.get('answer-notice').textContent,'');
+ // Each attached image can be removed on its own, and the removal saves.
+ q.run("pending.push({name:'one.png',data:'data:image/png;base64,AA'},{name:'two.png',data:'data:image/png;base64,AA'});edit();draw()");
+ const remove=q.get('attachments').children[0].children[1].children[1];assert.equal(remove.attrs['aria-label'],'Remove one.png');
+ await remove.click();await q.run('flush()');
+ assert.equal(q.run('JSON.stringify(candidate().feedback.attachments.map(a=>a.name))'),JSON.stringify(['two.png']));
+ // Hand-back is said once, in its own banner; the finish controls go away.
+ await q.get('finish-answer').click();assert.equal(q.get('handed').hidden,false);assert.equal(q.get('finish').hidden,true);
+ assert.match(q.get('handed-summary').textContent,/1 question answered, 2 left unanswered/);assert.equal(q.get('answer-notice').hidden,true);
+ // Options are chosen inside the decision; a changed selection offers to replace it.
+ storage.clear();q=page({...snapshot,candidates:[candidate('pick',{options:['A: outlined','B: filled']})]});await q.run("select('pick')");
+ assert.equal(label(q,'accept'),'Choose selected');assert.equal(label(q,'reject'),'Reject all');
+ await q.get('accept').click();assert.equal(q.run('decision(candidate())'),null);assert.match(q.get('answer-notice').textContent,/Tick at least one option/);
+ const [first,second]=q.get('options').children.map(l=>l.children[0]);first.checked=true;first.onchange();
+ await q.get('accept').click();assert.equal(q.run('JSON.stringify(decision(candidate()).selected)'),JSON.stringify(['A: outlined']));assert.equal(label(q,'accept'),'Chosen');
+ second.checked=true;second.onchange();assert.equal(label(q,'accept'),'Choose these instead');
+ await q.get('accept').click();assert.equal(q.run('JSON.stringify(decision(candidate()).selected)'),JSON.stringify(['A: outlined','B: filled']));
+ // Offline, finishing exports, and the button says so.
+ assert.equal(q.get('finish').textContent,'Finish and export');assert.match(q.get('feedback-status').textContent,/until you export/);
  if(process.argv[2]){
   storage.clear();const saved=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));p=page(saved);
   const audioId=saved.candidates.find(c=>c.question_type==='audio').id;
   await p.run(`select(${JSON.stringify(audioId)})`);p.get('note').value='Offline unanswered feedback for exact clip';p.run('edit()');await p.run('flush()');
   fs.writeFileSync(process.argv[3],p.run('JSON.stringify(packet())'));
  }
- console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery');
+ console.log('PASS: answered/pending next-question order across server regrouping/reload, wide/narrow focus and scroll, end-of-queue state, both handback entrypoints with failed prior-draft recovery; offline draft/reload/export, independent answer/withdrawal, keyed playback, controls, diagnostics, storage-failure recovery; self-saving note with retry only on failure, pressed decision buttons, per-image removal, options inside the decision, single hand-back banner');
 })().catch(e=>{console.error(e);process.exitCode=1;});
