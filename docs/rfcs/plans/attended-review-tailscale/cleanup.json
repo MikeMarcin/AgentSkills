@@ -1,0 +1,11 @@
+{
+  "task_owned_processes": [],
+  "serve_status_after": {},
+  "all_test_commands": "completed",
+  "all_test_fixtures": "removed by TemporaryDirectory cleanup",
+  "live_attempt_fixture_removed": true,
+  "handed_off_server": null,
+  "handed_off_waiter": null,
+  "protected_live_candidate": null,
+  "unrelated_work": ".mask.lock.json and pre-existing unrelated host preserved"
+}

@@ -2,11 +2,12 @@
 schema: implement-rfc.card.v1
 id: ASK-0118
 title: Prototype optional Tailscale Serve review transport
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 priority: P1
 metadata: {"milestone_plan":{"id":"attended-review-tailscale","path":"docs/rfcs/plans/attended-review-tailscale/milestone-plan.json"}}
+acceptance: [{"criterion":"ASK-0118-TS01","outcome":"pass","revision":"b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131","evidence":{"kind":"artifact","path":"docs/rfcs/plans/attended-review-tailscale/verification.md","detail":"Foreground route lifecycle, occupied/concurrent-port refusal, two linked consumers, attach/mismatch, stop, handled termination and startup/runtime failures pass public CLI tests; first-use live consent and forced-kill limits remain explicit."}},{"criterion":"ASK-0118-TS02","outcome":"pass","revision":"b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131","evidence":{"kind":"artifact","path":"docs/rfcs/plans/attended-review-tailscale/verification.md","detail":"Exact Host/Origin/token rejection, missing POST Origin, forged localhost/forwarded Host rejection, separate review listener control denial, durable partial note/reconnect/handback, and HTTPS page behavior pass focused tests."}},{"criterion":"ASK-0118-TS03","outcome":"pass","revision":"b42654b4c8f8a1dd42ec20ebb5aa0bbb0f825131","evidence":{"kind":"artifact","path":"docs/rfcs/plans/attended-review-tailscale/verification.md","detail":"39 Python tests plus real-page JavaScript, docs and portable-source checks pass at the exact source candidate. Real disposable attempt reached human consent, status remained empty, fixture stopped/removed. Native HTTPS/mobile/Windows remain unobserved; no permissions or deployment performed."}}]
 ---
 
 # Prototype optional Tailscale Serve review transport
