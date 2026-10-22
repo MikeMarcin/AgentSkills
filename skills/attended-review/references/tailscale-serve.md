@@ -1,20 +1,30 @@
-# Experimental private HTTPS transport
+# Private HTTPS for remote review
 
-Use this branch only when the user requests access from devices already on their
-Tailscale network. Keep the existing local host for ordinary review. Tailscale must
-already be installed, signed in and online; this helper neither installs it nor
-changes access rules, credentials or HTTPS settings.
+Use Tailscale Serve as the standard transport when the reviewer is on a phone or
+another device, or the session runs through SSH, remote control or Dot. A remote
+review request authorizes its temporary scoped private Serve session; use that
+authority without repeatedly requesting separate transport approval. Review at the
+source computer uses loopback. The CLI's bare `serve` default remains loopback;
+select `--tailscale` for this remote branch.
+
+Tailscale must already be installed, signed in and online, with HTTPS enabled and
+the reviewer able to reach this device through existing access rules. If a
+prerequisite is missing, surface the exact setup requirement or CLI error. Setup,
+installation, access grants and HTTPS permission changes remain separate user
+decisions; the review request does not authorize them. The helper changes none of
+those settings and never enables Funnel.
 
 From the selected consumer, initialize and prepare the usual manifest, then run:
 
 ```sh
-python /path/to/attended-review/scripts/attended_review.py --repo-root /path/to/consumer serve --tailscale --tailscale-port 8443
+python /path/to/attended-review/scripts/attended_review.py --repo-root /path/to/consumer serve --tailscale
 ```
 
 Use a supported local Python executable. If Tailscale is outside PATH, add
 `--tailscale-bin /absolute/path/to/tailscale`. Choose an unused HTTPS port already
-permitted by the tailnet's access rules. Omitting `--tailscale-port` uses this
-host's OS-assigned loopback port; it may require a different link after restart.
+permitted by the tailnet's access rules; pass `--tailscale-port PORT` when selecting
+it explicitly. Omitting that flag uses this host's OS-assigned loopback port; it
+must also be permitted, and may require a different link after restart.
 The helper never opens firewall rules or changes tailnet access to make a port work.
 
 Open the complete printed `url`, including `#token=...`, on the other device.
@@ -46,7 +56,7 @@ Each host owns a whole HTTPS port mounted at `/`. Existing persistent, foregroun
 Funnel and service mappings on that port cause refusal before mutation. Independent
 checkouts use independent backend ports and must choose different HTTPS ports.
 This intentionally keeps root-relative API URLs; friendly shared `/reviews/...`
-mounts are outside the prototype. Another driver in the same checkout attaches to
+mounts are unsupported. Another driver in the same checkout attaches to
 the existing host without changing Serve. Changing its transport or explicit port
 requires stopping that host locally and starting it again.
 
@@ -54,8 +64,10 @@ Keep the source machine online and the foreground helper running. Saved partial
 feedback and answers live in the same durable session files; closing the browser,
 reconnecting or leaving other questions unanswered does not lose saved intake.
 Unsaved browser drafts still need retry or export, especially before changing a
-URL's origin. Remote review does not wake a model by itself: use the existing
-[qualified waiter or manual-resume instructions](driver-wait.md).
+URL's origin. Before presenting the full HTTPS capability link, arm automatic
+continuation through [Driver waiting](driver-wait.md). The host must stay awake
+with the foreground helper and tool connection live; use its explicit manual-resume
+fallback when a qualified wait is unavailable.
 
 Stop from the source machine with the same source/state/registry arguments:
 
@@ -81,9 +93,12 @@ stop only the verified owned CLI process through the native process tools. Never
 reset another owner's Serve settings to recover. Tailscale itself removes the
 foreground mapping when that CLI's session ends.
 
-The prototype has focused fake-CLI, real loopback HTTP and HTTPS page regression
-coverage. Real private HTTPS, certificate provisioning, phone/browser behavior and
-native Windows lifetime need their own observations; fixtures do not certify them.
+Focused fake-CLI, real loopback HTTP and HTTPS page regression coverage is
+supplemented by observed private HTTPS certificate validation, phone save/accept/
+handback, and native macOS scoped stop with Tailscale 1.102.3. The awake Codex
+handback qualification is recorded in [Driver waiting](driver-wait.md). These
+bounded observations do not establish phone reload, native Windows lifetime,
+overnight waiting or recovery across sleep/app restart.
 
 Protocol references: [Serve](https://tailscale.com/docs/features/tailscale-serve),
 [CLI flags and lifetime](https://tailscale.com/docs/reference/tailscale-cli/serve),

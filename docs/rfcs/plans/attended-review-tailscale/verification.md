@@ -174,3 +174,27 @@ Wait for the foreground command to exit, inspect `tailscale serve status --json`
 then remove only that disposable directory through the normal fixture cleanup.
 Saved decisions remain in its session until cleanup; import/copy any desired demo
 evidence first. No live token, full private status or phone verdict belongs in Git.
+
+## Subsequent awake Codex handback qualification
+
+The `remote-review-standard-v1` instruction milestone incorporates a later real
+phone handback at source `38d0715610fa9255fdf990067c43b669c7d54191`, whose helper
+runtime last changed at `f52a273e4058ae58f420c19bc2d2370fe857610d`. The complete
+sanitized runtime/measurement summary now lives with the portable
+[Driver waiting qualification](../../../../skills/attended-review/references/driver-wait.md#recorded-awake-runtime-qualification)
+so a matching driver can reuse the known-good recipe without a fresh probe.
+
+The inner handback-only waiter ignored a saved intermediate decision. One outer
+tool call stayed pending until the actual phone handback and returned once with
+exit 0 and the expected session. Session identity, candidate fingerprints and the
+new cursor were reconciled and consumed before dispatch. No assistant activity or
+token-count usage events were recorded during the blocked outer call; handover/
+arming activity occurred before that interval. The owned waiter/server/Serve
+processes and fixture were cleaned up. No private IDs, host/token, raw quotes,
+paths, timestamps or usage totals are copied into this receipt.
+
+This supersedes the earlier automatic-wake gap for the recorded short awake
+runtime only. Historical failed cleanup attempts and incomplete extended waiting
+remain as recorded. Phone reload, overnight waiting, sleep/app restart and native
+Windows are still unverified. This documentation-only milestone starts no server
+and repeats no native acceptance test.

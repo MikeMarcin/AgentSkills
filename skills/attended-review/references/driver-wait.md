@@ -5,9 +5,12 @@ exit returns events to its caller; the host decides whether the driver resumes.
 An idle shell session, async hook, or final answer does not itself guarantee a
 new Codex turn. Keep durable decisions independent of that host capability.
 
-Before handing over, record the source/state/registry paths, session ID, sequence
-cursor, server identity, exact waiter command and owning driver in the existing
-continuation. Finish preparation and release engineering writer ownership first.
+Automatic continuation on handback is the normal handover in a qualified runtime.
+Before handing over, record the source checkout/revision, state/registry paths,
+session ID, candidate revisions/fingerprints, sequence cursor, server/Serve
+identities, exact waiter command and command/cell identity, and owning driver in
+the existing private continuation. Finish independent unattended work and release
+engineering writer ownership before arming the waiter.
 Use `--kind handed-back` for the normal review boundary: partial decisions save
 immediately but leave the waiter blocked. Keep personal `--state` and cooperating
 `--registry` arguments identical on every command.
@@ -25,9 +28,11 @@ Keep the coordinator's turn running on one pending call. The review remains
 usable in its browser, and the chat may show as running while the model is idle.
 No waiting subagent, daemon, model launcher or scheduled status check is needed.
 
-Use the following orchestration shape only when the installed runtime exposes
-these tools. Substitute the reviewed argument array and saved sequence; execute
-this as one `functions.exec` cell. Argument quoting keeps paths literal.
+Reuse the recorded qualification below for a matching awake runtime and toolchain;
+a new review session does not require a new probe. Use the following orchestration
+shape when the installed runtime exposes these tools. Substitute the reviewed
+argument array and saved sequence; execute this as one `functions.exec` cell.
+Argument quoting keeps paths literal.
 The example uses a POSIX shell. Native Windows needs a qualified native argument
 adapter; do not introduce Bash or WSL to make this example run.
 
@@ -58,7 +63,8 @@ deterministic tool orchestration and prints no idle updates to the model. The
 12-hour command timeout ends the review wait once; it does not start a retry loop.
 After the process exits, check its exit code before parsing the event JSON.
 
-Qualification must cover the entire stack, including the outer wait. Use a
+For a changed or unsupported runtime, qualification must cover the entire stack,
+including the outer wait; otherwise use explicit manual resume. Use a
 disposable review: an intermediate decision must leave the call blocked and
 handback must return once. Inspect recorded model usage and measure
 handback-to-return latency on an awake host. Require zero idle model requests and
@@ -69,6 +75,30 @@ user requests them. An accepted timeout parameter alone proves no waiting behavi
 Treat a changed host or an early outer yield as unqualified; do not hide it with
 model-driven re-polling. Native tools with other names require their own observed
 blocking-wait qualification rather than an assumed equivalent.
+
+### Recorded awake-runtime qualification
+
+The observed stack was Codex Desktop with reported CLI `0.163.0-alpha.10.2`,
+macOS 26.6.2 arm64, Python 3.14.7 and `functions.exec` / `functions.wait` /
+`exec_command` / `write_stdin`, using the orchestration above. CLI version alone
+does not identify the desktop build. Source was reviewed at
+`38d0715610fa9255fdf990067c43b669c7d54191`; the attended-review runtime last changed
+at `f52a273e4058ae58f420c19bc2d2370fe857610d`. Tailscale 1.102.3 carried the real
+phone review.
+
+| Observation | Result |
+| --- | --- |
+| Saved intermediate decision | Wait stayed blocked; handback followed 2.410406 seconds later |
+| Handback and return | Exactly one new handback, expected session, waiter exit 0; return latency 0.1793 seconds |
+| Blocked duration | Helper 43.392 seconds; outer call 32.604 seconds, with no early yield |
+| Idle activity | No assistant activity or token-count usage events recorded during the blocked outer wait |
+| Intake and cleanup | Session/fingerprints/cursor validated and consumed before dispatch; owned processes, Serve route and disposable fixture removed |
+
+Handover and arming activity occurred before the blocked outer wait and is excluded
+from the idle observation. This is a short awake-host qualification, reusable on
+the matching stack; it establishes no overnight, sleep, app-restart or native
+Windows guarantee. A prior extended test was interrupted without handback and
+remains incomplete. Keep the host awake and its tool connection live.
 
 ## Intake, interruption and manual resume
 

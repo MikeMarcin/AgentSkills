@@ -26,8 +26,11 @@ concrete failure, while independent judgeable candidates can proceed. Repair a r
 prerequisite and rerun its affected path before rebuilding that review bundle.
 Required human judgment remains pending.
 
-Use local HTML and practical captured evidence. If a server is unavailable, use
-the existing offline export/import path; server absence does not force a different
+Use the configured attended-review skill's transport routing: private Tailscale
+Serve for remote/phone/SSH/remote-control/Dot review, loopback at the source
+computer. Present the complete capability URL and practical captured evidence.
+If a server is unavailable, use the existing offline export/import path;
+server absence does not force a different
 acceptance standard. Follow attended-review's Driver waiting instructions before
 handing over: Claude uses its persistent monitor; Codex keeps one qualified tool
 call pending on `wait --after SEQUENCE --kind handed-back`. The coordinator owns

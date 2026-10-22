@@ -24,7 +24,7 @@ and security-reporting preparation.
 | [grill-rfc](skills/grill-rfc/SKILL.md) | Optionally challenge RFC designs while keeping decisions, acceptance and draft artifacts consistent. |
 | [grill-me](skills/grill-me/SKILL.md) | Stress-test plans, decisions or ideas through explicit-answer interviews, including nonsoftware topics. |
 | [implement-rfc](skills/implement-rfc/SKILL.md) | Carry RFCs or RFC packs through bounded implementation, acceptance verification, commits and issue-board closeout. Requires consumer workflow context. |
-| [attended-review](skills/attended-review/SKILL.md) | Prepare protected candidates and save partial human decisions through local HTML, with an offline fallback. |
+| [attended-review](skills/attended-review/SKILL.md) | Prepare protected candidates, save partial decisions through local or private tailnet HTML, and continue on handback in a qualified runtime. |
 | [wizard](skills/wizard/SKILL.md) | Guide required manual steps one at a time with durable progress on native Windows and macOS. |
 | [manage-agent-skills](skills/manage-agent-skills/SKILL.md) | Inspect and manage personal and project selections through MASK's JSON CLI. |
 | [coauthoring](skills/coauthoring/SKILL.md) | Collaborate on long-form prose while preserving the author’s voice. |

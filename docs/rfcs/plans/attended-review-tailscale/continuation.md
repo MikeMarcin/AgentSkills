@@ -48,3 +48,15 @@ verified. No required obligation remains in this bounded prototype. Phone browse
 reload, automatic agent wake and native Windows lifetime remain unverified; forced
 parent death and friendly shared mounts retain their documented limits. Preserve
 qualified waiter/manual-resume behavior. Further feature work needs a new assignment.
+
+## Later instruction-policy follow-up
+
+`remote-review-standard-v1`, assignment `/root/remote_review_standard`, consumes
+subsequent successful phone-to-Codex automatic continuation at source `38d0715`
+(helper runtime `f52a273`). Its sanitized evidence is appended to
+[verification.md](verification.md#subsequent-awake-codex-handback-qualification)
+and the reusable runtime qualification lives in Driver waiting. The earlier
+automatic-wake limitation above remains historical; matching short awake Codex
+continuation is now observed. The current instruction milestone's
+[continuation](../remote-review-standard/continuation.md) owns its source checks
+and final candidate. No live session/process or acceptance decision is handed off.
