@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0121"
+  ],
+  "reserve_for": "grapho-discovery-fix",
+  "purpose": "",
+  "created": "2026-10-24T17:53:40.528569+00:00",
+  "base": "73676198110acaaa788a8895dcc574aac4c0b10b"
+}
