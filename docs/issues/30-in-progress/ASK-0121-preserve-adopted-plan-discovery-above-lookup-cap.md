@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0121"
 title: "Preserve adopted plan discovery above the live lookup cap"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0012"]
 depends_on: []
 metadata: {"discovered_by":"Grapho headless-text-foundation integration", "baseline":"73676198110acaaa788a8895dcc574aac4c0b10b"}
