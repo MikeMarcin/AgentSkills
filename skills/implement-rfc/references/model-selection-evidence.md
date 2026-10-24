@@ -1,10 +1,21 @@
 # Supporting role selection, 2026-10-03
 
 The owner authorized refreshing the supporting roles from recent public sentiment,
-benchmarks and cost data. The working coordinator/implementer strategy, coordinator
-session routes and implementation routes are preserved. The choices below apply to
+benchmarks and cost data. That refresh preserved the coordinator/implementer strategy,
+coordinator session routes and implementation routes. The choices below apply to
 new supporting assignments, including the older integrator. Historical requests,
 RFC targets and accepted evidence retain their original routes.
+
+## Claude implementation trial, 2026-10-22
+
+The owner requested medium effort for the default Claude Code implementer and
+standard worker after reporting feedback from Anthropic. The standard worker was
+already Opus 5.5 medium; the independent implementer route changes from high to
+medium. This records the owner's trial choice, not a newly verified provider
+recommendation or measured quality result. Models, other routes, authority and
+acceptance requirements retain their existing settings. Deterministic native
+rendering checks configuration and banners; no live host loading, model-quality
+comparison or consumer rollout is claimed.
 
 ## Decisions
 

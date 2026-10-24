@@ -11,7 +11,7 @@ The coordinator's current route is never an implicit engineering override.
 | `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna xhigh | Sonnet 5.5 low |
 | `rfc-scout` | balanced | Sol 6.1 medium | Sonnet 5.5 medium |
 | `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
-| `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 high |
+| `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 medium |
 | `rfc-integrator` | integration | Sol 6.1 high | Opus 5.5 high |
 | `rfc-worker-deep` | deep | Sol 6.1 max | Opus 5.5 max |
 | `rfc-reviewer` | review | Sol 6.1 xhigh | Opus 5.5 xhigh |
@@ -32,8 +32,11 @@ requirements and the comparison with Sonnet low. Similar aggregate intelligence
 does not establish equal terminal or error-handling performance.
 For the benchmarks, prices, mixed public reports and role-specific judgment behind
 these choices, read [Selection evidence](model-selection-evidence.md) when reviewing
-or changing the allocation. The coordinator/implementer strategy, its coordinator
-session routes and its implementation routes retain the owner's existing choices.
+or changing the allocation. On 2026-10-22 the owner requested a medium-effort trial
+for the Claude implementer and standard worker after reported Anthropic feedback.
+The worker already used medium; the implementer now does too. This is an owner
+choice, with no local quality comparison. The coordinator/implementer strategy,
+coordinator session routes and Codex implementation route retain their existing choices.
 The older integrator route is independently refreshed. Exact model IDs and requested
 effort live in configuration; `verified_as_of` dates the source/configuration review,
 not observed serving or measured RFC-task quality. No local model bakeoff was run.

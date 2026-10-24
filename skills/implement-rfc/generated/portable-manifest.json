@@ -34,7 +34,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "8c8e3302fb211da2344d0a1110092e6799d0cc4250a3d98b1b8eded695b70126"
+      "sha256": "9cc48eec021e5ae9ce3eb9f48883b22b7f8f3d43122bc3a627e4f1566b5f968b"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -110,11 +110,11 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "6c57dd58acbabfa333e8c2f49929adee2752179fb97429324886c8df778f40cf"
+      "sha256": "97de7955810a7c766bf39f7179597a3ddf0555fec591593eb2238ddf7b321b57"
     },
     {
       "path": "references/model-selection-evidence.md",
-      "sha256": "0c08333f85127d6a18680b2c5a474aaa8cdbaedd05611c47052788408e4e6e51"
+      "sha256": "048e53b1478d5a112eb0baaccd189520fe21a2ed6bc93dfa12aeb944053b99e2"
     },
     {
       "path": "references/native-coordination.md",
@@ -590,7 +590,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "93feee5047528ac8c43d3513fb718f9f213438fa35ab71d14ae02db1c7653436"
+      "sha256": "6e4457c3095d4273a00c58cecdd2f05bd7d9a29943768eacb40494aec556762d"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -685,6 +685,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "de55d2919f8a9b04",
+  "portable_digest": "8a7b605df8ee23cb",
   "schema": "implement-rfc.portable-manifest.v1"
 }
