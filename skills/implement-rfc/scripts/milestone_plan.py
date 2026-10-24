@@ -145,7 +145,11 @@ def discover(root, config, *, source_root=None, plan=None, targets=()):
     if targets:
         live_paths = list(itertools.islice((root / config['rfc_root'] / 'plans').glob('*/milestone-plan.json'), 257))
         if len(live_paths) > 256:
-            raise PlanError('live plan lookup exceeds 256 plans; select --plan explicitly')
+            if not links:
+                raise PlanError('live plan lookup exceeds 256 plans; select --plan explicitly')
+            # Adopted linkage remains authoritative; only unlinked recovery needs
+            # the bounded directory scan. Full linkage is checked below.
+            live_paths = []
         for candidate in live_paths:
             candidate = safe_path(root, candidate.relative_to(root).as_posix())
             live = load_plan(candidate)

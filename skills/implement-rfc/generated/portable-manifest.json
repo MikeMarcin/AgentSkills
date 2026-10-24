@@ -302,7 +302,7 @@
     },
     {
       "path": "scripts/milestone_plan.py",
-      "sha256": "d9bf23345d0cef68de0236e3b5f300a36e307fec8b6bb94bed5a665b9355fa17"
+      "sha256": "fcfe88cd7f5f2675e1584711e126cef88a84573e79809354623e2719a928cf69"
     },
     {
       "path": "scripts/milestone_plan_contract.py",
@@ -530,7 +530,7 @@
     },
     {
       "path": "tests/test_milestone_plan.py",
-      "sha256": "16d9b7c93822dd021a6ecf820e11663851f79f99757444670aaddb537a4d9d87"
+      "sha256": "4d102106f91d18276286d35970967be0679500cfbed3288447e883d0813a7dc7"
     },
     {
       "path": "tests/test_milestone_public.py",
@@ -685,6 +685,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "80a63994aaa81e49",
+  "portable_digest": "de55d2919f8a9b04",
   "schema": "implement-rfc.portable-manifest.v1"
 }

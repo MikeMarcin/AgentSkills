@@ -177,6 +177,50 @@ class PlanTests(unittest.TestCase):
         result = self.cli(self.roots[0], 'discover', '--target', 'ONE-0001', code=2)
         self.assertIn('metadata must be an object', result['diagnostic'])
 
+    def populate_live_plans(self, root, count=256):
+        unrelated = copy.deepcopy(self.plan)
+        unrelated['scope'] = {'issues': ['OTHER-0001']}
+        unrelated['milestones'][0]['work'] = [{'issue': 'OTHER-0001'}]
+        for index in range(count):
+            unrelated['id'] = f'unrelated-{index}'
+            self.write(root / f'docs/rfcs/plans/unrelated-{index}/milestone-plan.json', json.dumps(unrelated))
+
+    def test_linked_target_resume_above_live_lookup_bound(self):
+        for root in self.roots:
+            self.adopt(root)
+            self.populate_live_plans(root)
+            result = self.cli(root, 'discover', '--target', 'ONE-0001')
+            self.assertEqual(result['origin'], 'live')
+            self.assertEqual(Path(result['path']), root / 'docs/rfcs/plans/demo/milestone-plan.json')
+            self.assertEqual(self.cli(root, 'bind', '--target', 'ONE-0001'),
+                             self.cli(root, 'bind', '--plan', 'docs/rfcs/plans/demo/milestone-plan.json'))
+
+    def test_unlinked_recovery_keeps_live_lookup_bound(self):
+        root = self.roots[0]
+        self.adopt(root)
+        self.populate_live_plans(root)
+        card = root / 'docs/issues/20-ready/ONE-0001-demo.md'
+        matter = mp.board_model.parse_matter(card.read_bytes(), card)
+        card.write_bytes(matter.updated({'metadata': None}))
+        result = self.cli(root, 'discover', '--target', 'ONE-0001', code=2)
+        self.assertIn('lookup exceeds 256 plans', result['diagnostic'])
+        self.assertEqual(self.cli(root, 'discover', '--plan', 'docs/rfcs/plans/demo/milestone-plan.json')['origin'], 'explicit')
+
+    def test_linked_large_repository_still_rejects_incomplete_adoption(self):
+        root = self.roots[0]
+        self.plan['scope']['rfcs'] = ['RFC-ONE-0001']
+        self.save(self.plan)
+        self.write(root / 'docs/rfcs/RFC-ONE-0001-demo.md',
+                   '---\nid: "RFC-ONE-0001"\n---\n## Acceptance\nAC01: usable.\n')
+        self.adopt(root)
+        self.populate_live_plans(root)
+        card = root / 'docs/issues/20-ready/ONE-0001-demo.md'
+        matter = mp.board_model.parse_matter(card.read_bytes(), card)
+        card.write_bytes(matter.updated({'metadata': None}))
+        result = self.cli(root, 'discover', '--target', 'RFC-ONE-0001', code=2)
+        self.assertEqual(result['state'], 'stale')
+        self.assertIn('missing linkage', result['diagnostic'])
+
     def test_interrupted_adoption_target_only_resume_refuses_until_retry(self):
         self.plan['scope']['rfcs'] = ['RFC-ONE-0001']
         self.save(self.plan)
