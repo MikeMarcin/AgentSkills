@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0122"
+  ],
+  "reserve_for": "claude-medium-defaults",
+  "purpose": "",
+  "created": "2026-10-24T23:46:54.433001+00:00",
+  "base": "f8e70fd067e16d102fd53c9d4987b0c951bc526b"
+}
