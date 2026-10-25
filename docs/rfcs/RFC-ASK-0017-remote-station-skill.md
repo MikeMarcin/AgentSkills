@@ -252,3 +252,6 @@ acknowledgement with a receipt ID.
 
 See the [closeout](../issues/10-backlog/ASK-0127-close-remote-station-skill-rfc.md)
 and [verification record](plans/remote-station-skill/verification.md).
+AC01–AC05 and AC07–AC11 pass. AC06 waits on the owner's live native resume of
+`aito-main-win`; ASK-0125 is Parked on `human-review` until it is observed, and
+this RFC stays Implementing until then.

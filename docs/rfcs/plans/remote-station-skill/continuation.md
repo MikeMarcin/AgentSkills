@@ -1,9 +1,11 @@
 # Remote-station skill continuation
 
-Status: M1 `agentskills-skill` complete and accepted; ASK-0124 Done. M4
-`compact-station-messaging` complete and accepted; ASK-0128 Done (see "M4
-implementation" below). RFC-ASK-0017 stays Implementing: M2 (AITO, AC06) and M3
-(BetterPullReview, AC07), then closeout ASK-0127, remain.
+Status: M1 `agentskills-skill` (ASK-0124), M3 `bpr-migration` (ASK-0126) and
+M4 `compact-station-messaging` (ASK-0128) are complete and accepted. M2
+`aito-migration` (ASK-0125) landed its engineering, but the card is Parked on
+`human-review`: AC06's live native resume has not been observed. RFC-ASK-0017
+stays Implementing, and closeout ASK-0127 stays in Backlog until ASK-0125 is Done
+(see "Closeout segment" below).
 
 Assignment: one non-delegating `rfc-implementer` (effective route
 `claude-opus-5-5`, effort high) under the coordinator-implementer recipe, on
@@ -113,28 +115,71 @@ Command state: quiescent. All suites and the bundle check finished. The scratch
 tokenizer virtual environment lives outside the repository. No runtime, server
 or writer is handed off.
 
+## Closeout segment (`closeout-1`)
+
+One non-delegating `rfc-implementer` (effective route `claude-opus-5-5`, effort
+medium), coordinator-implementer, run `remote-station-2026-10-24`, on AgentSkills
+`main`. It wrote only AgentSkills tracker and plan records. It reran read-only
+checks in AITO and BetterPullReview and edited neither repository.
+
+Consumer commits, verified with `git show`:
+
+- AITO: `c626d7a8cb` MASK upgrade (pin AgentSkills `e0b729c`) and `7c915c183e`
+  forwarder, `station.json`, fork deletion and reduced docs.
+- BetterPullReview: `db885a37a` MASK upgrade (pin `e0b729c`) and `e1c8661ac`
+  forwarder, `station.json` and docs.
+
+AgentSkills commits in this segment: `e3d78ba` claim ASK-0126; `de51c17` claim
+ASK-0125; `3fc3d6e` finish ASK-0126 (AC07 pass, M2/M3 verification section);
+`2949e1c` park ASK-0125 (`human-pending`, AC06 pending); then the closeout record
+that fills ASK-0127's table and this section.
+
+Rerun at closeout: AITO `status --json` (exit 0, `stn-39ef5ffb` with the
+recorded Codex thread and Claude session). AITO tools suite: the same 7 failures
+as the clean baseline. BetterPullReview `status --json` (exit 0, byte-identical
+to the M3 before capture). The takeover-default code was compared between the
+skill and the deleted BetterPullReview forwarder.
+
+Gates:
+
+- `issue_board.py validate` (global and `--rfc RFC-ASK-0017`): valid.
+- `audit_board.py --rfc RFC-ASK-0017`: no violations.
+- `verify_documentation.py`: 0 violations.
+- `milestone_plan.py check`: structural valid.
+- `git diff --check`: clean.
+- `milestone_checkpoint.py check` on `checkpoint-final.json` returns
+  `reconcile` ("candidate revision is not the current source revision"). This
+  is expected. M4's `ee12b1e` changed `skills/remote-station` and implement-rfc's
+  `remote-routing.md` after the M1 binding at `00b0023`. M4 has its own
+  acceptance in `ASK-0128.acceptance.json`. M2 and M3 ran in their own
+  repositories, so no AgentSkills binding was made for them. M1 acceptance is
+  unaffected.
+
+Distribution: AgentSkills `main` is 7 commits ahead of `origin/main` (`e0b729c`)
+before this segment, and every consumer still pins `e0b729c`. M4 reaches
+consumers only through a push and `mask upgrade`, which are not authorized.
+
 ## Next
 
-M2 `aito-migration` (ASK-0125, now Ready) needs a fresh implementer in
-`C:\code\git\aito` under AITO's own instructions and tracker, on native Windows:
-
-1. Reconcile with the owner the uncommitted edits to `tools/codex_station.py`,
-   `tools/tests/test_codex_station.py` and `tools/tests/test_launch_remote_station.py`
-   (they port ASK-0123's turn-read timeout, already in the skill) before deleting
-   those files.
-2. Install remote-station (MASK upgrade to a revision containing `12d3c32` or later),
-   write `.mask/skill-config/remote-station/station.json` from AITO's `project.json`
-   without the `moira` and `acta` workstreams, replace
-   `tools/launch_remote_station.py` with a forwarder of at most 30 lines, delete the
-   fork and its tests, and reduce `tools/docs/agents/remote-stations.md` and
-   `docs/remote-stations.md` to AITO-specific setup (the hazard table is now
-   `skills/remote-station/references/platform-dead-ends.md`).
-3. AC06: resume `aito-main-win` (`stn-39ef5ffb`) natively and observe the same
-   `station_id`, Codex thread and Claude session plus the return-path warning. This
-   may need the owner; never fabricate it.
-
-M3 `bpr-migration` (ASK-0126, Ready) is independent of M2 and can run first if M2
-waits on the owner.
+1. **Owner, AC06:** in PowerShell at `C:/code/git/aito`, run
+   `py -3 tools/launch_remote_station.py --require-claude-resume` and confirm the
+   same `station_id` (`stn-39ef5ffb`), Codex thread
+   `01a10525-e3fa-7250-85cf-c27f2f84897d`, Claude session
+   `session_01Mb2Coeg8PF5g19jUAMQGm1`, plus the printed "Claude return path
+   UNVERIFIED" warning. Never fabricate this observation.
+2. Then a fresh implementer finishes ASK-0125 with that observation as AC06
+   evidence (decision `done`), records AC06 in ASK-0127, makes ASK-0127 Ready,
+   claims and finishes it, and moves RFC-ASK-0017 to its terminal status.
+3. Owner decisions that remain open (none blocks AC06):
+   - `mask-workflow.json`: accept the resolver-only check, or add input-only
+     descriptors to ManageAgentSkills.
+   - The removal date for v1 envelopes and the implement-rfc forwarders.
+   - BetterPullReview's `mac` workstream: its `mac-lane` branch is absent on
+     origin.
+   - AITO `station_registry_doc`: `station.json` names `docs/remote-stations.md`,
+     while `project.json` still names `tools/docs/agents/remote-stations.md`.
+   - Push and `mask upgrade`, which would deliver M4 to consumers.
+4. Not yet observed: a live v2 admission on a real Codex station.
 
 ## Consistency check
 
