@@ -394,7 +394,7 @@ def adopt(root, config, source, mapping):
         metadata['milestone_plan'] = link
         updates.append((path, raw, matter.updated({'metadata': metadata})))
     # Record immutable raw provenance separately, without extending plan schema.
-    provenance = safe_path(root, str(destination.parent.relative_to(root) / 'source.json'))
+    provenance = safe_path(root, (destination.parent.relative_to(root) / 'source.json').as_posix())
     receipt = {'schema': 'implement-rfc.plan-source.v1', 'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
                'mapping': mapping, 'plan_path': relative}
     receipt_bytes = (json.dumps(receipt, indent=2, sort_keys=True) + '\n').encode()
