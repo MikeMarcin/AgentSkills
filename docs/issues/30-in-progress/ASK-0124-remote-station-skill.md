@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0124"
 title: "Extract the remote-station skill, station.json and launch command"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0017"]
 depends_on: []
 priority: "P1"
