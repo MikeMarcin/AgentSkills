@@ -57,7 +57,7 @@ def load_plan(path):
         safe_path(Path(path).parent, 'MILESTONES.md')
         if view.stat().st_size > 1024 * 1024:
             raise PlanError('generated view exceeds 1 MiB')
-        text = view.read_text()
+        text = view.read_text(encoding='utf-8')
         if 'Generated from `milestone-plan.json`' in text and text != render(plan):
             raise PlanError('generated MILESTONES.md has drifted', 'stale')
     return normalize(plan)
