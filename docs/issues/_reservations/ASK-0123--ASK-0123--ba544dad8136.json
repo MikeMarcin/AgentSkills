@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0123"
+  ],
+  "reserve_for": "station-turn-read-timeout",
+  "purpose": "",
+  "created": "2026-10-25T00:03:14.954419+00:00",
+  "base": "d7e597f2bd09f913e2f2abebcd1d3654016c548b"
+}
