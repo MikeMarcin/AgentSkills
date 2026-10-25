@@ -24,7 +24,8 @@ import station_lifecycle as lifecycle  # noqa: E402
 import station_task_admission as admission  # noqa: E402
 
 STATION_SCHEMA = lifecycle.STATION_SCHEMA
-TASK_ENVELOPE = "implement-rfc.remote-task.v1"
+TASK_ENVELOPE = admission.TASK_ENVELOPE
+TASK_ENVELOPE_V2 = admission.TASK_ENVELOPE_V2
 SESSION_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 SKILL_RELATIVE = pathlib.Path(".agents/skills/remote-station")
 TASK_ID = re.compile(r"^task-[0-9a-z-]{4,64}$")
@@ -48,6 +49,12 @@ REQUIRED_TASK_FIELDS = {
     "reply_to",
     "done_when",
 }
+REQUIRED_TASK_FIELDS_BY_ENVELOPE = {
+    TASK_ENVELOPE: REQUIRED_TASK_FIELDS,
+    TASK_ENVELOPE_V2: admission.REQUIRED_V2,
+}
+# v2 leaves these to the station identity file; v1 always names them.
+STATION_DERIVED_FIELDS = ("project", "workstream", "branch")
 READ_ONLY_DENIED_COMMANDS = (
     re.compile(
         r"(^|[;&|]\s*)git\s+(?:add|am|apply|cherry-pick|clean|commit|merge|mv|"
@@ -215,19 +222,19 @@ def _extract_envelope(prompt: str) -> dict[str, Any]:
                 parsed = json.loads(block)
             except json.JSONDecodeError:
                 continue
-            if isinstance(parsed, dict) and parsed.get("envelope") == TASK_ENVELOPE:
+            if isinstance(parsed, dict) and parsed.get("envelope") in admission.TASK_ENVELOPES:
                 candidates.append(parsed)
         else:
             parsed = _yaml_scalars(block)
-            if parsed.get("envelope") == TASK_ENVELOPE:
+            if parsed.get("envelope") in admission.TASK_ENVELOPES:
                 candidates.append(parsed)
     if len(candidates) != 1:
         raise GuardRefusal(
             "project-mismatch",
-            "prompt must contain exactly one fenced remote-task v1 envelope",
+            "prompt must contain exactly one fenced remote-task v1 or v2 envelope",
         )
     envelope = candidates[0]
-    missing = sorted(REQUIRED_TASK_FIELDS - envelope.keys())
+    missing = sorted(REQUIRED_TASK_FIELDS_BY_ENVELOPE[envelope["envelope"]] - envelope.keys())
     if missing:
         raise GuardRefusal(
             "project-mismatch",
@@ -235,13 +242,32 @@ def _extract_envelope(prompt: str) -> dict[str, Any]:
         )
     if not TASK_ID.fullmatch(str(envelope.get("task_id", ""))):
         raise GuardRefusal("project-mismatch", "remote-task task_id is invalid")
-    if not SHA40.fullmatch(str(envelope.get("rfc_base_sha", ""))):
+    if (envelope["envelope"] == TASK_ENVELOPE or "rfc_base_sha" in envelope) and not SHA40.fullmatch(
+        str(envelope.get("rfc_base_sha", ""))
+    ):
         raise GuardRefusal("project-mismatch", "remote-task rfc_base_sha is invalid")
     if not SHA40.fullmatch(str(envelope.get("base_commit", ""))):
         raise GuardRefusal("base-not-ancestor", "remote-task base_commit is invalid")
     if not SESSION_NAME.fullmatch(str(envelope.get("reply_to", ""))):
         raise GuardRefusal("project-mismatch", "remote-task reply_to is invalid")
     return envelope
+
+
+def _expand_envelope(station: dict[str, Any], envelope: dict[str, Any]) -> dict[str, Any]:
+    """Return the full envelope the guard validates.
+
+    A v2 envelope names its station but not the fields the station identity file
+    binds; fill those from the file. Fields a v2 envelope does name are kept, so
+    a stale or misaddressed value still refuses in _validate_envelope.
+    """
+    if envelope.get("envelope") != TASK_ENVELOPE_V2:
+        return envelope
+    expanded = dict(envelope)
+    for field in STATION_DERIVED_FIELDS:
+        expanded.setdefault(field, station.get(field))
+    for field in ("rfcs", "cards", "id_reservations"):
+        expanded.setdefault(field, [])
+    return expanded
 
 
 def _parse_expiry(value: object) -> dt.datetime | None:
@@ -428,7 +454,11 @@ def _admit_request(root: pathlib.Path, event: dict[str, Any], envelope: dict) ->
         _write_turn_state(root, event, envelope, admission_source="PreToolUse")
     except OSError as error:
         raise GuardRefusal("authority-exceeded", "cannot write turn admission; task receipt retained, send a fresh task_id") from error
-    _hook_context("PreToolUse", "Remote-task admission accepted by the actual host event: " + json.dumps(record, sort_keys=True))
+    # One line: the receipt on disk holds the session, turn and envelope digest.
+    _hook_context(
+        "PreToolUse",
+        f"Remote-task {envelope['task_id']} accepted for this turn ({envelope['authority']}); receipt {task_key[:16]}.",
+    )
 
 
 def _clear_turn_state(root: pathlib.Path, event: dict[str, Any]) -> None:
@@ -517,7 +547,7 @@ def _handle_prompt(
     try:
         _validate_live_checkout(root, station, project)
         _lease_record(root, station)
-        envelope = _extract_envelope(str(event.get("prompt", "")))
+        envelope = _expand_envelope(station, _extract_envelope(str(event.get("prompt", ""))))
         _validate_envelope(root, station, envelope)
         _write_turn_state(root, event, envelope)
     except GuardRefusal as refusal:
@@ -643,6 +673,7 @@ def _handle_tool(
         _lease_record(root, station)
         envelope = _request_envelope(root, event)
         if envelope is not None:
+            envelope = _expand_envelope(station, envelope)
             _validate_envelope(root, station, envelope)
             if "checkout" in envelope and pathlib.Path(envelope["checkout"]).resolve() != root:
                 raise GuardRefusal("project-mismatch", "remote-task checkout does not match this live root")

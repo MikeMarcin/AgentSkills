@@ -142,7 +142,7 @@
     },
     {
       "path": "references/remote-routing.md",
-      "sha256": "d2531f0179b0adfa83572d09bc4edf5fa84a21e89584f058ebdf901c2d550543"
+      "sha256": "8e919f25aa52a8aa88a9eb5aa862b4e8f236de0c3b58958adcff9588e5f62d80"
     },
     {
       "path": "references/role-adoption.md",
@@ -629,6 +629,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "c470d8318e140819",
+  "portable_digest": "67cfcf4715ccad94",
   "schema": "implement-rfc.portable-manifest.v1"
 }

@@ -54,7 +54,6 @@ SECTIONS = (
     "hook_context",
 )
 STATION_FIELDS = ("project", "station", "workstream", "branch", "checkout")
-V2_HELPER = "implement-rfc.admission-request.v1"
 
 
 class Tokenizer:
@@ -139,43 +138,75 @@ def fenced_envelopes(text: str) -> list[tuple[str, dict | None]]:
     return found
 
 
-# --- v2 re-expression (mirrors the skill's compact protocol) -------------------
+# --- v2 re-expression (mirrors skills/remote-station v2 exactly) ---------------
+# Envelope: implement-rfc.remote-task.v2 without the station-file fields
+# (project, workstream, branch, checkout), without empty lists, and without
+# rfc_base_sha when no RFC is named. done_when and notes are kept as recorded.
+# Admission: the v2 plain-flag request in place of --envelope-base64. A prompt
+# that carried both a fenced envelope and a request line keeps only the line.
+# Helper output: the v2 one-object line. Hook context: the one-line ack.
 
 
-def compact_envelope(envelope: dict, station: dict) -> dict:
-    """Drop fields the station identity file supplies and empty defaults."""
+def compact_envelope(envelope: dict) -> dict:
     compact = {"envelope": "implement-rfc.remote-task.v2"}
     for key, value in envelope.items():
         if key == "envelope" or key in STATION_FIELDS:
             continue
         if key in ("rfcs", "cards", "id_reservations") and value == []:
             continue
+        if key == "rfc_base_sha" and not envelope.get("rfcs"):
+            continue
         compact[key] = value
-    if envelope.get("station") not in (None, station.get("station")):
-        compact["station"] = envelope["station"]  # a misaddressed task stays explicit
     return compact
 
 
-def v2_fenced(envelope: dict, station: dict) -> str:
-    compact = compact_envelope(envelope, station)
-    return "```json\n" + json.dumps(compact, separators=(",", ":"), ensure_ascii=False) + "\n```"
+def v2_fenced(envelope: dict) -> str:
+    return "```json\n" + json.dumps(compact_envelope(envelope), indent=2, ensure_ascii=False) + "\n```"
 
 
-def v2_payload(envelope: dict, station: dict) -> str:
-    raw = json.dumps(compact_envelope(envelope, station), separators=(",", ":"), ensure_ascii=False)
-    return base64.b64encode(raw.encode("utf-8")).decode("ascii")
+def v2_flags(envelope: dict) -> str:
+    words = ["--task", envelope["task_id"], "--station", envelope["station"], "--base", envelope["base_commit"],
+             "--authority", envelope["authority"], "--reply-to", envelope["reply_to"]]
+    if envelope.get("rfcs"):
+        words += ["--rfc-base", envelope["rfc_base_sha"]]
+    for flag, field in (("--rfc", "rfcs"), ("--card", "cards")):
+        for value in envelope.get(field, []):
+            words += [flag, value]
+    for item in envelope.get("id_reservations", []):
+        words += ["--reservation", ":".join(item[key] for key in ("reservation_id", "area", "range", "reservation_commit"))]
+    if envelope.get("expires_at"):
+        words += ["--expires", envelope["expires_at"]]
+    return " ".join(words)
 
 
-def v2_payload_line(text: str, match: re.Match, envelope: dict, station: dict) -> str:
-    return text[: match.start(1)] + v2_payload(envelope, station) + text[match.end(1):]
+def v2_payload_line(text: str, match: re.Match, envelope: dict) -> str:
+    """Replace '--envelope-base64 PAYLOAD' by the v2 flags; the rest is unchanged."""
+    return text[: match.start(0)] + v2_flags(envelope) + text[match.end(0):]
+
+
+def v2_parses(envelope: dict) -> bool:
+    """Prove the re-expressed request is one the skill's own parser admits as syntax."""
+    scripts = pathlib.Path(__file__).resolve().parents[5] / "skills" / "remote-station" / "scripts"
+    sys.path.insert(0, str(scripts))
+    try:
+        import station_task_admission as admission  # noqa: PLC0415
+    finally:
+        sys.path.remove(str(scripts))
+    command = f'py -3 -B "C:\\fixture\\station_task_admission.py" {v2_flags(envelope)}'
+    try:
+        parsed = admission.command_request(command)
+    except admission.RequestError:
+        return False
+    return parsed is not None and parsed[1]["task_id"] == envelope["task_id"]
 
 
 def v2_helper_output(envelope: dict) -> str:
-    return json.dumps({"schema": V2_HELPER, "task_id": envelope.get("task_id"), "admission": "hook-controlled"})
+    return json.dumps({"task_id": envelope.get("task_id"), "admission": "hook-controlled"}, separators=(",", ":"))
 
 
-def v2_hook_ack(envelope: dict, receipt_id: str) -> str:
-    return f"Remote-task {envelope.get('task_id')} admitted (receipt {receipt_id})."
+def v2_hook_ack(envelope: dict) -> str:
+    receipt = hashlib.sha256(envelope["task_id"].encode()).hexdigest()[:16]
+    return f"Remote-task {envelope['task_id']} accepted for this turn ({envelope['authority']}); receipt {receipt}."
 
 
 # --- measurement ----------------------------------------------------------------
@@ -246,7 +277,12 @@ def measure_codex(path: pathlib.Path, station: dict, fmt: str, tok: Tokenizer) -
                 current["envelope_forms"].append("fenced")
                 envelope = parsed
                 current["_envelope"] = current["_envelope"] or envelope
-                replacement = v2_fenced(envelope, station) if (fmt == "v2" and envelope) else "```json\n" + block + "\n```"
+                if fmt == "v2" and envelope and PAYLOAD.search(body):
+                    replacement = ""  # v2 dispatch sends the request line only
+                elif fmt == "v2" and envelope:
+                    replacement = v2_fenced(envelope)
+                else:
+                    replacement = "```json\n" + block + "\n```"
                 current["_texts"]["fenced_envelope"].append(replacement)
                 prose = prose.replace(block, "")
             for line in body.splitlines():
@@ -258,8 +294,10 @@ def measure_codex(path: pathlib.Path, station: dict, fmt: str, tok: Tokenizer) -
                 envelope = decode_envelope(match.group(1))
                 current["_envelope"] = envelope or current["_envelope"]
                 current["_texts"]["admission_command"].append(
-                    v2_payload_line(line, match, envelope, station) if (fmt == "v2" and envelope) else line
+                    v2_payload_line(line, match, envelope) if (fmt == "v2" and envelope) else line
                 )
+                if fmt == "v2" and envelope:
+                    current.setdefault("_parsed", []).append(v2_parses(envelope))
                 prose = prose.replace(line, "")
             prose = re.sub(r"```(?:json|yaml|yml)?\s*\n\s*\n```", "", prose)
             repeated, novel = split_prose(prose, seen)
@@ -279,7 +317,7 @@ def measure_codex(path: pathlib.Path, station: dict, fmt: str, tok: Tokenizer) -
             match = PAYLOAD.search(text)
             if match:
                 envelope = decode_envelope(match.group(1))
-                echoed = v2_payload_line(text, match, envelope, station) if (fmt == "v2" and envelope) else text
+                echoed = v2_payload_line(text, match, envelope) if (fmt == "v2" and envelope) else text
                 current["_texts"]["model_admission_echo"].append(echoed)
                 current["_pending"].add("model_admission_echo")
                 current["_admission_call"] = payload.get("call_id")
@@ -297,8 +335,7 @@ def measure_codex(path: pathlib.Path, station: dict, fmt: str, tok: Tokenizer) -
             text = message_text(payload)
             if "hooks.additional_context" in kinds or text.startswith("Remote-task "):
                 if fmt == "v2" and text.startswith("Remote-task admission accepted") and current["_envelope"]:
-                    receipt = hashlib.sha256(current["_envelope"]["task_id"].encode()).hexdigest()[:12]
-                    text = v2_hook_ack(current["_envelope"], receipt)
+                    text = v2_hook_ack(current["_envelope"])
                 current["_texts"]["hook_context"].append(text)
                 current["_pending"].add("hook_context")
     return finish(turns, tok)
@@ -332,7 +369,8 @@ def finish(turns: list[dict], tok: Tokenizer) -> dict:
     )
     grand = sum(totals.values())
     overhead = sum(totals[name] for name in station_overhead)
-    return {
+    parsed = [ok for turn in station_turns for ok in turn.get("_parsed", [])]
+    report = {
         "delegated_prompts": len(turns),
         "station_task_turns": len(station_turns),
         "sum_tokens": totals,
@@ -344,6 +382,9 @@ def finish(turns: list[dict], tok: Tokenizer) -> dict:
         "re_read_tokens_within_turn": carried,
         "turns": rows,
     }
+    if parsed:
+        report["v2_requests_admissible_by_skill_parser"] = f"{sum(parsed)}/{len(parsed)}"
+    return report
 
 
 def payload_analysis(path: pathlib.Path, station: dict, tok: Tokenizer) -> dict:

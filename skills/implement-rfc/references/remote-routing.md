@@ -44,6 +44,40 @@ Codex delivers it as a follow-up to the provisioned station task. It is also
 valid pasted by hand from a mobile client. The receiving station validates it
 identically regardless of transport.
 
+New dispatch uses the compact v2 envelope. It omits what the station identity
+file already binds (`project`, `workstream`, `branch`, `checkout`), and it omits
+empty `rfcs`, `cards` and `id_reservations`. `station` stays required, so a
+misaddressed task still refuses. `rfc_base_sha` is required only when `rfcs`
+names an RFC. `done_when` and `notes` are optional, because the prompt prose
+already carries the task. An optional identity field that is present still binds.
+For example:
+
+```yaml
+envelope: implement-rfc.remote-task.v2
+task_id: task-20260829-a7f3
+station: <prefix>-<workstream>-linux
+base_commit: 0123456789abcdef0123456789abcdef01234567
+authority: lane-commit
+reply_to: <prefix>-main-mac
+rfc_base_sha: 89abcdef0123456789abcdef0123456789abcdef
+rfcs: [RFC-XXX-0004]
+cards: [XXX-0031, XXX-0032]
+expires_at: 2026-08-30T08:00:00Z
+```
+
+When the station guards turns with the delegated admission request (Codex
+tool-output delivery), send the v2 request line in its place. The
+remote-station skill's station control reference gives the line's exact shape. Do not send both
+the line and a fenced envelope. Do not base64-encode a v2 envelope. On the
+recorded station turns that motivated v2, base64 tripled the payload's tokens, and the
+station model paid for it again when it re-typed the line.
+Do not restate rules that the station guard and the remote-station skill
+already enforce: admission mechanics, lease preservation, the takeover
+prohibition and copy-verbatim warnings. Send only the request line and the
+task prose.
+
+v1 envelopes stay valid for one compatibility release:
+
 ```yaml
 envelope: implement-rfc.remote-task.v1
 task_id: task-20260829-a7f3
@@ -76,9 +110,11 @@ notes: free text
 - `expires_at` bounds stale dispatch; an expired envelope is refused.
 - `authority` can only narrow the station file's authority, never widen it.
 
-The remote-station skill's `schemas/remote-task-envelope.schema.json`
-validates the canonical JSON form of the envelope; the YAML rendering must
-round-trip to it. Its optional guard enforces the same fields when a station
+The remote-station skill's `schemas/remote-task-envelope.schema.json` (v1) and
+`schemas/remote-task-envelope.v2.schema.json` (v2) validate the canonical JSON
+form of the envelope; the YAML rendering must round-trip to it. The guard
+expands a v2 envelope with the station file's identity and then validates the
+full envelope exactly as it validates v1. Its optional guard enforces the same fields when a station
 explicitly enables hook enforcement.
 
 ## Identity guard

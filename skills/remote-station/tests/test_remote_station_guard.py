@@ -217,8 +217,11 @@ done_when: test the station guard
             output = json.loads(result.stdout)["hookSpecificOutput"]
             context = output["additionalContext"]
             self.assertNotIn("permissionDecision", output)
-            self.assertIn('"admission_source": "PreToolUse"', context)
-            self.assertIn(f'"turn_id": "{turn}"', context)
+            task_id = f"task-20990101-request-{index}"
+            self.assertEqual(context, self._ack(task_id))
+            receipt = json.loads(self._receipt_path(event["session_id"], task_id).read_text(encoding="utf-8"))
+            self.assertEqual((receipt["session_id"], receipt["turn_id"], receipt["admission_source"]),
+                             (event["session_id"], turn, "PreToolUse"))
             files = self._authorization_files()
             self.assertEqual(len(files), 1)
             state = json.loads(files[0].read_text())
@@ -377,6 +380,219 @@ done_when: test the station guard
         denied = subprocess.run([sys.executable, "-B", str(self.request_helper), "--envelope-base64", encoded, "--turn-id", "caller"], cwd=self.repo, capture_output=True, text=True)
         self.assertNotEqual(denied.returncode, 0)
         self._assert_denied(self._event("PreToolUse", tool_name="Write"), "no accepted")
+
+    # --- compact v2 messaging (ASK-0128) ------------------------------------
+
+    def _ack(self, task_id: str, authority: str = "lane-commit") -> str:
+        receipt = hashlib.sha256(task_id.encode()).hexdigest()[:16]
+        return f"Remote-task {task_id} accepted for this turn ({authority}); receipt {receipt}."
+
+    def _receipt_path(self, session_id: str, task_id: str) -> Path:
+        return (self.repo / ".git/implement-rfc-remote-station-turns/requests"
+                / hashlib.sha256(session_id.encode()).hexdigest()
+                / f"{hashlib.sha256(task_id.encode()).hexdigest()}.json")
+
+    def _v2_command(self, **overrides: object) -> str:
+        values: dict = {"task_id": "task-20990101-request", "station": "fx-main-mac", "base_commit": self.head,
+                        "authority": "lane-commit", "reply_to": "fx-main-mac", "expires_at": "2099-01-01T00:00:00Z"}
+        values.update(overrides)
+        words = ["--task", values["task_id"], "--station", values["station"], "--base", values["base_commit"],
+                 "--authority", values["authority"], "--reply-to", values["reply_to"]]
+        if values.get("rfc_base_sha"):
+            words += ["--rfc-base", values["rfc_base_sha"]]
+        for flag, field in (("--rfc", "rfcs"), ("--card", "cards")):
+            for value in values.get(field, []):
+                words += [flag, value]
+        if values.get("expires_at"):
+            words += ["--expires", values["expires_at"]]
+        words += values.get("extra", [])
+        return f'python3 -B "{self.request_helper}" ' + " ".join(words)
+
+    def _v2_prompt(self, **overrides: str) -> str:
+        values = {"station": "fx-main-mac", "authority": "lane-commit", "base_commit": self.head,
+                  "expires_at": "2099-01-01T00:00:00Z", "extra": ""}
+        values.update(overrides)
+        return f"""Do the fixture task.
+
+```yaml
+envelope: implement-rfc.remote-task.v2
+task_id: task-20990101-test
+station: {values["station"]}
+base_commit: {values["base_commit"]}
+authority: {values["authority"]}
+expires_at: {values["expires_at"]}
+reply_to: fx-main-mac{values["extra"]}
+```"""
+
+    def _command_for(self, version: str, **overrides: object) -> str:
+        if version == "v1":
+            return self._request_command(**overrides)
+        if "project" in overrides:
+            # v2 flags have no project; a v2 JSON envelope may name one, and then it binds.
+            values = {"envelope": "implement-rfc.remote-task.v2", "task_id": overrides["task_id"],
+                      "station": "fx-main-mac", "base_commit": self.head, "authority": "lane-commit",
+                      "reply_to": "fx-main-mac", "project": overrides["project"]}
+            encoded = base64.b64encode(json.dumps(values).encode()).decode()
+            return f'python3 -B "{self.request_helper}" --envelope-base64 {encoded}'
+        return self._v2_command(**overrides)
+
+    def _request_for(self, version: str, turn: str, **overrides: object) -> dict:
+        event = self._event("PreToolUse", turn_id=turn, tool_name="Bash", tool_input={})
+        event["tool_input"]["cmd"] = self._command_for(version, **overrides)
+        return event
+
+    def _request_refusal_reason(self, event: dict) -> str:
+        """The protocol reason _handle_tool would deny with (deny output carries only detail)."""
+        import remote_station_guard as guard
+        root = self.repo.resolve()
+        with self.assertRaises(guard.GuardRefusal) as caught:
+            guard._validate_live_checkout(root, self.station, FIXTURE_PROJECT)
+            envelope = guard._request_envelope(root, event)
+            envelope = guard._expand_envelope(self.station, envelope)
+            guard._validate_envelope(root, self.station, envelope)
+            guard._admit_request(root, event, envelope)
+        return caught.exception.reason
+
+    def test_v2_request_admits_with_compact_flags_and_one_line_ack(self) -> None:
+        registry = (self.repo / ".remote-station.json").read_bytes()
+        event = self._request_for("v2", "turn-v2", cards=["FX-0001"], rfcs=["RFC-FX-0005"], rfc_base_sha=self.head)
+        result = self._run_guard(event)
+        output = json.loads(result.stdout)["hookSpecificOutput"]
+        self.assertNotIn("permissionDecision", output)
+        self.assertEqual(output["additionalContext"], self._ack("task-20990101-request"))
+        receipt = json.loads(self._receipt_path(event["session_id"], "task-20990101-request").read_text(encoding="utf-8"))
+        expanded = {"envelope": "implement-rfc.remote-task.v2", "task_id": "task-20990101-request",
+                    "station": "fx-main-mac", "base_commit": self.head, "authority": "lane-commit",
+                    "reply_to": "fx-main-mac", "rfc_base_sha": self.head, "rfcs": ["RFC-FX-0005"],
+                    "cards": ["FX-0001"], "expires_at": "2099-01-01T00:00:00Z", "project": "fixture",
+                    "workstream": "main", "branch": "main", "id_reservations": []}
+        digest = hashlib.sha256(json.dumps(expanded, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        self.assertEqual(receipt["envelope_sha256"], digest)
+        self.assertEqual(self._run_guard(self._event("PreToolUse", turn_id="turn-v2", tool_name="Write")).stdout, "")
+        self.assertEqual((self.repo / ".remote-station.json").read_bytes(), registry)
+
+    def test_v2_prompt_envelope_is_expanded_and_admitted(self) -> None:
+        accepted = self._run_guard(self._event("UserPromptSubmit", prompt=self._v2_prompt()))
+        self.assertIn("accepted", json.loads(accepted.stdout)["hookSpecificOutput"]["additionalContext"])
+        self.assertEqual(self._run_guard(self._event("PreToolUse", tool_name="Write")).stdout, "")
+
+    def test_guard_refusals_fire_for_v1_and_v2_requests(self) -> None:
+        """AC10 on the delegated request route, the route that keeps task receipts."""
+        for version in ("v1", "v2"):
+            with self.subTest(version=version, refusal="replayed task_id"):
+                task = f"task-20990101-replay-{version}"
+                self.assertIn("accepted", self._run_guard(self._request_for(version, f"turn-a-{version}", task_id=task)).stdout)
+                self._run_guard(self._event("Stop", turn_id=f"turn-a-{version}"))
+                replay = self._request_for(version, f"turn-b-{version}", task_id=task)
+                self._assert_denied(replay, "already used")
+                # Existing protocol code for replay; unchanged by v2.
+                self.assertEqual(self._request_refusal_reason(replay), "authority-exceeded")
+            with self.subTest(version=version, refusal="project mismatch in envelope"):
+                event = self._request_for(version, f"turn-p-{version}", task_id=f"task-20990101-proj-{version}", project="other")
+                self._assert_denied(event, "project")
+                self.assertEqual(self._request_refusal_reason(event), "project-mismatch")
+            with self.subTest(version=version, refusal="project mismatch in station file"):
+                self.station["project"] = "other"
+                self._write_station()
+                event = self._request_for(version, f"turn-q-{version}", task_id=f"task-20990101-projf-{version}")
+                self._assert_denied(event, "project")
+                self.assertEqual(self._request_refusal_reason(event), "project-mismatch")
+                self.station["project"] = "fixture"
+                self._write_station()
+            with self.subTest(version=version, refusal="authority exceeded"):
+                self.station["authority"] = "read-only-proof"
+                self._write_station()
+                event = self._request_for(version, f"turn-r-{version}", task_id=f"task-20990101-auth-{version}")
+                self._assert_denied(event, "exceeds read-only")
+                self.assertEqual(self._request_refusal_reason(event), "authority-exceeded")
+                self.station["authority"] = "lane-commit"
+                self._write_station()
+            with self.subTest(version=version, refusal="expired"):
+                event = self._request_for(version, f"turn-e-{version}", task_id=f"task-20990101-exp-{version}",
+                                          expires_at="2000-01-01T00:00:00Z")
+                self._assert_denied(event, "expired")
+                self.assertEqual(self._request_refusal_reason(event), "expired")
+            with self.subTest(version=version, refusal="station mismatch"):
+                event = self._request_for(version, f"turn-s-{version}", task_id=f"task-20990101-stn-{version}",
+                                          station="fx-other-mac")
+                self._assert_denied(event, "station")
+                self.assertEqual(self._request_refusal_reason(event), "station-mismatch")
+        self.assertEqual(len(self._authorization_files()), 0)
+
+    def test_guard_refusals_fire_for_v1_and_v2_prompts(self) -> None:
+        """AC10 on the fenced-prompt route; the refusal envelope carries the reason."""
+        cases = (
+            ("project-mismatch", {"v1": self._envelope().replace("project: fixture", "project: other"),
+                                  "v2": self._v2_prompt(extra="\nproject: other")}, None),
+            ("authority-exceeded", {"v1": self._envelope(), "v2": self._v2_prompt()}, "read-only-proof"),
+            ("expired", {"v1": self._envelope().replace("2099-01-01T00:00:00Z", "2000-01-01T00:00:00Z"),
+                         "v2": self._v2_prompt(expires_at="2000-01-01T00:00:00Z")}, None),
+            ("station-mismatch", {"v1": self._envelope(station="fx-acta-linux"),
+                                  "v2": self._v2_prompt(station="fx-acta-linux")}, None),
+        )
+        for reason, prompts, station_authority in cases:
+            for version, prompt in prompts.items():
+                with self.subTest(reason=reason, version=version):
+                    self.station["authority"] = station_authority or "lane-commit"
+                    self._write_station()
+                    result = self._run_guard(self._event("UserPromptSubmit", prompt=prompt))
+                    context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
+                    self.assertIn(f"reason: {reason}", context)
+                    self.assertEqual(self._authorization_files(), [])
+        self.station["authority"] = "lane-commit"
+        self.station["project"] = "other"
+        self._write_station()
+        for version, prompt in (("v1", self._envelope()), ("v2", self._v2_prompt())):
+            with self.subTest(reason="station file project drift", version=version):
+                context = json.loads(self._run_guard(self._event("UserPromptSubmit", prompt=prompt)).stdout)
+                self.assertIn("reason: project-mismatch", context["hookSpecificOutput"]["additionalContext"])
+
+    def test_v2_cannot_carry_caller_identity_or_unknown_flags(self) -> None:
+        for extra in (["--session-id", "caller"], ["--turn-id", "caller"], ["--authority", "owner"],
+                      ["--expires", "2099-01-01T00:00:00Z"], [";", "git", "add", "seed.txt"], ["&&", "git", "status"]):
+            with self.subTest(extra=extra):
+                event = self._request_for("v2", "turn-x")
+                event["tool_input"]["cmd"] = self._v2_command(extra=extra)
+                self._assert_denied(event)
+                self.assertEqual(self._authorization_files(), [])
+
+    def test_v1_dispatcher_envelopes_are_still_admitted(self) -> None:
+        """AC11: the v1 shapes existing dispatchers send keep working unchanged."""
+        registry = (self.repo / ".remote-station.json").read_bytes()
+        lifecycle_path = self.repo / ".git/implement-rfc-station-lifecycle.json"
+        lifecycle_before = lifecycle_path.read_bytes() if lifecycle_path.exists() else None
+        # Recorded dispatcher shape: base64 JSON with checkout and notes.
+        task = "task-20990101-dispatcher-v1"
+        command = self._request_command(task_id=task, notes="free text from a v1 dispatcher",
+                                        cards=["FX-0001"], rfcs=["RFC-FX-0005"])
+        event = self._event("PreToolUse", turn_id="turn-v1", tool_name="Bash", tool_input={"command": command})
+        self.assertEqual(json.loads(self._run_guard(event).stdout)["hookSpecificOutput"]["additionalContext"], self._ack(task))
+        self._run_guard(self._event("Stop", turn_id="turn-v1"))
+        # v1 fenced YAML and fenced JSON prompts.
+        json_prompt = "```json\n" + json.dumps(self._request_values(task_id="task-20990101-json")) + "\n```"
+        for prompt in (self._envelope(), json_prompt):
+            with self.subTest(prompt=prompt[:12]):
+                accepted = self._run_guard(self._event("UserPromptSubmit", turn_id="turn-v1-prompt", prompt=prompt))
+                self.assertIn("accepted", accepted.stdout)
+                self._run_guard(self._event("Stop", turn_id="turn-v1-prompt"))
+        # The v1 request helper output is byte-compatible.
+        encoded = command.rsplit(" ", 1)[-1]
+        result = subprocess.run([sys.executable, "-B", str(self.request_helper), "--envelope-base64", encoded],
+                                cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(json.loads(result.stdout), {"schema": "implement-rfc.admission-request.v1",
+                                                     "task_id": task, "admission": "hook-controlled"})
+        # Station identity is untouched.
+        self.assertEqual((self.repo / ".remote-station.json").read_bytes(), registry)
+        self.assertEqual(lifecycle_path.read_bytes() if lifecycle_path.exists() else None, lifecycle_before)
+
+    def test_v2_direct_cli_reports_hook_control_only(self) -> None:
+        words = [str(self.request_helper), *self._v2_command().split('" ', 1)[1].split(" ")]
+        result = subprocess.run([sys.executable, "-B", *words], cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), {"task_id": "task-20990101-request", "admission": "hook-controlled"})
+        denied = subprocess.run([sys.executable, "-B", *words, "--turn-id", "caller"], cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(denied.returncode, 2)
+        self.assertFalse((self.repo / ".git/implement-rfc-remote-station-turns").exists())
 
     def _run_guard(self, event: dict) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
@@ -657,6 +873,69 @@ class AdmissionRequestParsingTests(unittest.TestCase):
         if Draft202012Validator is not None:
             validator = Draft202012Validator(json.loads((PACK / "schemas/remote-task-envelope.schema.json").read_text()))
             validator.validate(admission.decode_envelope(self.encoded))
+
+    V2_SCRIPT = r"C:\code\git\aito\.agents\skills\remote-station\scripts\station_task_admission.py"
+
+    def _v2(self, *words: str) -> str:
+        required = ["--task", "task-20990101-parse", "--station", "fx-main-win", "--base", "a" * 40,
+                    "--authority", "lane-commit", "--reply-to", "fx-main-mac"]
+        return f'py -3 -B "{self.V2_SCRIPT}" ' + " ".join([*required, *words])
+
+    def test_v2_flags_parse_into_the_compact_envelope(self) -> None:
+        reservation = "idr-fx-20990101-01:FX:FX-0037..FX-0044:" + "b" * 40
+        command = self._v2("--rfc-base", "c" * 40, "--rfc", "RFC-FX-0005", "--rfc", "RFC-FX-0006",
+                           "--card", "FX-0031", "--reservation", reservation, "--expires", "2099-01-01T00:00:00Z")
+        script, envelope = admission.command_request(command)
+        self.assertEqual(script, self.V2_SCRIPT)
+        self.assertEqual(envelope, {
+            "envelope": "implement-rfc.remote-task.v2", "task_id": "task-20990101-parse",
+            "station": "fx-main-win", "base_commit": "a" * 40, "authority": "lane-commit",
+            "reply_to": "fx-main-mac", "rfc_base_sha": "c" * 40, "rfcs": ["RFC-FX-0005", "RFC-FX-0006"],
+            "cards": ["FX-0031"], "expires_at": "2099-01-01T00:00:00Z",
+            "id_reservations": [{"reservation_id": "idr-fx-20990101-01", "area": "FX",
+                                 "range": "FX-0037..FX-0044", "reservation_commit": "b" * 40}],
+        })
+        self.assertEqual(admission.command_request(self._v2())[1]["envelope"], "implement-rfc.remote-task.v2")
+        if Draft202012Validator is not None:
+            schema = json.loads((PACK / "schemas/remote-task-envelope.v2.schema.json").read_text(encoding="utf-8"))
+            Draft202012Validator(schema).validate(envelope)
+
+    def test_v2_flags_refuse_order_repeats_identity_and_shell_text(self) -> None:
+        good = self._v2("--card", "FX-0031")
+        invalid = (
+            self._v2("--card", "FX-0031", "--rfc-base", "c" * 40),  # out of order
+            self._v2("--expires", "2099-01-01T00:00:00Z", "--expires", "2099-01-01T00:00:00Z"),
+            self._v2("--rfc", "RFC-FX-0005"),  # rfcs need --rfc-base
+            self._v2("--session-id", "caller"), self._v2("--turn-id", "caller"), self._v2("--project", "fixture"),
+            self._v2("--card", "FX-0031;whoami"), self._v2("--card", "$(whoami)"),
+            self._v2("--reservation", "idr-x:FX"), self._v2("--card"),
+            good.replace("--authority lane-commit", "--authority owner"),
+            good.replace("--base " + "a" * 40, "--base HEAD"),
+        )
+        for command in invalid:
+            with self.subTest(command=command[-60:]):
+                with self.assertRaises(admission.RequestError):
+                    admission.command_request(command)
+        swapped = good.replace("--task task-20990101-parse --station fx-main-win",
+                               "--station fx-main-win --task task-20990101-parse")
+        for command in (swapped, good + " ; git add seed.txt", good + "  ", good.replace(" --card", "  --card"),
+                        good + "\nwhoami", "powershell -Command " + good, good.replace("py -3 -B", "py -3 -c")):
+            with self.subTest(command=command[-40:]):
+                try:
+                    self.assertIsNone(admission.command_request(command))
+                except admission.RequestError:
+                    pass
+
+    def test_v2_json_envelope_requires_station_and_refuses_v1_only_identity(self) -> None:
+        compact = {"envelope": "implement-rfc.remote-task.v2", "task_id": "task-20990101-parse",
+                   "station": "fx-main-win", "base_commit": "a" * 40, "authority": "lane-commit",
+                   "reply_to": "fx-main-mac"}
+        self.assertEqual(admission.validate_envelope(dict(compact)), compact)
+        for changes in ({"station": None}, {"session_id": "caller"}, {"rfcs": ["RFC-FX-0001"]}):
+            with self.subTest(changes=changes):
+                value = {key: item for key, item in {**compact, **changes}.items() if item is not None}
+                with self.assertRaises(admission.RequestError):
+                    admission.validate_envelope(value)
 
 
 @unittest.skipIf(Draft202012Validator is None, "jsonschema is required for schema validation")

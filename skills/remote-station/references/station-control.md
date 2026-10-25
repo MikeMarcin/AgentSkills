@@ -70,36 +70,55 @@ generation or lease. Other markers carrying a Codex binding remain refused.
 
 Some Codex app versions deliver `send_message_to_thread` as a tool-output item,
 which does not invoke UserPromptSubmit. If that route has no prompt admission,
-make the first tool an exact request through the installed helper:
+make the first tool an exact request through the installed helper. Use the v2
+request: the compact envelope as plain flags, in this order. Include only the
+optional flags you need:
 
 ```sh
-python3 -B "/absolute/consumer/.agents/skills/remote-station/scripts/station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE
+python3 -B "/absolute/consumer/.agents/skills/remote-station/scripts/station_task_admission.py" --task TASK_ID --station STATION --base BASE_SHA --authority lane-commit --reply-to CONTROLLER [--rfc-base RFC_BASE_SHA] [--rfc RFC-ID]... [--card CARD-ID]... [--reservation ID:AREA:FIRST..LAST:COMMIT]... [--expires TIMESTAMP]
 ```
 
-On Windows the exact shape is `py -3 -B "C:\absolute\consumer\.agents\skills\remote-station\scripts\station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE`.
-Use one ordinary command with the quoted absolute helper path, exactly ordered
-arguments and canonical base64 of the UTF-8 JSON remote-task envelope. No shell
-prefix, suffix, interpreter `-c`, caller session/turn arguments or envelope file
-is accepted. The helper's resolved path must equal both the consumer's installed
-helper and the adjacent trusted guard helper; the installed link's exact target
-is equivalent. Copied helpers receive no admission authority.
+On Windows the exact shape starts `py -3 -B "C:\absolute\consumer\.agents\skills\remote-station\scripts\station_task_admission.py" --task ...`.
+emote-station\scripts\station_task_admission.py" --task ...`.
+Single spaces separate the words, and no value is quoted. Repeat `--rfc`,
+`--card` and `--reservation` once per value; never join values with commas,
+because PowerShell would turn a comma list into an array. The station identity
+file supplies project, workstream and branch.
+
+The v1 request is accepted for one compatibility release:
+`... station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE`, the
+canonical base64 of the UTF-8 JSON remote-task envelope. It costs about three
+times the tokens of the same fields as plain text, and the station model has to
+re-type all of it.
+
+Use one ordinary command with the quoted absolute helper path and exactly
+ordered arguments. No shell prefix, suffix, interpreter `-c`, caller session or
+turn argument, unknown flag or envelope file is accepted. The helper's resolved
+path must equal both the consumer's installed helper and the adjacent trusted
+guard helper; the installed link's exact target is equivalent. Copied helpers
+receive no admission authority.
 
 The actual PreToolUse event supplies session and turn identity. The hook checks
 the current endpoint, lifecycle, project/origin/branch, expected held supervisor
-lease, full envelope, authority, ancestor base and expiry before admission.
+lease, full envelope, authority, ancestor base and expiry before admission. A v2
+envelope is first expanded with the station file's project, workstream and
+branch, so v1 and v2 pass the same checks and the same refusals.
 Caller identity fields and unknown/duplicate fields are refused. The normal
 fenced-envelope UserPromptSubmit path remains available. Independent readiness
 tasks may have empty RFC/card arrays.
 
 The request CLI only validates syntax and reports `admission: hook-controlled`;
-that output alone is not proof of admission. The hook's additional context names
-the actual source event/session/turn. Tools need that exact accepted pair, and
+that output alone is not proof of admission. The hook's additional context is
+one line naming the admitted task, its authority and a receipt ID, which is the
+first 16 hex digits of the receipt file name. The receipt on disk records the
+actual source event, session and turn. Tools need that exact accepted pair, and
 request expiry is checked again on later tools. A second request cannot replace
 authority in an already admitted turn. Stop clears current authorization.
 
 Always issue a fresh task ID for each request, including retries after a
 partially written request. A receipt under the existing Git guard namespace
-retains task use after Stop and rejects replay at this endpoint. Receipts confer
+retains task use after Stop and rejects replay at this endpoint, for v1 and v2
+alike (refusal reason `authority-exceeded`, detail "already used"). Receipts confer
 no authority and cannot revive a retired or transferring endpoint. Payloads are
 bounded to 16 KiB UTF-8 JSON / 21,848 base64 characters; receipts contain only
 bounded identity/digest metadata, with at most 4,096 per endpoint session.
