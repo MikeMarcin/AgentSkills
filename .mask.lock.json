@@ -14,12 +14,12 @@
       "source": "agentskills"
     },
     {
-      "commit": "e0b729ca1e8f68a2015aab9062e6af61579b09eb",
+      "commit": "ac9c2e9e16851e9e37c17902011f3c87d9c3d147",
       "git_object_format": "sha1",
       "id": "implement-rfc",
       "metadata_digest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
       "path": "skills/implement-rfc",
-      "payload_digest": "sha256:ce3d09f6f6fd96848629f0b477abc5bb9c7032f97f93410441112c360abb972e",
+      "payload_digest": "sha256:96505b1615cf367eed06153717f8dea0c2f22a51e5aad15fc5080a8e9f928588",
       "repository": "https://github.com/MikeMarcin/AgentSkills.git",
       "selector": {
         "ref": "refs/heads/main"
@@ -40,12 +40,12 @@
       "source": "agentskills"
     },
     {
-      "commit": "e0b729ca1e8f68a2015aab9062e6af61579b09eb",
+      "commit": "ac9c2e9e16851e9e37c17902011f3c87d9c3d147",
       "git_object_format": "sha1",
       "id": "remote-station",
       "metadata_digest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
       "path": "skills/remote-station",
-      "payload_digest": "sha256:079da8072991b99ed828adfec1a355efcdd41b09b904df227d230caf0f4d564b",
+      "payload_digest": "sha256:9c6817f0cc054779db6ad618b30682d6901e2f58695a707ed7d119e88d9a515a",
       "repository": "https://github.com/MikeMarcin/AgentSkills.git",
       "selector": {
         "ref": "refs/heads/main"
