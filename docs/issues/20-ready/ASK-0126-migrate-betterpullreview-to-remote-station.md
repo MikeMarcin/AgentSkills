@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0126"
 title: "Migrate BetterPullReview to the remote-station skill"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0017"]
 depends_on: ["ASK-0124"]
 priority: "P1"
