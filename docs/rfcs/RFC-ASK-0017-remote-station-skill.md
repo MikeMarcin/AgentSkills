@@ -233,6 +233,20 @@ acknowledgement with a receipt ID.
   forbids dispatching personal-mode RFC work to a station.
 - AITO's uncommitted 2026-10-24 edits to its fork port ASK-0123's history-sized
   turn read, which the skill already had; there was nothing further to carry over.
+- **M4 compact messaging (ASK-0128).** Measured on the recorded `aito-main-win`
+  turns before any design. The dominant cost was the base64 admission payload
+  and the station model re-typing it. Station-invariant fields were secondary.
+  v2 is the `implement-rfc.remote-task.v2` envelope: it requires `station`, the
+  station file supplies project, workstream and branch, and a named value still
+  binds. The admission request renders it as plain fixed-order flags
+  (`--task ... --station ... --base ... --authority ... --reply-to ...`). The
+  guard expands v2 and then applies v1's checks unchanged. The admission hook
+  returns one line naming the task, its authority and a receipt ID; the full
+  receipt stays on disk. v1 base64 requests and v1 envelopes remain accepted for
+  one compatibility release. Replay keeps its existing refusal code,
+  `authority-exceeded`. Station protocol fell from 1,716.6 to 441.1 tokens per
+  turn
+  ([verification](plans/remote-station-skill/verification.md#ac09-per-turn-token-measurement)).
 
 ## Verification and execution record
 

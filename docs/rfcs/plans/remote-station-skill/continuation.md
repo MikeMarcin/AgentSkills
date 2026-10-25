@@ -1,8 +1,9 @@
 # Remote-station skill continuation
 
-Status: M1 `agentskills-skill` complete and accepted; ASK-0124 Done. RFC-ASK-0017
-stays Implementing: M2 (AITO, AC06), M3 (BetterPullReview, AC07) and M4 (compact
-station messaging, AC09–AC11, added by owner amendment) remain.
+Status: M1 `agentskills-skill` complete and accepted; ASK-0124 Done. M4
+`compact-station-messaging` complete and accepted; ASK-0128 Done (see "M4
+implementation" below). RFC-ASK-0017 stays Implementing: M2 (AITO, AC06) and M3
+(BetterPullReview, AC07), then closeout ASK-0127, remain.
 
 Assignment: one non-delegating `rfc-implementer` (effective route
 `claude-opus-5-5`, effort high) under the coordinator-implementer recipe, on
@@ -80,9 +81,37 @@ committed as `chore(mask): upgrade skills`. Like the other managed links, the ne
 `remote-station` links under `.agents/skills` and `.claude/skills` are machine-local
 and are now gitignored.
 
-M4 next action: a fresh implementer claims ASK-0128 and measures per-turn tokens on
-the recorded `aito-main-win` Codex thread history and Claude session transcript.
-The measurement method and results must be recorded as evidence before any design.
+## M4 implementation (segment `m4-implementation-1`)
+
+One non-delegating `rfc-implementer` (effective route `claude-opus-5-5`, effort
+medium), coordinator-implementer, on AgentSkills `main`. Other agents edited AITO
+(M2) and BetterPullReview (M3) at the same time. This segment read AITO's
+`.remote-station.json`, the Codex rollout and the Claude transcript, read-only, and
+wrote nothing outside AgentSkills.
+
+Commits: `3307b9d` claim; `83dc8c3` the before measurement (script plus
+`token-measurement/before-v1.json`, committed before any design); `ee12b1e`
+implementation; then the ASK-0128 finish with this record.
+
+What changed: `skills/remote-station/scripts/station_task_admission.py` (v2
+envelope validation and the plain-flag v2 request; v1 unchanged),
+`remote_station_guard.py` (expands v2 from the station file and then applies the
+v1 checks; one-line admission acknowledgement), the new
+`schemas/remote-task-envelope.v2.schema.json`, `references/station-control.md`,
+the guard tests, and implement-rfc's `references/remote-routing.md` dispatch
+rules, with the regenerated `generated/portable-manifest.json`.
+
+Result: station protocol fell from 1,716.6 to 441.1 tokens per turn on the same
+80 recorded turns (o200k_base). AC09–AC11 pass; the evidence is in
+`verification.md`. Pending for closeout (ASK-0127, not edited here): reconcile
+AC09–AC11 into the closeout table. The repeated-prose rule's effect is
+unmeasured. v1 removal after the compatibility release is unscheduled. A live
+v2 admission on a real Codex station has not been observed; fixtures and the
+recorded-turn re-expression stand in for it.
+
+Command state: quiescent. All suites and the bundle check finished. The scratch
+tokenizer virtual environment lives outside the repository. No runtime, server
+or writer is handed off.
 
 ## Next
 

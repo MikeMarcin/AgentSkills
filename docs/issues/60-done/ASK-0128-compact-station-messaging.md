@@ -2,11 +2,12 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0128"
 title: "Compact station message passing"
-status: "In Progress"
+status: "Done"
 rfcs: ["RFC-ASK-0017"]
 depends_on: ["ASK-0124"]
 priority: "P1"
 metadata: {"milestone_plan":{"id":"remote-station-skill","path":"docs/rfcs/plans/remote-station-skill/milestone-plan.json"}}
+acceptance: [{"criterion":"RFC-ASK-0017-AC09","outcome":"pass","revision":"ee12b1e95a60d9997297df81e35451095f2c9f1e","evidence":{"kind":"artifact","detail":"Same 80 recorded aito-main-win remote-task turns (Codex rollout) plus the one Claude endpoint turn, tiktoken o200k_base; before committed first (83dc8c3). Station protocol 1716.6 -> 441.1 tokens per turn (-74.3%); all measured tokens 215204 -> 113163 (-47.4%); 89/89 re-expressed v2 requests parse with the skill's parser.","path":"docs/rfcs/plans/remote-station-skill/verification.md"}},{"criterion":"RFC-ASK-0017-AC10","outcome":"pass","revision":"ee12b1e95a60d9997297df81e35451095f2c9f1e","evidence":{"kind":"artifact","detail":"Replayed task_id (authority-exceeded, unchanged code), project mismatch, authority exceeded, expired and station mismatch refuse for v1 and v2 on the delegated request route, and with the same reasons on the fenced-prompt route; no turn state written; also under the aito-prefixed station schema.","path":"docs/rfcs/plans/remote-station-skill/verification.md"}},{"criterion":"RFC-ASK-0017-AC11","outcome":"pass","revision":"ee12b1e95a60d9997297df81e35451095f2c9f1e","evidence":{"kind":"artifact","detail":"Recorded-dispatcher v1 base64 request and v1 fenced YAML/JSON prompts admitted; v1 helper output byte-compatible; station file and lifecycle record byte-identical; station identity code untouched.","path":"docs/rfcs/plans/remote-station-skill/verification.md"}}]
 ---
 
 # Compact station message passing
