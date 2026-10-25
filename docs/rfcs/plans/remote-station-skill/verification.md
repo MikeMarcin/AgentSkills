@@ -1,4 +1,4 @@
-# Remote-station skill verification (M1, M4)
+# Remote-station skill verification (M1–M4)
 
 Milestone `agentskills-skill` (ASK-0124) of RFC-ASK-0017. Run
 `remote-station-2026-10-24`, segment `m1-implementation-1`, mandate revision
@@ -18,12 +18,67 @@ RFC_BASE_SHA `3ad85990719baec8f38544006a110c7a91bf6ab2`. Source candidate
 | AC03 | `test_command_forwarder.test_each_checkout_runs_its_own_pinned_version`: the installed command, through both `launch_remote_station.cmd` and the POSIX `launch_remote_station` under Git `sh`, runs version B from checkout B and its subdirectory, version C from B's linked worktree (its own link), and the real source version from checkout A's subdirectory. Pass. | `12d3c32` |
 | AC04 | `test_refuses_outside_a_repository_and_without_the_skill_and_runs_nothing`: outside a repository the command exits 3 naming the directory; in a nested repository without the link (inside a consumer that has one) it exits 4 naming the root and `mask install remote-station`. Both print nothing on stdout and run no entry script. Pass. | `12d3c32` |
 | AC05 | `test_arguments_stdio_and_exit_status_pass_through_unchanged` (argv with spaces and `=`, stdin, stdout, stderr, cwd and exit 7 through both forwarders) and `test_real_entry_matches_direct_invocation_for_status_refusal_and_launch` (forwarded `status --json`, refused `--machine Not_A_Token` and a launch reaching the Codex probe match direct invocation byte for byte in exit code, stdout and stderr). Negative control: removing `%*`/`"$@"` from the templates fails 9 subtests. Pass. | `12d3c32` |
-| AC06 | M2 (ASK-0125): native AITO resume of `aito-main-win`. Not run in M1. | — |
-| AC07 | M3 (ASK-0126): BetterPullReview documented commands. Not run in M1. | — |
+| AC06 | M2 (ASK-0125). Engineering landed: AITO's `tools/launch_remote_station.py` is a 24-line forwarder; `tools/codex_station.py` and both fork test files are deleted. `py -3 tools/launch_remote_station.py status --json` (rerun at closeout, exit 0) reports `stn-39ef5ffb`, Codex thread `01a10525-e3fa-7250-85cf-c27f2f84897d` and Claude session `session_01Mb2Coeg8PF5g19jUAMQGm1`. An identity probe through the skill's own code keeps the same station, thread and session and renders the return-path warning. The live native resume has not been observed. **Pending owner.** | AITO `7c915c183e` |
+| AC07 | M3 (ASK-0126). BetterPullReview's `scripts/launch_remote_station.py` forwards to remote-station without private takeover defaults. Live `status --json` on `bpr-main-win` is byte-identical before, after and at closeout. Takeover with no options, `--json` and `--confirm-runtime-stopped` matched old against new in disposable fixtures. Pass. | BetterPullReview `e1c8661ac` |
 | AC08 | `test_station_forwarders`: in a fixture consumer with both skills linked, implement-rfc's `launch_remote_station.py` (`status --json`, refused launch) and `station_control.py status --repo-root` match the remote-station scripts exactly, and the runpy `main(argv)` loading used by BetterPullReview's wrapper works. Without the sibling skill both exit 2 naming `mask install remote-station`. The real-MASK bundle run above also reaches the station through `.agents/skills/implement-rfc/scripts/launch_remote_station.py`. Pass. | `12d3c32` |
 | AC09 | Measured on the same 80 recorded `aito-main-win` (`stn-39ef5ffb`) remote-task turns from the Codex rollout, plus the one recorded Claude endpoint turn, with tiktoken `o200k_base` ([method and results](#ac09-per-turn-token-measurement)). The before measurement was committed first (`83dc8c3`). Station protocol per turn fell from 1,716.6 to 441.1 tokens (−74.3%). All measured per-turn tokens fell from 215,204 to 113,163 (−47.4%). Pass. | `ee12b1e` |
 | AC10 | `test_guard_refusals_fire_for_v1_and_v2_requests` (delegated request route, both versions): replayed `task_id` is denied as "already used" with reason `authority-exceeded`, the existing code, unchanged. Project mismatch in the envelope (v1 field; v2 JSON naming `project`) and in the station file gives `project-mismatch`. A lane-commit request to a read-only station gives `authority-exceeded`. A past `expires_at` gives `expired`. A wrong `station` gives `station-mismatch`. No turn state is written. `test_guard_refusals_fire_for_v1_and_v2_prompts` gets the same reasons from the fenced-prompt route's refusal envelope. That route keeps no task receipts, in v1 as in v2, so replay is a request-route refusal only. `test_v2_cannot_carry_caller_identity_or_unknown_flags` and `test_v2_flags_refuse_order_repeats_identity_and_shell_text` cover caller identity, order, repeats and shell text. All cases also run under the `aito.`-prefixed station schema. Pass. | `ee12b1e` |
 | AC11 | `test_v1_dispatcher_envelopes_are_still_admitted`: the recorded dispatcher's v1 base64 request (with `checkout`, `notes`, cards and RFCs) is admitted. So are v1 fenced YAML and JSON prompts. The v1 helper output is byte-compatible. `.remote-station.json` and the lifecycle record are byte-identical afterwards. Every pre-existing v1 guard test passes unchanged, apart from the one assertion that read the old full-receipt hook text. The receipt it checked is now asserted on disk. Station identity code (`station_lifecycle`, `station_config`, the launcher and the station file schema) is untouched. Pass. | `ee12b1e` |
+
+## M2 and M3 consumer migrations
+
+Closeout segment `closeout-1` of run `remote-station-2026-10-24` verified both
+consumers itself on native Windows. It reran their read-only checks; nothing was
+taken from the implementers' summaries alone.
+
+**MASK pin.** Both consumers pin AgentSkills `e0b729c` (AITO `c626d7a8cb`,
+BetterPullReview `db885a37a`). That revision has M1 but not M4. Consumers get
+M4 only after a push and a `mask upgrade`, neither of which is authorized.
+
+**AITO (AC06), `7c915c183e`.** The commit replaces the 1,226-line launcher with a
+24-line forwarder, which exits 3 outside a repository and 4 without the skill.
+It deletes `tools/codex_station.py`, `tools/tests/test_codex_station.py` and
+`tools/tests/test_launch_remote_station.py`. The owner approved discarding their
+uncommitted ASK-0123 port, which the skill already had. It writes `station.json`
+with only the `main` workstream and `station_registry_doc`
+`docs/remote-stations.md`, and reduces both station pages to AITO-specific setup.
+
+- `py -3 tools/launch_remote_station.py status --json`: exit 0, `stn-39ef5ffb`,
+  generation 0, the recorded Codex thread and Claude session. The lease holder
+  is stale and nothing is running.
+- `py -3 -m unittest discover -s tools/tests -p 'test_*.py'`: 84 tests, 5
+  failures and 2 errors. That is the same failing set as the clean-HEAD baseline
+  (171 tests; the 87 removed tests are the fork's). The failures are skills
+  archive, source-bundle and WSL doctor tests, which do not touch station code.
+- An identity probe through the skill's own code (implementer, read-only)
+  resolved `aito-main-win`, accepted the `aito.implement-rfc.remote-station.v2`
+  station file, kept the station, thread and session, and rendered "WARNING:
+  Claude return path UNVERIFIED for aito-main-win".
+- **Not observed:** the live native resume. The owner must run
+  `py -3 tools/launch_remote_station.py --require-claude-resume` in PowerShell at
+  `C:/code/git/aito` and confirm the same `station_id`, Codex thread and Claude
+  session, plus the printed return-path warning. ASK-0125 is Parked on
+  `human-review` until then.
+
+**BetterPullReview (AC07), `e1c8661ac`.** `scripts/launch_remote_station.py` runs
+the pinned remote-station entry in-process with `--repo-root`, and it no longer
+adds takeover defaults. The skill's `main()` adds `--mode local` and
+`--stop-previous` to `takeover` under the same conditions as the deleted
+forwarder (code compared at closeout). `station.json` carries `main`, `win`,
+`linux` and `mac`.
+
+- `py -3 scripts/launch_remote_station.py status --json` on `bpr-main-win`
+  (`stn-a3502cc1`): exit 0, byte-identical to the implementer's before and after
+  captures.
+- Takeover with no options, `--json` and `--confirm-runtime-stopped` produced
+  identical results from the old and new forwarders in disposable fixtures. The
+  M3 implementer ran this. It was not run on the live station, and the fixture
+  logs were not retained.
+- Remote-station suite 255 OK (1 skip). The BetterPullReview documentation gate
+  and its 67 documentation tests pass.
+- Two differences from the old forwarder: the launch path now returns the
+  skill's exit status instead of always 0, and the old custom `--help` lines are
+  gone.
 
 ## AC09 per-turn token measurement
 
