@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0125"
 title: "Migrate AITO to the remote-station skill"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0017"]
 depends_on: ["ASK-0124"]
 priority: "P1"
