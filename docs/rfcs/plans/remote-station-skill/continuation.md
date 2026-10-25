@@ -66,3 +66,13 @@ M2 `aito-migration` (ASK-0125, now Ready) needs a fresh implementer in
 
 M3 `bpr-migration` (ASK-0126, Ready) is independent of M2 and can run first if M2
 waits on the owner.
+
+## Consistency check
+
+`checkpoint-final.json` renews the M1 binding at `00b0023` (records-only movement
+after the source candidate; `git diff 12d3c32 00b0023` over `skills`, `scripts`,
+`mask-source.json` and `README.md` is empty). `completion-observation.json` accounts
+for `ASK-0124:*` and all three exits; `milestone_checkpoint.py check --execution
+quiescent` returned `fresh-context` (`completion-check.json`). That consistency
+result does not replace engineering acceptance, which is in `ASK-0124.acceptance.json`
+and `verification.md`.
