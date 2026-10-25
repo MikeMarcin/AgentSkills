@@ -24,7 +24,7 @@ def main():
     expected = {path.split('/')[1]: '/'.join(path.split('/')[:-1]) for path in git(source, 'ls-tree', '-r', '--name-only', revision, 'skills').splitlines()
                 if path.endswith('/SKILL.md') and len(path.split('/')) == 3}
     assert index['packages'] == expected, (index['packages'], expected)
-    names = ['author-rfc', 'grill-rfc', 'grill-me', 'implement-rfc']
+    names = ['author-rfc', 'grill-rfc', 'grill-me', 'implement-rfc', 'remote-station']
     assert index['bundles']['rfc']['skills'] == [dict(source='agentskills', id=name) for name in names]
     with tempfile.TemporaryDirectory(prefix='agentskills-rfc-bundle-') as temporary:
         base = Path(temporary).resolve()
@@ -39,6 +39,12 @@ def main():
         config.update(project='rfc-bundle-fixture', display_name='RFC bundle fixture', session_prefix='rfc-bundle-fixture', origin_repo_name='consumer')
         (context / 'project.json').write_text(json.dumps(config, indent=2) + '\n')
         (context / 'project.md').write_text('# Disposable RFC bundle consumer\nOnly local fixture checks are authorized.\n')
+        station = consumer / '.mask/skill-config/remote-station'
+        station.mkdir(parents=True)
+        (station / 'station.json').write_text(json.dumps(dict(
+            schema='remote-station.config.v1', project='rfc-bundle-fixture', display_name='RFC bundle fixture',
+            origin_repo_name='consumer', session_prefix='rfc-bundle-fixture',
+            station_registry_doc='docs/development/remote-stations.md', workstreams={'main': {'branch': 'main'}}), indent=2) + '\n')
         environment = dict(os.environ, MASK_HOME=str(home), PYTHONDONTWRITEBYTECODE='1', GIT_TERMINAL_PROMPT='0')
         commands = []
         def mask(*words):
@@ -75,6 +81,16 @@ def main():
             selected = json.loads(run.stdout)['projects']
             assert len(selected) == 1 and selected[0]['available_now'], selected
         assert (home / 'state.json').read_bytes() == registry_before
+        # The bundled remote-station runs beside implement-rfc from both link roots,
+        # and implement-rfc's temporary forwarder reaches it as a sibling.
+        station_runs = []
+        for script in ('.agents/skills/remote-station/scripts/launch_remote_station.py',
+                       '.claude/skills/remote-station/scripts/launch_remote_station.py',
+                       '.agents/skills/implement-rfc/scripts/launch_remote_station.py'):
+            run = subprocess.run([sys.executable, '-B', str(consumer / script), 'status', '--json'], cwd=consumer,
+                                 env=environment, capture_output=True, text=True, timeout=90)
+            assert run.returncode == 0 and json.loads(run.stdout)['mode'] == 'unmanaged', (script, run.stdout, run.stderr)
+            station_runs.append(dict(script=script, exit_code=run.returncode, mode='unmanaged'))
         assert not mask('bundle', 'install', 'agentskills/rfc')['changed']
         mask('install', 'grill-me', '--no-update')  # Preserve a separately selected companion.
         removal = mask('bundle', 'uninstall', 'agentskills/rfc', '--dry-run', '--offline')
@@ -114,13 +130,13 @@ def main():
         assert not mask('bundle', 'upgrade', 'agentskills/rfc', '--offline')['changed']
         receipt = dict(source_revision=revision, mask_revision=git(program, 'rev-parse', 'HEAD'),
                        bundle=shown, packages_discovered=len(expected), package_validation=validation['ok'],
-                       selected=names, workflow_readiness=status['data'].get('workflow_readiness'),
+                       selected=names, station_runs=station_runs, workflow_readiness=status['data'].get('workflow_readiness'),
                        setup=[dict(skill=row.get('skill'), action=row.get('action'), state=row['state']) for row in installed['data']['setup']['actions']],
                        healthy=True, uninstall=dict(removed=removal['data']['removed'], preserved='agentskills/grill-me', repeat_noop=True, offline=True), reinstall_healthy=True, upgrade=dict(derived_fixture_revision=derived_revision, changed_member='agentskills/grill-me', named_preview=True, aggregate_definitions=True, healthy=True, repeat_noop=True), host_load='not_verified', platform=sys.platform, commands=commands,
                        fixture_cleanup='TemporaryDirectory removed on completion')
     if args.output:
         args.output.write_text(json.dumps(receipt, indent=2) + '\n')
-    print(f"Canonical agentskills/rfc ready: {len(names)} skills; {len(expected)} packages preserved; reviewed setup published; safe uninstall/reinstall and combined aggregate upgrade passed.")
+    print(f"Canonical agentskills/rfc ready: {len(names)} skills, remote-station beside implement-rfc; {len(expected)} packages preserved; reviewed setup published; safe uninstall/reinstall and combined aggregate upgrade passed.")
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ sys.path.insert(0, str(PACK / 'scripts'))
 import station_control as control
 import station_lifecycle as lifecycle
 import station_lease
-import project_config
+import station_config
 
 
 class StationControlTests(fixtures.RemoteStationGuardTests):
@@ -24,7 +24,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         super().setUp()
         # Exercise a consumer link, rather than a per-consumer copied script bundle.
         import shutil
-        target = self.repo / '.agents/skills/implement-rfc'
+        target = self.repo / '.agents/skills/remote-station'
         shutil.rmtree(target)
         target.symlink_to(PACK, target_is_directory=True)
 
@@ -39,7 +39,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.holder.stderr.close()
 
     def run_control(self, operation, *args):
-        return subprocess.run([sys.executable, str(self.repo / '.agents/skills/implement-rfc/scripts/station_control.py'),
+        return subprocess.run([sys.executable, str(self.repo / '.agents/skills/remote-station/scripts/station_control.py'),
                                operation, '--repo-root', str(self.repo), '--json', *args],
                               capture_output=True, text=True)
 
@@ -59,7 +59,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.assertEqual(lifecycle.load(self.repo)['mode'], 'transferring')
 
     def test_public_launcher_inspects_without_hidden_root_flags_and_preserves_binding(self):
-        launcher = self.repo / '.agents/skills/implement-rfc/scripts/launch_remote_station.py'
+        launcher = self.repo / '.agents/skills/remote-station/scripts/launch_remote_station.py'
         before = (self.repo / '.remote-station.json').read_bytes()
         result = subprocess.run([sys.executable, '-B', str(launcher), 'status', '--json'],
                                 cwd=self.repo, capture_output=True, text=True)
@@ -74,7 +74,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.release()
         self.station['environment'] = 'fixture'
         self._write_station()
-        launcher = self.repo / '.agents/skills/implement-rfc/scripts/launch_remote_station.py'
+        launcher = self.repo / '.agents/skills/remote-station/scripts/launch_remote_station.py'
         refused = subprocess.run([sys.executable, '-B', str(launcher), 'takeover', '--json'],
                                 cwd=self.repo, capture_output=True, text=True)
         self.assertEqual(refused.returncode, 75, refused.stdout)
@@ -167,7 +167,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
     def test_replacement_prompt_and_exact_recovery_argv(self):
         event = self._event('UserPromptSubmit', session_id='replacement', prompt='resume this work here')
         self.assertNotIn('"decision": "block"', self._run_guard(event).stdout)
-        script = self.repo / '.agents/skills/implement-rfc/scripts/station_control.py'
+        script = self.repo / '.agents/skills/remote-station/scripts/station_control.py'
         command = shlex.join([sys.executable, str(script), 'status', '--repo-root', str(self.repo), '--json'])
         def tool(command):
             return self._run_guard(self._event('PreToolUse', session_id='replacement', tool_name='Bash', tool_input={'command': command}))
@@ -195,7 +195,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         result = control.takeover(self.repo, stop_previous=True, runtime_stop_adapter=self.proof)
         self.assertEqual(result['mode'], 'local')
         self.holder.wait(timeout=10)
-        self.assertFalse(station_lease.snapshot(self.repo, 'project-integrator', project_config.resolve_context(repo_root=self.repo))['held'])
+        self.assertFalse(station_lease.snapshot(self.repo, 'project-integrator', station_config.resolve_context(repo_root=self.repo))['held'])
         self.assertIn('[redacted]', json.dumps(result['supervisor_lease']))
 
     def test_fresh_generation_keeps_retired_endpoint_fence(self):
@@ -212,9 +212,9 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         second = self.repo.parent / 'other-consumer'
         second.mkdir()
         fixtures._git(second, 'init', '-b', 'main')
-        from project_fixtures import write_context
+        from station_fixtures import write_context
         write_context(second, token='other')
-        link = second / '.agents/skills/implement-rfc'
+        link = second / '.agents/skills/remote-station'
         link.parent.mkdir(parents=True)
         link.symlink_to(PACK, target_is_directory=True)
         result = subprocess.run([sys.executable, str(link / 'scripts/station_control.py'), 'status', '--repo-root', str(second), '--json'], capture_output=True, text=True)
@@ -250,7 +250,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
 
     def test_control_tokens_are_redacted_in_status_and_competing_writer_diagnostics(self):
         holder_path = station_lease._holder_path(station_lease._lock_path('project-integrator', self.repo,
-                                                    project_config.resolve_context(repo_root=self.repo).config))
+                                                    station_config.resolve_context(repo_root=self.repo).config))
         holder = json.loads(holder_path.read_text())
         secret = 'a' * 64
         holder['control'] = {'port':1234,'protocol':'implement-rfc.supervisor-stop.v1','token':secret}
@@ -263,7 +263,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         self.assertEqual(conflict.returncode,75)
         self.assertNotIn(secret,conflict.stderr)
         self.assertIn('[redacted]',conflict.stderr)
-        script = self.repo / '.agents/skills/implement-rfc/scripts/station_control.py'
+        script = self.repo / '.agents/skills/remote-station/scripts/station_control.py'
         self.assertTrue(fixtures.GUARD.exists())
         import remote_station_guard as guard
         command=shlex.join(['py','-3',str(script),'status','--repo-root',str(self.repo),'--json'])
@@ -278,7 +278,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         context = launcher.StationContext(root=self.repo.resolve(), workstream='main', branch='main',
             name=self.station['station'], environment='macos', authority='lane-commit',
             lease_role='project-integrator', station_file=self.repo / '.remote-station.json',
-            project_context=project_config.resolve_context(repo_root=self.repo))
+            project_context=station_config.resolve_context(repo_root=self.repo))
         with patch.object(launcher, 'provision_codex', return_value=contextlib.nullcontext({
             'thread_id':'fresh-thread', 'thread_name':self.station['station'], 'cli_version':'0.151.0'})), \
                 patch.object(launcher, 'run_claude', return_value=0):
@@ -303,7 +303,7 @@ class StationControlTests(fixtures.RemoteStationGuardTests):
         context = launcher.StationContext(root=self.repo.resolve(), workstream='main', branch='main',
             name=self.station['station'], environment='macos', authority='lane-commit',
             lease_role='project-integrator', station_file=self.repo / '.remote-station.json',
-            project_context=project_config.resolve_context(repo_root=self.repo))
+            project_context=station_config.resolve_context(repo_root=self.repo))
         options = arguments(new_codex_session=True, new_claude_session=True)
         original_run = subprocess.run
         def start_new_supervisor(command, **kwargs):

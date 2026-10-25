@@ -9,7 +9,8 @@ usage: launch_remote_station.py [workstream] [--fresh [codex|claude|both]]
 Start or resume automatically, or use --fresh to clear context in enabled
 runtimes. Use --no-claude or --no-codex when one service is unavailable.
 Claude uses the compact Remote Control interface. --help-all shows setup and
-troubleshooting options. Workstreams and station names come from project.json.
+troubleshooting options. Workstreams and station names come from the
+checkout's .mask/skill-config/remote-station/station.json.
 
 The default path holds one writer lease while Codex Managed Remote provisions
 and materializes a persistent task named for the station, then resumes the exact
@@ -19,8 +20,11 @@ ownership with Codex Desktop and uses a short-lived standalone App Server only
 to provision the task. Neither path exposes an App Server network listener.
 
 Run it with `python3` on macOS, Linux and WSL2, and `py -3` in a native Windows
-terminal. The station contract lives in
-.agents/skills/implement-rfc/references/remote-routing.md.
+terminal, from any directory inside the checkout. This path and invocation shape
+is the frozen entry contract of the remote-station skill: the version-free
+`launch_remote_station` command runs it from the checkout's
+.agents/skills/remote-station link. The station contract lives in
+.agents/skills/remote-station/references/station-contract.md.
 """
 
 from __future__ import annotations
@@ -43,7 +47,7 @@ from dataclasses import dataclass
 from typing import Any
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import project_config  # noqa: E402
+import station_config  # noqa: E402
 import station_lifecycle as lifecycle  # noqa: E402
 from codex_station import (  # noqa: E402
     AppServerClient,
@@ -82,7 +86,7 @@ class StationContext:
     authority: str
     lease_role: str
     station_file: pathlib.Path
-    project_context: project_config.ProjectContext
+    project_context: station_config.ConsumerContext
 
 
 def run_git(root: pathlib.Path | None, *arguments: str) -> str:
@@ -208,9 +212,7 @@ def station_lease_path(context: StationContext) -> pathlib.Path:
 
 
 def resolve_context(arguments: argparse.Namespace) -> StationContext:
-    selected = project_config.resolve_context(repo_root=getattr(arguments, "repo_root", None))
-    if selected.mode == "personal":
-        raise LaunchRefusal("adapter does not support paired source/tracker handoffs; personal mode refused before launch")
+    selected = station_config.resolve_context(repo_root=getattr(arguments, "repo_root", None))
     root = selected.repo_root
     config = selected.config
     workstreams = config["workstreams"]
@@ -256,7 +258,7 @@ def resolve_context(arguments: argparse.Namespace) -> StationContext:
             "Windows a Windows station)"
         )
     station_file = root / ".remote-station.json"
-    canonical = project_config.station_name(
+    canonical = station_config.station_name(
         config, arguments.workstream, platform_token
     )
     recorded_machine = (
@@ -270,7 +272,7 @@ def resolve_context(arguments: argparse.Namespace) -> StationContext:
             "under a different one"
         )
     arguments.machine = arguments.machine or recorded_machine
-    name = project_config.station_name(
+    name = station_config.station_name(
         config, arguments.workstream, platform_token, arguments.machine
     )
     lease_role = (
@@ -293,7 +295,7 @@ def infer_workstream(station_file: pathlib.Path, current_branch: str, config: di
     """The workstream this checkout is, without being told.
 
     A checkout launched before says so in its station file. A fresh one says
-    so by its branch: every workstream in `the selected consumer project.json` names the one
+    so by its branch: every workstream in the checkout's station.json names the one
     branch it lives on, so the branch identifies the workstream exactly or not
     at all. Nothing is inferred from the host platform — a Windows host can
     hold the integrator checkout, and the branch is what makes that unambiguous.
@@ -953,6 +955,30 @@ def wait_for_station_stop() -> int:
         return 0
 
 
+def warn_unverified_claude_return_path(context: StationContext) -> None:
+    """Keep runtime readiness separate from receipt by the receiving dispatcher."""
+    print(
+        f"WARNING: Claude return path UNVERIFIED for {context.name}. "
+        "This launcher has no receipt from the receiving dispatcher.",
+        file=sys.stderr,
+        flush=True,
+    )
+    print(
+        'If replies are held or refused, check "crossSessionInbound": "accept" '
+        "in ~/.claude/settings.json on the RECEIVING dispatcher's computer. "
+        "The worker's own setting cannot verify that return path.",
+        file=sys.stderr,
+        flush=True,
+    )
+    print(
+        "A running station or an accepted send does not confirm delivery; "
+        "unconfirmed delivery does not establish that the station is offline. "
+        "Confirm receipt in the dispatcher before unattended dispatch.",
+        file=sys.stderr,
+        flush=True,
+    )
+
+
 def supervise(arguments: argparse.Namespace, context: StationContext) -> int:
     try:
         # Keep launch and transfer serialization separate from the indefinite station
@@ -979,6 +1005,8 @@ def _supervise(arguments: argparse.Namespace, context: StationContext) -> int:
         None if arguments.new_claude_session
         else expected_claude_session_id(remembered)
     )
+    if not arguments.no_claude:
+        warn_unverified_claude_return_path(context)
     try:
         codex_session = (
             contextlib.nullcontext(existing.get("codex"))
@@ -1050,7 +1078,7 @@ def _supervise(arguments: argparse.Namespace, context: StationContext) -> int:
                 session_id=claude_session_id,
                 record_session=record_claude_session,
             )
-    except (LaunchRefusal, project_config.ProjectConfigError, lifecycle.LifecycleError) as refusal:
+    except (LaunchRefusal, station_config.StationConfigError, lifecycle.LifecycleError) as refusal:
         print(f"station refused: {refusal}", file=sys.stderr)
         return 2
     except OSError as error:
@@ -1290,9 +1318,9 @@ def main(argv: list[str] | None = None) -> int:
             import station_hooks
             return station_hooks.main(argv[1:])
         import station_control
+        # Without --repo-root, station_control resolves the Git root of the
+        # current directory, so management works from any subdirectory.
         management = argv[:]
-        if not any(arg == '--repo-root' or arg.startswith('--repo-root=') for arg in management):
-            management += ['--repo-root', str(pathlib.Path.cwd())]
         if management[0] == 'takeover':
             if '--mode' not in management and not any(arg.startswith('--mode=') for arg in management):
                 management += ['--mode', 'local']
@@ -1313,7 +1341,7 @@ def main(argv: list[str] | None = None) -> int:
         arguments.new_claude_session = True
     try:
         context = resolve_context(arguments)
-    except (LaunchRefusal, project_config.ProjectConfigError, lifecycle.LifecycleError) as refusal:
+    except (LaunchRefusal, station_config.StationConfigError, lifecycle.LifecycleError) as refusal:
         print(refusal, file=sys.stderr)
         return 2
 

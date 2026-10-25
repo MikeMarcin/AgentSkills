@@ -24,7 +24,8 @@ No other implement-rfc script imports them. All of them read consumer identity t
 `display_name` and `origin_repo_name` are shared with lanes, allocation and
 adapter rendering. The guidance lives in
 [remote-routing](../../skills/implement-rfc/references/remote-routing.md) and
-[station-control](../../skills/implement-rfc/references/station-control.md),
+`station-control.md` (since moved to
+[remote-station](../../skills/remote-station/references/station-control.md)),
 which mix general station rules with RFC dispatch rules.
 
 Consumers diverge:
@@ -179,6 +180,24 @@ Original draft retained unchanged under `drafts/`. Live work: ASK-0124
 (AgentSkills skill, AC01–AC05, AC08), ASK-0125 (AITO migration, AC06), ASK-0126
 (BetterPullReview migration, AC07); closeout: ASK-0127. Milestones and exits are in
 the [adopted plan](plans/remote-station-skill/milestone-plan.json).
+
+## Implementation notes
+
+- **No `mask-workflow.json` (pending owner decision).** MASK at ManageAgentSkills
+  `9b73453` refuses a workflow descriptor whose `native_roles` list is empty
+  (`workflow.invalid`: "Descriptor native roles must be a nonempty bounded list"),
+  and remote-station declares no native roles. The skill therefore ships no
+  descriptor; `station_config.py` enforces the required `station.json` itself and
+  refuses before any runtime starts. Declaring the input for `mask status` needs an
+  input-only descriptor in ManageAgentSkills, which this RFC leaves out of scope.
+- Durable identifiers keep their `implement-rfc.*` names (station-file, lifecycle,
+  lease and envelope schemas; Git-directory file names) so existing stations
+  resume unchanged.
+- Station code no longer reads implement-rfc's personal-mode binding: it resolves
+  only the invoking checkout's `station.json`. implement-rfc's remote routing still
+  forbids dispatching personal-mode RFC work to a station.
+- AITO's uncommitted 2026-10-24 edits to its fork port ASK-0123's history-sized
+  turn read, which the skill already had; there was nothing further to carry over.
 
 ## Verification and execution record
 

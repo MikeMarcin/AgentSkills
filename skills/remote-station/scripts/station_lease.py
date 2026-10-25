@@ -22,7 +22,6 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import json
-import hashlib
 import os
 import socket
 import secrets
@@ -38,7 +37,7 @@ from pathlib import Path
 ROLES = ("station-writer", "project-integrator")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import project_config  # noqa: E402
+import station_config  # noqa: E402
 
 
 if os.name == "posix":
@@ -74,7 +73,7 @@ def _git_dir(role: str, repo: Path) -> Path:
     flag = "--git-common-dir" if role == "project-integrator" else "--git-dir"
     proc = subprocess.run(
         ["git", "-C", str(repo), "rev-parse", flag],
-        env=project_config.git_environment(),
+        env=station_config.git_environment(),
         capture_output=True,
         text=True,
     )
@@ -88,13 +87,6 @@ def _git_dir(role: str, repo: Path) -> Path:
 
 
 def _lock_path(role: str, repo: Path, config: dict) -> Path:
-    context = project_config.resolve_context(repo_root=repo)
-    if context.mode == "personal":
-        scope = "common" if role == "project-integrator" else hashlib.sha256(str(repo.resolve()).encode()).hexdigest()
-        from slice_model import inside
-        path = inside(context.runtime_root, f"leases/{scope}-{role}.lock")
-        inside(context.runtime_root, str(path.with_suffix(".holder.json").relative_to(context.runtime_root)))
-        return path
     return _git_dir(role, repo) / f"{config['project']}-{role}.lock"
 
 
@@ -324,8 +316,8 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     try:
-        args.context = project_config.resolve_context(repo_root=args.repo)
-    except project_config.ProjectConfigError as error:
+        args.context = station_config.resolve_context(repo_root=args.repo)
+    except station_config.StationConfigError as error:
         parser.error(str(error))
     args.repo = args.context.source_root
     if args.mode == "run":

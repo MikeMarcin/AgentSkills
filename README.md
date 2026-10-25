@@ -24,6 +24,7 @@ and security-reporting preparation.
 | [grill-rfc](skills/grill-rfc/SKILL.md) | Optionally challenge RFC designs while keeping decisions, acceptance and draft artifacts consistent. |
 | [grill-me](skills/grill-me/SKILL.md) | Stress-test plans, decisions or ideas through explicit-answer interviews, including nonsoftware topics. |
 | [implement-rfc](skills/implement-rfc/SKILL.md) | Carry RFCs or RFC packs through bounded implementation, acceptance verification, commits and issue-board closeout. Requires consumer workflow context. |
+| [remote-station](skills/remote-station/SKILL.md) | Launch, resume, inspect or take over a checkout's persistent Claude and Codex remote station from its own `station.json`, and install the version-free `launch_remote_station` command. |
 | [attended-review](skills/attended-review/SKILL.md) | Review protected candidates through private tailnet HTML by default, save partial decisions during independent work, and automatically wait/resume when only human input remains. |
 | [wizard](skills/wizard/SKILL.md) | Guide required manual steps one at a time with durable progress on native Windows and macOS. |
 | [manage-agent-skills](skills/manage-agent-skills/SKILL.md) | Inspect and manage personal and project selections through MASK's JSON CLI. |
@@ -88,8 +89,10 @@ optional per task; drafting confirmation adds no implementation gate. Authoring
 defaults to one compact grounded RFC. Requested, supplied or repository-required
 portable packs use implement-rfc's existing offline kit. RFC grilling requires
 author-rfc and grill-me; resolve companions by skill name in the current host.
-The flat `agentskills/rfc` bundle selects all four companions: author-rfc, grill-rfc,
-grill-me and implement-rfc.
+The flat `agentskills/rfc` bundle selects five companions: author-rfc, grill-rfc,
+grill-me, implement-rfc and remote-station. remote-station reads only its own
+`.mask/skill-config/remote-station/station.json`; a consumer that runs no stations
+needs none.
 After approving the tap and configuring the consumer context below, fetch its catalog
 and review this installation:
 

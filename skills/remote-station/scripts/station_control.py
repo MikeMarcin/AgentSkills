@@ -9,7 +9,7 @@ from pathlib import Path
 import secrets
 import sys
 
-import project_config
+import station_config
 import remote_station_guard as guard
 import station_lease
 import codex_station
@@ -37,7 +37,7 @@ def _station(root, state):
         if state is not None:
             raise lifecycle.LifecycleError('Restore .remote-station.json from the recorded identity before station recovery.')
         return None
-    guard._validate_live_checkout(root, station, project_config.resolve_context(repo_root=root).config)
+    guard._validate_live_checkout(root, station, station_config.resolve_context(repo_root=root).config)
     lifecycle.identity(root, station)
     if state is not None:
         lifecycle.validate(root, station, state)
@@ -49,7 +49,7 @@ def _owner_client(root, station):
     # App Server, model turn or Desktop app to manufacture stop capability.
     if station.get('environment') not in ('macos', 'linux-native', 'wsl2'):
         raise lifecycle.LifecycleError('Existing managed owner proxy is unavailable on this host.')
-    return codex_station.ProxyAppServerClient(cwd=root, context=project_config.resolve_context(repo_root=root),
+    return codex_station.ProxyAppServerClient(cwd=root, context=station_config.resolve_context(repo_root=root),
                                               timeout=3, connect_timeout=1)
 
 
@@ -83,7 +83,7 @@ def status(root, *, observe_runtime=False):
     if station is None:
         return dict(schema=SCHEMA, mode='unmanaged', endpoint=None, supervisor_lease=None,
                     activity={'state': 'unrestricted-local'}, recovery=None)
-    observed = station_lease.snapshot(root, lease_role(station), project_config.resolve_context(repo_root=root))
+    observed = station_lease.snapshot(root, lease_role(station), station_config.resolve_context(repo_root=root))
     holder = observed.get('holder')
     if isinstance(holder, dict):
         holder = dict(holder)
@@ -105,9 +105,7 @@ def takeover(root, *, stop_previous, confirm_runtime_stopped=False, runtime_stop
     """An explicit human resume instruction authorizes this scoped stop and transfer."""
     if not stop_previous:
         raise lifecycle.LifecycleError('Local takeover requires --stop-previous under the human instruction to resume here.')
-    context = project_config.resolve_context(repo_root=root)
-    if context.mode == 'personal':
-        raise lifecycle.LifecycleError('Station takeover does not support paired source/tracker identity; personal mode refused before writes.')
+    context = station_config.resolve_context(repo_root=root)
     with lifecycle.locked(root):
         state = lifecycle.load(root)
         station = _station(root, state)
@@ -174,7 +172,7 @@ def takeover(root, *, stop_previous, confirm_runtime_stopped=False, runtime_stop
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('status', 'takeover'))
-    parser.add_argument('--repo-root', required=True, type=Path)
+    parser.add_argument('--repo-root', type=Path, help='consumer checkout root; defaults to the Git root of the current directory')
     parser.add_argument('--json', action='store_true')
     parser.add_argument('--observe-runtime', action='store_true', help='measure activity through the existing owning proxy without starting a runtime')
     parser.add_argument('--mode', choices=('local',))
@@ -188,7 +186,7 @@ def main(argv=None):
     if args.operation == 'status' and (args.mode or args.stop_previous or args.confirm_runtime_stopped):
         parser.error('status accepts only --repo-root and --json')
     try:
-        root = project_config.resolve_context(repo_root=args.repo_root).source_root
+        root = station_config.resolve_context(repo_root=args.repo_root).source_root
         value = status(root, observe_runtime=args.observe_runtime) if args.operation == 'status' else takeover(
             root, stop_previous=args.stop_previous, confirm_runtime_stopped=args.confirm_runtime_stopped)
         if args.json:
@@ -204,7 +202,7 @@ def main(argv=None):
             if value['mode'] == 'transferring':
                 print(value['recovery']['manual_step'])
         return 0
-    except (ValueError, OSError, guard.GuardRefusal, project_config.ProjectConfigError) as error:
+    except (ValueError, OSError, guard.GuardRefusal, station_config.StationConfigError) as error:
         print(json.dumps(dict(schema=SCHEMA, ok=False, error=str(error), writes='deferred')))
         return 75
 

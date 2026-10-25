@@ -41,18 +41,15 @@ class ProjectConfigTests(unittest.TestCase):
         self.assertEqual(module.active_lanes(self.config), lanes[:-1])
         self.assertEqual(set(self.config["lane_statuses"]), set(lanes))
 
-    def test_station_name_omits_platform_for_platform_bound_workstreams(self) -> None:
+    def test_station_keys_are_optional_but_still_validated(self) -> None:
         config = copy.deepcopy(self.config)
-        config["workstreams"] = {
-            "main": {"branch": "main"},
-            "win": {"branch": "windows-lane", "platform": "win"},
-        }
-        prefix = config["session_prefix"]
-        self.assertEqual(module.station_name(config, "main", "mac"), f"{prefix}-main-mac")
-        self.assertEqual(module.station_name(config, "win", "win", "example-win-host"), f"{prefix}-win-example-win-host")
-        pattern = module.session_name_pattern(config)
-        self.assertTrue(pattern.fullmatch(f"{prefix}-main-mac"))
-        self.assertFalse(pattern.fullmatch("other-main-mac"))
+        for key in module.LEGACY_STATION_KEYS:
+            config.pop(key, None)
+        self.assertEqual(module.validate(config)["project"], self.config["project"])
+        for key, bad in (("session_prefix", "Not A Token"), ("station_registry_doc", "docs/")):
+            broken = dict(config, **{key: bad})
+            with self.assertRaises(module.ProjectConfigError):
+                module.validate(broken)
 
     def test_explicit_closeout_membership(self):
         matcher = module.closeout_card_matcher(self.config)
@@ -190,7 +187,7 @@ class ConsumerContextTests(unittest.TestCase):
     def test_helpers_import_outside_any_repository(self):
         scripts = SKILL_DIR / "scripts"
         code = f"import sys; sys.path.insert(0, {str(scripts)!r}); " + "; ".join(
-            f"import {name}" for name in ("project_config", "audit_board", "codex_lane", "codex_station", "launch_remote_station", "station_lease", "remote_station_guard"))
+            f"import {name}" for name in ("project_config", "audit_board", "codex_lane"))
         result = subprocess.run([sys.executable, "-c", code], cwd=self.base, text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -198,22 +195,12 @@ class ConsumerContextTests(unittest.TestCase):
     def test_optional_helpers_keep_sequential_consumer_identity(self):
         sys.path.insert(0, str(SKILL_DIR / "scripts"))
         import codex_lane
-        import codex_station
-        import launch_remote_station
-        import station_lease
-        import remote_station_guard
         role, route = codex_lane.load_role_route("rfc-reviewer")
         for root in (self.a, self.b, self.a):
             selected = module.resolve_context(repo_root=root)
             prompt = codex_lane.compose_prompt("rfc-reviewer", role, route, "rfc_reviewer_check", "Check", selected.config)
             self.assertTrue(prompt.startswith(root.name.title() + " lane"))
             self.assertEqual(codex_lane.lane_log_path(root, selected.config).name, f"{root.name}-codex-lanes.jsonl")
-            self.assertEqual(station_lease._lock_path("station-writer", root, selected.config).name, f"{root.name}-station-writer.lock")
-            self.assertIn(root.name.title(), codex_station.station_bootstrap_text(selected.config))
-            self.assertEqual(remote_station_guard._load_project(root)["project"], root.name)
-            with mock.patch.dict(os.environ, {module.PROJECT_ROOT_ENV: str(self.b)}):
-                station = launch_remote_station.StationContext(root, "main", "main", root.name + "-main-mac", "macos", "lane-commit", "project-integrator", root / ".remote-station.json", selected)
-                self.assertEqual(launch_remote_station.station_document(station, station_id="fixture", codex=None)["project"], root.name)
 
 
 if __name__ == "__main__":

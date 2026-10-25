@@ -8,7 +8,6 @@
     "schema",
     "project",
     "display_name",
-    "session_prefix",
     "origin_repo_name",
     "rfc_root",
     "issue_root",
@@ -20,7 +19,6 @@
     "terminal_rfc_status",
     "structure_gate",
     "attended_review_skill",
-    "station_registry_doc",
     "workstreams",
     "role_addenda"
   ],
@@ -47,7 +45,8 @@
       "minLength": 1
     },
     "session_prefix": {
-      "$ref": "#/$defs/token"
+      "$ref": "#/$defs/token",
+      "description": "Optional legacy station key; station identity now lives in the remote-station skill's station.json."
     },
     "origin_repo_name": {
       "type": "string",
@@ -147,7 +146,8 @@
       ]
     },
     "station_registry_doc": {
-      "$ref": "#/$defs/relativePath"
+      "$ref": "#/$defs/relativePath",
+      "description": "Optional legacy station key; station identity now lives in the remote-station skill's station.json."
     },
     "workstreams": {
       "type": "object",

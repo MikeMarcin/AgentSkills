@@ -3,10 +3,9 @@
 This directory is shared RFC workflow source. Project mode keeps facts and
 rules in the source repository; personal mode keeps them in its paired external
 tracker. A single local agent can use
-`SKILL.md`; native role adapters and remote station helpers are optional.
-The station launcher also exposes `status`, `takeover`, `hooks status` and
-`hooks off --dry-run`. Automatic station hooks are inactive; blocking enforcement
-requires explicit opt-in. See [station control](references/station-control.md).
+`SKILL.md`; native role adapters are optional. Remote stations are the separate
+`remote-station` skill; [remote routing](references/remote-routing.md) keeps only
+the rules for dispatching RFC work to one.
 
 ## Policy
 
@@ -89,8 +88,9 @@ tracker:
 
 - `.mask/skill-config/implement-rfc/project.json` — machine-read facts: project tokens, tracker paths,
   lane names and their status words, single/per-area counters, sequencing, the structure-gate commands, the attended-review skill (or
-  `null`), the station registry document, workstream branches, and per-role
-  instruction addenda. `schemas/project.schema.json` documents the contract;
+  `null`), workstream branches, and per-role instruction addenda. The former
+  `session_prefix` and `station_registry_doc` keys are optional legacy station
+  keys; station identity lives in remote-station's `station.json`. `schemas/project.schema.json` documents the contract;
   `scripts/project_config.py` enforces it.
 - `.mask/skill-config/implement-rfc/project.md` — the project's own rules in prose: what to read
   first, the side-effect boundary, what counts as a direct surface, the
@@ -126,7 +126,7 @@ These observations do not measure subscription savings.
   assignment rationale, and per-lane runtime selection.
 - `references/codex-lanes.md`: launching delegated lanes on the Codex
   runtime from a Claude driver.
-- `references/remote-routing.md`: remote-station identity and writer authority.
+- `references/remote-routing.md`: dispatching RFC work to a remote station.
 - `references/runtime-compatibility.md`: adapter and runtime-specific facts.
 - `scripts/project_config.py`: invocation context resolver and project schema validator.
 - `scripts/render_runtime_adapters.py`: deterministic native adapter renderer
@@ -139,9 +139,8 @@ These observations do not measure subscription savings.
   informational.
 - `scripts/codex_lane.py`: routed Codex lane launcher over the openai-codex
   plugin's companion runtime.
-- `scripts/station_lease.py`, `scripts/remote_station_guard.py`,
-  `scripts/launch_remote_station.py`, `scripts/codex_station.py`: remote
-  station identity, single-writer protection, and launch.
+- `scripts/launch_remote_station.py`, `scripts/station_control.py`: temporary
+  forwarders to the remote-station skill, kept for one release.
 
 The designated milestone integrator owns authorized tracker, commit, integration
 and RFC-status decisions within its assigned main/lane scope. The native
@@ -230,11 +229,10 @@ map the stable model IDs to inference-profile ARNs outside the portable skill
 using `config/claude-bedrock-model-overrides.example.json`. Confirm each
 agent's startup banner before relying on the mapping.
 
-## Optional remote station controls
+## Remote stations
 
-The station launcher starts or resumes both runtimes. Use `--fresh codex`,
-`--fresh claude`, or `--fresh` for both contexts while retaining station identity.
-`--no-claude` and `--no-codex` select one service. Claude uses the compact Remote
-Control server; a fresh session becomes visible after a controller connects.
-See [launch and reset controls](references/remote-routing.md#launch-and-reset-controls)
-for exact-ID resumption, writer ownership and legacy flags.
+Station launch, status, takeover and hooks moved to the `remote-station` skill,
+configured by its own `station.json`. For one release,
+`scripts/launch_remote_station.py` and `scripts/station_control.py` here forward to
+that skill when it is installed beside implement-rfc; otherwise they name
+`mask install remote-station`.

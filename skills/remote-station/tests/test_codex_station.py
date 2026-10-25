@@ -16,13 +16,13 @@ SCRIPTS_ROOT = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_ROOT))
 
 import codex_station  # noqa: E402
-from project_fixtures import CONFIG, context_for
+from station_fixtures import CONFIG, context_for
 from unittest import mock
 
 
 class ContextTestCase(unittest.TestCase):
     def setUp(self):
-        self.enterContext(mock.patch.object(codex_station.project_config, "resolve_context", side_effect=lambda **kwargs: context_for(Path(kwargs["repo_root"]))))
+        self.enterContext(mock.patch.object(codex_station.station_config, "resolve_context", side_effect=lambda **kwargs: context_for(Path(kwargs["repo_root"]))))
 
 
 class FakeStdioProcess:

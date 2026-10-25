@@ -25,6 +25,7 @@ def main():
         environment['MASK_PROGRAM'] = str(program.parent)
     for skill, directory, pattern in (
         ('implement-rfc', 'tests', 'test_*.py'),
+        ('remote-station', 'tests', 'test_*.py'),
         ('attended-review', 'tests', 'test_*.py'),
         ('author-rfc', 'tests', 'test_*.py'),
         ('wizard', 'tests', 'test_*.py'),

@@ -1,0 +1,17 @@
+#!/bin/sh
+# launch_remote_station: version-free forwarder installed by the remote-station skill.
+# It runs the current checkout's own pinned skill and contains no station logic.
+root=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -z "$root" ]; then
+    echo "launch_remote_station: not inside a Git repository: $(pwd)" >&2
+    exit 3
+fi
+target="$root/.agents/skills/remote-station/scripts/launch_remote_station.py"
+if [ ! -f "$target" ]; then
+    echo "launch_remote_station: $root has no remote-station skill at .agents/skills/remote-station; run: mask install remote-station" >&2
+    exit 4
+fi
+case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*) exec py -3 "$target" "$@" ;;
+    *) exec python3 "$target" "$@" ;;
+esac

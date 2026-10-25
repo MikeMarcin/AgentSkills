@@ -2,7 +2,7 @@
 """Optional Codex station enforcement; inactive unless invoked with --enforce.
 
 Project facts come from the guarded checkout's own
-the consumer .mask/skill-config/implement-rfc/project.json.
+.mask/skill-config/remote-station/station.json.
 """
 
 from __future__ import annotations
@@ -19,14 +19,14 @@ import sys
 from typing import Any
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import project_config  # noqa: E402
+import station_config  # noqa: E402
 import station_lifecycle as lifecycle  # noqa: E402
 import station_task_admission as admission  # noqa: E402
 
 STATION_SCHEMA = lifecycle.STATION_SCHEMA
 TASK_ENVELOPE = "implement-rfc.remote-task.v1"
 SESSION_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
-SKILL_RELATIVE = pathlib.Path(".agents/skills/implement-rfc")
+SKILL_RELATIVE = pathlib.Path(".agents/skills/remote-station")
 TASK_ID = re.compile(r"^task-[0-9a-z-]{4,64}$")
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 MAX_REQUEST_RECEIPTS = 4096
@@ -71,7 +71,7 @@ class GuardRefusal(Exception):
 def _git(root: pathlib.Path, *arguments: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", "-C", str(root), *arguments],
-        env=project_config.git_environment(),
+        env=station_config.git_environment(),
         capture_output=True,
         text=True,
         check=False,
@@ -79,7 +79,7 @@ def _git(root: pathlib.Path, *arguments: str) -> subprocess.CompletedProcess[str
 
 
 def _repo_root(cwd: str) -> pathlib.Path | None:
-    top = project_config._git(pathlib.Path(cwd), "rev-parse", "--show-toplevel")
+    top = station_config._git(pathlib.Path(cwd), "rev-parse", "--show-toplevel")
     return pathlib.Path(top).resolve() if top is not None else None
 
 
@@ -126,9 +126,9 @@ def _is_project_origin(origin: str, expected: str) -> bool:
 
 def _load_project(root: pathlib.Path) -> dict[str, Any]:
     try:
-        return project_config.resolve_context(repo_root=root).config
-    except project_config.ProjectConfigError as error:
-        raise GuardRefusal("no-station", f"project configuration is unusable: {error}") from error
+        return station_config.resolve_context(repo_root=root).config
+    except station_config.StationConfigError as error:
+        raise GuardRefusal("no-station", f"station configuration is unusable: {error}") from error
 
 
 def _validate_live_checkout(

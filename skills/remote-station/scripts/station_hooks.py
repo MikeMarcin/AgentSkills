@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inspect or remove only implement-rfc station commands from project hooks."""
+"""Inspect or remove only station guard commands from project hooks."""
 from __future__ import annotations
 
 import argparse
@@ -8,9 +8,14 @@ import json
 import os
 from pathlib import Path
 import stat
+import subprocess
 import tempfile
 
 SCHEMA = 'implement-rfc.station-hooks.v1'
+# The guard moved from implement-rfc to remote-station; hooks written for
+# either location are station commands.
+GUARD_PATHS = ('remote-station/scripts/remote_station_guard.py',
+               'implement-rfc/scripts/remote_station_guard.py')
 
 
 def _object(pairs):
@@ -27,7 +32,7 @@ def station_command(value):
         return False
     commands = [value[key] for key in ('command', 'command_windows') if key in value]
     owned = [isinstance(command, str) and
-             'implement-rfc/scripts/remote_station_guard.py' in command.replace('\\', '/')
+             any(guard in command.replace('\\', '/') for guard in GUARD_PATHS)
              for command in commands]
     if any(owned) and not all(owned):
         raise ValueError('station hook has an unrelated platform command; preserve it for manual review')
@@ -41,6 +46,13 @@ def linked(path):
         return False
     return stat.S_ISLNK(observed.st_mode) or bool(
         getattr(observed, 'st_file_attributes', 0) & getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0))
+
+
+def checkout_root(cwd):
+    """The Git root of cwd; hook inspection needs no station configuration."""
+    completed = subprocess.run(['git', '-C', str(cwd), 'rev-parse', '--show-toplevel'],
+                               capture_output=True, text=True, check=False)
+    return Path(completed.stdout.strip()) if completed.returncode == 0 else cwd
 
 
 def inspect(root, *, off=False, dry_run=False):
@@ -105,12 +117,12 @@ def inspect(root, *, off=False, dry_run=False):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('status', 'off'), nargs='?', default='status')
-    parser.add_argument('--repo-root', type=Path, default=Path.cwd())
+    parser.add_argument('--repo-root', type=Path, help='consumer checkout root; defaults to the Git root of the current directory')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args(argv)
     try:
-        result = inspect(args.repo_root, off=args.operation == 'off', dry_run=args.dry_run)
+        result = inspect(args.repo_root or checkout_root(Path.cwd()), off=args.operation == 'off', dry_run=args.dry_run)
         if args.json:
             print(json.dumps(dict(result, ok=True)))
         else:

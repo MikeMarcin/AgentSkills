@@ -32,7 +32,7 @@ THREAD_SOURCE_KINDS = (
 import sys as _sys
 
 _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import project_config  # noqa: E402
+import station_config  # noqa: E402
 
 STATION_SANDBOX = "danger-full-access"
 TERMINAL_TURN_STATUSES = {"completed", "failed", "interrupted"}
@@ -66,7 +66,7 @@ class CodexStationError(Exception):
 class _AppServerRpcClient:
     """Shared JSON-RPC lifecycle over a transport-specific message stream."""
 
-    def __init__(self, timeout: float, context: project_config.ProjectContext) -> None:
+    def __init__(self, timeout: float, context: station_config.ConsumerContext) -> None:
         self.context = context
         self._timeout = timeout
         self._next_id = 0
@@ -239,13 +239,11 @@ class AppServerClient(_AppServerRpcClient):
         self,
         *,
         cwd: pathlib.Path,
-        context: project_config.ProjectContext | None = None,
+        context: station_config.ConsumerContext | None = None,
         timeout: float = 30.0,
         popen: Callable[..., subprocess.Popen[bytes]] = subprocess.Popen,
     ) -> None:
-        selected = context or project_config.resolve_context(repo_root=cwd)
-        if selected.mode == "personal":
-            raise CodexStationError("adapter does not support paired source/tracker handoffs; personal mode refused before launch")
+        selected = context or station_config.resolve_context(repo_root=cwd)
         if selected.repo_root != cwd.resolve():
             raise CodexStationError("project context does not match transport checkout")
         super().__init__(timeout, selected)
@@ -307,14 +305,12 @@ class ProxyAppServerClient(_AppServerRpcClient):
         self,
         *,
         cwd: pathlib.Path,
-        context: project_config.ProjectContext | None = None,
+        context: station_config.ConsumerContext | None = None,
         timeout: float = 30.0,
         connect_timeout: float | None = None,
         popen: Callable[..., subprocess.Popen[bytes]] = subprocess.Popen,
     ) -> None:
-        selected = context or project_config.resolve_context(repo_root=cwd)
-        if selected.mode == "personal":
-            raise CodexStationError("adapter does not support paired source/tracker handoffs; personal mode refused before launch")
+        selected = context or station_config.resolve_context(repo_root=cwd)
         if selected.repo_root != cwd.resolve():
             raise CodexStationError("project context does not match transport checkout")
         super().__init__(timeout, selected)
@@ -950,14 +946,12 @@ def provision_named_thread(
     cwd: pathlib.Path,
     name: str,
     expected_thread_id: str | None,
-    context: project_config.ProjectContext | None = None,
+    context: station_config.ConsumerContext | None = None,
     new_session: bool = False,
 ) -> str:
     """Create or verify the only task bound to ``name`` and ``cwd``."""
     cwd = cwd.resolve()
-    selected = context or project_config.resolve_context(repo_root=cwd)
-    if selected.mode == "personal":
-        raise CodexStationError("adapter does not support paired source/tracker handoffs; personal mode refused before launch")
+    selected = context or station_config.resolve_context(repo_root=cwd)
     if selected.repo_root != cwd:
         raise CodexStationError("project context does not match station checkout")
     bootstrap_text = station_bootstrap_text(selected.config)

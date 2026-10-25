@@ -14,6 +14,7 @@
     "instamat-image-to-pbr": "skills/instamat-image-to-pbr",
     "manage-agent-skills": "skills/manage-agent-skills",
     "pr-tour": "skills/pr-tour",
+    "remote-station": "skills/remote-station",
     "sprite-sheet-animation-updater": "skills/sprite-sheet-animation-updater",
     "technical-book-humanizer": "skills/technical-book-humanizer",
     "trellis-image-to-3d": "skills/trellis-image-to-3d",
@@ -22,7 +23,7 @@
   },
   "bundles": {
     "rfc": {
-      "description": "Draft, grill and implement RFCs with their shared companions.",
+      "description": "Draft, grill and implement RFCs, with their shared companions and remote stations.",
       "skills": [
         {
           "source": "agentskills",
@@ -39,6 +40,10 @@
         {
           "source": "agentskills",
           "id": "implement-rfc"
+        },
+        {
+          "source": "agentskills",
+          "id": "remote-station"
         }
       ]
     }

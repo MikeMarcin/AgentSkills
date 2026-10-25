@@ -12,7 +12,7 @@ from dataclasses import replace
 from pathlib import Path
 from unittest import mock
 
-from project_fixtures import CONFIG, context_for, init_repo, git
+from station_fixtures import CONFIG, context_for, init_repo, git
 
 SCRIPTS_ROOT = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS_ROOT))
@@ -80,7 +80,7 @@ class LauncherTests(unittest.TestCase):
         self._temporary = tempfile.TemporaryDirectory()
         root = Path(self._temporary.name).resolve()
         self.selected = context_for(root, self.project)
-        self.enterContext(mock.patch.object(launcher.project_config, "resolve_context", return_value=self.selected))
+        self.enterContext(mock.patch.object(launcher.station_config, "resolve_context", return_value=self.selected))
         self.context = launcher.StationContext(
             root=root,
             workstream="main",
@@ -467,7 +467,7 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(launcher.infer_workstream(self.context.station_file, "main", project), "main")
         with self.assertRaisesRegex(launcher.LaunchRefusal, "cannot infer a workstream"):
             launcher.infer_workstream(self.context.station_file, "linux-lane", project)
-        with mock.patch.object(launcher.project_config, "resolve_context", return_value=context_for(self.context.root, project)), mock.patch.object(launcher, "run_git", return_value="Fixture"):
+        with mock.patch.object(launcher.station_config, "resolve_context", return_value=context_for(self.context.root, project)), mock.patch.object(launcher, "run_git", return_value="Fixture"):
             with self.assertRaisesRegex(launcher.LaunchRefusal, "unknown workstream"):
                 launcher.resolve_context(launcher.parse_arguments(["linux"]))
 
@@ -1205,6 +1205,25 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(events, ["open", "close"])
         self.assertEqual(launcher.load_station_file(self.context.station_file)["claude"], claude)
 
+    def test_return_path_warning_precedes_every_claude_endpoint_only(self) -> None:
+        @contextlib.contextmanager
+        def provision(*args, **kwargs):
+            yield {"thread_id": "thr-new", "thread_name": self.context.name, "cli_version": "0.151.0"}
+        for flags, warned in (({}, True), ({"no_codex": True}, True), ({"no_claude": True}, False)):
+            with self.subTest(flags=flags):
+                errors = io.StringIO()
+                with (
+                    mock.patch.object(launcher, "provision_codex", side_effect=provision),
+                    mock.patch.object(launcher, "run_claude", return_value=0),
+                    mock.patch.object(launcher, "wait_for_station_stop", return_value=0),
+                    contextlib.redirect_stderr(errors),
+                    contextlib.redirect_stdout(io.StringIO()),
+                ):
+                    self.assertEqual(launcher.supervise(arguments(**flags), self.context), 0)
+                text = errors.getvalue()
+                self.assertEqual(f"Claude return path UNVERIFIED for {self.context.name}" in text, warned)
+                self.assertEqual('"crossSessionInbound": "accept"' in text, warned)
+
     def test_codex_only_wait_stops_cleanly_on_ctrl_c(self) -> None:
         with mock.patch.object(launcher.time, "sleep", side_effect=KeyboardInterrupt):
             self.assertEqual(launcher.wait_for_station_stop(), 0)
@@ -1315,7 +1334,7 @@ class LinkedConsumerLaunchTests(unittest.TestCase):
                 root = Path(temporary) / token
                 init_repo(root, token=token)
                 git(root, "remote", "add", "origin", (Path(temporary) / (token + ".git")).as_posix())
-                link = root / ".agents/skills/implement-rfc"
+                link = root / ".agents/skills/remote-station"
                 link.parent.mkdir(parents=True)
                 link.symlink_to(source, target_is_directory=True)
                 # Execute the public entry point with only the runtime-launch boundary

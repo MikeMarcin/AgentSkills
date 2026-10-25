@@ -8,9 +8,12 @@ because it obstructed ordinary work and MASK recovery.
 
 ## Project commands
 
-From the consumer checkout, use its existing station management script:
+From anywhere in the consumer checkout, use the `launch_remote_station` command,
+the project's wrapper script, or the skill's entry script. All take the same
+arguments:
 
 ```sh
+launch_remote_station status
 python3 scripts/launch_remote_station.py status
 python3 scripts/launch_remote_station.py status --observe-runtime --json
 python3 scripts/launch_remote_station.py hooks status
@@ -18,10 +21,11 @@ python3 scripts/launch_remote_station.py hooks off --dry-run
 python3 scripts/launch_remote_station.py hooks off
 ```
 
-Use `py -3` on Windows. If a project has no wrapper, use the installed skill's
-`scripts/launch_remote_station.py` from the consumer root. `hooks off` removes
-only implement-rfc station commands from `.codex/hooks.json`, preserving unrelated
-hooks and settings. Reload project hooks in the host after removal. Hook inspection
+Use `py -3` on Windows. If a project has no wrapper, use
+`.agents/skills/remote-station/scripts/launch_remote_station.py`; the former
+implement-rfc path forwards there for one release. `hooks off` removes only station
+guard commands (at either skill's path) from `.codex/hooks.json`, preserving
+unrelated hooks and settings. Reload project hooks in the host after removal. Hook inspection
 and removal need neither a valid station binding nor working MASK readiness.
 
 Removing hooks does not stop a writer or transfer ownership. Reconcile actual
@@ -34,7 +38,8 @@ python3 scripts/launch_remote_station.py takeover --json
 ```
 
 A direct owner instruction to resume here authorizes the scoped stop and transfer.
-The command supplies the consumer root, local mode and previous-owner stop option.
+The command resolves the consumer root and supplies local mode and the
+previous-owner stop option unless you pass `--mode` or `--stop-previous` yourself.
 If it reports manual stop steps, observe the listed stops before retrying with
 `takeover --confirm-runtime-stopped --json`. That flag records a real human
 observation, never a guess based on a stale record.
@@ -68,10 +73,10 @@ which does not invoke UserPromptSubmit. If that route has no prompt admission,
 make the first tool an exact request through the installed helper:
 
 ```sh
-python3 -B "/absolute/consumer/.agents/skills/implement-rfc/scripts/station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE
+python3 -B "/absolute/consumer/.agents/skills/remote-station/scripts/station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE
 ```
 
-On Windows the exact shape is `py -3 -B "C:\absolute\consumer\.agents\skills\implement-rfc\scripts\station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE`.
+On Windows the exact shape is `py -3 -B "C:\absolute\consumer\.agents\skills\remote-station\scripts\station_task_admission.py" --envelope-base64 BASE64_JSON_ENVELOPE`.
 Use one ordinary command with the quoted absolute helper path, exactly ordered
 arguments and canonical base64 of the UTF-8 JSON remote-task envelope. No shell
 prefix, suffix, interpreter `-c`, caller session/turn arguments or envelope file
@@ -105,11 +110,11 @@ recovery; do not delete receipts, seed turn records or relax hooks to continue.
 
 A replacement chat can inspect ownership and perform recovery while the old writer
 is reconciled. The project commands above are preferred. The underlying helper
-remains available for older installed launchers, with the explicit consumer root:
+takes an explicit consumer root:
 
 ```sh
-python3 /absolute/consumer/.agents/skills/implement-rfc/scripts/station_control.py status --repo-root /absolute/consumer --json
-python3 /absolute/consumer/.agents/skills/implement-rfc/scripts/station_control.py status --repo-root /absolute/consumer --json --observe-runtime
+python3 /absolute/consumer/.agents/skills/remote-station/scripts/station_control.py status --repo-root /absolute/consumer --json
+python3 /absolute/consumer/.agents/skills/remote-station/scripts/station_control.py status --repo-root /absolute/consumer --json --observe-runtime
 ```
 
 Use `py -3` on native Windows. Status reports the endpoint, generation, real OS
@@ -122,12 +127,14 @@ A direct human instruction such as “resume this work here” authorizes the sc
 stop and transfer. Execute it without asking the owner to repeat that authorization:
 
 ```sh
-python3 /absolute/consumer/.agents/skills/implement-rfc/scripts/station_control.py takeover --repo-root /absolute/consumer --json --mode local --stop-previous
+python3 /absolute/consumer/.agents/skills/remote-station/scripts/station_control.py takeover --repo-root /absolute/consumer --json --mode local --stop-previous
 ```
 
 The optional prompt hook provides recovery context; it does not parse prose into
 mutation authority. Guarded recovery accepts public launcher commands and helper
-flags in any order.
+flags in any order. Under enforcement, run them as the skill's own entry script or
+the project's `scripts/launch_remote_station.py` wrapper; the guard does not trust
+the `launch_remote_station` command or the former implement-rfc forwarder paths.
 Bounded inspection also permits `git -C ROOT status --short`,
 `git -C ROOT diff --no-ext-diff --no-textconv --stat`,
 `git -C ROOT log -5 --oneline`, `git -C ROOT rev-parse HEAD`, and `cat` of up to five
@@ -159,7 +166,7 @@ commands, and reconcile descendant or detached writers. Stop the supervisor in i
 owning terminal if its lease is held. After actually observing those stops, rerun:
 
 ```sh
-python3 /absolute/consumer/.agents/skills/implement-rfc/scripts/station_control.py takeover --repo-root /absolute/consumer --json --mode local --stop-previous --confirm-runtime-stopped
+python3 /absolute/consumer/.agents/skills/remote-station/scripts/station_control.py takeover --repo-root /absolute/consumer --json --mode local --stop-previous --confirm-runtime-stopped
 ```
 
 That last flag records a human observation. An instruction to resume authorizes

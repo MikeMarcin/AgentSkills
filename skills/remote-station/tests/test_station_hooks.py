@@ -102,7 +102,7 @@ class StationHookRemovalTests(unittest.TestCase):
         # needed to remove the hook that would otherwise obstruct their repair.
         for root in (self.root, self.root / 'second-consumer'):
             root.mkdir(exist_ok=True)
-            link = root / '.agents/skills/implement-rfc'
+            link = root / '.agents/skills/remote-station'
             link.parent.mkdir(parents=True)
             link.symlink_to(PACK, target_is_directory=True)
             result = subprocess.run([sys.executable, '-B', str(link / 'scripts/launch_remote_station.py'),
@@ -111,6 +111,25 @@ class StationHookRemovalTests(unittest.TestCase):
             parsed = json.loads(result.stdout)
             self.assertEqual(Path(parsed['path']), root.resolve() / '.codex/hooks.json')
             self.assertFalse(parsed['changed'])
+
+    def test_guard_commands_from_either_skill_location_are_station_commands(self):
+        windows = r'py -3 C:\checkout\.agents\skills\remote-station\scripts\remote_station_guard.py --enforce'
+        current = dict(type='command', command='python3 /checkout/.agents/skills/remote-station/scripts/remote_station_guard.py --enforce',
+                       command_windows=windows)
+        self.assertTrue(station_hooks.station_command(current))
+        self.assertTrue(station_hooks.station_command(self.station))
+        self.assertFalse(station_hooks.station_command(self.other))
+
+    def test_default_root_is_the_git_root_of_a_subdirectory(self):
+        subprocess.run(['git', 'init', '-q', str(self.root)], check=True)
+        nested = self.root / 'a' / 'b'
+        nested.mkdir(parents=True)
+        result = subprocess.run([sys.executable, '-B', str(PACK / 'scripts/station_hooks.py'), 'status', '--json'],
+                                cwd=nested, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        parsed = json.loads(result.stdout)
+        self.assertEqual(Path(parsed['path']).resolve(), self.path.resolve())
+        self.assertEqual(parsed['station_commands'], 2)
 
 
 if __name__ == '__main__':

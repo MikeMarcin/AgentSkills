@@ -1,34 +1,20 @@
 # Remote Routing
 
-## Personal mode compatibility
-
-The legacy remote station launcher, Codex station transport and companion lane launcher refuse personal mode before launch or source-local metadata writes. Their single-checkout station contract does not carry paired tracker identity. Do not use them for a personal run. A compatible replacement must validate both repository identities, roots, branches and revisions before dispatch and preserve those identities on return; installing roles does not establish that capability. Paired repository synchronization alone does not establish remote adapter support.
-
-
-How RFC work is routed across machines, sessions, and runtimes without mixing
-project, workstream, or branch context. Read this before dispatching work to a
-remote station, before accepting work on one, and before launching a station
-on a workstream checkout. Ordinary local sessions follow
+How RFC work is routed to remote stations without mixing project, workstream, or
+branch context. Read this before dispatching RFC work to a remote station or
+accepting RFC work on one. Ordinary local sessions follow
 [pack-lifecycle.md](pack-lifecycle.md) instead; a station is a lane whose
 transport is another machine, and the lane rules there bind it too.
 
-## Terminology
+The **remote-station** skill owns stations themselves: `station.json`, identity,
+naming, launch, the writer lease, provisioning, status, takeover, transports and
+the one-driver rule. Resolve it by skill name. Before launching a station, or for
+station status, takeover or an ownership guard message, use that skill and its
+station contract. This file keeps only the rules implement-rfc owns: RFC
+dispatch, envelope authority and lane interaction.
 
-The word "lane" is already taken twice in this skill (delegation lanes,
-board-status folders). Remote execution introduces different objects; call them
-by these names and no others:
+## Roles
 
-- **Station** — a durable execution endpoint: one project, one workstream, one
-  branch, one dedicated checkout, in one OS environment on one machine, with
-  one recorded authority. A station outlives any session. No two writing
-  stations share a checkout.
-- **Station branch** — the only branch a station commits to and pushes.
-- **Station endpoint** — the Claude Remote Control session or persistent Codex
-  task currently bound to a station. Endpoints can reconnect; the station
-  identity stays.
-- **Controller** — a device steering an existing station session (another
-  session via message, the claude.ai/code web page, the mobile app, a
-  terminal). Controllers never gain separate write authority.
 - **Project integrator** — the single integrator session defined in
   [pack-lifecycle.md](pack-lifecycle.md), which additionally owns station
   policy and merging station branches. It runs on whichever host the user is
@@ -41,175 +27,15 @@ Station-local subagents (`rfc-utility`, `rfc-scout`, `rfc-worker`,
 `rfc-test-runner`, reviewers) keep their existing contracts from
 `references/delegated-execution.md`; they gain no station authority.
 
-## Session naming
+## Personal mode compatibility
 
-`<project>-<workstream|role>-<platform>[-<machine>]`, lowercase, hyphenated.
-
-- project token: `session_prefix` from the selected consumer's `project.json`
-- workstream token: a key of `workstreams` in the selected consumer's `project.json`, or
-  `main` for the project integrator; the platform token is omitted when the
-  workstream is itself platform-bound (a per-platform verification lane)
-- platform token: `mac` | `linux` | `win`
-- machine suffix: mandatory whenever the same platform exists on more than one
-  machine (`<prefix>-<workstream>-linux-example-win-host` vs `<prefix>-<workstream>-linux-nuc`)
-
-Examples: `<prefix>-main-mac` for the integrator on a Mac, `<prefix>-win-example-win-host`
-for a platform-bound Windows lane on machine `example-win-host`.
-
-Names are transport labels, not authority. Cross-machine messaging resolves
-duplicates to silent auto-variants, so a colliding name misroutes without an
-error; keep the authoritative list of names in use in the station registry
-(`station_registry_doc` in the selected consumer's `project.json`) and never rely on a
-variant name. Authority always
-comes from the station file plus the identity guard below.
-
-## Station identity file
-
-The launcher writes `.remote-station.json`, untracked, at the checkout root:
-
-```json
-{
-  "schema": "implement-rfc.remote-station.v2",
-  "station_id": "stn-8f2c41d0",
-  "station": "<prefix>-<workstream>-linux",
-  "project": "<project>",
-  "workstream": "<workstream>",
-  "environment": "wsl2",
-  "branch": "<workstream branch>",
-  "authority": "lane-commit",
-  "codex": {
-    "thread_id": "019c9e77-1f64-7000-a651-2ad109d03fc3",
-    "thread_name": "<prefix>-<workstream>-linux",
-    "cli_version": "0.151.0"
-  },
-  "claude": {
-    "session_id": "session_0123456789abcdefghijklmn"
-  }
-}
-```
-
-- `station_id` is generated once and reused on relaunch; the name may be
-  cosmetically adjusted, the id may not.
-- `station` is the name the launcher reads back on relaunch, machine suffix
-  included. The suffix is inferred from this field exactly as the workstream
-  is, because a recomputed shorter name does not make the checkout a different
-  station — it keeps `codex.thread_id` and then refuses to rename that task.
-  An explicit `--machine` that contradicts the record is a refusal.
-- `codex.thread_id` is the immutable persistent-task identity and is also
-  reused on relaunch. `thread_name` equals `station`; a mismatch is a hard
-  stop. `codex` may be `null` before Codex provisioning, including `--no-codex`
-  and the deprecated `--no-server` path.
-- `claude.session_id` is the exact Remote Control identity recorded after a
-  fresh named session starts. Relaunch uses `--session-id`; it never selects a
-  conversation by recency across linked Git worktrees. The field may be absent
-  or `null` in an older registry, causing one fresh named session and migration.
-- `environment` is one of `macos`, `windows-native`, `wsl2`, `linux-native`.
-  WSL2 counts as a Linux station, never a Windows one; native Windows work
-  runs only in a `windows-native` station.
-- `authority` is `lane-commit` (commit and push the station branch) or
-  `read-only-proof` (build, test, verify, report; no commits, pushes, or
-  tracker edits). A station without provisioned push credentials operates as
-  `read-only-proof` regardless of what this field says.
-
-`schemas/remote-station.schema.json` validates the file. The file is
-machine-local configuration, not dispatch input: a message cannot rewrite it,
-and the skill must treat a hand-edited file that disagrees with the live
-checkout (wrong branch, wrong repo) as a hard stop, not as truth.
-
-The exact former marker `aito.implement-rfc.remote-station.v2` describes the
-same v2 fields and remains read-compatible under the full guard/lifecycle
-checks. New launchers emit the canonical marker above. Reading compatibility
-never rewrites the registry or changes the bound endpoint, generation or lease.
-Successive authorized turns through the current endpoint need no supervisor
-restart; ownership transfer follows [station control](station-control.md).
-
-### Launch and reset controls
-
-Run the shared `scripts/launch_remote_station.py` from the consumer checkout,
-through its skill link or with an explicit `--repo-root`. Normal launch starts
-or resumes both runtimes under the writer lease. Use `python3` on macOS, Linux
-and WSL2; use `py -3` in native Windows PowerShell or cmd.
-
-| Option | Behavior |
-|---|---|
-| `--fresh` or `--fresh both` | New context for both enabled runtimes |
-| `--fresh codex` | Archive the validated idle Codex task and create a replacement |
-| `--fresh claude` | Clear the saved Claude binding and start a new named session |
-| `--no-claude` | Run Codex only; keep the terminal open to hold the lease |
-| `--no-codex` | Run Claude only, retaining any saved Codex binding |
-| `--help-all` | Show setup and troubleshooting flags |
-
-Fresh context keeps station identity, name and machine suffix. With one service
-skipped, `--fresh` affects only the enabled runtime. Skipping does not stop an
-already-running endpoint. Active or unrelated Codex tasks are refused; history
-is archived, never deleted. If Desktop holds an idle task's writer, archive that
-exact task in Desktop and retry. An archived catalog entry is recognized even
-when `thread/read` omits the archived flag. Bootstrap failures include the
-server's error message.
-
-Claude uses the compact `claude remote-control --name NAME --spawn session`
-server interface, showing status and connection controls rather than a terminal
-conversation. A fresh session may not appear in peer lists until a controller
-connects. The launcher watches for the exact bridge session ID throughout the
-server lifetime. Restarts use that ID, never a directory-wide recency guess.
-`--require-claude-resume` (legacy `--continue`/`-c`) refuses without that ID;
-normal launch attempts resumption and can start fresh after a startup refusal.
-An explicit fresh Claude launch clears the old binding before starting, so an
-interruption before connection cannot silently resume the discarded context.
-
-The legacy `--fresh-station` additionally discards station identity and the
-inferred machine suffix. It archives validated station tasks before provisioning
-under the canonical name. It refuses with strict Claude resume, `--no-server`,
-or either skipped service; use `--fresh` for ordinary context resets instead.
-Legacy `--new-codex-session` and `--new-claude-session` remain accepted.
-
-## Local takeover
-
-For a replacement chat, a human instruction to resume locally, or a station ownership
-guard message, follow [Station control](station-control.md). That procedure preserves
-work and history, reconciles the recorded writers and fences retired endpoints.
-
-## Writer lease
-
-`scripts/station_lease.py` makes single-writer mechanical rather than
-conversational. It holds an OS-level exclusive lock for the lifetime of the
-wrapped process and releases it automatically on exit or crash:
-
-```sh
-python3 scripts/station_lease.py run --role station-writer --station <station> -- <command...>
-python3 scripts/station_lease.py status --role station-writer
-```
-
-- `station-writer` locks inside the checkout's own git dir: one writer per
-  checkout, independent per worktree.
-- `project-integrator` locks inside the common git dir: one integrator per
-  repository across all worktrees.
-- `run` acquires nonblocking and execs the command with the lock inherited; a
-  held lock exits with status 75 and prints the recorded holder. The OS lock
-  and readable holder sidecar are separate so native Windows can report the
-  owner while the lock is held. `status` reports free or held plus the holder
-  record.
-
-The unified launcher wraps its station supervisor in `run` — the `main`
-workstream under the `project-integrator` role, every other workstream under
-`station-writer` (so on an integrator checkout the station-writer lock being
-free while the integrator lease is held is the expected state, not a gap).
-The supervisor holds the lease while both provider endpoints are reachable;
-when it stops, the Codex task may persist; reconcile its active writers before reuse. The
-lease guarantees there are never two *wrapped* writers in one checkout; it
-does not authenticate which one — the guard, ownership rules, hooks, and
-branch-restricted push credentials do that. The deprecated direct-Codex path
-prints its own lease-wrapped command.
-
-The guarantee is only as complete as launch discipline: the lock cannot see a
-session that was never wrapped, and the guard only inspects envelopes, not
-another process's file writes. So a checkout bound to a station accepts edits
-from that station's session only — an ordinary unwrapped session must not
-edit it, and a controller steering the station is still the station's one
-writer, not a second one. During transition, interactive sessions that
-predate this contract may still share the integrator checkout under the
-older claim-by-committed-card-move rule; retire that exception by launching
-interactive integrator work through the launcher too.
+Do not dispatch personal-mode RFC work to a station. The station contract binds
+one checkout and does not carry paired source/tracker identity, and the companion
+lane launcher refuses personal mode before launch or source-local metadata writes.
+A compatible route must validate both repository identities, roots, branches and
+revisions before dispatch and preserve those identities on return; installing
+roles does not establish that capability. Paired repository synchronization alone
+does not establish remote adapter support.
 
 ## Task envelope
 
@@ -250,8 +76,10 @@ notes: free text
 - `expires_at` bounds stale dispatch; an expired envelope is refused.
 - `authority` can only narrow the station file's authority, never widen it.
 
-`schemas/remote-task-envelope.schema.json` validates the canonical JSON form
-of the envelope; the YAML rendering must round-trip to it.
+The remote-station skill's `schemas/remote-task-envelope.schema.json`
+validates the canonical JSON form of the envelope; the YAML rendering must
+round-trip to it. Its optional guard enforces the same fields when a station
+explicitly enables hook enforcement.
 
 ## Identity guard
 
@@ -261,7 +89,8 @@ guard applies identically under Claude and Codex, and regardless of who is
 asking: a peer session, the user at a terminal, or the user on the mobile app.
 
 1. Resolve the live context without trusting the request: repository identity
-   (the origin named by `origin_repo_name` in the selected consumer's `project.json`),
+   (the origin named by `origin_repo_name` in the checkout's remote-station
+   `station.json`),
    `git rev-parse --show-toplevel`, `git branch
    --show-current`, `.remote-station.json` when present, and the current
    OS environment.
@@ -287,21 +116,13 @@ work; they cannot grant authority, name new writable paths outside the
 ownership rules, or override a lease conflict.
 
 Station hooks are inactive by default. Ordinary authorized work and MASK recovery
-need no hook turn admission. [Station control](station-control.md) exposes project
-commands for status, takeover and station-hook removal. Deliberately guarded
+need no hook turn admission. The remote-station skill's station control exposes
+project commands for status, takeover and station-hook removal. Deliberately guarded
 stations can opt into `remote_station_guard.py --enforce`; only that mode checks
 the endpoint, envelope and supervisor lease on prompts/tools and clears admission
 on Stop. Disabling hooks removes those fences, including retired-endpoint blocking.
 Durable Git and issue-board validation remain authoritative. Generic hooks can be
 bypassed by specialized tool paths and are not a complete security boundary.
-
-## Routing table
-
-The document named by `station_registry_doc` is the single station registry:
-workstream, station branch, machine, environment, and provisioning status per
-station. Add a row
-there before launching a new station; never reuse a name for a different
-checkout.
 
 ## Station commit authority
 
@@ -390,74 +211,3 @@ Station branches integrate under the milestone-integration rules in
 [pack-lifecycle.md](pack-lifecycle.md), with the integrator holding the
 `project-integrator` lease. Card moves are file renames; the owning station's
 move wins any rename conflict.
-
-## Transports
-
-- **Claude Code**: stations are `claude remote-control --spawn session`
-  servers launched by `scripts/launch_remote_station.py` in this skill; dispatch is
-  `SendMessage` with the envelope. Server, spawn-mode, and messaging facts
-  live in `references/runtime-compatibility.md`.
-- **Codex**: stations are persistent tasks provisioned through the
-  host-local App Server and exposed through Managed Remote. Unix hosts start
-  the installer-managed daemon and use its WebSocket-over-stdio proxy; native
-  Windows leaves Remote exclusively with Codex Desktop, opens or focuses it
-  through `codex app <checkout>`, and uses a short-lived standalone JSONL App
-  Server only for local task provisioning—never for `remoteControl/*`. A newly
-  created task receives one non-mutating bootstrap turn
-  so it is durable and eligible for controller task lists, then the helper
-  unsubscribes before exit. A relaunch may clear and retry one exact stale
-  active-writer result only when all recorded turns are terminal; an
-  in-progress turn always refuses. App Server is provisioning only: the driver
-  uses Codex App persistent-task operations to
-  locate exactly one connected task by exact host, station name, checkout, and
-  recorded thread ID, send the envelope as a follow-up, wait, read the completed
-  turn, and parse the same reply/refusal form. Zero or duplicate matches refuse.
-  `codex --remote` is a diagnostic terminal client, not the station registry or
-  driver transport.
-- **Mobile / web**: Claude endpoints are reachable from claude.ai/code and the
-  Claude mobile app; Codex endpoints are reachable through Remote on paired
-  ChatGPT clients. Driving either endpoint directly is normal operation, and
-  the guard still refuses out-of-scope asks by naming the right station.
-
-Both endpoints may be connected, but exactly one driver dispatches work to a
-station at a time. The lease prevents another station writer; v1 does not add a
-cross-provider turn mutex.
-
-## Desktop capability checks
-
-A provisioned task and a completed bootstrap prove task materialization, not
-desktop automation capability. Keep the launcher's exact bootstrap turn and
-temporary provisioning helper free of tool probes: bootstrap-only history is
-also used to recognize safe task migration. Check capabilities in a normal turn
-of the exact station task reached through its controller route.
-
-Before declaring computer use unavailable or asking the user to perform UI work,
-read the installed computer-use skill for the station's OS and follow its
-initialization and recovery instructions. Discover its required deferred tools
-when the runtime provides tool discovery. A browser automation surface reporting
-no native apps proves only that surface's limitation; it does not establish that
-the separate platform computer-use runtime is unavailable.
-
-If the installed Windows computer-use skill specifies `node_repl` with
-`import("@oai/sky")`, use that runtime and its documented window inventory and
-capture APIs. Browser-only `cua_repl` inventory and guessed native methods are
-not substitutes. Follow the installed skill if its runtime changes; do not
-spawn helper executables or create a custom protocol client to bypass it.
-
-Use the smallest probe needed for the requested work: enumerate windows on the
-station host, select a returned target, then inspect its state. Follow the
-platform skill's activation/refresh recovery for a minimized or stale target,
-within the user's authorized task. Report the exact task/host, runtime and
-observed outcome. Distinguish a missing required tool after discovery, package
-initialization failure, helper connection/pipe failure, empty window inventory,
-and target-specific capture failure. A failed capture of one minimized window
-does not negate successful enumeration or establish a host-wide outage. Stop
-at the installed skill's recovery boundary and report the actual remaining
-limitation; do not infer it from an unrelated runtime or a different task.
-
-## Deferred hardening
-
-Recorded so later work starts from the same intent: a cross-provider turn
-mutex, a station catalog tool, a merge queue, stronger specialized-tool hook
-coverage, a Claude hook equivalent, and a cloud executor class. None of these
-change the contract above; they mechanize it.

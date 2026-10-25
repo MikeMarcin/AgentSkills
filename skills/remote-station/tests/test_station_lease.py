@@ -6,7 +6,7 @@ import time
 import unittest
 from pathlib import Path
 
-from project_fixtures import write_context
+from station_fixtures import write_context
 
 SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "station_lease.py"
 SUCCESS_COMMAND = (sys.executable, "-c", "pass")

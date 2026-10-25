@@ -8,7 +8,7 @@ from pathlib import Path
 import secrets
 import stat
 
-import project_config
+import station_config
 import station_lease
 
 SCHEMA = 'implement-rfc.station-lifecycle.v1'
@@ -47,13 +47,13 @@ def locked(root):
 
 
 def identity(root, station):
-    context = project_config.resolve_context(repo_root=root)
+    context = station_config.resolve_context(repo_root=root)
     fields = ('station_id', 'station', 'project', 'branch', 'workstream')
     if station.get('schema') not in STATION_SCHEMAS or any(not isinstance(station.get(k), str) or not station[k] for k in fields):
         raise LifecycleError('Station v2 identity is incomplete; preserve it and repair the recorded identity first.')
     if station['project'] != context.config['project']:
         raise LifecycleError('Station project differs from consumer context.')
-    branch = project_config._git(root, 'branch', '--show-current')
+    branch = station_config._git(root, 'branch', '--show-current')
     if branch != station['branch']:
         raise LifecycleError('Station branch differs from live checkout.')
     return dict(root=str(context.source_root), **{k: station[k] for k in fields})

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://remote-station.local/schemas/station-config.v1.json",
+  "title": "remote-station consumer configuration",
+  "description": "The consumer's .mask/skill-config/remote-station/station.json. scripts/station_config.py validates it without a JSON Schema library; this schema documents the same contract.",
+  "type": "object",
+  "required": [
+    "schema",
+    "project",
+    "display_name",
+    "origin_repo_name",
+    "session_prefix",
+    "station_registry_doc",
+    "workstreams"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "token": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "relativePath": {
+      "type": "string",
+      "pattern": "^[^/][^\n]*[^/]$"
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "remote-station.config.v1"
+    },
+    "project": {
+      "$ref": "#/$defs/token",
+      "description": "Project token recorded in station files and lease names."
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "origin_repo_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository token the checkout's origin must name."
+    },
+    "session_prefix": {
+      "$ref": "#/$defs/token",
+      "description": "First token of every station name."
+    },
+    "station_registry_doc": {
+      "$ref": "#/$defs/relativePath",
+      "description": "Repository document that lists the stations in use."
+    },
+    "workstreams": {
+      "type": "object",
+      "required": ["main"],
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["branch"],
+        "additionalProperties": false,
+        "properties": {
+          "branch": {
+            "type": "string",
+            "minLength": 1
+          },
+          "platform": {
+            "enum": ["win", "linux", "mac"]
+          }
+        }
+      }
+    }
+  }
+}

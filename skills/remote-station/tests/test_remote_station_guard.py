@@ -24,9 +24,7 @@ PACK = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PACK / 'scripts'))
 GUARD = PACK / "scripts" / "remote_station_guard.py"
 LEASE = PACK / "scripts" / "station_lease.py"
-PROJECT_CONFIG_MODULE = PACK / "scripts" / "project_config.py"
-PERSONAL_STATE_MODULE = PACK / "scripts" / "personal_state.py"
-from project_fixtures import CONFIG
+from station_fixtures import CONFIG
 
 FIXTURE_PROJECT = {
     **CONFIG,
@@ -67,17 +65,16 @@ class RemoteStationGuardTests(unittest.TestCase):
             self.repo
             / ".agents"
             / "skills"
-            / "implement-rfc"
+            / "remote-station"
             / "scripts"
             / "station_lease.py"
         )
         lease_target.parent.parent.mkdir(parents=True)
         lease_target.parent.symlink_to(PACK / "scripts", target_is_directory=True)
         self.request_helper = lease_target.with_name("station_task_admission.py")
-        config_dir = self.repo / ".mask/skill-config/implement-rfc"
+        config_dir = self.repo / ".mask/skill-config/remote-station"
         config_dir.mkdir(parents=True)
-        (config_dir / "project.md").write_text("Fixture rules")
-        (config_dir / "project.json").write_text(
+        (config_dir / "station.json").write_text(
             json.dumps(FIXTURE_PROJECT, indent=2) + "\n", encoding="utf-8"
         )
         self.station = {

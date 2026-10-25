@@ -27,13 +27,16 @@ SCHEMA = "implement-rfc.project.v2"
 TOKEN_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 PLATFORM_TOKENS = ("win", "linux", "mac")
 REQUIRED_KEYS = (
-    "schema", "project", "display_name", "session_prefix", "origin_repo_name",
+    "schema", "project", "display_name", "origin_repo_name",
     "rfc_root", "issue_root", "next_id", "reservations_dir", "allocate_id_command",
     "lanes", "lane_statuses", "terminal_rfc_status",
-    "structure_gate", "attended_review_skill", "station_registry_doc", "workstreams",
+    "structure_gate", "attended_review_skill", "workstreams",
     "role_addenda",
 )
-OPTIONAL_KEYS = ("bookkeeping", "sequencing", "allocation")
+# Station identity moved to the remote-station skill's station.json. These keys
+# remain accepted and validated so existing project.json files stay valid.
+LEGACY_STATION_KEYS = ("session_prefix", "station_registry_doc")
+OPTIONAL_KEYS = ("bookkeeping", "sequencing", "allocation", *LEGACY_STATION_KEYS)
 LANE_KEYS = ("inbox", "backlog", "ready", "in_progress", "parked", "blocked", "done")
 
 
@@ -73,11 +76,14 @@ def validate(config: Any) -> dict[str, Any]:
     if config["schema"] != SCHEMA:
         raise ProjectConfigError(f"project.json schema must be {SCHEMA!r}")
     _require_token(config, "project")
-    _require_token(config, "session_prefix")
+    if "session_prefix" in config:
+        _require_token(config, "session_prefix")
     _require_text(config, "display_name")
     _require_text(config, "origin_repo_name")
-    for key in ("rfc_root", "issue_root", "reservations_dir", "station_registry_doc"):
+    for key in ("rfc_root", "issue_root", "reservations_dir"):
         _require_relative_path(config, key)
+    if "station_registry_doc" in config:
+        _require_relative_path(config, "station_registry_doc")
     _require_text(config, "allocate_id_command")
     _require_text(config, "terminal_rfc_status")
 
@@ -330,23 +336,6 @@ def resolve_context(*, repo_root: Path | str | None = None,
 def repo_root() -> Path:
     """Compatibility accessor; selection occurs at the call, never at import."""
     return resolve_context().repo_root
-
-
-def session_name_pattern(config: dict[str, Any]) -> re.Pattern[str]:
-    return re.compile(rf"^{re.escape(config['session_prefix'])}(?:-[a-z0-9]+)+$")
-
-
-def station_name(config: dict[str, Any], workstream: str, platform: str, machine: str = "") -> str:
-    """`<prefix>-<workstream>-<platform>[-<machine>]`, omitting the platform token
-    when the workstream is itself platform-bound (so `<prefix>-win-example-win-host`, not
-    `<prefix>-win-win-example-win-host`, and `<prefix>-main-mac` for the integrator)."""
-    spec = config["workstreams"][workstream]
-    parts = [config["session_prefix"], workstream]
-    if "platform" not in spec:
-        parts.append(platform)
-    if machine:
-        parts.append(machine)
-    return "-".join(parts)
 
 
 def lane_log_name(config: dict[str, Any]) -> str:
