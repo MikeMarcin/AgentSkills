@@ -283,9 +283,13 @@ class FakeClient:
         self.turn_status = turn_status
         self.projects = list(projects or [])
         self.stale_writer_thread_ids = set(stale_writer_thread_ids or ())
+        self.timeouts: list[tuple[str, float | None]] = []
 
-    def request(self, method: str, params: dict) -> dict:
+    def request(
+        self, method: str, params: dict, *, timeout: float | None = None
+    ) -> dict:
         self.calls.append((method, params))
+        self.timeouts.append((method, timeout))
         if method == "project/list":
             return {"data": list(self.projects), "nextCursor": None}
         if method == "project/update":
@@ -436,6 +440,25 @@ class ProvisionNamedThreadTests(ContextTestCase):
 
     def tearDown(self) -> None:
         self._temporary.cleanup()
+
+    def test_turn_reads_outlast_the_default_request_timeout(self) -> None:
+        # Long station histories made thread/read with turns exceed 30 seconds.
+        client = FakeClient()
+
+        codex_station.provision_named_thread(
+            client,
+            cwd=self.cwd,
+            name=self.name,
+            expected_thread_id=None,
+        )
+
+        reads = [
+            timeout for method, timeout in client.timeouts if method == "thread/read"
+        ]
+        self.assertTrue(reads)
+        self.assertEqual(
+            set(reads), {codex_station.THREAD_TURNS_READ_TIMEOUT_SECONDS}
+        )
 
     def test_creates_names_and_verifies_a_fresh_task(self) -> None:
         client = FakeClient()
@@ -1008,7 +1031,9 @@ class ProvisionNamedThreadTests(ContextTestCase):
 
     def test_reset_recognizes_archival_when_read_omits_archived_flag(self) -> None:
         class DesktopRead(FakeClient):
-            def request(self, method: str, params: dict) -> dict:
+            def request(
+                self, method: str, params: dict, *, timeout: float | None = None
+            ) -> dict:
                 result = super().request(method, params)
                 if method == "thread/read":
                     result["thread"].pop("archived", None)
@@ -1037,7 +1062,9 @@ class ProvisionNamedThreadTests(ContextTestCase):
 
     def test_archive_writer_collision_is_not_retried(self) -> None:
         class PersistentWriter(FakeClient):
-            def request(self, method: str, params: dict) -> dict:
+            def request(
+                self, method: str, params: dict, *, timeout: float | None = None
+            ) -> dict:
                 if method == "thread/archive":
                     self.stale_writer_thread_ids.add(params["threadId"])
                 return super().request(method, params)
@@ -1069,7 +1096,9 @@ class ProvisionNamedThreadTests(ContextTestCase):
 
     def test_registered_named_task_survives_unavailable_rename_rpc(self) -> None:
         class ReadableDesktopClient(FakeClient):
-            def request(self, method: str, params: dict) -> dict:
+            def request(
+                self, method: str, params: dict, *, timeout: float | None = None
+            ) -> dict:
                 if method == "thread/name/set":
                     raise codex_station.CodexStationError(
                         "no rollout found for thread id thr-existing"

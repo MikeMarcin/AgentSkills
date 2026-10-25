@@ -37,6 +37,9 @@ import project_config  # noqa: E402
 STATION_SANDBOX = "danger-full-access"
 TERMINAL_TURN_STATUSES = {"completed", "failed", "interrupted"}
 STATION_BOOTSTRAP_TIMEOUT_SECONDS = 120.0
+# Reading a task's turns scales with its history: an 87-turn station task took
+# 58 seconds under CLI 0.164.0, well past the default request timeout.
+THREAD_TURNS_READ_TIMEOUT_SECONDS = 300.0
 
 
 def station_bootstrap_text(config: dict[str, Any]) -> str:
@@ -117,11 +120,19 @@ class _AppServerRpcClient:
     def _send(self, message: dict[str, Any]) -> None:
         raise NotImplementedError
 
-    def request(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
+    def request(
+        self,
+        method: str,
+        params: dict[str, Any],
+        *,
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
         request_id = self._next_id
         self._next_id += 1
         self._send({"method": method, "id": request_id, "params": params})
-        deadline = time.monotonic() + self._timeout
+        deadline = time.monotonic() + (
+            self._timeout if timeout is None else timeout
+        )
 
         while True:
             remaining = deadline - time.monotonic()
@@ -710,13 +721,15 @@ def _read_thread(
     *,
     include_turns: bool = False,
 ) -> dict[str, Any]:
-    return _thread_from_result(
+    params = {"threadId": thread_id, "includeTurns": include_turns}
+    result = (
         client.request(
-            "thread/read",
-            {"threadId": thread_id, "includeTurns": include_turns},
-        ),
-        "thread/read",
+            "thread/read", params, timeout=THREAD_TURNS_READ_TIMEOUT_SECONDS
+        )
+        if include_turns
+        else client.request("thread/read", params)
     )
+    return _thread_from_result(result, "thread/read")
 
 
 def _thread_turns(thread: dict[str, Any], operation: str) -> list[dict[str, Any]]:

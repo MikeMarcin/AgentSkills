@@ -361,7 +361,7 @@ class OwnerRuntimeAdapterTests(unittest.TestCase):
             self.calls = []
         def __enter__(self): return self
         def __exit__(self, *unused): pass
-        def request(self, method, params):
+        def request(self, method, params, *, timeout=None):
             self.calls.append((method, params))
             if method == 'thread/read':
                 items = ([{'type':'collabAgentToolCall','receiverThreadIds':['child']}] if self.descendants else [])
@@ -407,7 +407,7 @@ class OwnerRuntimeAdapterTests(unittest.TestCase):
         client = self.Client(Path('/different-root'))
         client.context.source_root = self.root
         original = client.request
-        def request(method, params):
+        def request(method, params, *, timeout=None):
             result = original(method, params)
             if method == 'thread/read': result['thread']['cwd'] = '/different-root'
             return result
@@ -415,7 +415,7 @@ class OwnerRuntimeAdapterTests(unittest.TestCase):
         with self.assertRaises(codex_station.CodexStationError): codex_station.station_activity(client, self.station)
         client = self.Client(self.root)
         original = client.request
-        def partial(method, params):
+        def partial(method, params, *, timeout=None):
             result = original(method, params)
             if method.endswith('/list'): result['nextCursor'] = 'more'
             return result

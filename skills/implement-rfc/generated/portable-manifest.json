@@ -274,7 +274,7 @@
     },
     {
       "path": "scripts/codex_station.py",
-      "sha256": "131dc05da68a6450c636a69e8eecf46565385b739876fab525ba26e214381faf"
+      "sha256": "6a7c00bc70a6af28d50a30e6b951845d8885b00735396fe26822f85eb737fe11"
     },
     {
       "path": "scripts/coordinator_handoff.py",
@@ -474,7 +474,7 @@
     },
     {
       "path": "tests/test_codex_station.py",
-      "sha256": "a00d3244a3cf02666f08fe994c6eb07a0add85434433c3b602fc9f61f76ce43d"
+      "sha256": "5e8c29e4c5f8bb07e2aada1cc3c67d72fc6caeb81790bfb8a1064698bdd69604"
     },
     {
       "path": "tests/test_coordinator_handoff.py",
@@ -502,7 +502,7 @@
     },
     {
       "path": "tests/test_launch_remote_station.py",
-      "sha256": "6a479ec3d31bcdd76564efe4e3a59324ec083284f182944fcb9dd078d440383e"
+      "sha256": "6313ed008fbd62c1acbfc9ec021ed9f1b8700538e213c012d90e8356a6e9f4a2"
     },
     {
       "path": "tests/test_mask_workflow.py",
@@ -626,7 +626,7 @@
     },
     {
       "path": "tests/test_station_control.py",
-      "sha256": "be849c220b8032b670f7f40b58db78bd68c28bf0165339c0d7fc04f5bb9ee3cb"
+      "sha256": "0539f75422ba7249fef4b9b0e43755de75d203721cb29874a7c16112c815e8dc"
     },
     {
       "path": "tests/test_station_hooks.py",
@@ -685,6 +685,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "8a7b605df8ee23cb",
+  "portable_digest": "f98d0b97f1a8fd6c",
   "schema": "implement-rfc.portable-manifest.v1"
 }

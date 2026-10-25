@@ -48,7 +48,9 @@ class FakeRemoteClient:
         self._diagnostic = diagnostic
         self.closed = False
 
-    def request(self, method: str, params: dict) -> dict:
+    def request(
+        self, method: str, params: dict, *, timeout: float | None = None
+    ) -> dict:
         self.calls.append((method, params))
         values = self.responses.get(method)
         if not values:
