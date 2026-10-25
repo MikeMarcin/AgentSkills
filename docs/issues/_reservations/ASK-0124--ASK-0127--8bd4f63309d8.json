@@ -1,0 +1,13 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0124",
+    "ASK-0125",
+    "ASK-0126",
+    "ASK-0127"
+  ],
+  "reserve_for": "remote-station-skill",
+  "purpose": "",
+  "created": "2026-10-25T00:54:40.863595+00:00",
+  "base": "f9ebeeb788db1c2fa0d15c952e8729458fb9a7df"
+}
