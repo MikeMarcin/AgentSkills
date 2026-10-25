@@ -16,7 +16,7 @@ RFC_BASE_SHA: 3ad85990719baec8f38544006a110c7a91bf6ab2
 
 Planned local cards: ASK-0124 (M1), ASK-0125 (M2), ASK-0126 (M3), ASK-0127 (closeout).
 
-Closeout review runtime: not yet selected.
+Closeout review runtime: M1 local implementer self-review (claude-opus-5-5); no independent review required or run.
 
 ## Milestone plan
 
@@ -33,15 +33,27 @@ three ordered milestones:
 
 | Criterion | Check/command | Outcome | Implementation commit |
 |---|---|---|---|
-| AC01 | | Not run | |
-| AC02 | | Not run | |
-| AC03 | | Not run | |
-| AC04 | | Not run | |
-| AC05 | | Not run | |
-| AC06 | | Not run | |
-| AC07 | | Not run | |
-| AC08 | | Not run | |
+| AC01 | `test_command_forwarder.StationConfigRefusalTests`, `test_station_config`, remote-station suite (255 tests) and `test_station_forwarders`; [verification](../../rfcs/plans/remote-station-skill/verification.md) | Pass | 12d3c32 |
+| AC02 | `python -B scripts/verify_rfc_bundle.py --mask-program C:/code/git/ManageAgentSkills` (real MASK 9b73453); [bundle receipt](../../rfcs/plans/remote-station-skill/rfc-bundle-evidence.json) | Pass | 12d3c32 |
+| AC03 | `test_command_forwarder.test_each_checkout_runs_its_own_pinned_version` (cmd and Git sh); [verification](../../rfcs/plans/remote-station-skill/verification.md) | Pass | 12d3c32 |
+| AC04 | `test_command_forwarder.test_refuses_outside_a_repository_and_without_the_skill_and_runs_nothing`; [verification](../../rfcs/plans/remote-station-skill/verification.md) | Pass | 12d3c32 |
+| AC05 | `test_command_forwarder` pass-through and direct-equivalence tests, with negative control; [verification](../../rfcs/plans/remote-station-skill/verification.md) | Pass | 12d3c32 |
+| AC06 | M2 native AITO resume of `aito-main-win` | Not run | |
+| AC07 | M3 BetterPullReview documented commands | Not run | |
+| AC08 | `test_station_forwarders` and the forwarder run inside the real-MASK bundle check; [verification](../../rfcs/plans/remote-station-skill/verification.md) | Pass | 12d3c32 |
 
 ## Checkpoint
 
-Import and plan adoption only; implementation not started.
+M1 `agentskills-skill` accepted at source candidate
+`12d3c3285909542febf39ae090f4150a4e673fc0` (pure move `3173ee9`, implementation
+`12d3c32`); ASK-0124 Done. Earlier commits: reservation `3ad8599`, implement-rfc
+Windows fixes `67c77e4` and `e5295e0` found while adopting the plan, import
+`e89ca41`, claim `625600a`, binding `011cc25`. Continuation, commands and pending
+obligations: [continuation](../../rfcs/plans/remote-station-skill/continuation.md).
+
+Pending: AC06 (M2, ASK-0125, native Windows; may need the owner) and AC07 (M3,
+ASK-0126). Owner decision pending on shipping no `mask-workflow.json` (MASK refuses
+an input-only descriptor; see the RFC's implementation notes). M2 must reconcile the
+owner's uncommitted AITO edits to `tools/codex_station.py`,
+`tools/tests/test_codex_station.py` and `tools/tests/test_launch_remote_station.py`
+before deleting those files.
