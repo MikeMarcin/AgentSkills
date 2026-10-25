@@ -21,6 +21,9 @@ RFC_BASE_SHA `3ad85990719baec8f38544006a110c7a91bf6ab2`. Source candidate
 | AC06 | M2 (ASK-0125): native AITO resume of `aito-main-win`. Not run in M1. | — |
 | AC07 | M3 (ASK-0126): BetterPullReview documented commands. Not run in M1. | — |
 | AC08 | `test_station_forwarders`: in a fixture consumer with both skills linked, implement-rfc's `launch_remote_station.py` (`status --json`, refused launch) and `station_control.py status --repo-root` match the remote-station scripts exactly, and the runpy `main(argv)` loading used by BetterPullReview's wrapper works. Without the sibling skill both exit 2 naming `mask install remote-station`. The real-MASK bundle run above also reaches the station through `.agents/skills/implement-rfc/scripts/launch_remote_station.py`. Pass. | `12d3c32` |
+| AC09 | M4 (ASK-0128, owner amendment 2026-10-24): per-turn token measurement before and after. Not run. | — |
+| AC10 | M4 (ASK-0128): guard refusals for v1 and v2 envelopes. Not run. | — |
+| AC11 | M4 (ASK-0128): v1 admission during the compatibility release. Not run. | — |
 
 ## Preserved behavior
 

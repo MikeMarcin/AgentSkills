@@ -171,6 +171,8 @@ internals, publication and live-runtime qualification beyond the AITO resume che
 - **AC08:** Existing implement-rfc launcher paths still work through the temporary
   forwarders.
 
+AC09–AC11 were added by the owner amendment of 2026-10-24 below.
+
 ## Execution authority
 
 Accepted for implementation by the owner on 2026-10-24 ("Implement the RFC ...
@@ -180,6 +182,39 @@ Original draft retained unchanged under `drafts/`. Live work: ASK-0124
 (AgentSkills skill, AC01–AC05, AC08), ASK-0125 (AITO migration, AC06), ASK-0126
 (BetterPullReview migration, AC07); closeout: ASK-0127. Milestones and exits are in
 the [adopted plan](plans/remote-station-skill/milestone-plan.json).
+
+## Owner amendment 2026-10-24: compact station message passing
+
+This section records an owner amendment. It is a requirement, not an observation.
+
+The owner added milestone M4 `compact-station-messaging` ("Compact station message
+passing"), giving this reason: "the remote-station message format is token
+inefficient, with boilerplate re-sent on every turn." Live work: ASK-0128. It depends
+on M1 `agentskills-skill`. Its boundary is `skills/remote-station` plus the
+implement-rfc dispatch rules that build station prompts. No push is authorized. The
+closeout card ASK-0127 now also waits on ASK-0128.
+
+- **AC09:** Per-turn token cost is measured on the same recorded `aito-main-win`
+  turns (Codex thread history and Claude session transcript), before and after the
+  change, and the method is recorded. The before measurement precedes design and is
+  kept as evidence.
+- **AC10:** Every guard refusal still fires for both v1 and v2 envelopes: replayed or
+  reused `task_id`, project mismatch, authority exceeded and expired.
+- **AC11:** v1 envelopes from existing dispatchers are still admitted during the
+  compatibility release. Station identity rules are unchanged.
+
+Candidate causes are unmeasured hypotheses, and AC09's measurement decides:
+
+- The `implement-rfc.remote-task.v1` envelope (schema
+  `remote-task-envelope.v1.json`) re-sends station-invariant fields on every turn.
+- `remote_station_guard.py` `_admit_request` injects the full admission receipt
+  JSON as hook `additionalContext`.
+- Bootstrap and dispatch text is repeated on every turn.
+
+A likely shape, which does not bind the design: a compact v2 envelope whose
+invariants come from the station identity file; the guard validates the expanded
+envelope; v1 is still accepted for one release; and the hook returns a one-line
+acknowledgement with a receipt ID.
 
 ## Implementation notes
 

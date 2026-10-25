@@ -1,7 +1,8 @@
 # Remote-station skill continuation
 
 Status: M1 `agentskills-skill` complete and accepted; ASK-0124 Done. RFC-ASK-0017
-stays Implementing: M2 (AITO, AC06) and M3 (BetterPullReview, AC07) remain.
+stays Implementing: M2 (AITO, AC06), M3 (BetterPullReview, AC07) and M4 (compact
+station messaging, AC09–AC11, added by owner amendment) remain.
 
 Assignment: one non-delegating `rfc-implementer` (effective route
 `claude-opus-5-5`, effort high) under the coordinator-implementer recipe, on
@@ -43,6 +44,45 @@ Command and ownership state: quiescent. All test, bundle and baseline runs finis
 the temporary baseline worktree was removed (`git worktree list` shows only the main
 checkout). No review server, waiter or writer is handed off. No real Claude or Codex
 runtime was started.
+
+## Owner amendment 2026-10-24 (segment `owner-amendment-m4`)
+
+The owner added milestone M4 `compact-station-messaging` ("Compact station message
+passing"), giving this reason: "the remote-station message format is token
+inefficient, with boilerplate re-sent on every turn." Records-only segment
+`owner-amendment-m4` of run `remote-station-2026-10-24` (coordinator-implementer)
+recorded it:
+
+- RFC section "Owner amendment 2026-10-24" holds AC09–AC11, the unmeasured
+  candidate causes (hypotheses only) and the non-binding likely shape.
+- `milestone-plan.json` gains `ASK-0128` in scope and milestone
+  `compact-station-messaging` (prerequisite `agentskills-skill`). `bpr-migration`
+  gains an added exit for closeout of AC09–AC11; its existing exits are unchanged.
+  `MILESTONES.md` was regenerated with the helper's `render()`. The `render` CLI
+  refuses to run while the view is stale.
+- `milestone_plan.py check-amendment` refused, as designed for a scope change
+  (`amendment cannot change plan identity or authorized scope`). The owner amendment
+  is the explicit requirement change, and `check` on the published plan reports
+  `structural: valid`.
+- ASK-0128 was reserved (`a0f66c8`) and created in Ready (its only dependency,
+  ASK-0124, is Done). ASK-0127 now depends on ASK-0128, and its checklist and
+  `verification.md` carry AC09–AC11 as Not run. Following the existing pattern for
+  ASK-0125, this is a card-level dependency; `bpr-migration` gains no milestone
+  prerequisite.
+- The M1 binding is unaffected. `bind` reproduces `checkpoint-final.json`'s
+  definition, obligation and prerequisite fingerprints. `milestone_checkpoint.py
+  check` now reports `reconcile` only because HEAD moved past `00b0023` through
+  records-only commits. M1 needs no rebind.
+
+MASK was upgraded to AgentSkills `e0b729c` in all consumers and pushed with owner
+approval. AgentSkills' own upgrade outputs (`.mask.json`, `.mask.lock.json`) are
+committed as `chore(mask): upgrade skills`. Like the other managed links, the new
+`remote-station` links under `.agents/skills` and `.claude/skills` are machine-local
+and are now gitignored.
+
+M4 next action: a fresh implementer claims ASK-0128 and measures per-turn tokens on
+the recorded `aito-main-win` Codex thread history and Claude session transcript.
+The measurement method and results must be recorded as evidence before any design.
 
 ## Next
 

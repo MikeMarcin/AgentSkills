@@ -49,5 +49,22 @@ BetterPullReview's documented station commands behave as before through remote-s
 
 - AC07 is demonstrated through BetterPullReview's documented commands, including takeover with no options.
 - RFC-ASK-0017 closeout reconciles AC01-AC08 against RFC_BASE_SHA with truthful pending native evidence.
+- RFC-ASK-0017 closeout also reconciles the 2026-10-24 owner-amendment criteria AC09-AC11 from compact-station-messaging (ASK-0128).
 
 **Boundary:** BetterPullReview repository under its own instructions and tracker, plus AgentSkills closeout records.
+
+## compact-station-messaging
+
+Compact station message passing: remote-station dispatch, admission and acknowledgement stop re-sending station-invariant boilerplate on every turn, with a measured per-turn token reduction and no weakening of guard refusals or v1 compatibility.
+
+**Work:** `ASK-0128`
+
+**Prerequisites:** agentskills-skill
+
+**Completion:**
+
+- AC09: per-turn token cost is measured on the same recorded aito-main-win turns (Codex thread history and Claude session transcript) before and after the change, with the method recorded; the before measurement precedes design and is kept as evidence.
+- AC10: every guard refusal still fires for both v1 and v2 envelopes: replayed or reused task_id, project mismatch, authority exceeded and expired.
+- AC11: v1 envelopes from existing dispatchers are still admitted during the compatibility release, and station identity rules are unchanged.
+
+**Boundary:** skills/remote-station plus the implement-rfc dispatch rules that build station prompts; no push, publication or credential change.
