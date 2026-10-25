@@ -10,6 +10,8 @@ __pycache__/
 /.claude/skills/attended-review
 /.agents/skills/wizard
 /.claude/skills/wizard
+/.agents/skills/remote-station
+/.claude/skills/remote-station
 /.mask/attended-review/
 /.mask/sessions/
 /.claude/agents/rfc-*.md

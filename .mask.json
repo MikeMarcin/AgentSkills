@@ -18,6 +18,10 @@
       "source": "agentskills"
     },
     {
+      "id": "remote-station",
+      "source": "agentskills"
+    },
+    {
       "id": "wizard",
       "source": "agentskills"
     }
