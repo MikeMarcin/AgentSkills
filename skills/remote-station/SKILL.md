@@ -47,9 +47,9 @@ Windows:
 | `takeover [--json] [--confirm-runtime-stopped]` | Transfer to local work; defaults to `--mode local --stop-previous` |
 | `hooks [status\|off] [--dry-run]` | Inspect or remove station guard hooks |
 
-Every launch with Claude enabled prints **Claude return path UNVERIFIED**. Confirm
-receipt in the dispatcher before unattended dispatch; a running station is not
-delivery.
+Every launch with Claude enabled prints a note that the launcher cannot confirm
+Claude replies reach the dispatcher. Confirm receipt in the dispatcher before
+unattended dispatch; a running station is not delivery.
 
 The skill's `scripts/install_command.py --bin-dir DIR` writes the version-free
 `launch_remote_station` and `launch_remote_station.cmd` into DIR without editing

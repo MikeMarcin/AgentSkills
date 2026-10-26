@@ -1005,22 +1005,10 @@ def wait_for_station_stop() -> int:
 def warn_unverified_claude_return_path(context: StationContext) -> None:
     """Keep runtime readiness separate from receipt by the receiving dispatcher."""
     print(
-        f"WARNING: Claude return path UNVERIFIED for {context.name}. "
-        "This launcher has no receipt from the receiving dispatcher.",
-        file=sys.stderr,
-        flush=True,
-    )
-    print(
-        'If replies are held or refused, check "crossSessionInbound": "accept" '
-        "in ~/.claude/settings.json on the RECEIVING dispatcher's computer. "
-        "The worker's own setting cannot verify that return path.",
-        file=sys.stderr,
-        flush=True,
-    )
-    print(
-        "A running station or an accepted send does not confirm delivery; "
-        "unconfirmed delivery does not establish that the station is offline. "
-        "Confirm receipt in the dispatcher before unattended dispatch.",
+        f"note: Claude replies from {context.name} reach its dispatcher only if the "
+        'dispatcher\'s computer has "crossSessionInbound": "accept" in '
+        "~/.claude/settings.json. Send one test task and check that the reply "
+        "arrives before leaving the station unattended.",
         file=sys.stderr,
         flush=True,
     )

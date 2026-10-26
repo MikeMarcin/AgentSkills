@@ -171,8 +171,8 @@ normal launch attempts resumption and can start fresh after a startup refusal.
 An explicit fresh Claude launch clears the old binding before starting, so an
 interruption before connection cannot silently resume the discarded context.
 
-Every launch with Claude enabled prints a **Claude return path UNVERIFIED**
-warning. The launcher cannot observe receipt by the receiving dispatcher: replies
+Every launch with Claude enabled prints a note that Claude replies are
+unconfirmed. The launcher cannot observe receipt by the receiving dispatcher: replies
 held or refused there usually mean that dispatcher's computer lacks
 `"crossSessionInbound": "accept"` in `~/.claude/settings.json`, which the station's
 own setting cannot verify. A running station or an accepted send confirms neither

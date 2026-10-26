@@ -1297,7 +1297,7 @@ class LauncherTests(unittest.TestCase):
                 ):
                     self.assertEqual(launcher.supervise(arguments(**flags), self.context), 0)
                 text = errors.getvalue()
-                self.assertEqual(f"Claude return path UNVERIFIED for {self.context.name}" in text, warned)
+                self.assertEqual(f"Claude replies from {self.context.name} reach its dispatcher" in text, warned)
                 self.assertEqual('"crossSessionInbound": "accept"' in text, warned)
 
     def test_codex_only_wait_stops_cleanly_on_ctrl_c(self) -> None:

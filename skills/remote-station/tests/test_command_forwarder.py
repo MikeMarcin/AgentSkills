@@ -87,7 +87,7 @@ class CommandForwarderTests(unittest.TestCase):
                                      (direct.returncode, direct.stdout, direct.stderr))
         launch = run_direct(self.a, sub, env=bare)
         self.assertIn("starting or resuming unified station alpha-main-", launch.stdout)
-        self.assertIn("Claude return path UNVERIFIED", launch.stderr)
+        self.assertIn("Claude replies from alpha-main-", launch.stderr)
         self.assertIn("station refused: Codex CLI", launch.stderr)
         self.assertFalse((self.a / ".remote-station.json").exists())
 
