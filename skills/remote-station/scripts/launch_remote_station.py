@@ -722,17 +722,49 @@ def claude_worktree_bridge_pointers(root: pathlib.Path) -> tuple[pathlib.Path, .
     return tuple(dict.fromkeys(claude_bridge_pointer(candidate) for candidate in roots))
 
 
+def claude_environment_only_pointer(backup: pathlib.Path) -> dict[str, Any] | None:
+    """Return a pointer that keeps this checkout's environment but no session.
+
+    A terminal `claude remote-control` keeps its environment registered after it
+    exits, and the server refuses a second environment for the same device and
+    folder. Claude reuses the pointer's `environmentId` on registration, but it
+    also adopts the pointer's `sessionId`, so a fresh launch gets the environment
+    alone. `pid` and `procStart` stay so Claude still refuses to take over an
+    environment that a live server owns.
+    """
+    try:
+        value = json.loads(backup.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(value, dict) or value.get("source") != "standalone":
+        return None
+    environment_id = value.get("environmentId")
+    if not isinstance(environment_id, str) or not environment_id:
+        return None
+    pointer: dict[str, Any] = {
+        "sessionId": "",
+        "environmentId": environment_id,
+        "source": "standalone",
+    }
+    for key in ("pid", "procStart", "pidDomain"):
+        if key in value:
+            pointer[key] = value[key]
+    return pointer
+
+
 @dataclass
 class ClaudeBridgeIsolation:
     """Temporarily hide cross-worktree pointers while Claude creates a session."""
 
     target: pathlib.Path
     backups: tuple[tuple[pathlib.Path, pathlib.Path], ...]
+    placeholder: dict[str, Any] | None = None
 
     @classmethod
     def begin(cls, root: pathlib.Path) -> "ClaudeBridgeIsolation":
         target = claude_bridge_pointer(root)
         backups: list[tuple[pathlib.Path, pathlib.Path]] = []
+        placeholder: dict[str, Any] | None = None
         try:
             for pointer in claude_worktree_bridge_pointers(root):
                 backup = pointer.with_name(CLAUDE_BRIDGE_BACKUP_NAME)
@@ -744,13 +776,26 @@ class ClaudeBridgeIsolation:
                 if pointer.exists():
                     pointer.replace(backup)
                     backups.append((pointer, backup))
+                    if pointer == target:
+                        placeholder = claude_environment_only_pointer(backup)
+            if placeholder is not None:
+                atomic_write_json(target, placeholder)
         except OSError as error:
-            isolation = cls(target=target, backups=tuple(backups))
+            isolation = cls(target=target, backups=tuple(backups), placeholder=placeholder)
             isolation.close()
             raise LaunchRefusal(
                 f"could not isolate Claude bridge pointers for a fresh session: {error}"
             ) from error
-        return cls(target=target, backups=tuple(backups))
+        return cls(target=target, backups=tuple(backups), placeholder=placeholder)
+
+    def _target_is_placeholder(self) -> bool:
+        if self.placeholder is None:
+            return False
+        try:
+            value = json.loads(self.target.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return False
+        return value == self.placeholder
 
     def session_started(self) -> None:
         """Keep the new target pointer and make sibling pointers visible again."""
@@ -781,7 +826,9 @@ class ClaudeBridgeIsolation:
         self.backups = tuple(remaining)
 
     def close(self) -> None:
-        self._restore(preserve_target=self.target.exists())
+        self._restore(
+            preserve_target=self.target.exists() and not self._target_is_placeholder()
+        )
 
     def _restore(self, *, preserve_target: bool) -> None:
         remaining: list[tuple[pathlib.Path, pathlib.Path]] = []

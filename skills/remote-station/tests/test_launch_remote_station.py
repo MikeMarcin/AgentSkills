@@ -179,6 +179,82 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(target.read_text(encoding="utf-8"), "old-target")
         self.assertEqual(sibling.read_text(encoding="utf-8"), "old-sibling")
 
+    def test_fresh_claude_keeps_the_checkout_environment_without_its_session(self) -> None:
+        """A preserved environment blocks a second one for the same folder."""
+        target = self.context.root / "target" / "bridge-pointer.json"
+        sibling = self.context.root / "sibling" / "bridge-pointer.json"
+        target.parent.mkdir()
+        sibling.parent.mkdir()
+        old_target = {
+            "sessionId": "session_OldMain123",
+            "environmentId": "env_OldMain123",
+            "source": "standalone",
+            "pid": 1234,
+            "procStart": "5678",
+            "activeSessionIds": ["session_OldMain123"],
+            "activeSessionIdsPersistedAt": 1,
+        }
+        target.write_text(json.dumps(old_target), encoding="utf-8")
+        sibling.write_text(
+            json.dumps({**old_target, "environmentId": "env_Sibling123"}),
+            encoding="utf-8",
+        )
+
+        with mock.patch.object(
+            launcher,
+            "claude_worktree_bridge_pointers",
+            return_value=(target, sibling),
+        ), mock.patch.object(
+            launcher, "claude_bridge_pointer", return_value=target
+        ):
+            isolation = launcher.ClaudeBridgeIsolation.begin(self.context.root)
+            self.assertIsNone(launcher.read_claude_bridge_session_id(self.context.root))
+
+        self.assertEqual(
+            json.loads(target.read_text(encoding="utf-8")),
+            {
+                "sessionId": "",
+                "environmentId": "env_OldMain123",
+                "source": "standalone",
+                "pid": 1234,
+                "procStart": "5678",
+            },
+        )
+        self.assertFalse(sibling.exists())
+        new_target = {**old_target, "sessionId": "session_NewMain456", "pid": 4321}
+        target.write_text(json.dumps(new_target), encoding="utf-8")
+        isolation.session_started()
+
+        self.assertEqual(json.loads(target.read_text(encoding="utf-8")), new_target)
+        self.assertTrue(sibling.exists())
+        self.assertFalse(
+            target.with_name(launcher.CLAUDE_BRIDGE_BACKUP_NAME).exists()
+        )
+
+    def test_failed_fresh_claude_replaces_the_environment_placeholder(self) -> None:
+        target = self.context.root / "target" / "bridge-pointer.json"
+        target.parent.mkdir()
+        old_target = json.dumps({
+            "sessionId": "session_OldMain123",
+            "environmentId": "env_OldMain123",
+            "source": "standalone",
+        })
+        target.write_text(old_target, encoding="utf-8")
+
+        with mock.patch.object(
+            launcher, "claude_worktree_bridge_pointers", return_value=(target,)
+        ), mock.patch.object(
+            launcher, "claude_bridge_pointer", return_value=target
+        ):
+            isolation = launcher.ClaudeBridgeIsolation.begin(self.context.root)
+        self.assertTrue(target.exists())
+        isolation.close()
+
+        self.assertEqual(target.read_text(encoding="utf-8"), old_target)
+        self.assertFalse(
+            target.with_name(launcher.CLAUDE_BRIDGE_BACKUP_NAME).exists()
+        )
+
     def test_records_a_new_exact_claude_session_from_the_bridge(self) -> None:
         recorded: list[str] = []
         stop = launcher.threading.Event()
