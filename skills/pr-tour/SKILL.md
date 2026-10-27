@@ -11,6 +11,12 @@ metadata:
 
 Help the author explain the problem, the solution, and the important code decisions in a useful order. The `bpr tour` CLI owns draft state, GitHub interpretation, source bindings, hooks, publication and recovery. Do not reimplement any of it.
 
+## Get the CLI
+
+Run this skill's `scripts/locate_bpr.py` with Python 3. It looks on `PATH` first, then at `/Applications/BetterPullReview.app/Contents/MacOS/bpr` on macOS. Keep the returned absolute executable path for every command in this session, including capability discovery; `bpr` below means that path. This also works for a GUI-launched agent whose shell PATH was never inherited. If lookup fails, stop and give its setup instruction; do not attempt `tour open`. For a nonstandard app location ask for its absolute path and check `<app>/Contents/MacOS/bpr`.
+
+The macOS desktop package includes the terminal executable in builds with local automation. The automation-off variant does not provide it. See [setup](references/setup.md) for direct invocation, optional persistent PATH configuration, other platforms and the source-build fallback. Never edit shell configuration or create a symlink without an explicit user action.
+
 ## Begin or resume
 
 Run `bpr tour capabilities --json` once per binary/session and stop if `cli_contract` is not `1` or `assist` is absent: that is a dependency problem, never permission to fall back to `gh api`, HTTP, or the database. Then `bpr tour open <PR-URL> --json`, and keep the returned `profile_id` and `draft_id` explicit on every later call. Ask only for a missing choice. Read the draft before writing: GitHub is canonical for published content, the shared local store holds unsent work, and neither holds private history the author never entered. See [commands](references/commands.md); load [recovery](references/recovery.md) only for an error.
