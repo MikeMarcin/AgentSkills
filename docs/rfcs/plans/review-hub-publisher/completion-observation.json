@@ -1,0 +1,199 @@
+{
+  "run_id": "review-hub-2026-10-30",
+  "segment_id": "session-publication-1",
+  "mandate_revision": "review-hub-v1",
+  "selection": {
+    "schema": "implement-rfc.strategy-selection.v1",
+    "strategy": "coordinator-implementer",
+    "topology_id": "coordinator-implementer",
+    "recipe_revision": "2",
+    "recipe_fingerprint": "sha256:6a3e244394aeed7652d24753f6588c0a9408080bd24ddad0dcfc5198d5369fe4",
+    "routing": {},
+    "requirement_profile": "coordinator-implementer",
+    "owners": {
+      "engineering": "implementer",
+      "bookkeeping": "implementer",
+      "product_edits": "implementer"
+    },
+    "delegation": "recipe",
+    "instruction_paths": [
+      "references/engineering-contract.md",
+      "references/strategies/coordinator-implementer.md"
+    ],
+    "configuration_complete": true,
+    "missing_routes": [],
+    "host_load": "not_verified"
+  },
+  "binding": {
+    "plan_id": "review-hub-publisher",
+    "plan_path": "docs/rfcs/plans/review-hub-publisher/milestone-plan.json",
+    "milestone_id": "session-publication",
+    "definition_fingerprint": "sha256:12ad260e12f5f595dde92f5fda73b5a827f22b82d4626cc21f15776089546ffc",
+    "obligations": [
+      {
+        "id": "RFC-ASK-0018:AC01",
+        "source": "RFC-ASK-0018",
+        "selector": "AC01",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      },
+      {
+        "id": "RFC-ASK-0018:AC02",
+        "source": "RFC-ASK-0018",
+        "selector": "AC02",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      },
+      {
+        "id": "RFC-ASK-0018:AC03",
+        "source": "RFC-ASK-0018",
+        "selector": "AC03",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      },
+      {
+        "id": "RFC-ASK-0018:AC04",
+        "source": "RFC-ASK-0018",
+        "selector": "AC04",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      },
+      {
+        "id": "RFC-ASK-0018:AC05",
+        "source": "RFC-ASK-0018",
+        "selector": "AC05",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      },
+      {
+        "id": "RFC-ASK-0018:AC06",
+        "source": "RFC-ASK-0018",
+        "selector": "AC06",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      },
+      {
+        "id": "RFC-ASK-0018:AC07",
+        "source": "RFC-ASK-0018",
+        "selector": "AC07",
+        "source_fingerprint": "sha256:76dcb7e92a4a5b33bdd17e30659257e57c7a94a19e02a8e8bc836e3cf708f6d0"
+      }
+    ],
+    "obligation_fingerprint": "sha256:b6a6386c3dc4b12ca202106ab9a6eec8cdf2597b394725fee17e1801dce0e9bb",
+    "exit_criteria": [
+      {
+        "id": "session-publication:exit:1",
+        "text": "The publisher meets the record, configuration, lifecycle and failure-isolation contract against disposable fixtures; the integrated contract revision is ready for the standalone service handoff."
+      }
+    ],
+    "prerequisite_fingerprint": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "structural": "valid",
+    "references": "resolved",
+    "semantic_coverage": "unknown",
+    "diagnostics": [],
+    "diagnostics_truncated": false
+  },
+  "milestone": "session-publication",
+  "disposition": "pack-complete",
+  "candidate_revision": "ab99baa3976ea77de6690922ca0e9696988dbcfa",
+  "handoff_ref": "docs/rfcs/plans/review-hub-publisher/continuation.md",
+  "required_pending": [],
+  "evidence_refs": [
+    "docs/rfcs/plans/review-hub-publisher/verification.md",
+    "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+    "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+    "docs/rfcs/plans/review-hub-publisher/documentation.json",
+    "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+  ],
+  "acceptance_records": [
+    {
+      "id": "RFC-ASK-0018:AC01",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "RFC-ASK-0018:AC02",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "RFC-ASK-0018:AC03",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "RFC-ASK-0018:AC04",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "RFC-ASK-0018:AC05",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "RFC-ASK-0018:AC06",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "RFC-ASK-0018:AC07",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    },
+    {
+      "id": "session-publication:exit:1",
+      "outcome": "pass",
+      "evidence_refs": [
+        "docs/rfcs/plans/review-hub-publisher/verification.md",
+        "docs/rfcs/plans/review-hub-publisher/focused-tests.json",
+        "docs/rfcs/plans/review-hub-publisher/ac01-differential.json",
+        "docs/rfcs/plans/review-hub-publisher/documentation.json",
+        "docs/rfcs/plans/review-hub-publisher/fixture-records.json"
+      ]
+    }
+  ],
+  "continuation": {
+    "intent": "stop",
+    "next_milestone": null,
+    "reason": "target-complete",
+    "detail": "Publisher consumer plan complete (source unchanged since 3cb6856; binding renewed after non-requirement RFC edits: status, card links, implementation record). hub-service and hub-push belong to the standalone service repository (D4)."
+  },
+  "ownership": "quiescent"
+}
