@@ -1,0 +1,80 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "review-hub",
+  "scope": {
+    "rfcs": [
+      "RFC-DRAFT-0001",
+      "RFC-DRAFT-0002"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "session-publication",
+      "outcome": "Attended-review sessions can publish private, ordered summaries to a configured hub while preserving local review behavior when delivery is unavailable.",
+      "work": [
+        {
+          "rfc": "RFC-DRAFT-0001",
+          "criteria": [
+            "AC01",
+            "AC02",
+            "AC03",
+            "AC04",
+            "AC05",
+            "AC06",
+            "AC07"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "The publisher meets the record, configuration, lifecycle and failure-isolation contract against disposable fixtures; the integrated contract revision is ready for the standalone service handoff."
+      ],
+      "boundary": "A verified optional AgentSkills publisher and versioned record contract, usable before a real hub exists; no publication or consumer upgrade is implied."
+    },
+    {
+      "id": "hub-service",
+      "outcome": "The owner can open one tailnet-only page on the NAS that lists every active review across machines and links to each.",
+      "work": [
+        {
+          "rfc": "RFC-DRAFT-0002",
+          "criteria": [
+            "AC01",
+            "AC02",
+            "AC03",
+            "AC04",
+            "AC05",
+            "AC08"
+          ]
+        }
+      ],
+      "depends_on": [
+        "session-publication"
+      ],
+      "exit_criteria": [
+        "The standalone stack provides the authorized, capability-protecting index with ordered durable records, stale handling and no review control; required NAS deployment evidence is recorded."
+      ],
+      "boundary": "A verified hub on the NAS with push disabled. Fixture-only results leave deployment acceptance open."
+    },
+    {
+      "id": "hub-push",
+      "outcome": "The owner receives Android notifications for qualifying ready-count increases through the self-hosted tailnet service, without sending summaries or capabilities to external notification providers.",
+      "work": [
+        {
+          "rfc": "RFC-DRAFT-0002",
+          "criteria": [
+            "AC06",
+            "AC07"
+          ]
+        }
+      ],
+      "depends_on": [
+        "hub-service"
+      ],
+      "exit_criteria": [
+        "Persistent throttling, account restrictions and failure isolation pass fixture checks, and an authorized screen-off Android observation demonstrates delivery of the summary and hub link."
+      ],
+      "boundary": "The defined hub and optional push outcome with actual closeout evidence; iOS remains deferred."
+    }
+  ],
+  "coverage": "complete"
+}

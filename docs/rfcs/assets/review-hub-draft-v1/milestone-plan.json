@@ -1,0 +1,31 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "review-hub",
+  "scope": {"rfcs": ["RFC-DRAFT-0001", "RFC-DRAFT-0002"]},
+  "milestones": [
+    {
+      "id": "session-publication",
+      "outcome": "Attended-review sessions can optionally announce themselves to a configured hub without any effect on review when the hub is absent or failing.",
+      "work": [{"rfc": "RFC-DRAFT-0001", "criteria": ["AC01", "AC02", "AC03", "AC04", "AC05"]}],
+      "depends_on": [],
+      "exit_criteria": ["The publisher sends the version-1 record at every defined point against a fixture hub, and unchanged behavior holds with no hub or a failing hub."],
+      "boundary": "A released attended-review client and record contract, usable before any hub exists."
+    },
+    {
+      "id": "hub-service",
+      "outcome": "The owner can open one tailnet-only page on the NAS that lists every active review across machines and links to each.",
+      "work": [{"rfc": "RFC-DRAFT-0002", "criteria": ["AC01", "AC02", "AC03", "AC04", "AC05"]}],
+      "depends_on": ["session-publication"],
+      "exit_criteria": ["The compose stack serves the identity-restricted hub over Tailscale Serve only, with listing, stale handling and no influence on review state."],
+      "boundary": "A deployable hub without push."
+    },
+    {
+      "id": "hub-push",
+      "outcome": "The owner's Android phone is notified when a session gains ready items, without anything leaving the tailnet.",
+      "work": [{"rfc": "RFC-DRAFT-0002", "criteria": ["AC06", "AC07"]}],
+      "depends_on": ["hub-service"],
+      "exit_criteria": ["Throttled, content-free ntfy messages reach a subscribed device through a locked-down tailnet-only ntfy server."],
+      "boundary": "The complete defined hub outcome with closeout evidence; iOS stays deferred."
+    }
+  ]
+}

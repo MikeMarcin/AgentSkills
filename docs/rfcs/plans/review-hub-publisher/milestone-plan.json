@@ -1,0 +1,36 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "review-hub-publisher",
+  "scope": {
+    "rfcs": [
+      "RFC-ASK-0018"
+    ]
+  },
+  "coverage": "complete",
+  "milestones": [
+    {
+      "id": "session-publication",
+      "outcome": "Attended-review sessions can publish private, ordered summaries to a configured hub while preserving local review behavior when delivery is unavailable.",
+      "work": [
+        {
+          "rfc": "RFC-ASK-0018",
+          "criteria": [
+            "AC01",
+            "AC02",
+            "AC03",
+            "AC04",
+            "AC05",
+            "AC06",
+            "AC07"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "The publisher meets the record, configuration, lifecycle and failure-isolation contract against disposable fixtures; the integrated contract revision is ready for the standalone service handoff."
+      ],
+      "boundary": "A verified optional AgentSkills publisher and versioned record contract, usable before a real hub exists; no publication or consumer upgrade is implied."
+    }
+  ],
+  "unplanned_work": []
+}

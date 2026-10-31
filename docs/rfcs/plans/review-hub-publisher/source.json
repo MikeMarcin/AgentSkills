@@ -1,0 +1,10 @@
+{
+  "mapping": {
+    "DRAFT-0001": "ASK-0129",
+    "DRAFT-0004": "ASK-0130",
+    "RFC-DRAFT-0001": "RFC-ASK-0018"
+  },
+  "plan_path": "docs/rfcs/plans/review-hub-publisher/milestone-plan.json",
+  "schema": "implement-rfc.plan-source.v1",
+  "source_sha256": "6192afc5e0d7d25596bf065e85a6247e85d5ee8d1e63a825eb659f74ee24bdd7"
+}

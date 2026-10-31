@@ -43,3 +43,5 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 | RFC-ASK-0016 | Auto-Verified | Audio questions and durable feedback |
 
 | RFC-ASK-0017 | Implementing | Standalone remote-station skill and a version-agnostic launch command |
+
+| RFC-ASK-0018 | Implementing | Attended-review session publication to an optional review hub |
