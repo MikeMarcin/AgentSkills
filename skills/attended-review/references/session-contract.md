@@ -128,7 +128,7 @@ See [the portable example](../examples/README.md) for a mixed session.
 | `wait [--after SEQUENCE] [--kind KIND ...] [--timeout SECONDS]` | Block until an event newer than the cursor of a requested kind exists (default `handed-back` and `decision`), print those events on one line and exit 0. A timeout exits 1 with the current sequence. Use `--kind handed-back` for the normal review boundary. Host orchestration follows [Driver waiting](driver-wait.md); process exit alone does not guarantee a model wake. It polls the file's modification time and reads under the ordinary lock only when that moves. |
 | `conflicts --paths PATH ... --resources KEY ...` | Return overlapping local path/shared resource protections before modifying them. |
 | `resume-development --paths PATH ... --resources KEY ... [--candidate ID]` | Release only selected affected candidates; unanswered ones become waiting. `--all` explicitly releases the whole checkout session. |
-| `serve [--tailscale] [--tailscale-port PORT] [--tailscale-bin FILE]` | Start a foreground host or attach to this checkout's host. Agents choose `serve --tailscale` by default for every session under the [Tailscale contract](tailscale-serve.md); bare `serve` retains loopback for explicit local choice or deliberate fallback. |
+| `serve [--tailscale] [--tailscale-port PORT] [--tailscale-bin FILE] [--hub ORIGIN \| --no-hub]` | Start a foreground host or attach to this checkout's host. `--hub`/`--no-hub` configure optional [hub publication](#optional-hub-publication). Agents choose `serve --tailscale` by default for every session under the [Tailscale contract](tailscale-serve.md); bare `serve` retains loopback for explicit local choice or deliberate fallback. |
 | `stop` | Authenticate to and stop only the recorded host. Prepared candidates remain protected. |
 | `html --output FILE` | Create standalone self-contained HTML after preparation. |
 | `import --file FILE` | Validate and atomically intake partial answer/feedback JSON; `-` reads stdin. |
@@ -240,6 +240,111 @@ The UI has direct Accept/Reject controls (Choose selected/Reject all for
 options); the pressed control is the recorded answer, and pressing it again
 records nothing new. A System/Light/Dark theme control is a browser preference
 kept only in local storage; it is never session state, exported or logged. It has one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
+
+## Optional hub publication
+
+A session can publish a private summary to a review hub: one always-on page that
+lists active reviews across checkouts, harnesses and machines. Publication is opt-in
+per session, best effort, and changes nothing about review, intake or protection.
+The hub is read-only for reviews; decisions stay on this session's page or `import`.
+
+### Configuration
+
+`serve --hub ORIGIN` selects a destination; otherwise a nonempty
+`ATTENDED_REVIEW_HUB`, then the destination saved earlier, applies. `serve --no-hub`
+overrides both, clears the saved destination and cancels pending delivery; it cannot
+retract a record already sent, so that hub entry becomes stale. The flags are
+mutually exclusive and also apply when attaching to a running host, which then
+publishes to the new choice. Only `serve` reads the flags and environment; the running
+host and later mutating commands reuse the saved setting from any shell.
+
+`ORIGIN` is a Tailscale Serve HTTPS origin: `https://NAME.ts.net` with an optional
+port, and no userinfo, path other than `/`, query or fragment. An invalid flag or
+environment value is a configuration error (exit 1) before anything changes.
+Delivery verifies the certificate for that name, refuses redirects and sends no
+credential; tailnet access rules are the hub's only access boundary.
+
+The setting, the publication revision and the current diagnostic live in
+`hub.json` (and a transient `.hub-lock`) beside `session.json`, outside the event
+stream. A session that never enabled publication gains no files, fields, output or
+network activity.
+
+### Record (wire contract version 1)
+
+Each publication is `PUT ORIGIN/api/sessions/SESSION_ID` with
+`Content-Type: application/json`, no `Origin` or `Authorization` header, and exactly
+these fields:
+
+```json
+{
+  "schema": "attended-review.hub-record.v1",
+  "session_id": "3f0c...",
+  "repo": "checkout (AgentSkills)",
+  "machine": "studio-mac",
+  "harness": "claude",
+  "url": "https://studio-mac.example.ts.net:8443/#token=...",
+  "state": "ready",
+  "counts": {"waiting": 1, "ready": 2, "answered": 1, "total": 4},
+  "sequence": 42,
+  "publication_revision": 7,
+  "updated_at": "2026-10-30T18:04:11.512345+00:00"
+}
+```
+
+- `session_id` is the session `id`, also in the path. `repo` is the checkout
+  directory name, plus ` (NAME)` when the `origin` remote's basename differs; the
+  remote string itself is never sent. `machine` is the host name. Labels are at most
+  200 characters.
+- `harness` is `claude`, `codex` or `unknown`, detected from the environment of the
+  host that served through Tailscale (`CLAUDECODE=1`; `CODEX_THREAD_ID` or
+  `CODEX_SANDBOX`). Later CLI callers do not relabel it.
+- `url` is the complete Tailscale capability URL, or `null` when no published
+  transport is live. It is never `local_url`, a loopback/offline link or a bare origin.
+- `counts` are disjoint: `answered` has a current decision; `ready` is unanswered,
+  ready and protected; `waiting` is every other current candidate, including
+  preparing, cancelling and failed preparation. They sum to `total`. Saved feedback
+  alone is not an answer, and counts describe the queue while paused or handed back.
+- `state` is the first that applies: `stopped` (`url` is null), `handed-back`,
+  `paused`, `ready` (ready count positive), `preparing` (waiting count positive),
+  `idle`. The existing rules for clearing handback apply.
+- `sequence` is the review event sequence, for diagnostics only.
+  `publication_revision` is a positive integer persisted before sending and larger
+  for every changed snapshot, including URL rotation, shutdown and restart. It is
+  assigned while holding the publisher lock and reading the committed session, so
+  concurrent publishers never number an older snapshot higher. `updated_at` is when
+  the snapshot changed, never a freshness authority.
+
+The record excludes candidate titles, criteria, content, paths, remote URLs,
+credentials, comments and verdicts. Labels and counts are private metadata; `url`
+also grants review access. A heartbeat resends the identical record and revision.
+Hubs compare revisions, not `sequence` or sender time, and treat any 2xx as receipt.
+
+### Lifecycle and failure isolation
+
+Nothing is published until the session has served through Tailscale with a
+destination set. The host's single background worker then publishes after start,
+attachment, every committed change it observes (CLI or browser) and every 5 minutes
+as a heartbeat, coalescing to the latest snapshot. Graceful stop, handled termination
+and transport failure attempt one final `stopped` record, spending at most one
+deadline. A forced kill, sleep or power loss is visible only as hub staleness.
+Without a running host, a mutating command (`init`, `prepare`, `ready`, `observe`,
+`import`, `start`, `pause`, `hand-back`, `resume-development`) makes one bounded
+attempt after committing; such records are `stopped`. A loopback-only host also
+publishes only `stopped` records.
+
+Each attempt has a 3-second total deadline and no immediate retry. Delivery runs
+after local state commits, outside review and resource locks; the browser response
+never waits for it. Delivery and publisher-metadata failures never roll back review
+data or change a command's output or exit status. The current failure appears in
+`status` as `"hub": {"warning": {"time": ..., "message": ...}}` and clears after a
+delivery of the current revision succeeds. Diagnostics name the destination and
+cause only, never the record or token. The hub's response is a receipt or error,
+never an instruction.
+
+Fixture-only overrides for disposable tests: `ATTENDED_REVIEW_HUB_FIXTURE_CONNECT=127.0.0.1:PORT`
+routes the TCP connection to a loopback fixture while TLS still verifies the
+configured name, and `ATTENDED_REVIEW_HUB_FIXTURE_HEARTBEAT=SECONDS` shortens the
+heartbeat. Never set them for a real hub.
 
 ## Local host and recovery boundaries
 

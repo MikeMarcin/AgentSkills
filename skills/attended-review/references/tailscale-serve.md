@@ -42,6 +42,11 @@ setup. Review any requested HTTPS or other permissions before enabling them.
 A failed attempt leaves prepared candidates and durable feedback available; run
 plain `serve` for local review while setup remains pending.
 
+To list the session on the owner's review hub as well, add `--hub
+https://HUB.ts.net` or set `ATTENDED_REVIEW_HUB`; see [hub publication](session-contract.md#optional-hub-publication).
+Publication is optional and best effort, and sends this complete capability URL
+only to that verified hub origin.
+
 ## Lifetime and isolation
 
 The helper invokes `tailscale serve --bg=false --https=PORT http://127.0.0.1:BACKEND`.

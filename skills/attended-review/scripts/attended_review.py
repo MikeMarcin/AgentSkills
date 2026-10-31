@@ -15,6 +15,7 @@ import re
 import secrets
 import signal
 import socket
+import ssl
 import subprocess
 import sys
 import tempfile
@@ -74,9 +75,9 @@ def atomic_json(path, value):
 
 
 @contextmanager
-def lock(path):
+def lock(path, timeout=8):
     path.parent.mkdir(parents=True, exist_ok=True)
-    deadline = time.monotonic() + 8
+    deadline = time.monotonic() + timeout
     while True:
         try:
             path.mkdir()
@@ -388,6 +389,9 @@ class Session:
             result["events"] = [e for e in state["events"] if e["sequence"] > after]
         if state.get("host"):
             result["host"] = state["host"]
+        warning = HubPublisher(self).warning() if (self.directory / "hub.json").exists() else None
+        if warning:
+            result["hub"] = {"warning": warning}
         return result
 
     def page_status(self, after=None, material=True):
@@ -401,6 +405,7 @@ class Session:
         """
         result = self.status(full=True)
         result.pop("host", None)
+        result.pop("hub", None)
         if after is not None and result["sequence"] == after:
             return {"session": result["session"], "sequence": result["sequence"], "unchanged": True}
         if not material:
@@ -741,6 +746,7 @@ class Session:
     def html(self, output):
         snapshot = self.status(full=True)
         snapshot.pop("host", None)
+        snapshot.pop("hub", None)
         # A static file cannot know what was decided after it was written; it
         # says when it was written so nobody mistakes its silence for a record.
         snapshot["generated_at"] = now()
@@ -751,6 +757,359 @@ class Session:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(text, encoding="utf-8")
         return {"html": str(destination), "session": snapshot["session"]}
+
+
+HUB_RECORD = "attended-review.hub-record.v1"
+HUB_METADATA = "attended-review.hub-publisher.v1"
+HUB_DEADLINE_SECONDS = 3
+HUB_HEARTBEAT_SECONDS = 300
+HUB_LABEL_LIMIT = 200
+TS_NET = re.compile(r"[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.ts\.net")
+
+
+def hub_origin(value):
+    """A Tailscale Serve HTTPS origin, validated before any configuration changes."""
+    problem = ReviewError("hub must be a Tailscale Serve HTTPS origin such as https://hub.example.ts.net or https://hub.example.ts.net:8443")
+    if not isinstance(value, str) or any(c in value for c in "?#@\\") or any(ord(c) <= 32 for c in value):
+        raise problem
+    parts = urllib.parse.urlsplit(value)
+    try:
+        port = parts.port
+    except ValueError:
+        raise problem from None
+    host = parts.hostname or ""
+    expected = host + ("" if parts.port is None else f":{port}")
+    if parts.scheme != "https" or parts.path not in ("", "/") or not TS_NET.fullmatch(host) \
+            or parts.netloc.lower() != expected or port == 0:
+        raise problem
+    return f"https://{host}" + ("" if port in (None, 443) else f":{port}")
+
+
+def serving_harness(environ=os.environ):
+    """Which harness launched this host; later CLI callers never relabel it."""
+    if environ.get("CLAUDECODE") == "1":
+        return "claude"
+    if environ.get("CODEX_THREAD_ID") or environ.get("CODEX_SANDBOX"):
+        return "codex"
+    return "unknown"
+
+
+def repository_label(root):
+    """The checkout name, plus only the basename of its origin remote."""
+    label = root.name or "checkout"
+    try:
+        remote = subprocess.run(["git", "-C", str(root), "config", "--get", "remote.origin.url"],
+                                capture_output=True, text=True, timeout=2).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        remote = ""
+    name = re.split(r"[/:]", remote.rstrip("/"))[-1].removesuffix(".git") if remote else ""
+    if re.fullmatch(r"[A-Za-z0-9._-]{1,100}", name) and name not in (label, ".", ".."):
+        label = f"{label} ({name})"
+    return label[:HUB_LABEL_LIMIT]
+
+
+def hub_counts(state):
+    """Each current candidate belongs to exactly one count; feedback alone is no answer."""
+    counts = {"waiting": 0, "ready": 0, "answered": 0, "total": 0}
+    for item in state["candidates"].values():
+        if item.get("decision"):
+            counts["answered"] += 1
+        elif item["phase"] == "ready" and item.get("protected"):
+            counts["ready"] += 1
+        else:
+            counts["waiting"] += 1
+        counts["total"] += 1
+    return counts
+
+
+def hub_state(state, counts, url):
+    if url is None:
+        return "stopped"
+    if state.get("handed_back"):
+        return "handed-back"
+    if state.get("paused"):
+        return "paused"
+    if counts["ready"]:
+        return "ready"
+    return "preparing" if counts["waiting"] else "idle"
+
+
+def hub_address(host, port):
+    """Disposable fixtures may redirect only the TCP connection to loopback.
+
+    TLS still verifies the configured hub name, so a capability reaches only a
+    holder of that name's certificate.
+    """
+    value = os.environ.get("ATTENDED_REVIEW_HUB_FIXTURE_CONNECT")
+    if not value:
+        return host, port
+    match = re.fullmatch(r"127\.0\.0\.1:(\d{1,5})", value)
+    if not match:
+        raise ReviewError("fixture connection must be 127.0.0.1:PORT")
+    return "127.0.0.1", int(match.group(1))
+
+
+def heartbeat_seconds():
+    value = os.environ.get("ATTENDED_REVIEW_HUB_FIXTURE_HEARTBEAT")
+    try:
+        return min(max(float(value), .2), HUB_HEARTBEAT_SECONDS) if value else HUB_HEARTBEAT_SECONDS
+    except ValueError:
+        return HUB_HEARTBEAT_SECONDS
+
+
+def put_record(origin, record):
+    """One HTTPS attempt within a total deadline; no redirects, retries or credentials."""
+    parts = urllib.parse.urlsplit(origin)
+    deadline = time.monotonic() + HUB_DEADLINE_SECONDS
+    def remaining():
+        left = deadline - time.monotonic()
+        if left <= 0:
+            raise TimeoutError("deadline")
+        return left
+    body = json.dumps(record, separators=(",", ":")).encode()
+    raw = socket.create_connection(hub_address(parts.hostname, parts.port or 443), timeout=remaining())
+    try:
+        stream = ssl.create_default_context().wrap_socket(raw, server_hostname=parts.hostname)
+    except BaseException:
+        raw.close()
+        raise
+    with stream:
+        stream.settimeout(remaining())
+        stream.sendall((f"PUT /api/sessions/{record['session_id']} HTTP/1.1\r\nHost: {parts.netloc}\r\n"
+                        f"Content-Type: application/json\r\nContent-Length: {len(body)}\r\n"
+                        "User-Agent: attended-review-hub-publisher/1\r\nConnection: close\r\n\r\n").encode() + body)
+        # The response is a receipt or an error, never an instruction: read its status only.
+        response = b""
+        while b"\r\n" not in response and len(response) < 1024:
+            stream.settimeout(remaining())
+            chunk = stream.recv(1024)
+            if not chunk:
+                break
+            response += chunk
+    match = re.match(rb"HTTP/1\.[01] (\d{3}) ", response)
+    if not match:
+        raise ConnectionError("invalid hub response")
+    return int(match.group(1))
+
+
+def delivery_problem(exc=None, status=None):
+    """A concise diagnostic that never contains the record or its capability."""
+    if status is not None:
+        return f"redirect refused (HTTP {status})" if 300 <= status < 400 else f"hub returned HTTP {status}"
+    if isinstance(exc, ssl.SSLCertVerificationError):
+        return "certificate verification failed"
+    if isinstance(exc, ssl.SSLError):
+        return "TLS failure"
+    if isinstance(exc, TimeoutError):
+        return f"no response within the {HUB_DEADLINE_SECONDS}-second deadline"
+    if isinstance(exc, ConnectionRefusedError):
+        return "connection refused"
+    if isinstance(exc, socket.gaierror):
+        return "hub name did not resolve"
+    if isinstance(exc, ReviewError):
+        return str(exc)
+    return f"delivery failed ({type(exc).__name__})"
+
+
+class HubPublisher:
+    """Optional best-effort session summaries for a review hub.
+
+    Configuration, ordering and diagnostics live in hub.json beside the session,
+    outside its event stream. Publication never fails or delays a review command.
+    """
+
+    def __init__(self, session):
+        self.session = session
+        self.path = session.directory / "hub.json"
+        self.lock_path = session.directory / ".hub-lock"
+
+    def read(self):
+        value = read_json(self.path)
+        return value if isinstance(value, dict) and value.get("schema") == HUB_METADATA else None
+
+    def configure(self, choice):
+        """Apply serve's --hub/--no-hub/environment choice; None keeps the saved one."""
+        if choice is None and not self.path.exists():
+            return
+        try:
+            with lock(self.lock_path, 1):
+                state = self.session.load()
+                meta = self.read()
+                if choice == ("disable", None):
+                    # Cancels pending delivery. A request already sent is not retracted.
+                    if meta is None or not meta.get("hub"):
+                        return
+                    meta["hub"] = None
+                    meta.pop("warning", None)
+                elif choice is not None:
+                    meta = meta if meta and meta.get("session") == state["id"] else \
+                        {"schema": HUB_METADATA, "session": state["id"], "publication_revision": 0, "served": False}
+                    meta["hub"] = choice[1]
+                elif not meta or not meta.get("hub"):
+                    return
+                # A new request makes a running host resend the current snapshot.
+                meta["requested_at"] = now()
+                atomic_json(self.path, meta)
+        except (ReviewError, OSError, ValueError):
+            pass
+
+    def assign(self, url=None, served=False, harness=None, force=False):
+        """Persist the current snapshot under a larger revision when it changed.
+
+        The revision is assigned while holding the publisher lock and reading the
+        committed session, so no concurrent publisher numbers an older snapshot higher.
+        Returns (destination, record) to send, or None.
+        """
+        with lock(self.lock_path, 1):
+            meta = self.read()
+            if not meta or not meta.get("hub"):
+                return None
+            state = self.session.load()
+            if meta.get("session") != state["id"]:
+                return None
+            before = json.dumps(meta, sort_keys=True)
+            if served:
+                meta["served"] = True
+            if harness:
+                meta["harness"] = harness
+            if meta.get("served"):
+                if not meta.get("repo"):
+                    meta["repo"] = repository_label(self.session.root)
+                counts = hub_counts(state)
+                url = url if isinstance(url, str) and url.startswith("https://") and "#token=" in url else None
+                current = {"schema": HUB_RECORD, "session_id": state["id"], "repo": meta["repo"],
+                           "machine": socket.gethostname()[:HUB_LABEL_LIMIT], "harness": meta.get("harness", "unknown"),
+                           "url": url, "state": hub_state(state, counts, url), "counts": counts,
+                           "sequence": state["sequence"]}
+                previous = {k: v for k, v in (meta.get("record") or {}).items() if k not in ("publication_revision", "updated_at")}
+                if previous != current:
+                    meta["publication_revision"] = meta.get("publication_revision", 0) + 1
+                    meta["record"] = {**current, "publication_revision": meta["publication_revision"], "updated_at": now()}
+                    force = True
+            if json.dumps(meta, sort_keys=True) != before:
+                atomic_json(self.path, meta)
+            return (meta["hub"], meta["record"]) if force and meta.get("served") else None
+
+    def deliver(self, destination, record):
+        try:
+            status = put_record(destination, record)
+            problem = None if 200 <= status < 300 else delivery_problem(status=status)
+        except (OSError, ValueError, ReviewError) as exc:
+            problem = delivery_problem(exc)
+        try:
+            with lock(self.lock_path, 1):
+                meta = self.read()
+                if not meta or meta.get("hub") != destination:
+                    return  # Disabled or redirected since this attempt began.
+                if problem:
+                    meta["warning"] = {"time": now(), "message": f"hub {destination}: {problem}"}
+                elif record["publication_revision"] >= meta.get("publication_revision", 0):
+                    meta.pop("warning", None)
+                else:
+                    return
+                atomic_json(self.path, meta)
+        except (ReviewError, OSError, ValueError):
+            pass
+
+    def publish(self, url=None, **options):
+        """Assign and send once, swallowing every publisher failure."""
+        try:
+            pending = self.assign(url, **options)
+        except (ReviewError, OSError, ValueError, KeyError, TypeError):
+            return
+        if pending:
+            self.deliver(*pending)
+
+    def warning(self):
+        try:
+            meta = self.read()
+        except (OSError, ValueError):
+            return None
+        return (meta or {}).get("warning")
+
+
+def publish_after_command(session):
+    """A mutating CLI command makes one bounded attempt only when no host is running."""
+    publisher = HubPublisher(session)
+    try:
+        meta = publisher.read() if publisher.path.exists() else None
+        if not meta or not meta.get("hub") or not meta.get("served"):
+            return
+        host = session.load().get("host")
+        if host:
+            try:
+                if host_request(host, "/api/ping").get("token") == host["token"]:
+                    return  # The running host publishes this committed change.
+            except (OSError, ValueError, AttributeError):
+                pass
+    except (ReviewError, OSError, ValueError):
+        return
+    publisher.publish()
+
+
+class HubWorker(threading.Thread):
+    """The host's single bounded publisher; it coalesces to the latest snapshot."""
+
+    def __init__(self, session, public):
+        super().__init__(daemon=True)
+        self.publisher = HubPublisher(session)
+        self.public = public
+        self.harness = serving_harness()
+        self.wake = threading.Event()
+        self.stopping = threading.Event()
+        # Once finish() holds this, no live snapshot can be numbered after the stopped one.
+        self.guard = threading.Lock()
+
+    def stamps(self):
+        result = []
+        for path in (self.publisher.session.path, self.publisher.path):
+            try:
+                result.append(path.stat().st_mtime_ns)
+            except OSError:
+                result.append(None)
+        return tuple(result)
+
+    def run(self):
+        seen, config, last = None, None, time.monotonic()
+        while not self.stopping.is_set():
+            self.wake.wait(.25)
+            self.wake.clear()
+            if self.stopping.is_set():
+                return
+            url = self.public.get("url")
+            heartbeat = url is not None and time.monotonic() - last >= heartbeat_seconds()
+            key = (self.stamps(), url)
+            if key == seen and not heartbeat:
+                continue
+            seen = key
+            try:
+                meta = self.publisher.read() if key[0][1] is not None else None
+            except (OSError, ValueError):
+                meta = None
+            if not meta or not meta.get("hub"):
+                config = None
+                continue
+            requested = (meta["hub"], meta.get("requested_at"))
+            try:
+                with self.guard:
+                    if self.stopping.is_set():
+                        return
+                    pending = self.publisher.assign(url, served=url is not None, harness=self.harness if url else None,
+                                                    force=heartbeat or requested != config)
+            except (ReviewError, OSError, ValueError, KeyError, TypeError):
+                continue
+            config = requested
+            if pending:
+                last = time.monotonic()
+                self.publisher.deliver(*pending)
+
+    def finish(self):
+        """Attempt one final stopped snapshot, spending at most one delivery deadline."""
+        with self.guard:
+            self.stopping.set()
+        self.wake.set()
+        self.publisher.publish()
+        self.join(timeout=.5)
 
 
 def host_request(host, path, payload=None):
@@ -904,12 +1263,15 @@ class TailscaleServe:
             self.logs.cleanup()
 
 
-def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscale"):
+def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscale", hub=None):
     if tailscale_port is not None and (not tailscale or not 1 <= tailscale_port <= 65535):
         raise ReviewError("--tailscale-port requires --tailscale and a port between 1 and 65535")
     token = secrets.token_urlsafe(32)
     transport = None
     transport_ready = threading.Event()
+    # Only the registered HTTPS capability is ever published, never the loopback URL.
+    public = {"url": None}
+    publisher = None
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -1002,6 +1364,8 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
                     self.answer(404, {"error": "Unknown endpoint"})
                     return
                 self.answer(200, result)
+                if publisher:
+                    publisher.wake.set()
             except (ReviewError, ValueError, TypeError) as exc:
                 self.answer(400, {"error": str(exc)})
 
@@ -1010,6 +1374,7 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
     host = {"port": server.server_port, "token": token, "pid": os.getpid(), "hostname": socket.gethostname()}
     host["url"] = f"http://127.0.0.1:{host['port']}/#token={token}"
     host["local_url"] = host["url"]
+    attached = None
     with session.transaction() as (state, _):
         if state is None:
             server.server_close()
@@ -1025,9 +1390,16 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
                 prior_transport = previous.get("tailscale")
                 if tailscale and (not prior_transport or tailscale_port is not None and prior_transport["port"] != tailscale_port):
                     raise ReviewError("Existing host has a different transport; stop it locally before restarting with --tailscale")
-                print(json.dumps({"attached": True, **previous}), flush=True)
-                return
-        state["host"] = host
+                attached = previous
+        if attached is None:
+            state["host"] = host
+    # Outside review locks; the running host picks up the saved choice.
+    HubPublisher(session).configure(hub)
+    if attached is not None:
+        print(json.dumps({"attached": True, **attached}), flush=True)
+        return
+    publisher = HubWorker(session, public)
+    publisher.start()
     servers = [server]
     if tailscale:
         # A distinct loopback listener makes local control unreachable through
@@ -1051,6 +1423,8 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
                                  "foreground_session": transport.session_id, "pid": transport.process.pid}
             with session.transaction() as (state, _):
                 state["host"] = host
+            public["url"] = host["url"]
+            publisher.wake.set()
         print(json.dumps({"hosting": True, **host}), flush=True)
         while workers[0].is_alive():
             workers[0].join(timeout=.2)
@@ -1058,6 +1432,7 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
                 raise ReviewError(f"Tailscale Serve stopped; reopen serve to resume: {transport.log()}")
     finally:
         transport_ready.clear()
+        public["url"] = None
         for item in servers:
             item.shutdown()
         for worker in workers:
@@ -1069,9 +1444,15 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
             if transport:
                 transport.close()
         finally:
-            with session.transaction() as (state, _):
-                if state and (state.get("host") or {}).get("token") == token:
-                    state["host"] = None
+            try:
+                with session.transaction() as (state, _):
+                    if state and (state.get("host") or {}).get("token") == token:
+                        state["host"] = None
+            finally:
+                publisher.finish()
+
+
+PUBLISHING_COMMANDS = {"init", "prepare", "ready", "observe", "import", "start", "pause", "hand-back", "resume-development"}
 
 
 def main(argv=None):
@@ -1097,11 +1478,15 @@ def main(argv=None):
     p.add_argument("--tailscale", action="store_true", help="Experimental private HTTPS transport using an owned foreground Tailscale Serve session")
     p.add_argument("--tailscale-port", type=int, help="Unused HTTPS port on this node; defaults to the loopback host's ephemeral port")
     p.add_argument("--tailscale-bin", default="tailscale", help="Tailscale executable path")
+    destination = p.add_mutually_exclusive_group()
+    destination.add_argument("--hub", help="Publish private session summaries to this Tailscale Serve HTTPS origin; saved for later commands")
+    destination.add_argument("--no-hub", action="store_true", help="Disable and clear hub publication, overriding ATTENDED_REVIEW_HUB")
     sub.add_parser("stop")
     args = parser.parse_args(argv)
+    session = None
+    command = args.command
     try:
         session = Session(args.repo_root, args.registry, args.state)
-        command = args.command
         if command == "init": result = session.initialize(read_json(Path(args.manifest)))
         elif command == "status": result = session.status(args.after, args.full)
         elif command == "prepare": result = session.prepare(args.candidate, args.include_slow, args.max_items)
@@ -1115,7 +1500,12 @@ def main(argv=None):
         elif command == "start": result = session.pause(False, not args.keep_preparing)
         elif command == "resume-development": result = session.resume_development(args.paths, args.resources, args.candidate, args.all, args.preparation_stopped)
         elif command == "conflicts": result = session.conflicts(args.paths, args.resources)
-        elif command == "serve": serve(session, args.tailscale, args.tailscale_port, args.tailscale_bin); return 0
+        elif command == "serve":
+            hub = ("disable", None) if args.no_hub else None
+            if not args.no_hub and (args.hub is not None or os.environ.get("ATTENDED_REVIEW_HUB")):
+                hub = ("set", hub_origin(args.hub if args.hub is not None else os.environ["ATTENDED_REVIEW_HUB"]))
+            serve(session, args.tailscale, args.tailscale_port, args.tailscale_bin, hub)
+            return 0
         elif command == "stop":
             host = session.load().get("host")
             result = host_request(host, "/api/stop", {}) if host else {"stopped": False, "reason": "No host"}
@@ -1129,6 +1519,10 @@ def main(argv=None):
             failure["sequence"] = exc.sequence
         print(json.dumps(failure), file=sys.stderr)
         return 1
+    finally:
+        # After output: committed changes, including failures and cancellation.
+        if session is not None and command in PUBLISHING_COMMANDS:
+            publish_after_command(session)
 
 
 if __name__ == "__main__":

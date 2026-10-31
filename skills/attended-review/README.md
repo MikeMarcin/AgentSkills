@@ -14,6 +14,11 @@ A blocking wait parks the coordinator; inspect saved intake at natural work
 boundaries instead while busy. Idle waiting needs an awake host and live tool
 connection, with explicit manual resume when unavailable.
 
+Optionally, `serve --tailscale --hub https://HUB.ts.net` also publishes a private
+summary (counts, state and the capability link, never review content) to a review
+hub on the tailnet. It is opt-in per session, best effort and never blocks review;
+see [hub publication](references/session-contract.md#optional-hub-publication).
+
 The session directory is `<checkout>/.mask/attended-review/`. Ignore that generated directory in the consumer. Treat its verdicts as local acceptance records and transfer the relevant evidence to the authoritative issue/RFC records through the driver. Do not commit live host tokens, full incidental logs or unrelated session history.
 
 Run focused public-path tests:
