@@ -12,7 +12,7 @@ Imported from RFC-DRAFT-0001 of the [review hub pack](drafts/review-hub/README.m
 The hub service itself, RFC-DRAFT-0002, stays unimported here: it belongs to the
 standalone service repository selected in D4 and is retained as
 [pack provenance](drafts/review-hub/rfcs/RFC-DRAFT-0002-review-hub-service.md).
-Cards: [ASK-0129](../issues/30-in-progress/ASK-0129-optional-hub-publication.md), closeout
+Cards: [ASK-0129](../issues/60-done/ASK-0129-optional-hub-publication.md), closeout
 [ASK-0130](../issues/10-backlog/ASK-0130-close-review-hub-publication-rfc.md).
 Decisions: [design record](drafts/review-hub/DECISIONS.md). Grouping:
 [adopted publisher plan](plans/review-hub-publisher/milestone-plan.json).
@@ -169,3 +169,25 @@ never an instruction. Decisions remain local to the session page or `import`.
   callers preserve snapshot ordering even with an unchanged review sequence.
 - **AC07:** Configuration precedence, reuse across shells/host attachment and
   explicit disabling work as specified, with no foreground browser network wait.
+
+## Implementation record
+
+Implemented in `skills/attended-review` at `156b32ba80218133a6998735dde68d992f71d8ea`
+and `3cb685646a09f454fd407a5596c036683db261a2`; the
+[verification checklist](plans/review-hub-publisher/verification.md) records each
+criterion. The authoritative wire contract for the hub service is the
+[Optional hub publication](../../skills/attended-review/references/session-contract.md#optional-hub-publication)
+section at **`3cb685646a09f454fd407a5596c036683db261a2`**: `PUT
+ORIGIN/api/sessions/SESSION_ID`, JSON, no Origin or credential, exactly the record
+fields above, any 2xx a receipt. [Fixture records](plans/review-hub-publisher/fixture-records.json)
+accompany it.
+
+Implementation choices within this RFC: publisher metadata is `hub.json` plus a
+transient `.hub-lock` beside `session.json`; the revision is assigned under that
+lock while reading the committed session. The host runs one background worker that
+watches the session file, so CLI and browser changes share one path; a mutating
+command attempts delivery itself only when no host answers its token ping. `harness`
+comes from `CLAUDECODE=1` or `CODEX_THREAD_ID`/`CODEX_SANDBOX`. Labels are bounded
+to 200 characters. Two fixture-only environment overrides (loopback connection with
+unchanged TLS name verification, and a shorter heartbeat) exist for disposable tests.
+

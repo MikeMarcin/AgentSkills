@@ -1,0 +1,13 @@
+{
+  "criterion": "RFC-ASK-0018-AC01",
+  "outcome": "pass",
+  "revision": "3cb685646a09f454fd407a5596c036683db261a2",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"docs/rfcs/plans/review-hub-publisher/ac01_differential.py\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 2.479,
+    "stdout_tail": "identical: 11985 normalized bytes; baseline ff6b40727e673cf4defd9a6cbaca7816558eb1de\n",
+    "stderr_tail": ""
+  }
+}

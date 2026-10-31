@@ -1,0 +1,85 @@
+{
+  "schema": "attended-review.hub-record.v1",
+  "note": "Actual records from a disposable fixture flow (start, CLI answer, partial handback, stop); capability tokens redacted, machine name normalized.",
+  "requests": [
+    {
+      "method": "PUT",
+      "path": "/api/sessions/c6fc061f00e0ad6c3e1b547c59b7e308",
+      "content_type": "application/json"
+    }
+  ],
+  "records": [
+    {
+      "schema": "attended-review.hub-record.v1",
+      "session_id": "c6fc061f00e0ad6c3e1b547c59b7e308",
+      "repo": "checkout",
+      "machine": "fixture-machine",
+      "harness": "claude",
+      "url": "https://review.example.ts.net:55321/#token=FIXTURE-TOKEN-REDACTED",
+      "state": "ready",
+      "counts": {
+        "waiting": 0,
+        "ready": 3,
+        "answered": 0,
+        "total": 3
+      },
+      "sequence": 9,
+      "publication_revision": 1,
+      "updated_at": "2026-10-31T01:09:25.091062+00:00"
+    },
+    {
+      "schema": "attended-review.hub-record.v1",
+      "session_id": "c6fc061f00e0ad6c3e1b547c59b7e308",
+      "repo": "checkout",
+      "machine": "fixture-machine",
+      "harness": "claude",
+      "url": "https://review.example.ts.net:55321/#token=FIXTURE-TOKEN-REDACTED",
+      "state": "ready",
+      "counts": {
+        "waiting": 0,
+        "ready": 2,
+        "answered": 1,
+        "total": 3
+      },
+      "sequence": 10,
+      "publication_revision": 2,
+      "updated_at": "2026-10-31T01:09:25.355180+00:00"
+    },
+    {
+      "schema": "attended-review.hub-record.v1",
+      "session_id": "c6fc061f00e0ad6c3e1b547c59b7e308",
+      "repo": "checkout",
+      "machine": "fixture-machine",
+      "harness": "claude",
+      "url": "https://review.example.ts.net:55321/#token=FIXTURE-TOKEN-REDACTED",
+      "state": "handed-back",
+      "counts": {
+        "waiting": 0,
+        "ready": 2,
+        "answered": 1,
+        "total": 3
+      },
+      "sequence": 11,
+      "publication_revision": 3,
+      "updated_at": "2026-10-31T01:09:25.613220+00:00"
+    },
+    {
+      "schema": "attended-review.hub-record.v1",
+      "session_id": "c6fc061f00e0ad6c3e1b547c59b7e308",
+      "repo": "checkout",
+      "machine": "fixture-machine",
+      "harness": "claude",
+      "url": null,
+      "state": "stopped",
+      "counts": {
+        "waiting": 0,
+        "ready": 2,
+        "answered": 1,
+        "total": 3
+      },
+      "sequence": 11,
+      "publication_revision": 4,
+      "updated_at": "2026-10-31T01:09:25.709269+00:00"
+    }
+  ]
+}

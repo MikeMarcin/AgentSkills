@@ -1,0 +1,13 @@
+{
+  "criterion": "RFC-ASK-0018-structure",
+  "outcome": "pass",
+  "revision": "3cb685646a09f454fd407a5596c036683db261a2",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.455,
+    "stdout_tail": "18 RFCs, 130 cards; 0 structural violations\n",
+    "stderr_tail": ""
+  }
+}
