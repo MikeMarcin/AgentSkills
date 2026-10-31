@@ -300,6 +300,9 @@ class HubPublicationTests(unittest.TestCase):
         self.cli("observe", "B", "--evidence", "after stop", env=self.environment(CODEX_THREAD_ID="x"))
         after = self.latest(lambda b: b["sequence"] == stopped["sequence"] + 1)[-1]
         self.assertEqual((after["state"], after["harness"], after["url"]), ("stopped", "claude", None))
+        self.init(self.candidate("D"))
+        added = self.latest(lambda b: b["counts"]["total"] == 4)[-1]
+        self.assertEqual((added["state"], added["counts"]["waiting"]), ("stopped", 2))
         raw = b"".join(entry["raw"] for entry in self.hub.requests).decode()
         for private in ("Private title", "Private content", "Private criterion", str(self.root), "127.0.0.1",
                         host["local_url"], "remote-secret", "git.example.com", "reviewer", "build-1"):
