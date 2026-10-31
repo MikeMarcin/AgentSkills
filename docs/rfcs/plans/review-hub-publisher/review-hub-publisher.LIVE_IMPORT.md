@@ -13,7 +13,7 @@ authoritative. Imported through the pack's
 |---|---|---|
 | RFC-DRAFT-0001 | [RFC-ASK-0018](../../RFC-ASK-0018-review-hub-session-publication.md) | Session publication; SHA-256 of the draft `c0900de7a1062d49313349af4092c7bbc8cb710f4792be396cdaa589f333ff09` |
 | DRAFT-0001 | [ASK-0129](../../../issues/60-done/ASK-0129-optional-hub-publication.md) | session-publication milestone |
-| DRAFT-0004 | [ASK-0130](../../../issues/20-ready/ASK-0130-close-review-hub-publication-rfc.md) | Closeout for RFC-ASK-0018 |
+| DRAFT-0004 | [ASK-0130](../../../issues/30-in-progress/ASK-0130-close-review-hub-publication-rfc.md) | Closeout for RFC-ASK-0018 |
 | RFC-DRAFT-0002 | External (standalone service repository, D4) | Not imported here |
 | DRAFT-0002, DRAFT-0003, DRAFT-0005 | External (standalone service repository) | Not imported here; DRAFT-0002's prerequisite on the publisher becomes an `external_depends_on` on `AgentSkills:ASK-0129`/ASK-0130 with the recorded completion commit |
 
