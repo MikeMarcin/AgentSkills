@@ -1,0 +1,11 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0129",
+    "ASK-0130"
+  ],
+  "reserve_for": "review-hub-publisher",
+  "purpose": "",
+  "created": "2026-10-31T00:46:23.151219+00:00",
+  "base": "64938f927093de1d3071e94d3372d2f96feedeb3"
+}
