@@ -12,7 +12,7 @@ Imported from RFC-DRAFT-0001 of the [review hub pack](drafts/review-hub/README.m
 The hub service itself, RFC-DRAFT-0002, stays unimported here: it belongs to the
 standalone service repository selected in D4 and is retained as
 [pack provenance](drafts/review-hub/rfcs/RFC-DRAFT-0002-review-hub-service.md).
-Cards: [ASK-0129](../issues/20-ready/ASK-0129-optional-hub-publication.md), closeout
+Cards: [ASK-0129](../issues/30-in-progress/ASK-0129-optional-hub-publication.md), closeout
 [ASK-0130](../issues/10-backlog/ASK-0130-close-review-hub-publication-rfc.md).
 Decisions: [design record](drafts/review-hub/DECISIONS.md). Grouping:
 [adopted publisher plan](plans/review-hub-publisher/milestone-plan.json).
