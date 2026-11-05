@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0018"
 title: "Attended-review session publication to an optional review hub"
-status: "Auto-Verified"
+status: "Implementing"
 metadata: {"milestone_plan":{"id":"review-hub-publisher","path":"docs/rfcs/plans/review-hub-publisher/milestone-plan.json"}}
 ---
 
@@ -169,6 +169,13 @@ never an instruction. Decisions remain local to the session page or `import`.
   callers preserve snapshot ordering even with an unchanged review sequence.
 - **AC07:** Configuration precedence, reuse across shells/host attachment and
   explicit disabling work as specified, with no foreground browser network wait.
+- **AC08:** With a valid machine hub file and no flag, environment or saved
+  choice, a Tailscale-served session publishes to the file's origin from any harness
+  or shell, and later commands reuse it. `--no-hub`, `--hub`, `ATTENDED_REVIEW_HUB`
+  and a saved destination or saved explicit disable each win over the file. An
+  invalid or unreadable file publishes nothing and reports a redacted `hub` warning
+  without failing a command; a missing file keeps AC01 behavior. `hub-config
+  set|show|clear` manages the file atomically with owner-only permissions.
 
 ## Implementation record
 
@@ -190,4 +197,25 @@ command attempts delivery itself only when no host answers its token ping. `harn
 comes from `CLAUDECODE=1` or `CODEX_THREAD_ID`/`CODEX_SANDBOX`. Labels are bounded
 to 200 characters. Two fixture-only environment overrides (loopback connection with
 unchanged TLS name verification, and a shorter heartbeat) exist for disposable tests.
+
+## Machine hub default amendment — 2026-11-04
+
+The owner asked to "make sure all the registered mask repos are putting their
+reviews in the hub" and chose a machine configuration file: `attended_review.py`
+reads a per-user file as the lowest-precedence hub default, so every session on a
+machine publishes without per-session flags, for Claude, Codex or any shell.
+[ASK-0131](../issues/20-ready/ASK-0131-machine-hub-default.md) owns this follow-up
+and AC08. Amendment baseline: `b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`. The
+original RFC_BASE_SHA, AC01–AC07 acceptance and the wire contract are unchanged.
+
+The file is `$XDG_CONFIG_HOME/attended-review/hub.json` (otherwise
+`~/.config/attended-review/hub.json`; `%APPDATA%\attended-review\hub.json` on
+Windows), or the explicit path in `ATTENDED_REVIEW_HUB_CONFIG`. Its content is
+exactly `{"schema":"attended-review.hub-config.v1","hub":"https://NAME.ts.net"}`,
+validated by the origin rules above. Precedence at `serve` is `--no-hub` > `--hub` >
+`ATTENDED_REVIEW_HUB` > the session's saved destination or saved explicit disable >
+machine file. A session that never enabled publication adopts the machine default
+at its next `serve`, publishing once served through Tailscale; a destination adopted
+this way follows later changes to the file at each `serve`, while explicit choices do
+not. This changes no behavior on machines without the file.
 

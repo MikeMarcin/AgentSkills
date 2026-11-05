@@ -61,3 +61,15 @@ The service imports RFC-DRAFT-0002 and DRAFT-0002/0003/0005 from the retained
 `external_depends_on: ["AgentSkills:ASK-0130"]` against that completion commit.
 This handoff does not claim a hub is deployed or that any managed consumer has
 loaded the new publisher. See the [continuation](../../rfcs/plans/review-hub-publisher/continuation.md).
+
+## Machine hub default amendment — 2026-11-04
+
+[ASK-0131](../20-ready/ASK-0131-machine-hub-default.md) owns the owner-requested
+machine-wide default hub, AC08. Amendment baseline:
+`b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`. The original RFC_BASE_SHA, AC01–AC07
+rows and the service handoff above remain unchanged.
+
+| Criterion | Check/evidence | Outcome | Implementation revision |
+|---|---|---|---|
+| AC08 | Machine file precedence, invalid/missing file, `hub-config` helper, AC01–AC07 regression | pending | pending |
+

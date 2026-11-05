@@ -30,6 +30,22 @@
         "The publisher meets the record, configuration, lifecycle and failure-isolation contract against disposable fixtures; the integrated contract revision is ready for the standalone service handoff."
       ],
       "boundary": "A verified optional AgentSkills publisher and versioned record contract, usable before a real hub exists; no publication or consumer upgrade is implied."
+    },
+    {
+      "id": "machine-hub-default",
+      "outcome": "Every attended-review session on a configured machine publishes to the owner's hub without per-session flags, from any harness or shell, while explicit session choices keep precedence.",
+      "work": [
+        {
+          "issue": "ASK-0131"
+        }
+      ],
+      "depends_on": [
+        "session-publication"
+      ],
+      "exit_criteria": [
+        "RFC-ASK-0018 AC08 passes against disposable config paths and fixture hubs; AC01-AC07 still pass, and a missing machine file keeps the never-enabled invariants."
+      ],
+      "boundary": "Owner amendment 2026-11-04: per-user machine default file and a hub-config helper; no real user config, consumer upgrade, push or hub deployment."
     }
   ],
   "unplanned_work": []
