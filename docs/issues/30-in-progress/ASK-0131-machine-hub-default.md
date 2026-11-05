@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0131"
 title: "Machine-wide default hub for attended-review publication"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0018"]
 depends_on: []
 priority: "P1"

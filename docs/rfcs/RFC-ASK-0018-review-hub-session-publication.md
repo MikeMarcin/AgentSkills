@@ -204,7 +204,7 @@ The owner asked to "make sure all the registered mask repos are putting their
 reviews in the hub" and chose a machine configuration file: `attended_review.py`
 reads a per-user file as the lowest-precedence hub default, so every session on a
 machine publishes without per-session flags, for Claude, Codex or any shell.
-[ASK-0131](../issues/20-ready/ASK-0131-machine-hub-default.md) owns this follow-up
+[ASK-0131](../issues/30-in-progress/ASK-0131-machine-hub-default.md) owns this follow-up
 and AC08. Amendment baseline: `b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`. The
 original RFC_BASE_SHA, AC01–AC07 acceptance and the wire contract are unchanged.
 

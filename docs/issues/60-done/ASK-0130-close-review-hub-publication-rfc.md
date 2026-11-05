@@ -64,7 +64,7 @@ loaded the new publisher. See the [continuation](../../rfcs/plans/review-hub-pub
 
 ## Machine hub default amendment — 2026-11-04
 
-[ASK-0131](../20-ready/ASK-0131-machine-hub-default.md) owns the owner-requested
+[ASK-0131](../30-in-progress/ASK-0131-machine-hub-default.md) owns the owner-requested
 machine-wide default hub, AC08. Amendment baseline:
 `b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`. The original RFC_BASE_SHA, AC01–AC07
 rows and the service handoff above remain unchanged.
