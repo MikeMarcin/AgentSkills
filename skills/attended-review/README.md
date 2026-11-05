@@ -16,8 +16,14 @@ connection, with explicit manual resume when unavailable.
 
 Optionally, `serve --tailscale --hub https://HUB.ts.net` also publishes a private
 summary (counts, state and the capability link, never review content) to a review
-hub on the tailnet. It is opt-in per session, best effort and never blocks review;
-see [hub publication](references/session-contract.md#optional-hub-publication).
+hub on the tailnet. It is opt-in, best effort and never blocks review; see
+[hub publication](references/session-contract.md#optional-hub-publication). To make
+every session on a machine publish without flags, from Claude, Codex or any shell,
+configure a [machine default](references/session-contract.md#machine-default) once:
+
+```sh
+python3 scripts/attended_review.py hub-config set https://HUB.ts.net
+```
 
 The session directory is `<checkout>/.mask/attended-review/`. Ignore that generated directory in the consumer. Treat its verdicts as local acceptance records and transfer the relevant evidence to the authoritative issue/RFC records through the driver. Do not commit live host tokens, full incidental logs or unrelated session history.
 

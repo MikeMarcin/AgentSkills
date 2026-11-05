@@ -130,6 +130,7 @@ See [the portable example](../examples/README.md) for a mixed session.
 | `resume-development --paths PATH ... --resources KEY ... [--candidate ID]` | Release only selected affected candidates; unanswered ones become waiting. `--all` explicitly releases the whole checkout session. |
 | `serve [--tailscale] [--tailscale-port PORT] [--tailscale-bin FILE] [--hub ORIGIN \| --no-hub]` | Start a foreground host or attach to this checkout's host. `--hub`/`--no-hub` configure optional [hub publication](#optional-hub-publication). Agents choose `serve --tailscale` by default for every session under the [Tailscale contract](tailscale-serve.md); bare `serve` retains loopback for explicit local choice or deliberate fallback. |
 | `stop` | Authenticate to and stop only the recorded host. Prepared candidates remain protected. |
+| `hub-config set ORIGIN \| show \| clear` | Manage this user's [machine default hub](#machine-default); no session is needed. |
 | `html --output FILE` | Create standalone self-contained HTML after preparation. |
 | `import --file FILE` | Validate and atomically intake partial answer/feedback JSON; `-` reads stdin. |
 
@@ -244,19 +245,22 @@ kept only in local storage; it is never session state, exported or logged. It ha
 ## Optional hub publication
 
 A session can publish a private summary to a review hub: one always-on page that
-lists active reviews across checkouts, harnesses and machines. Publication is opt-in
-per session, best effort, and changes nothing about review, intake or protection.
+lists active reviews across checkouts, harnesses and machines. Publication is opt-in,
+per session or once per machine, best effort, and changes nothing about review,
+intake or protection.
 The hub is read-only for reviews; decisions stay on this session's page or `import`.
 
 ### Configuration
 
 `serve --hub ORIGIN` selects a destination; otherwise a nonempty
-`ATTENDED_REVIEW_HUB`, then the destination saved earlier, applies. `serve --no-hub`
-overrides both, clears the saved destination and cancels pending delivery; it cannot
-retract a record already sent, so that hub entry becomes stale. The flags are
+`ATTENDED_REVIEW_HUB`, then the session's saved choice (a destination or an explicit
+disable), then the [machine default](#machine-default) applies. `serve --no-hub`
+overrides all of them, clears the saved destination and cancels pending delivery; it
+cannot retract a record already sent, so that hub entry becomes stale. The flags are
 mutually exclusive and also apply when attaching to a running host, which then
-publishes to the new choice. Only `serve` reads the flags and environment; the running
-host and later mutating commands reuse the saved setting from any shell.
+publishes to the new choice. Only `serve` reads the flags, environment and machine
+file; the running host and later mutating commands reuse the saved setting from any
+shell.
 
 `ORIGIN` is a Tailscale Serve HTTPS origin: `https://NAME.ts.net` with an optional
 port, and no userinfo, path other than `/`, query or fragment. An invalid flag or
@@ -266,8 +270,48 @@ credential; tailnet access rules are the hub's only access boundary.
 
 The setting, the publication revision and the current diagnostic live in
 `hub.json` (and a transient `.hub-lock`) beside `session.json`, outside the event
-stream. A session that never enabled publication gains no files, fields, output or
-network activity.
+stream. A session that never enabled publication, on a machine without a machine
+default, gains no files, fields, output or network activity.
+
+### Machine default
+
+Once the owner configures a machine default, every session served through Tailscale
+on that machine publishes there with no per-session flag, whichever harness or shell
+runs it. Agents need not pass `--hub`; they still present the session URL as usual.
+
+```sh
+python3 scripts/attended_review.py hub-config set https://HUB.ts.net
+python3 scripts/attended_review.py hub-config show
+python3 scripts/attended_review.py hub-config clear
+```
+
+The file is `$XDG_CONFIG_HOME/attended-review/hub.json` when `XDG_CONFIG_HOME` is an
+absolute path, otherwise `~/.config/attended-review/hub.json`; on Windows it is
+`%APPDATA%\attended-review\hub.json`. A nonempty `ATTENDED_REVIEW_HUB_CONFIG` names
+another path (tests use disposable ones). Its whole content is:
+
+```json
+{"schema": "attended-review.hub-config.v1", "hub": "https://HUB.ts.net"}
+```
+
+`set` validates `ORIGIN` by the rules above (exit 1 before writing), creates the
+directory owner-only and replaces the file atomically with mode 0600. `show` reports
+`path`, the validated `hub` (or `null`) and `configured`, plus a `warning` when the
+file is unusable. `clear` removes the file and reports whether one existed. A host
+already running picks up a change the next time `serve` runs or attaches.
+
+At `serve`, a session with no saved choice adopts the machine origin, marked in its
+`hub.json` as following the machine default; such a session follows later changes to
+the file at each `serve`, while an explicit `--hub`, environment or `--no-hub` choice
+stops following it. A saved explicit disable keeps winning over the file. `--no-hub`
+on a session with no saved metadata records that disable only when a machine file
+exists; with no file there is nothing to outrank and nothing is written.
+
+A missing file changes nothing. An unreadable or invalid file (wrong keys or schema,
+not JSON, larger than 64 KiB or an invalid origin) publishes nothing and never fails
+a command; `status` of a session that would follow it reports
+`"hub": {"warning": {"time": ..., "message": "machine hub config: ..."}}`. Messages
+name only the problem, never the file's content.
 
 ### Record (wire contract version 1)
 

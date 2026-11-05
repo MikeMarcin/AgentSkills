@@ -3,6 +3,8 @@
 No real network, Tailscale or hub is contacted: the fake Tailscale CLI models Serve,
 and ATTENDED_REVIEW_HUB_FIXTURE_CONNECT routes the TCP connection to a loopback
 fixture while TLS still verifies the configured ts.net name against a fixture CA.
+Every child process gets a disposable ATTENDED_REVIEW_HUB_CONFIG path, so the real
+per-user machine default is never read or written.
 """
 import concurrent.futures
 from contextlib import contextmanager
@@ -11,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import ssl
 import subprocess
 import sys
@@ -140,6 +143,7 @@ class HubPublicationTests(unittest.TestCase):
         self.tailscale = self.fake / "tailscale"
         self.tailscale.write_text(f"#!{sys.executable}\n" + FAKE_TAILSCALE.read_text())
         self.tailscale.chmod(0o700)
+        self.machine = self.base / "user-config" / "attended-review" / "hub.json"  # absent unless a test sets it
         self.hub.requests.clear(); self.hub.mode = {"status": 200}
         self.impostor.requests.clear()
         self.env = self.environment()
@@ -149,7 +153,8 @@ class HubPublicationTests(unittest.TestCase):
     def environment(self, hub=None, **extra):
         env = {k: v for k, v in os.environ.items() if not k.startswith(("CLAUDE", "CODEX_", "ATTENDED_REVIEW_"))}
         env.update(FAKE_TAILSCALE_ROOT=str(self.fake), SSL_CERT_FILE=str(self.ca),
-                   ATTENDED_REVIEW_HUB_FIXTURE_CONNECT=f"127.0.0.1:{(hub or self.hub).port}")
+                   ATTENDED_REVIEW_HUB_FIXTURE_CONNECT=f"127.0.0.1:{(hub or self.hub).port}",
+                   ATTENDED_REVIEW_HUB_CONFIG=str(self.machine))
         env.update(extra)
         return env
 
@@ -520,6 +525,120 @@ class HubPublicationTests(unittest.TestCase):
         self.cli("observe", "A", "--evidence", "reuse saved")
         self.hub.wait_for(lambda b: b[-1]["state"] == "stopped" and b[-1]["sequence"] == self.cli("status")["sequence"])
         self.assertEqual(hosts()[-1], "second.example.ts.net:8443")
+
+    # AC08
+    def test_machine_default_publishes_every_session_below_explicit_choices(self):
+        second = "https://second.example.ts.net:8443"
+        hosts = lambda: [entry["headers"]["Host"] for entry in self.hub.requests]
+        metadata = lambda: json.loads((self.root / ".mask" / "attended-review" / "hub.json").read_text())
+        # Without a machine file, --no-hub on a never-enabled session still writes nothing.
+        self.init(self.candidate(), self.candidate("B")); self.cli("prepare")
+        process, _ = self.serve("--no-hub")
+        self.stop(process)
+        self.assertEqual(self.files(), ["session.json"])
+        self.assertFalse(self.machine.exists())
+        # hub-config needs no session, validates first and writes an owner-only file atomically.
+        refused = self.cli("hub-config", "set", "https://hub.example.com", success=False)
+        self.assertEqual(refused.returncode, 1)
+        self.assertFalse(self.machine.exists())
+        self.assertEqual(self.cli("hub-config", "show"), {"path": str(self.machine), "hub": None, "configured": False})
+        self.assertEqual(self.cli("hub-config", "set", HUB + "/")["hub"], HUB)
+        self.assertEqual(json.loads(self.machine.read_text()), {"schema": "attended-review.hub-config.v1", "hub": HUB})
+        self.assertEqual(stat.S_IMODE(self.machine.stat().st_mode), 0o600)
+        self.assertEqual(self.cli("hub-config", "show")["hub"], HUB)
+        self.assertEqual([p.name for p in self.machine.parent.iterdir()], ["hub.json"])
+        # A never-enabled session now publishes once served, from a harness with no hub flags or variable.
+        process, host = self.serve(env=self.environment(CODEX_THREAD_ID="x"))
+        first = self.hub.wait_for(lambda b: len(b) >= 1)[0]
+        self.assertEqual((first["url"], first["harness"], hosts()[-1]), (host["url"], "codex", "hub.example.ts.net"))
+        self.assertEqual((metadata()["hub"], metadata()["source"]), (HUB, "machine"))
+        self.cli("ready", "B", "--evidence", "plain shell")  # reused from a shell without any setting
+        self.hub.wait_for(lambda b: b[-1]["sequence"] > first["sequence"])
+        # A saved explicit disable outranks the machine default, now and at every later serve.
+        self.assertTrue(self.cli("serve", "--no-hub")["attached"])
+        time.sleep(.6)
+        count = len(self.hub.requests)
+        self.cli("observe", "A", "--evidence", "disabled")
+        self.stop(process)
+        self.assertNotIn("source", metadata())
+        process, _ = self.serve()
+        self.cli("observe", "A", "--evidence", "still disabled")
+        self.stop(process)
+        time.sleep(.5)
+        self.assertEqual(len(self.hub.requests), count)
+        self.assertIsNone(metadata()["hub"])
+        self.assertNotIn("hub", self.cli("status"))
+        # A saved explicit destination also outranks it, and the file's later changes.
+        process, _ = self.serve("--hub", second)
+        self.hub.wait_for(lambda b: len(b) > count)
+        self.stop(process)
+        process, _ = self.serve()
+        self.cli("observe", "A", "--evidence", "saved destination")
+        self.stop(process)
+        self.assertEqual(set(hosts()[count:]), {"second.example.ts.net:8443"})
+        # In another checkout, the environment outranks the machine default.
+        original, self.root = self.root, self.base / "environment-checkout"
+        self.root.mkdir()
+        self.init(self.candidate()); self.cli("prepare")
+        count = len(self.hub.requests)
+        process, _ = self.serve(env=self.environment(ATTENDED_REVIEW_HUB=second))
+        self.hub.wait_for(lambda b: len(b) > count)
+        self.stop(process)
+        self.assertEqual(set(hosts()[count:]), {"second.example.ts.net:8443"})
+        self.assertNotIn("source", metadata())
+        # A destination adopted from the machine file follows its later changes at serve.
+        self.root = self.base / "following-checkout"
+        self.root.mkdir()
+        self.init(self.candidate()); self.cli("prepare")
+        count = len(self.hub.requests)
+        process, _ = self.serve()
+        self.hub.wait_for(lambda b: len(b) > count)
+        self.stop(process)
+        self.cli("hub-config", "set", second)
+        count = len(self.hub.requests)
+        process, _ = self.serve()
+        self.hub.wait_for(lambda b: len(b) > count and hosts()[-1] == "second.example.ts.net:8443")
+        self.stop(process)
+        # Invalid or unreadable files publish nothing and warn without failing or leaking content.
+        followed = self.root
+        for index, broken in enumerate(('{"schema": "attended-review.hub-config.v1", "hub": "https://leak-secret.example.com"}',
+                                        "not json leak-secret", None)):
+            if broken is None:
+                self.machine.unlink(); self.machine.mkdir()  # unreadable as a file
+            else:
+                self.machine.write_text(broken)
+            for self.root in (followed, self.base / f"never-enabled-{index}"):
+                fresh = not self.root.exists()
+                if fresh:
+                    self.root.mkdir(); self.init(self.candidate()); self.cli("prepare")
+                count = len(self.hub.requests)
+                process, _ = self.serve()
+                self.cli("observe", "A", "--evidence", "broken machine file")
+                warning = self.cli("status")["hub"]["warning"]["message"]
+                self.assertTrue(warning.startswith("machine hub config: "), warning)
+                self.assertNotIn("leak-secret", warning)
+                self.stop(process)
+                time.sleep(.4)
+                self.assertEqual(len(self.hub.requests), count)
+                if fresh:
+                    self.assertEqual(self.files(), ["session.json"])
+                else:
+                    self.assertIsNone(metadata()["hub"])
+            self.assertNotIn("leak-secret", json.dumps(self.cli("hub-config", "show")))
+        # Clearing restores exact never-enabled behavior.
+        self.machine.rmdir()
+        self.assertEqual(self.cli("hub-config", "clear")["cleared"], False)
+        self.cli("hub-config", "set", HUB)
+        self.assertEqual(self.cli("hub-config", "clear")["cleared"], True)
+        self.root = self.base / "after-clear"
+        self.root.mkdir(); self.init(self.candidate()); self.cli("prepare")
+        count = len(self.hub.requests)
+        process, _ = self.serve()
+        self.assertNotIn("hub", self.cli("status"))
+        self.stop(process)
+        time.sleep(.3)
+        self.assertEqual((len(self.hub.requests), self.files()), (count, ["session.json"]))
+        self.root = original
 
     def test_symlinked_skill_in_two_consumers_publishes_independent_sessions(self):
         roots, processes = [self.root, self.base / "second-consumer"], []

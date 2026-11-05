@@ -43,7 +43,9 @@ A failed attempt leaves prepared candidates and durable feedback available; run
 plain `serve` for local review while setup remains pending.
 
 To list the session on the owner's review hub as well, add `--hub
-https://HUB.ts.net` or set `ATTENDED_REVIEW_HUB`; see [hub publication](session-contract.md#optional-hub-publication).
+https://HUB.ts.net`, set `ATTENDED_REVIEW_HUB`, or configure a
+[machine default](session-contract.md#machine-default) once with `hub-config set`;
+see [hub publication](session-contract.md#optional-hub-publication).
 Publication is optional and best effort, and sends this complete capability URL
 only to that verified hub origin.
 

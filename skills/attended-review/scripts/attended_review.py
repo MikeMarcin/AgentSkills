@@ -389,7 +389,7 @@ class Session:
             result["events"] = [e for e in state["events"] if e["sequence"] > after]
         if state.get("host"):
             result["host"] = state["host"]
-        warning = HubPublisher(self).warning() if (self.directory / "hub.json").exists() else None
+        warning = HubPublisher(self).warning(state["id"])
         if warning:
             result["hub"] = {"warning": warning}
         return result
@@ -785,6 +785,76 @@ def hub_origin(value):
     return f"https://{host}" + ("" if port in (None, 443) else f":{port}")
 
 
+HUB_CONFIG = "attended-review.hub-config.v1"
+HUB_CONFIG_LIMIT = 64 * 1024
+
+
+def hub_config_path(environ=os.environ):
+    """The per-user machine default: explicit override, else the platform config directory."""
+    if environ.get("ATTENDED_REVIEW_HUB_CONFIG"):
+        return Path(environ["ATTENDED_REVIEW_HUB_CONFIG"]).expanduser()
+    if os.name == "nt" and environ.get("APPDATA"):
+        return Path(environ["APPDATA"]) / "attended-review" / "hub.json"
+    base = environ.get("XDG_CONFIG_HOME")
+    return (Path(base) if base and os.path.isabs(base) else Path.home() / ".config") / "attended-review" / "hub.json"
+
+
+def machine_hub(path=None):
+    """(origin, None) when valid, (None, problem) when unusable, (None, None) when absent.
+
+    Problems are redacted: they never repeat the file's content.
+    """
+    try:
+        with open(path or hub_config_path(), "rb") as stream:
+            raw = stream.read(HUB_CONFIG_LIMIT + 1)
+    except (FileNotFoundError, RuntimeError):  # RuntimeError: no home directory, so no file
+        return None, None
+    except OSError:
+        return None, "unreadable"
+    if len(raw) > HUB_CONFIG_LIMIT:
+        return None, "larger than 64 KiB"
+    try:
+        value = json.loads(raw.decode("utf-8-sig"))
+    except (UnicodeDecodeError, ValueError):
+        return None, "not valid JSON"
+    if not isinstance(value, dict) or value.get("schema") != HUB_CONFIG or set(value) != {"schema", "hub"}:
+        return None, f"expected exactly the keys schema ({HUB_CONFIG}) and hub"
+    try:
+        return hub_origin(value["hub"]), None
+    except ReviewError:
+        return None, "hub is not a Tailscale Serve HTTPS origin"
+
+
+def machine_file_present():
+    try:
+        return hub_config_path().exists()
+    except (OSError, RuntimeError):
+        return False
+
+
+def hub_config(action, url=None):
+    """Manage the machine default; no session is involved."""
+    path = hub_config_path()
+    if action == "set":
+        origin = hub_origin(url)
+        if path.parent.is_symlink() or path.is_symlink():
+            raise ReviewError(f"refusing a symlinked hub config location: {path}")
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        atomic_json(path, {"schema": HUB_CONFIG, "hub": origin})  # mkstemp: owner-only 0600
+        return {"path": str(path), "hub": origin}
+    if action == "clear":
+        try:
+            path.unlink()
+            return {"path": str(path), "cleared": True}
+        except FileNotFoundError:
+            return {"path": str(path), "cleared": False}
+    origin, problem = machine_hub(path)
+    result = {"path": str(path), "hub": origin, "configured": origin is not None}
+    if problem:
+        result["warning"] = f"machine hub config: {problem}; nothing is published from it"
+    return result
+
+
 def serving_harness(environ=os.environ):
     """Which harness launched this host; later CLI callers never relabel it."""
     if environ.get("CLAUDECODE") == "1":
@@ -928,24 +998,53 @@ class HubPublisher:
         return value if isinstance(value, dict) and value.get("schema") == HUB_METADATA else None
 
     def configure(self, choice):
-        """Apply serve's --hub/--no-hub/environment choice; None keeps the saved one."""
-        if choice is None and not self.path.exists():
-            return
+        """Apply serve's --hub/--no-hub/environment choice.
+
+        None keeps the saved choice (a destination or an explicit disable); without
+        one, or when the saved destination came from the machine file, the machine
+        default applies. A missing machine file leaves unconfigured sessions untouched.
+        """
+        machine = None
+        if choice is None:
+            machine = machine_hub()[0]
+            if machine is None and not self.path.exists():
+                return
         try:
             with lock(self.lock_path, 1):
                 state = self.session.load()
                 meta = self.read()
+                mine = meta if meta and meta.get("session") == state["id"] else None
+                fresh = {"schema": HUB_METADATA, "session": state["id"], "publication_revision": 0, "served": False}
                 if choice == ("disable", None):
                     # Cancels pending delivery. A request already sent is not retracted.
-                    if meta is None or not meta.get("hub"):
-                        return
+                    if mine is None:
+                        # Saved only when there is a machine default for it to outrank.
+                        if not machine_file_present():
+                            return
+                        meta = fresh
+                    elif not meta.get("hub") and "source" not in meta:
+                        return  # Already explicitly disabled.
                     meta["hub"] = None
+                    meta.pop("source", None)
                     meta.pop("warning", None)
                 elif choice is not None:
-                    meta = meta if meta and meta.get("session") == state["id"] else \
-                        {"schema": HUB_METADATA, "session": state["id"], "publication_revision": 0, "served": False}
+                    meta = mine or fresh
                     meta["hub"] = choice[1]
-                elif not meta or not meta.get("hub"):
+                    meta.pop("source", None)
+                elif mine is not None and mine.get("source") != "machine":
+                    if not mine.get("hub"):
+                        return  # A saved explicit disable outranks the machine default.
+                elif machine is not None:
+                    meta = mine or fresh
+                    if meta.get("hub") != machine:
+                        meta.pop("warning", None)
+                    meta["hub"] = machine
+                    meta["source"] = "machine"
+                elif mine is not None and mine.get("hub"):
+                    # The machine default this followed is gone or invalid.
+                    mine["hub"] = None
+                    mine.pop("warning", None)
+                else:
                     return
                 # A new request makes a running host resend the current snapshot.
                 meta["requested_at"] = now()
@@ -1020,12 +1119,19 @@ class HubPublisher:
         if pending:
             self.deliver(*pending)
 
-    def warning(self):
+    def warning(self, session_id):
         try:
-            meta = self.read()
+            meta = self.read() if self.path.exists() else None
+            if meta and meta.get("warning"):
+                return meta["warning"]
+            if meta and meta.get("session") == session_id and meta.get("source") != "machine":
+                return None  # An explicit session choice; the machine file is irrelevant.
         except (OSError, ValueError):
             return None
-        return (meta or {}).get("warning")
+        if not machine_file_present():
+            return None
+        problem = machine_hub()[1]
+        return {"time": now(), "message": f"machine hub config: {problem}; nothing is published from it"} if problem else None
 
 
 def publish_after_command(session):
@@ -1480,12 +1586,20 @@ def main(argv=None):
     p.add_argument("--tailscale-bin", default="tailscale", help="Tailscale executable path")
     destination = p.add_mutually_exclusive_group()
     destination.add_argument("--hub", help="Publish private session summaries to this Tailscale Serve HTTPS origin; saved for later commands")
-    destination.add_argument("--no-hub", action="store_true", help="Disable and clear hub publication, overriding ATTENDED_REVIEW_HUB")
+    destination.add_argument("--no-hub", action="store_true", help="Disable and clear hub publication for this session, overriding ATTENDED_REVIEW_HUB and the machine default")
     sub.add_parser("stop")
+    p = sub.add_parser("hub-config", help="Machine-wide default hub for every session served on this machine; no session needed")
+    action = p.add_subparsers(dest="action", required=True)
+    action.add_parser("set", help="Save ORIGIN as this user's default hub").add_argument("url", metavar="ORIGIN")
+    action.add_parser("show", help="Report the file location and its validated origin")
+    action.add_parser("clear", help="Remove the machine default")
     args = parser.parse_args(argv)
     session = None
     command = args.command
     try:
+        if command == "hub-config":
+            print(json.dumps(hub_config(args.action, getattr(args, "url", None))))
+            return 0
         session = Session(args.repo_root, args.registry, args.state)
         if command == "init": result = session.initialize(read_json(Path(args.manifest)))
         elif command == "status": result = session.status(args.after, args.full)

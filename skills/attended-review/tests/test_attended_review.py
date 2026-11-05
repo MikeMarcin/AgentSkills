@@ -22,6 +22,16 @@ spec = importlib.util.spec_from_file_location("attended_under_test", SCRIPT)
 review_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(review_module)
 
+_machine_config = tempfile.TemporaryDirectory()
+
+
+def setUpModule():
+    # Served sessions must never read the real per-user machine hub default.
+    patcher = mock.patch.dict(os.environ, {"ATTENDED_REVIEW_HUB_CONFIG": str(Path(_machine_config.name) / "absent" / "hub.json")})
+    patcher.start()
+    unittest.addModuleCleanup(patcher.stop)
+    unittest.addModuleCleanup(_machine_config.cleanup)
+
 
 class ReviewTests(unittest.TestCase):
     def setUp(self):
