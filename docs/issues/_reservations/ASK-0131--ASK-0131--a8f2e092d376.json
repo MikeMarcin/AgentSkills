@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0131"
+  ],
+  "reserve_for": "hub-machine-config",
+  "purpose": "",
+  "created": "2026-11-05T06:32:18.091953+00:00",
+  "base": "dbc36aa427560f3cbd4149beeaecf95605326337"
+}
