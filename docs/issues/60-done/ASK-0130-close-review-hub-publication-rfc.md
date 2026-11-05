@@ -64,12 +64,17 @@ loaded the new publisher. See the [continuation](../../rfcs/plans/review-hub-pub
 
 ## Machine hub default amendment — 2026-11-04
 
-[ASK-0131](../30-in-progress/ASK-0131-machine-hub-default.md) owns the owner-requested
+[ASK-0131](ASK-0131-machine-hub-default.md) owns the owner-requested
 machine-wide default hub, AC08. Amendment baseline:
 `b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`. The original RFC_BASE_SHA, AC01–AC07
 rows and the service handoff above remain unchanged.
 
 | Criterion | Check/evidence | Outcome | Implementation revision |
 |---|---|---|---|
-| AC08 | Machine file precedence, invalid/missing file, `hub-config` helper, AC01–AC07 regression | pending | pending |
+| AC08 | Machine file precedence, invalid/missing file, `hub-config` helper, AC01–AC07 regression ([checklist](../../rfcs/plans/review-hub-publisher/verification.md#ac08-machine-hub-default-ask-0131-owner-amendment-2026-11-04)) | pass | 5f770a6a18650b9414621098663e8e6436dc1f53 |
+
+Checked at `5f770a6a18650b9414621098663e8e6436dc1f53`: attended-review suite 53 OK, AC01 differential identical with
+no machine file, structure gate 0 violations. The wire contract is unchanged, so the
+service handoff revision above still applies. No push, consumer upgrade or real user
+configuration write was performed; the owner runs `hub-config set` on each machine.
 

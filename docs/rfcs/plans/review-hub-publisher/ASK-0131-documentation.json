@@ -1,0 +1,13 @@
+{
+  "criterion": "structure",
+  "outcome": "pass",
+  "revision": "5f770a6a18650b9414621098663e8e6436dc1f53",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"scripts/verify_documentation.py\", \"--root\", \".\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 0.578,
+    "stdout_tail": "18 RFCs, 131 cards; 0 structural violations\n",
+    "stderr_tail": ""
+  }
+}

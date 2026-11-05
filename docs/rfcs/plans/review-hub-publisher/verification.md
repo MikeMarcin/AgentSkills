@@ -42,3 +42,28 @@ native Windows publication (the fake-Tailscale fixture is POSIX-only, as for the
 existing transport tests), and harness detection for Codex beyond its documented
 environment variables. Closeout review runtime: local implementer self-review
 (claude-opus-5-5); no independent or human review is required by the RFC.
+
+## AC08 machine hub default (ASK-0131, owner amendment 2026-11-04)
+
+Amendment baseline `b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`; implementation
+`5f770a6a18650b9414621098663e8e6436dc1f53`. Every test child process receives a disposable
+`ATTENDED_REVIEW_HUB_CONFIG` path (the hub module through `environment()`, the
+transport module through a module-level patch), so no check reads or writes the
+real per-user file; `~/.config/attended-review` does not exist on this machine
+before or after the runs.
+
+| Criterion | Check | Outcome | Commit |
+|---|---|---|---|
+| AC08 | `test_machine_default_publishes_every_session_below_explicit_choices`: with no file, `serve --no-hub` writes nothing; `hub-config set` refuses an invalid origin before writing, normalizes `https://hub.example.ts.net/`, writes exactly the v1 content with mode 0600 and no stray temporary file; `show` and `clear` report path/state. A never-enabled session served with only `CODEX_THREAD_ID` publishes to the file's origin (harness `codex`, `source: machine`), and a plain-shell `ready` is reused. Attached `--no-hub` stops publication and survives a later flagless serve; a saved `--hub` destination survives a later flagless serve; in another checkout `ATTENDED_REVIEW_HUB` outranks the file; a machine-sourced session follows `hub-config set` changes. A wrong-origin file, non-JSON content and a directory in place of the file each publish nothing for following and never-enabled sessions, leave exit status 0, report `machine hub config: ...` in `status` without the file's content, and add no session files to never-enabled sessions. After `clear`, a new session has no files, fields or requests. | pass | 5f770a6 |
+| AC01 regression | [ac01_differential.py](ac01_differential.py) with no machine file ([evidence](ASK-0131-ac01-differential.json)): identical normalized output against RFC_BASE_SHA. | pass | 5f770a6 |
+
+Suite: `python3 -B -m unittest discover -s skills/attended-review/tests` — 53 tests
+OK ([evidence](ASK-0131-focused-tests.json); AC01–AC07 tests unchanged apart from
+the disposable config path). Structure gate: 0 violations
+([evidence](ASK-0131-documentation.json)). Portable source validator passed.
+One development failure was a test-only root-name collision in the broken-file loop,
+fixed before the recorded runs. Not established: native Windows `%APPDATA%`
+resolution (path logic only, unexercised), a real hub, and any consumer having
+loaded this publisher. Closeout review runtime: local implementer self-review
+(claude-opus-5-5); no independent or human review is required by the RFC.
+

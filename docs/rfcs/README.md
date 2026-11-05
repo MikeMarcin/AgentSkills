@@ -44,4 +44,4 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 
 | RFC-ASK-0017 | Implementing | Standalone remote-station skill and a version-agnostic launch command |
 
-| RFC-ASK-0018 | Implementing | Attended-review session publication to an optional review hub |
+| RFC-ASK-0018 | Auto-Verified | Attended-review session publication to an optional review hub |

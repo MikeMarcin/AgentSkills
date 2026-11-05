@@ -1,0 +1,13 @@
+{
+  "criterion": "RFC-ASK-0018-AC08",
+  "outcome": "pass",
+  "revision": "5f770a6a18650b9414621098663e8e6436dc1f53",
+  "evidence": {
+    "kind": "command",
+    "detail": "[\"python3\", \"-B\", \"-m\", \"unittest\", \"discover\", \"-s\", \"skills/attended-review/tests\"]",
+    "exit_code": 0,
+    "elapsed_seconds": 119.334,
+    "stdout_tail": "",
+    "stderr_tail": ".....................................................\n----------------------------------------------------------------------\nRan 53 tests in 119.132s\n\nOK\n"
+  }
+}

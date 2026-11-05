@@ -41,3 +41,28 @@ claude-opus-5-5, medium effort, non-delegating leaf.
   `3cb685646a09f454fd407a5596c036683db261a2`.
 - NAS deployment and Android phone observations remain owner/deployment-scoped
   acceptance for the service RFC.
+
+## Machine hub default amendment (2026-11-04)
+
+Owner amendment, verbatim intent: "make sure all the registered mask repos are
+putting their reviews in the hub"; owner chose "Machine config file (Recommended)".
+Milestone `machine-hub-default`, card ASK-0131, criterion AC08. Strategy
+coordinator-implementer; implementer claude-opus-5-5, medium effort, non-delegating leaf.
+
+- Commits: reservation `b3e1fea` (amendment baseline), adoption `47ad165`, claim
+  `2d62092`, implementation `5f770a6a18650b9414621098663e8e6436dc1f53`, then the
+  ASK-0131 finish commit (RFC back to Auto-Verified).
+- Changed source: `skills/attended-review/scripts/attended_review.py`,
+  `tests/test_hub_publication.py`, `tests/test_attended_review.py`,
+  `references/session-contract.md`, `references/tailscale-serve.md`, `README.md`,
+  `SKILL.md`.
+- Verification: [AC08 checklist](verification.md#ac08-machine-hub-default-ask-0131-owner-amendment-2026-11-04),
+  [suite](ASK-0131-focused-tests.json), [AC01 differential](ASK-0131-ac01-differential.json),
+  [structure](ASK-0131-documentation.json).
+- Commands and writers: none running; tests tear down their hosts, fixture hubs and
+  temporary roots. No real user config, Tailscale, network or consumer state changed.
+
+Pending (owner/deployment, outside this repository's acceptance): run
+`python3 <attended-review>/scripts/attended_review.py hub-config set https://HUB.ts.net`
+once per machine and user; managed consumers pick up the publisher only after their
+MASK deployment links resolve to this revision. No push was performed.

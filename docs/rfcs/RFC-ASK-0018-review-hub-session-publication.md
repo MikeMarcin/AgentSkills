@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0018"
 title: "Attended-review session publication to an optional review hub"
-status: "Implementing"
+status: "Auto-Verified"
 metadata: {"milestone_plan":{"id":"review-hub-publisher","path":"docs/rfcs/plans/review-hub-publisher/milestone-plan.json"}}
 ---
 
@@ -204,7 +204,7 @@ The owner asked to "make sure all the registered mask repos are putting their
 reviews in the hub" and chose a machine configuration file: `attended_review.py`
 reads a per-user file as the lowest-precedence hub default, so every session on a
 machine publishes without per-session flags, for Claude, Codex or any shell.
-[ASK-0131](../issues/30-in-progress/ASK-0131-machine-hub-default.md) owns this follow-up
+[ASK-0131](../issues/60-done/ASK-0131-machine-hub-default.md) owns this follow-up
 and AC08. Amendment baseline: `b3e1feaab30fde9a5fcc111fa3bf22765ee1ecf7`. The
 original RFC_BASE_SHA, AC01–AC07 acceptance and the wire contract are unchanged.
 
@@ -218,4 +218,9 @@ machine file. A session that never enabled publication adopts the machine defaul
 at its next `serve`, publishing once served through Tailscale; a destination adopted
 this way follows later changes to the file at each `serve`, while explicit choices do
 not. This changes no behavior on machines without the file.
+
+AC08 is satisfied at `5f770a6a18650b9414621098663e8e6436dc1f53` ([checklist](plans/review-hub-publisher/verification.md#ac08-machine-hub-default-ask-0131-owner-amendment-2026-11-04));
+usage is `attended_review.py hub-config set|show|clear` in the
+[Machine default](../../skills/attended-review/references/session-contract.md#machine-default)
+section. The record wire contract is unchanged.
 
