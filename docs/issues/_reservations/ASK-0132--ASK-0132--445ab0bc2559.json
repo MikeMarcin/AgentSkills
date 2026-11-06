@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0132"
+  ],
+  "reserve_for": "mask-fleet-guidance",
+  "purpose": "",
+  "created": "2026-11-06T08:14:02.032400+00:00",
+  "base": "d0e9431231d436f8bb541b6370c2ed35e6366d77"
+}
