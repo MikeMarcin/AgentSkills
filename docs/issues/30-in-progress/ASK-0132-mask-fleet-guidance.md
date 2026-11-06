@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0132"
 title: "Teach the canonical MASK skill to operate enrolled fleets"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: ["ASK-0005"]
 ---
