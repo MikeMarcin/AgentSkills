@@ -1,6 +1,6 @@
 ---
 name: manage-agent-skills
-description: Manage personal and project skills, enrolled fleets, version holds and readiness through the MASK JSON CLI. Use for installing or uninstalling shared skills, upgrading or repairing deployments, and cleaning unused MASK storage.
+description: Use the MASK JSON CLI for personal or project skill deployment, readiness, version holds, cleanup, and enrolled fleet operations.
 ---
 
 # Manage skills with MASK
@@ -73,7 +73,8 @@ user's authorization. Ordinary owned effects need no additional permission.
 
 `project set-agents`, `user set-agents` and target setters reconcile immediately;
 there is no separate apply step. Inspect the Git diff and commit portable declarations
-or consumer context only within the project's authorized workflow. MASK does not commit.
+or consumer context only within the project's authorized workflow. Those setters
+leave the Git commit to the caller.
 
 ## Updates, cleanup and recovery
 
