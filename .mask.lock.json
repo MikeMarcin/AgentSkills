@@ -27,12 +27,12 @@
       "source": "agentskills"
     },
     {
-      "commit": "c85be25596b5c981107e8b09af27ee52119bd8bf",
+      "commit": "a856c8b532eb68f5a19eaa20a6d693f266dc1b87",
       "git_object_format": "sha1",
       "id": "manage-agent-skills",
       "metadata_digest": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
       "path": "skills/manage-agent-skills",
-      "payload_digest": "sha256:15619110b5ef2ad6f7129fc4b72a155d4e16f6926b689886580f951fb2233f7d",
+      "payload_digest": "sha256:360ebc1c07d9758dd2d2dee526616c5ea0c32b1eeead7c90e16003f84bc78f01",
       "repository": "https://github.com/MikeMarcin/AgentSkills.git",
       "selector": {
         "ref": "refs/heads/main"
