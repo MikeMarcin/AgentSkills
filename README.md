@@ -39,6 +39,7 @@ and security-reporting preparation.
 | [bpr-cycle](skills/bpr-cycle/SKILL.md) | Read a BetterPullReview Review Cycle round the reviewer granted, through the `bpr cycle` consumer commands, act on it in the active harness and report by item. |
 | [concept-art-approval-pipeline](skills/concept-art-approval-pipeline/SKILL.md) | Produce and review concept-art candidates with exact, persistent approval records. |
 | [sprite-sheet-animation-updater](skills/sprite-sheet-animation-updater/SKILL.md) | Preserve character identity and validate fixed-cell sprite animation layouts. |
+| [clang-split-refactor](skills/clang-split-refactor/SKILL.md) | Split oversized C++ files into responsibility-named files with libclang, keeping behavior, includes and guards correct. |
 
 `implement-rfc` was imported first with the supplied seed provenance preserved. `manage-agent-skills` was added after the CLI contracts were verified. Source membership and deployment scope are separate. MASK user commands explicitly select personal skills; project declarations continue to select project workflows.
 

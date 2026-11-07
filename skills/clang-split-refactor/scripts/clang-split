@@ -1,0 +1,4 @@
+#!/bin/sh
+# Launcher: runs the clang_split package that sits beside this script.
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHONPATH="$here${PYTHONPATH:+:$PYTHONPATH}" exec "${PYTHON:-python3}" -B -m clang_split "$@"

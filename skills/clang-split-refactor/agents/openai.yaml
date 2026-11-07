@@ -1,0 +1,6 @@
+interface:
+  display_name: "Clang Split Refactor"
+  short_description: "Split large C++ files with libclang"
+  default_prompt: "Use $clang-split-refactor to split an oversized C++ file into responsibility-named files without changing behavior, then build both configurations."
+policy:
+  allow_implicit_invocation: true
