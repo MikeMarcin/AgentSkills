@@ -163,14 +163,43 @@ def leading_comment_start(lines, start_line):
 
 
 def span_end_offset(data, c):
-    """End offset including a trailing ';' of a declaration."""
+    """End offset including a trailing ';' of a declaration, and balanced directives."""
     e = c.extent.end.offset
     j = e
     while j < len(data) and data[j:j + 1] in (b' ', b'\t'):
         j += 1
     if data[j:j + 1] == b';':
-        return j + 1
-    return e
+        e = j + 1
+    return balanced_end(data, line_start(data, c.extent.start.offset), e)
+
+
+def balanced_end(data, start, end):
+    """Extend `end` through the #endif of any conditional opened inside [start, end).
+
+    libclang's extent stops at the active branch, so an initializer written as
+    `#if A` / `x;` / `#else` / `y;` / `#endif` would otherwise be cut in half.
+    """
+    depth = 0
+    for ln in data[start:end].split(b'\n'):
+        m = DIRECTIVE.match(ln)
+        if m:
+            k = m.group(1)
+            depth += 1 if k in (b'if', b'ifdef', b'ifndef') else -1 if k == b'endif' else 0
+    pos = end
+    while depth > 0:
+        nl = data.find(b'\n', pos)
+        if nl < 0:
+            return len(data)
+        pos = nl + 1
+        eol = data.find(b'\n', pos)
+        ln = data[pos:eol if eol >= 0 else len(data)]
+        m = DIRECTIVE.match(ln)
+        if m:
+            k = m.group(1)
+            depth += 1 if k in (b'if', b'ifdef', b'ifndef') else -1 if k == b'endif' else 0
+        if depth == 0:
+            return eol if eol >= 0 else len(data)
+    return end
 
 
 def line_start(data, off):
@@ -680,10 +709,15 @@ def run(plan, write=False):
             if not blocks and not (u == default_unit and private_blocks):
                 continue
             sinc, sun = pick(unit_refs.get(u, set()))
-            sinc = [i for i in sinc if i not in hinc]
+            if g.get('header', True):
+                sinc = [i for i in sinc if i not in hinc]
+            else:
+                # No header carries the group's declarations' includes: each unit takes them.
+                sinc, sun2 = pick(unit_refs.get(u, set()) | header_refs)
+                sun = sorted(set(sun) | set(sun2))
             for x in sun:
                 report['notes'].append(f'{u}: unresolved include for {x}')
-            scross = sorted(f'"{pfx}{x}.hpp"' for x in cross.get(u, set()) - cross['header'])
+            scross = sorted(f'"{pfx}{x}.hpp"' for x in cross.get(u, set()) - (cross['header'] if g.get('header', True) else set()))
             source = inc_lines(scross + sinc, hdr_name if g.get('header', True) else None)
             source += ns_open
             if u == default_unit and private_blocks:

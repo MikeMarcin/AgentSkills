@@ -3,5 +3,10 @@
 #include <string>
 namespace demo {
 	std::string run_demo();
+
+	struct Counter {
+		int value = 0;
+		int next();
+	};
 }
 #endif

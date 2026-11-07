@@ -56,3 +56,13 @@ or list members in one file miss the moved code. Concatenate the source and its
 split `.cpp` files for call counts (headers would add declaration hits) and
 include headers, minus `#include` lines, for member inventories. Tests that copy
 the tree to a temp directory must copy the split files as well.
+
+**Header-less groups carry their own declaration includes.** A group with
+`header: false` has no header to include the class's declaring header, so each
+of its source files takes the full include set. Earlier it worked only when the
+header happened to arrive transitively.
+
+**Extend spans to balanced directives.** For an initializer spelled as an
+`#if`/`#else` pair, libclang's extent ends inside the active branch. Every moved
+span is extended through the matching `#endif`, or the header gets an
+unterminated conditional and the source keeps a stray `#else`.

@@ -120,8 +120,10 @@ PLAN = {
     'guard_prefix': 'DEMO_',
     'groups': [{
         'stem': 'shapes', 'doc': 'Shapes the demo reports on.',
-        'entities': ['report_count', 'sum_of', 'square', 'Shape', 'Widget'],
+        'entities': ['report_count', 'platform_text', 'sum_of', 'square', 'Shape', 'Widget'],
         'private': ['describe', 'describe@22', 'twice'],
+    }, {
+        'stem': 'shapes_counter', 'header': False, 'entities': [], 'source_only': ['next'],
     }],
     'register': {'dir': 'src', 'prefix': 'shapes',
                  'lists': [{'file': 'CMakeLists.txt', 'anchor': 'src/widget.cpp', 'entry': 'src/{name}', 'kinds': ['.cpp']}]},
@@ -201,6 +203,15 @@ class CorpusTests(unittest.TestCase):
     def test_mutable_namespace_variable_becomes_inline_in_header(self):
         self.assertIn('inline int report_count = 0;', self.header)
 
+    def test_conditional_initializer_moves_whole(self):
+        self.assertIn('platform_text =\n#if defined(__APPLE__)\n\t\t"apple";\n#else\n\t\t"other";\n#endif', self.header)
+        self.assertNotIn('#else', self.rest)
+
+    def test_header_less_group_includes_the_declaring_header(self):
+        counter = (self.root / 'src/shapes_counter.cpp').read_text()
+        self.assertIn('#include "widget.hpp"', counter)
+        self.assertIn('int Counter::next() {', counter)
+
     def test_conditional_branches_move_with_their_code(self):
         self.assertIn('#if DEMO_FEATURE\n\t\tout << " feature";\n#else', self.source)
 
@@ -223,6 +234,7 @@ class CorpusTests(unittest.TestCase):
     def test_registration_added_the_new_source_once(self):
         cmake = (self.root / 'CMakeLists.txt').read_text()
         self.assertEqual(cmake.count('src/shapes.cpp'), 1)
+        self.assertEqual(cmake.count('src/shapes_counter.cpp'), 1)
         self.assertNotIn('shapes.hpp', cmake)
 
     def test_class_segmentation_before_outlining(self):
@@ -231,7 +243,7 @@ class CorpusTests(unittest.TestCase):
             shutil.copytree(CORPUS, base)
             _run(['git', 'init', '-q'], base)
             _run(['cmake', '-S', '.', '-B', 'b', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], base)
-        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '57'], base)
+        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '65'], base)
         self.assertIn('report', g)
         self.assertIn('name', g['report']['refs'])
         segs = segments.segment(g, max_lines=12, penalty=1.0)
