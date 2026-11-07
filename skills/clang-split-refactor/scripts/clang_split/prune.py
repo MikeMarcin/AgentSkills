@@ -118,6 +118,7 @@ def run(plan, write=False):
         if t2 == result:
             break
         result = t2
+    result = re.sub(r'\n{3,}', '\n\n', result)
     if write:
         open(src, 'w', encoding='utf-8').write(result)
     return {'dropped': dropped, 'kept': sum(1 for ln in kept_lines if INCLUDE.match(ln)), 'written': bool(write)}

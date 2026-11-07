@@ -89,7 +89,9 @@ def analyze(build, src, alt_builds=()):
                 for h in helper_names[m]:
                     if h != key:
                         refs.add(h)
-        graph[key] = {'line': k.extent.start.line, 'end': k.extent.end.line, 'helper': anon,
+        # Out-of-line members are movable units even inside an anonymous namespace.
+        helper = anon and k.kind.name not in ('CXX_METHOD', 'CONSTRUCTOR', 'DESTRUCTOR', 'CONVERSION_FUNCTION')
+        graph[key] = {'line': k.extent.start.line, 'end': k.extent.end.line, 'helper': helper,
                       'kind': k.kind.name, 'refs': sorted(refs)}
     return graph
 

@@ -165,10 +165,11 @@ PLAN = {
     'build': 'build-on',
     'alt_builds': ['build-off'],
     'guard_prefix': 'DEMO_',
+    'guard_style': 'path',
     'groups': [{
         'stem': 'shapes', 'doc': 'Shapes the demo reports on.',
         'entities': ['report_count', 'platform_text', 'sum_of', 'square', 'Shape', 'Widget', 'Step'],
-        'private': ['describe', 'describe@23', 'twice'],
+        'private': ['describe', 'describe@27', 'twice'],
     }, {
         'stem': 'shapes_counter', 'header': False, 'entities': [], 'source_only': ['~Counter', 'next'],
     }],
@@ -190,7 +191,9 @@ class CorpusTests(unittest.TestCase):
         _run(['git', 'add', '-A'], root)
         _run(['git', '-c', 'user.email=t@example.invalid', '-c', 'user.name=t', 'commit', '-qm', 'base'], root)
         for build, flag in (('build-on', 'ON'), ('build-off', 'OFF')):
-            _run(['cmake', '-S', '.', '-B', build, f'-DDEMO_FEATURE={flag}', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], root)
+            testing = 'ON' if flag == 'OFF' else 'OFF'
+            _run(['cmake', '-S', '.', '-B', build, f'-DDEMO_FEATURE={flag}', f'-DDEMO_TESTING={testing}',
+                  '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], root)
         cls.baseline = {b: cls.build_and_run(b) for b in ('build-on', 'build-off')}
         cls.graph = _cli(['analyze', 'src/widget.cpp', '--build', 'build-on', '--alt-build', 'build-off'], root)
         (root / 'plan.json').write_text(json.dumps(PLAN))
@@ -219,7 +222,7 @@ class CorpusTests(unittest.TestCase):
 
     def test_generic_lambda_helper_found_by_text(self):
         self.assertIn('twice', self.graph['Widget']['refs'])
-        self.assertIn('describe@23', self.graph['Widget']['refs'])
+        self.assertIn('describe@27', self.graph['Widget']['refs'])
 
     def test_header_keeps_declarations_only(self):
         self.assertNotIn('return "widget:"', self.header)
@@ -228,7 +231,7 @@ class CorpusTests(unittest.TestCase):
         self.assertIn('[[nodiscard]] virtual int area() const;', self.header)
         self.assertIn('virtual ~Shape() = default;', self.header)
         self.assertIn('int scaled(int value) const;', self.header)
-        self.assertIn('#ifndef DEMO_SHAPES_HPP', self.header)
+        self.assertIn('#ifndef DEMO_SRC_SHAPES_HPP', self.header)
 
     def test_default_args_with_shift_tokens_stay_in_header_only(self):
         self.assertIn('rows = std::vector<std::vector<int>>{{1, 2}, {3}}, int bias = square(2));', self.header)
@@ -270,6 +273,24 @@ class CorpusTests(unittest.TestCase):
         self.assertIn('#include "palette.hpp"', self.source)
         self.assertNotIn('color.hpp', self.source + self.header)
 
+    def test_guarded_source_include_stays_guarded_where_it_lands(self):
+        self.assertIn('#if defined(DEMO_TESTING)\n\t#include <atomic>\n#endif', self.source)
+        self.assertNotIn('#include <atomic>', self.header)
+
+    def test_namespace_alias_is_redeclared_where_spelled(self):
+        self.assertIn('namespace text = std;', self.source)
+        self.assertNotIn('namespace text', self.header)
+
+    def test_prune_collapses_blank_runs(self):
+        self.assertNotIn('\n\n\n', self.rest)
+
+    def test_anonymous_namespace_members_still_segment(self):
+        g = _cli(['analyze', 'src/catalog.cpp', '--build', 'build-on'], self.root)
+        self.assertTrue(g['Catalog']['helper'])
+        self.assertFalse(g['size']['helper'])
+        segs = segments.segment(g, max_lines=4)
+        self.assertEqual([s['entities'] for s in segs], [['size'], ['twice'], ['catalog_size']])
+
     def test_conditional_branches_move_with_their_code(self):
         self.assertIn('#if DEMO_FEATURE\n\t\tout << " feature";\n#else', self.source)
 
@@ -301,7 +322,7 @@ class CorpusTests(unittest.TestCase):
             shutil.copytree(CORPUS, base)
             _run(['git', 'init', '-q'], base)
             _run(['cmake', '-S', '.', '-B', 'b', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], base)
-        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '66'], base)
+        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '73'], base)
         self.assertIn('report', g)
         self.assertIn('name', g['report']['refs'])
         segs = segments.segment(g, max_lines=12, penalty=1.0)

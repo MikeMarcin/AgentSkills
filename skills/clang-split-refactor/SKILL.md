@@ -100,6 +100,10 @@ These come from splitting a 42k-line file; the reasons are in
   text but get no include analysis; build on those platforms before merging.
 - Formatting assumes one indentation unit per level and namespace contents
   indented `namespace_indent` levels; run the formatter afterwards.
+- Code left in the source does not get qualified automatically. When moved
+  anonymous-namespace types go to a named namespace (pick one the project does
+  not already use, such as `<file>_detail`), qualify the remaining uses by hand.
+  Namespace aliases are re-declared in each generated file that spells them.
 - Macros that generate declarations, unusual preprocessor layouts and
   definitions split across `#if` branches may need manual post-processing.
 - Choosing responsibilities, names and API boundaries stays a human decision.

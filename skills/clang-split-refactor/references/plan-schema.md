@@ -17,6 +17,7 @@ fields from a base file with `--base`.
 | `namespace_indent` | int | `1` | Indentation levels of namespace contents. |
 | `indent` | string or int | `"\t"` | One indentation level; an int means that many spaces. |
 | `guard_prefix` | string | `""` | Prefix of generated include guards: `<prefix><SUBDIR_STEM_HPP>`. |
+| `guard_style` | string | `"name"` | `"path"` spells guards from the header's repository path (`<prefix>SRC_X_STEM_HPP`); `"name"` from `subdir/stem.hpp`. |
 | `guard_macros` | strings | `[]` | Extra macros allowed to guard generated includes, beyond platform and `-D` macros. |
 | `qualify` | object | `{}` | Name → qualified name substitutions applied to generated text, for names a `using` made unqualified in the source. |
 | `source_includes` | bool | `true` | Add each new header to the remaining source; prune removes unused ones. |

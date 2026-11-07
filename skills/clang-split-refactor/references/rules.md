@@ -81,3 +81,12 @@ failed with incomplete types.
 extent of `X::~X() = default;` at the `)`. Spans are extended past
 `= default`/`= delete`, or the moved copy becomes a bare declaration and the
 source keeps a stray `= default;`.
+
+**Anonymous-namespace members still segment.** When every class sits in an
+anonymous namespace, its out-of-line members are still the movable units; only
+anonymous free functions and types are helpers.
+
+**A guard macro is safe unless a project header defines it.** A macro set only
+on the command line (even in just one configuration) means the same in every
+file, so an include the source guarded with it keeps that guard wherever it
+lands.

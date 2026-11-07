@@ -323,7 +323,31 @@ def run(plan, write=False):
     if namespace is None:
         first = next((n for g_ in plan['groups'] for n in g_['entities'] + g_.get('private', []) + g_.get('source_only', [])), None)
         namespace = enclosing_namespace(ents[first]) if first else ''
+    # Namespace aliases are not entities; each generated file that spells one
+    # gets the source's declaration right after its namespace opens.
+    aliases = []
+    def collect_aliases(c_):
+        for k_ in c_.get_children():
+            if not in_file(k_, src):
+                continue
+            if k_.kind == K.NAMESPACE:
+                collect_aliases(k_)
+            elif k_.kind == K.NAMESPACE_ALIAS:
+                a_ = line_start(data, k_.extent.start.offset)
+                aliases.append((k_.spelling, data[a_:span_end_offset(data, k_)].decode().strip()))
+    collect_aliases(tu.cursor)
     ns_open = [f'namespace {namespace} {{'] if namespace else []
+    def with_aliases(file_lines):
+        text_ = '\n'.join(file_lines)
+        used_ = [decl_ for name_, decl_ in aliases if re.search(rf'(?<![:\w]){re.escape(name_)}::', text_)]
+        if not used_ or not ns_open or ns_open[0] not in file_lines:
+            return file_lines
+        at_ = file_lines.index(ns_open[0]) + 1
+        return file_lines[:at_] + [IND + d_ for d_ in used_] + [''] + file_lines[at_:]
+    def guard_path(name_):
+        if plan.get('guard_style') != 'path':
+            return name_
+        return os.path.relpath(os.path.join(os.path.dirname(src), name_), root)
     ns_close = ['}'] if namespace else []
     guard_prefix = plan.get('guard_prefix', '')
     qt_dirs = []
@@ -347,6 +371,7 @@ def run(plan, write=False):
         if m_ and m_.group(1) != b'endif':
             tested |= set(re.findall(r'[A-Za-z_][A-Za-z_0-9]*', m_.group(2).decode('utf-8', 'replace'))) - {'defined'}
     macro_header = {}
+    macro_header_all = set()
     if tested:
         pattern = r'^\s*#\s*define\s+(' + '|'.join(sorted(tested)) + r')\b'
         out_ = subprocess.run(['git', '-C', root, 'grep', '-n', '-E', pattern, '--'] + HEADER_GLOBS,
@@ -355,6 +380,8 @@ def run(plan, write=False):
             path_, _, rest_ = line_.split(':', 2)
             m_ = re.search(r'#\s*define\s+([A-Za-z_][A-Za-z_0-9]*)', rest_)
             full_ = os.path.realpath(os.path.join(root, path_))
+            if m_:
+                macro_header_all.add(m_.group(1))
             if m_ and full_ != src and not any(full_.startswith(d + os.sep) for d in excluded):
                 macro_header.setdefault(m_.group(1), full_)
     # Only command-line and platform macros may guard a generated include:
@@ -366,7 +393,9 @@ def run(plan, write=False):
         out_ = []
         for f_ in fr_:
             names_ = set(re.findall(r'[A-Za-z_][A-Za-z_0-9]*', f_)) - {'if', 'defined'}
-            if not names_ <= SAFE_GUARDS:
+            # A macro no project header defines can only come from the command
+            # line (or stay undefined), so it means the same in every file.
+            if not all(n_ in SAFE_GUARDS or n_ not in macro_header_all for n_ in names_):
                 break
             out_.append(f_)
         return tuple(out_)
@@ -655,7 +684,7 @@ def run(plan, write=False):
         if hoist_blocks:
             hoinc, _ = pick(hoist_refs)
             hname = (f"{plan['subdir']}/" if plan['subdir'] else '') + f"{g['hoist_stem']}.hpp"
-            hguard = guard_prefix + re.sub(r'[^A-Za-z0-9]', '_', hname).upper()
+            hguard = guard_prefix + re.sub(r'[^A-Za-z0-9]', '_', guard_path(hname)).upper()
             header_refs.add('INC:"' + hname + '"')
             inc_frames['"' + hname + '"'] = ()
         hinc, hun = pick(header_refs)
@@ -664,7 +693,7 @@ def run(plan, write=False):
         sub = plan['subdir']
         pfx = f'{sub}/' if sub else ''
         hdr_name = f'{pfx}{stem}.hpp'
-        guard = guard_prefix + re.sub(r'[^A-Za-z0-9]', '_', hdr_name).upper()
+        guard = guard_prefix + re.sub(r'[^A-Za-z0-9]', '_', guard_path(hdr_name)).upper()
         def inc_lines(incs, own):
             proj = sorted(i for i in incs if i.startswith('"'))
             qt = sorted(i for i in incs if i.startswith('<Q') or i.startswith('<q'))
@@ -704,7 +733,7 @@ def run(plan, write=False):
                 htxt += ['// ' + l if l else '//' for l in g['hoist_doc'].split('\n')]
             htxt += ns_open + [qualify_text(wrap(hoist_blocks))] + ns_close + ['#endif', '']
             if write:
-                open(os.path.join(os.path.dirname(src), hname), 'w').write('\n'.join(htxt))
+                open(os.path.join(os.path.dirname(src), hname), 'w').write('\n'.join(with_aliases(htxt)))
             report.setdefault('hoisted', {})[g['hoist_stem']] = len(htxt)
         hcross = sorted(f'"{pfx}{x}.hpp"' for x in cross['header'])
         header = [f'#ifndef {guard}', f'#define {guard}'] + inc_lines(hcross + hinc, None)
@@ -744,9 +773,9 @@ def run(plan, write=False):
             if sub:
                 os.makedirs(os.path.join(os.path.dirname(src), sub), exist_ok=True)
             if g.get('header', True):
-                open(os.path.join(os.path.dirname(src), hdr_name), 'w').write('\n'.join(header))
+                open(os.path.join(os.path.dirname(src), hdr_name), 'w').write('\n'.join(with_aliases(header)))
             for u, t in sources.items():
-                open(os.path.join(os.path.dirname(src), f'{pfx}{u}.cpp'), 'w').write('\n'.join(t))
+                open(os.path.join(os.path.dirname(src), f'{pfx}{u}.cpp'), 'w').write('\n'.join(with_aliases(t)))
     # Remove spans from the source.
     removals.sort()
     out = bytearray()

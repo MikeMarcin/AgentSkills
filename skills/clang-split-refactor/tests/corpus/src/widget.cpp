@@ -13,6 +13,10 @@
 	#include <windows.h>
 #endif
 
+#if defined(DEMO_TESTING)
+	#include <atomic>
+#endif
+
 namespace demo {
 	namespace {
 		// Overloads move together.
@@ -29,6 +33,9 @@ namespace demo {
 			return value * 2;
 		}
 	}
+
+	// Generated files that spell the alias get its declaration.
+	namespace text = std;
 
 	// Mutable namespace-scope state needs inline once it lives in a header.
 	int report_count = 0;
@@ -95,6 +102,10 @@ namespace demo {
 
 		std::string report() const {
 			++report_count;
+#if defined(DEMO_TESTING)
+			static std::atomic<int> probes{0};
+			++probes;
+#endif
 			std::ostringstream out;
 			auto apply = [](auto value) { return twice(value); };
 			out << name() << ' ' << area() << ' ' << apply(area()) << ' ' << describe(label_) << ' ' << describe(fold());
@@ -107,7 +118,7 @@ namespace demo {
 #if DEMO_VERBOSE
 			out << " verbose";
 #endif
-			return out.str();
+			return text::string(out.str());
 		}
 
 	private:
