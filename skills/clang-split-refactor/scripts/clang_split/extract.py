@@ -165,6 +165,10 @@ def leading_comment_start(lines, start_line):
 def span_end_offset(data, c):
     """End offset including a trailing ';' of a declaration, and balanced directives."""
     e = c.extent.end.offset
+    # libclang ends `X::~X() = default` at the ')'.
+    m = re.match(rb'\s*=\s*(default|delete)\b', data[e:e + 64])
+    if m:
+        e += m.end()
     j = e
     while j < len(data) and data[j:j + 1] in (b' ', b'\t'):
         j += 1

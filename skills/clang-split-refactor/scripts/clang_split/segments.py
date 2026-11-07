@@ -11,6 +11,7 @@ plan: turns named segments into an extract plan. Helpers used by one file stay
 """
 import json, os, re
 
+RECORD_KINDS = ('STRUCT_DECL', 'CLASS_DECL', 'CLASS_TEMPLATE')
 METHOD_KINDS = ('CXX_METHOD', 'CONSTRUCTOR', 'DESTRUCTOR', 'CONVERSION_FUNCTION', 'FUNCTION_TEMPLATE')
 
 
@@ -136,7 +137,12 @@ def plan(g, segs, names, support, base):
         for k in s_:
             home[k] = names[str(si)]
     order = sorted(g, key=lambda k: g[k]['line'])
-    # Non-helper, non-method entities (namespace-scope statics, classes) go with the next method.
+    # Records defined here (often a class's nested types, defined out of class)
+    # are needed by every member file: they go to the support header.
+    for k in order:
+        if not g[k]['helper'] and g[k]['kind'] in RECORD_KINDS and k not in home:
+            home[k] = support
+    # Other non-helper, non-method entities (namespace-scope statics) go with the next method.
     pending = []
     for k in order:
         if k in home:
@@ -185,7 +191,7 @@ def plan(g, segs, names, support, base):
             key = 'entities' if stem == support else 'private'
         else:
             stem = home[k]
-            key = 'source_only'
+            key = 'entities' if g[k]['kind'] in RECORD_KINDS else 'source_only'
         groups.setdefault(stem, {'stem': stem, 'entities': [], 'private': [], 'source_only': []})[key].append(k)
     base = dict(base)
     base['groups'] = []

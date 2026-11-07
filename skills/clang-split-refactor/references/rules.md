@@ -71,3 +71,13 @@ unterminated conditional and the source keeps a stray `#else`.
 header through the smallest of the source's own direct includes that brings it
 in, spelled as the source spells it. Including the declaring file directly can
 break boundary rules that allow only a façade header across a layer.
+
+**Nested types defined out of class go to the support header.** A
+`struct Outer::Inner { ... };` in the source is needed complete by every member
+file. Treated like a namespace-scope static, it landed in one file and the rest
+failed with incomplete types.
+
+**Defaulted and deleted definitions keep their `= default`.** libclang ends the
+extent of `X::~X() = default;` at the `)`. Spans are extended past
+`= default`/`= delete`, or the moved copy becomes a bare declaration and the
+source keeps a stray `= default;`.

@@ -92,6 +92,17 @@ class PurePythonTests(unittest.TestCase):
         self.assertEqual(sorted(groups['support']['entities']), ['f', 'f@5'])
         self.assertEqual(plan['source'], 's.cpp')
 
+    def test_plan_sends_records_to_the_support_header(self):
+        g = {
+            'Outer::Inner': {'line': 1, 'end': 5, 'helper': False, 'kind': 'STRUCT_DECL', 'refs': []},
+            'x': {'line': 10, 'end': 20, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['Outer::Inner']},
+            'y': {'line': 21, 'end': 30, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['Outer::Inner']},
+        }
+        plan, _ = segments.plan(g, [['x'], ['y']], {'0': 'one', '1': 'two'}, 'support', {})
+        groups = {grp['stem']: grp for grp in plan['groups']}
+        self.assertEqual(groups['support']['entities'], ['Outer::Inner'])
+        self.assertEqual(groups['one']['source_only'], ['x'])
+
     def test_register_inserts_after_anchor_idempotently(self):
         with tempfile.TemporaryDirectory() as d:
             os.makedirs(os.path.join(d, 'src'))
@@ -120,10 +131,10 @@ PLAN = {
     'guard_prefix': 'DEMO_',
     'groups': [{
         'stem': 'shapes', 'doc': 'Shapes the demo reports on.',
-        'entities': ['report_count', 'platform_text', 'sum_of', 'square', 'Shape', 'Widget'],
+        'entities': ['report_count', 'platform_text', 'sum_of', 'square', 'Shape', 'Widget', 'Step'],
         'private': ['describe', 'describe@23', 'twice'],
     }, {
-        'stem': 'shapes_counter', 'header': False, 'entities': [], 'source_only': ['next'],
+        'stem': 'shapes_counter', 'header': False, 'entities': [], 'source_only': ['~Counter', 'next'],
     }],
     'register': {'dir': 'src', 'prefix': 'shapes',
                  'lists': [{'file': 'CMakeLists.txt', 'anchor': 'src/widget.cpp', 'entry': 'src/{name}', 'kinds': ['.cpp']}]},
@@ -211,6 +222,13 @@ class CorpusTests(unittest.TestCase):
         counter = (self.root / 'src/shapes_counter.cpp').read_text()
         self.assertIn('#include "widget.hpp"', counter)
         self.assertIn('int Counter::next() {', counter)
+        self.assertIn('Counter::~Counter() = default;', counter)
+        self.assertIn('#include "shapes.hpp"', counter)
+        self.assertNotIn('= default', self.rest)
+
+    def test_out_of_line_nested_type_is_outlined_with_full_qualifier(self):
+        self.assertIn('struct Counter::Step {\n\t\tint by() const;\n\t};', self.header)
+        self.assertIn('int Counter::Step::by() const {', self.source)
 
     def test_reaches_types_through_the_sources_own_includes(self):
         self.assertIn('#include "palette.hpp"', self.source)

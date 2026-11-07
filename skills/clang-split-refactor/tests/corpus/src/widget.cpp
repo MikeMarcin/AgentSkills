@@ -116,9 +116,19 @@ namespace demo {
 		std::vector<int> weights_;
 	};
 
+	// A nested type defined out of class: every member file needs it complete.
+	struct Counter::Step {
+		int by() const {
+			return 1;
+		}
+	};
+
+	// libclang's extent of a defaulted out-of-line definition stops at ')'.
+	Counter::~Counter() = default;
+
 	// An out-of-line member of a class declared in another header.
 	int Counter::next() {
-		return ++value;
+		return value += Step{}.by();
 	}
 
 	std::string run_demo() {
