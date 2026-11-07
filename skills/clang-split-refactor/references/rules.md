@@ -34,6 +34,11 @@ body to know the type; a `constexpr` function must be visible for constant
 evaluation. They are kept whole in the header and `inline` is added to deduced
 functions so the header defines them once.
 
+**Make mutable header variables inline.** A non-const variable moved from an
+anonymous namespace into a shared header is defined in every file that includes
+it, a duplicate symbol at link time. `inline` keeps one object, and constant
+initialization means no change in initialization order.
+
 **Keep pinned spans in place.** Code covered by a digest, a security review or a
 contract test must not move, even byte-identically, without that process. Leave
 such spans out of every group.
@@ -45,3 +50,9 @@ returns `tail`'s status, so a failed build looked green.
 **Regenerate instead of hand-merging.** When the base branch moves, merging
 generated files by hand mixes old and new extents. Reset the source to the new
 base, adjust the plan to the entities that now exist and regenerate.
+
+**Teach source-scanning tests the split.** Contract tests that count call sites
+or list members in one file miss the moved code. Concatenate the source and its
+split `.cpp` files for call counts (headers would add declaration hits) and
+include headers, minus `#include` lines, for member inventories. Tests that copy
+the tree to a temp directory must copy the split files as well.

@@ -55,6 +55,9 @@ post-processing) in the consumer; see
    failing build: a test run after a failed build exercises stale binaries.
    Read each gate's full output or its exit status; never pipe a gate into
    `tail`/`head`, which replaces the gate's exit status with the pipe's.
+   Never regenerate sources while tests run; contract tests and nested builds
+   read the tree. Rerun a timing-sensitive failure alone before blaming the
+   split.
 10. **Review the diff** as a move: every removed line should reappear verbatim
     apart from qualification, declarations and includes.
 
@@ -77,7 +80,11 @@ These come from splitting a 42k-line file; the reasons are in
   and generic lambdas are often unresolved; overloads move together.
 - Deduced-return and `constexpr` functions stay whole in headers (`inline`).
 - Leave spans that a security review, digest or contract pins in place: list
-  them in no group.
+  them in no group, or route their bodies to the `__root__` unit and check that
+  the old span with one indentation level removed equals the new one.
+- Mutable namespace-scope variables moved into a header become `inline`.
+- Tests that scan source text (call-site counts, member inventories, temp-dir
+  copies of the tree) must learn the split file set.
 
 ## Limits
 

@@ -29,6 +29,9 @@ namespace demo {
 		}
 	}
 
+	// Mutable namespace-scope state needs inline once it lives in a header.
+	int report_count = 0;
+
 	// A deduced return type stays in the header.
 	auto sum_of(const std::vector<int>& values) {
 		return std::accumulate(values.begin(), values.end(), 0);
@@ -82,6 +85,7 @@ namespace demo {
 		}
 
 		std::string report() const {
+			++report_count;
 			std::ostringstream out;
 			auto apply = [](auto value) { return twice(value); };
 			out << name() << ' ' << area() << ' ' << apply(area()) << ' ' << describe(label_) << ' ' << describe(fold());
@@ -110,7 +114,7 @@ namespace demo {
 		for (const auto& [key, shape] : shapes) {
 			out << key << '=' << shape->name() << ' ' << shape->area() << '\n';
 		}
-		out << Widget("beta").report() << '\n';
+		out << Widget("beta").report() << ' ' << report_count << '\n';
 		return out.str();
 	}
 }

@@ -120,7 +120,7 @@ PLAN = {
     'guard_prefix': 'DEMO_',
     'groups': [{
         'stem': 'shapes', 'doc': 'Shapes the demo reports on.',
-        'entities': ['sum_of', 'square', 'Shape', 'Widget'],
+        'entities': ['report_count', 'sum_of', 'square', 'Shape', 'Widget'],
         'private': ['describe', 'describe@22', 'twice'],
     }],
     'register': {'dir': 'src', 'prefix': 'shapes',
@@ -198,6 +198,9 @@ class CorpusTests(unittest.TestCase):
         self.assertIn('constexpr int square(int value) {', self.header)
         self.assertNotIn('sum_of(const', self.source)
 
+    def test_mutable_namespace_variable_becomes_inline_in_header(self):
+        self.assertIn('inline int report_count = 0;', self.header)
+
     def test_conditional_branches_move_with_their_code(self):
         self.assertIn('#if DEMO_FEATURE\n\t\tout << " feature";\n#else', self.source)
 
@@ -228,7 +231,7 @@ class CorpusTests(unittest.TestCase):
             shutil.copytree(CORPUS, base)
             _run(['git', 'init', '-q'], base)
             _run(['cmake', '-S', '.', '-B', 'b', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], base)
-        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '54'], base)
+        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '57'], base)
         self.assertIn('report', g)
         self.assertIn('name', g['report']['refs'])
         segs = segments.segment(g, max_lines=12, penalty=1.0)

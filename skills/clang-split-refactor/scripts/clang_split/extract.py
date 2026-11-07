@@ -490,6 +490,13 @@ def run(plan, write=False):
                 body_ranges.append((b.extent.start.offset, b.extent.end.offset, u))
             else:
                 text = data[line_start(data, c.extent.start.offset):eoff]
+                if c.kind == K.VAR_DECL:
+                    vt = [t_.spelling for t_ in toks(tu, c.extent.start, c.location)]
+                    if not ({'constexpr', 'extern', 'inline', 'static', 'thread_local'} & set(vt)) and not c.type.is_const_qualified():
+                        # A mutable variable defined in a header needs inline to stay one object.
+                        ind_ = text[:len(text) - len(text.lstrip(b' \t'))]
+                        text = ind_ + b'inline ' + text.lstrip(b' \t')
+                        report['notes'].append(f'mutable variable {n} made inline in {stem}.hpp')
                 header_blocks.append((fr, (lead + dedent_all(text, cur_indent - NS)).decode()))
         # References: header vs body.
         def body_unit(off):
