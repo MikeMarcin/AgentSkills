@@ -12,7 +12,9 @@ plan: turns named segments into an extract plan. Helpers used by one file stay
 import json, os, re
 
 RECORD_KINDS = ('STRUCT_DECL', 'CLASS_DECL', 'CLASS_TEMPLATE')
-METHOD_KINDS = ('CXX_METHOD', 'CONSTRUCTOR', 'DESTRUCTOR', 'CONVERSION_FUNCTION', 'FUNCTION_TEMPLATE')
+# Movable units. Free functions count: a non-anonymous definition moves as a
+# source_only definition, its declaration staying in the existing header.
+METHOD_KINDS = ('CXX_METHOD', 'CONSTRUCTOR', 'DESTRUCTOR', 'CONVERSION_FUNCTION', 'FUNCTION_TEMPLATE', 'FUNCTION_DECL')
 
 
 def analyze(build, src, alt_builds=()):

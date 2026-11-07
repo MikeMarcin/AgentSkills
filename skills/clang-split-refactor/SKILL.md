@@ -44,7 +44,11 @@ post-processing) in the consumer; see
    responsibility name (equal names merge), then
    `clang-split plan graph.json segs.json names.json --support STEM --base base.json -o plan.json`.
    Edit the plan freely; the [schema](references/plan-schema.md) documents every
-   field.
+   field. Pass `--ceiling 2000`: private helpers land beside their only users,
+   so files exceed the segment budget. Re-segment with a smaller `--max-lines`
+   until `over_ceiling` is empty; a first guess is
+   ceiling × (method lines / total lines) − 150. Free functions segment like
+   members and move as `source_only` definitions.
 6. **Dry run, then write.** `clang-split extract plan.json` reports notes,
    unresolved includes and per-file sizes. Resolve every note you do not
    understand. Then `clang-split extract plan.json --write`, which also runs the

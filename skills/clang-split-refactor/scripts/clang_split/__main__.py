@@ -55,11 +55,17 @@ def cmd_plan(a):
     names = json.load(open(a.names))
     base = json.load(open(a.base)) if a.base else {}
     plan, sizes = segments.plan(g, segs, names, a.support, base)
+    # Private helpers land beside their users and includes add ~150 lines, so
+    # a file can exceed the segment budget; report stems over the ceiling.
+    over = {s: n + a.include_allowance for s, n in sizes.items() if n + a.include_allowance > a.ceiling} if a.ceiling else {}
+    summary = {'lines_per_stem': sizes, 'over_ceiling': over}
     if a.output:
         _emit(plan, a.output)
-        print(json.dumps({'lines_per_stem': sizes}), file=sys.stderr)
+        print(json.dumps(summary), file=sys.stderr)
     else:
-        _emit({'plan': plan, 'lines_per_stem': sizes})
+        _emit(dict(summary, plan=plan))
+    if over:
+        print(json.dumps({'warning': 're-segment with a smaller --max-lines', 'over_ceiling': over}), file=sys.stderr)
 
 
 def cmd_extract(a):
@@ -153,6 +159,8 @@ def main(argv=None):
     s.add_argument('names', help='JSON mapping segment index to file stem; equal stems merge')
     s.add_argument('--support', required=True, help='stem of the header declaring shared helpers')
     s.add_argument('--base', help='plan fields to copy (source, build, namespace, register, ...)')
+    s.add_argument('--ceiling', type=int, help='largest acceptable file; stems estimated above it are reported')
+    s.add_argument('--include-allowance', type=int, default=150, help='lines added to each estimate for includes')
     s.add_argument('-o', '--output')
     s.set_defaults(fn=cmd_plan)
 

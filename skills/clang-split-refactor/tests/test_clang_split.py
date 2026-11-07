@@ -92,6 +92,26 @@ class PurePythonTests(unittest.TestCase):
         self.assertEqual(sorted(groups['support']['entities']), ['f', 'f@5'])
         self.assertEqual(plan['source'], 's.cpp')
 
+    def test_free_functions_are_segmented(self):
+        g = {
+            'f': {'line': 1, 'end': 10, 'helper': False, 'kind': 'FUNCTION_DECL', 'refs': []},
+            'h': {'line': 11, 'end': 12, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': []},
+            'g': {'line': 13, 'end': 20, 'helper': False, 'kind': 'FUNCTION_DECL', 'refs': ['h']},
+        }
+        segs = segments.segment(g, max_lines=10, penalty=1.0)
+        self.assertEqual([s['entities'] for s in segs], [['f'], ['g']])
+
+    def test_plan_cli_reports_stems_over_the_ceiling(self):
+        g = {
+            'h': {'line': 1, 'end': 900, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': []},
+            'x': {'line': 901, 'end': 1000, 'helper': False, 'kind': 'FUNCTION_DECL', 'refs': ['h']},
+        }
+        with tempfile.TemporaryDirectory() as d:
+            for name, obj in (('g.json', g), ('s.json', [['x']]), ('n.json', {'0': 'one'})):
+                Path(d, name).write_text(json.dumps(obj))
+            out = _cli(['plan', 'g.json', 's.json', 'n.json', '--support', 'support', '--ceiling', '1000'], d)
+        self.assertEqual(out['over_ceiling'], {'one': 1150})
+
     def test_plan_sends_records_to_the_support_header(self):
         g = {
             'Outer::Inner': {'line': 1, 'end': 5, 'helper': False, 'kind': 'STRUCT_DECL', 'refs': []},
