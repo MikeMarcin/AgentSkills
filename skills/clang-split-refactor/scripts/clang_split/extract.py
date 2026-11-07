@@ -812,6 +812,13 @@ def run(plan, write=False):
             at_ = (last_ + 1) if last_ is not None else 0
             src_lines_[at_:at_] = new_
             text = b'\n'.join(src_lines_)
+    # Divider comments (`// ---- name ----`) whose section moved away.
+    divider = re.compile(rb'\n[ \t]*//[ \t]*[-=*#~]{3,}[^\n]*(?=\n(?:[ \t]*\n)*(?:[ \t]*//[ \t]*[-=*#~]{3,}|[ \t]*\}|\Z))')
+    while True:
+        t2 = divider.sub(b'', text)
+        if t2 == text:
+            break
+        text = t2
     # Drop now-empty preprocessor blocks.
     empty = re.compile(rb'\n[ \t]*#[ \t]*if[^\n]*\n(?:[ \t]*\n)*[ \t]*#[ \t]*endif[^\n]*(?=\n)')
     empty_ns = re.compile(rb'\n[ \t]*namespace[ \t]*\{[ \t]*\n(?:[ \t]*\n)*[ \t]*\}[^\n]*(?=\n)')

@@ -141,7 +141,7 @@ def plan(g, segs, names, support, base, support_max=None, penalty=1.0):
     home = {}
     for si, s_ in enumerate(segs):
         for k in s_:
-            home[k] = names[str(si)]
+            home[k] = names.get(str(si)) or '(source)'
     order = sorted(g, key=lambda k: g[k]['line'])
     # Records defined here (often a class's nested types, defined out of class)
     # are needed by every member file: they go to the support header.
@@ -158,7 +158,7 @@ def plan(g, segs, names, support, base, support_max=None, penalty=1.0):
         elif not g[k]['helper']:
             pending.append(k)
     for p in pending:
-        home[p] = names[str(len(segs) - 1)]
+        home[p] = names.get(str(len(segs) - 1)) or '(source)'
     users = {k: set() for k in g}
     for k, v in g.items():
         for r in v['refs']:
@@ -199,6 +199,21 @@ def plan(g, segs, names, support, base, support_max=None, penalty=1.0):
             stem = home[k]
             key = 'entities' if g[k]['kind'] in RECORD_KINDS else 'source_only'
         groups.setdefault(stem, {'stem': stem, 'entities': [], 'private': [], 'source_only': []})[key].append(k)
+    # A source whose every entity moves would keep only includes and stray
+    # comments. One segment stays instead: a name mapped to null/"" if given,
+    # else the segment holding a constructor, else the first.
+    kept = {'(source)'} if any(not names.get(str(si)) for si in range(len(segs))) else set()
+    if not kept:
+        ctor = next((si for si, s_ in enumerate(segs) if any(g[k]['kind'] == 'CONSTRUCTOR' for k in s_)), 0)
+        kept = {names[str(ctor)]} if segs else set()
+    stay = '(source)'
+    for stem_ in kept:
+        grp_ = groups.pop(stem_, None)
+        for k in (grp_ or {}).get('source_only', []) + (grp_ or {}).get('private', []) + (grp_ or {}).get('entities', []):
+            if g[k]['helper']:
+                place[k] = stay
+            else:
+                home[k] = stay
     base = dict(base)
     base['groups'] = []
     if support in groups:

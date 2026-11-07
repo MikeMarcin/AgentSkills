@@ -90,3 +90,8 @@ anonymous free functions and types are helpers.
 on the command line (even in just one configuration) means the same in every
 file, so an include the source guarded with it keeps that guard wherever it
 lands.
+
+**One segment stays in the source.** When every entity moves, the original
+keeps only includes and orphaned divider comments, and a new file duplicates its
+build entry. The planner keeps the constructor's segment (or a segment named
+`null`) in place, and the extractor drops `// ----` dividers whose section moved.

@@ -86,7 +86,7 @@ class PurePythonTests(unittest.TestCase):
             'x': {'line': 10, 'end': 20, 'helper': False, 'kind': m, 'refs': ['h', 'f']},
             'y': {'line': 21, 'end': 30, 'helper': False, 'kind': m, 'refs': ['f@5']},
         }
-        plan, _ = segments.plan(g, [['x'], ['y']], {'0': 'one', '1': 'two'}, 'support', {'source': 's.cpp'})
+        plan, _ = segments.plan(g, [['x'], ['y'], []], {'0': 'one', '1': 'two', '2': None}, 'support', {'source': 's.cpp'})
         groups = {grp['stem']: grp for grp in plan['groups']}
         self.assertEqual(groups['one']['private'], ['h'])
         self.assertEqual(sorted(groups['support']['entities']), ['f', 'f@5'])
@@ -107,7 +107,7 @@ class PurePythonTests(unittest.TestCase):
             'x': {'line': 901, 'end': 1000, 'helper': False, 'kind': 'FUNCTION_DECL', 'refs': ['h']},
         }
         with tempfile.TemporaryDirectory() as d:
-            for name, obj in (('g.json', g), ('s.json', [['x']]), ('n.json', {'0': 'one'})):
+            for name, obj in (('g.json', g), ('s.json', [['x'], []]), ('n.json', {'0': 'one', '1': None})):
                 Path(d, name).write_text(json.dumps(obj))
             out = _cli(['plan', 'g.json', 's.json', 'n.json', '--support', 'support', '--ceiling', '1000'], d)
         self.assertEqual(out['over_ceiling'], {'one': 1150})
@@ -121,12 +121,30 @@ class PurePythonTests(unittest.TestCase):
             'x': {'line': 1601, 'end': 1610, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['a1', 'b1']},
             'y': {'line': 1611, 'end': 1620, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['a2', 'b2']},
         }
-        plan, sizes = segments.plan(g, [['x'], ['y']], {'0': 'one', '1': 'two'}, 'support', {}, support_max=1000)
+        plan, sizes = segments.plan(g, [['x'], ['y'], []], {'0': 'one', '1': 'two', '2': None}, 'support', {}, support_max=1000)
         groups = {grp['stem']: grp['entities'] for grp in plan['groups']}
         self.assertEqual(groups['support_1'], ['a1', 'a2'])
         self.assertEqual(groups['support_2'], ['b1', 'b2'])
         self.assertNotIn('support', sizes)
         self.assertEqual(sizes['support_1'], 800)
+
+    def test_plan_keeps_the_constructor_segment_in_the_source(self):
+        g = {
+            'h': {'line': 1, 'end': 2, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': []},
+            'C': {'line': 3, 'end': 10, 'helper': False, 'kind': 'CONSTRUCTOR', 'refs': ['h']},
+            'x': {'line': 11, 'end': 20, 'helper': False, 'kind': 'CXX_METHOD', 'refs': []},
+        }
+        plan, sizes = segments.plan(g, [['x'], ['C']], {'0': 'one', '1': 'two'}, 'support', {})
+        self.assertEqual([grp['stem'] for grp in plan['groups']], ['one'])
+        self.assertEqual(sizes['(source)'], 10)
+
+    def test_plan_keeps_segments_named_null_in_the_source(self):
+        g = {
+            'C': {'line': 1, 'end': 10, 'helper': False, 'kind': 'CONSTRUCTOR', 'refs': []},
+            'x': {'line': 11, 'end': 20, 'helper': False, 'kind': 'CXX_METHOD', 'refs': []},
+        }
+        plan, _ = segments.plan(g, [['C'], ['x']], {'0': 'one', '1': None}, 'support', {})
+        self.assertEqual([grp['stem'] for grp in plan['groups']], ['one'])
 
     def test_plan_sends_records_to_the_support_header(self):
         g = {
@@ -134,7 +152,7 @@ class PurePythonTests(unittest.TestCase):
             'x': {'line': 10, 'end': 20, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['Outer::Inner']},
             'y': {'line': 21, 'end': 30, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['Outer::Inner']},
         }
-        plan, _ = segments.plan(g, [['x'], ['y']], {'0': 'one', '1': 'two'}, 'support', {})
+        plan, _ = segments.plan(g, [['x'], ['y'], []], {'0': 'one', '1': 'two', '2': None}, 'support', {})
         groups = {grp['stem']: grp for grp in plan['groups']}
         self.assertEqual(groups['support']['entities'], ['Outer::Inner'])
         self.assertEqual(groups['one']['source_only'], ['x'])
@@ -281,6 +299,10 @@ class CorpusTests(unittest.TestCase):
         self.assertIn('namespace text = std;', self.source)
         self.assertNotIn('namespace text', self.header)
 
+    def test_orphaned_dividers_are_dropped(self):
+        self.assertNotIn('---- shapes ----', self.rest)
+        self.assertIn('---- demo ----', self.rest)
+
     def test_prune_collapses_blank_runs(self):
         self.assertNotIn('\n\n\n', self.rest)
 
@@ -322,7 +344,7 @@ class CorpusTests(unittest.TestCase):
             shutil.copytree(CORPUS, base)
             _run(['git', 'init', '-q'], base)
             _run(['cmake', '-S', '.', '-B', 'b', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], base)
-        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '73'], base)
+        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '75'], base)
         self.assertIn('report', g)
         self.assertIn('name', g['report']['refs'])
         segs = segments.segment(g, max_lines=12, penalty=1.0)

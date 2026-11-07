@@ -57,6 +57,8 @@ namespace demo {
 		return value * value;
 	}
 
+	// ---- shapes ----
+
 	class Shape {
 	public:
 		virtual ~Shape() = default;
@@ -141,6 +143,8 @@ namespace demo {
 	int Counter::next() {
 		return value += Step{}.by();
 	}
+
+	// ---- demo ----
 
 	std::string run_demo() {
 		std::map<std::string, std::unique_ptr<Shape>> shapes;
