@@ -121,7 +121,7 @@ PLAN = {
     'groups': [{
         'stem': 'shapes', 'doc': 'Shapes the demo reports on.',
         'entities': ['report_count', 'platform_text', 'sum_of', 'square', 'Shape', 'Widget'],
-        'private': ['describe', 'describe@22', 'twice'],
+        'private': ['describe', 'describe@23', 'twice'],
     }, {
         'stem': 'shapes_counter', 'header': False, 'entities': [], 'source_only': ['next'],
     }],
@@ -172,7 +172,7 @@ class CorpusTests(unittest.TestCase):
 
     def test_generic_lambda_helper_found_by_text(self):
         self.assertIn('twice', self.graph['Widget']['refs'])
-        self.assertIn('describe@22', self.graph['Widget']['refs'])
+        self.assertIn('describe@23', self.graph['Widget']['refs'])
 
     def test_header_keeps_declarations_only(self):
         self.assertNotIn('return "widget:"', self.header)
@@ -212,6 +212,10 @@ class CorpusTests(unittest.TestCase):
         self.assertIn('#include "widget.hpp"', counter)
         self.assertIn('int Counter::next() {', counter)
 
+    def test_reaches_types_through_the_sources_own_includes(self):
+        self.assertIn('#include "palette.hpp"', self.source)
+        self.assertNotIn('color.hpp', self.source + self.header)
+
     def test_conditional_branches_move_with_their_code(self):
         self.assertIn('#if DEMO_FEATURE\n\t\tout << " feature";\n#else', self.source)
 
@@ -243,7 +247,7 @@ class CorpusTests(unittest.TestCase):
             shutil.copytree(CORPUS, base)
             _run(['git', 'init', '-q'], base)
             _run(['cmake', '-S', '.', '-B', 'b', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'], base)
-        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '65'], base)
+        g = _cli(['analyze', 'src/widget.cpp', '--build', 'b', '--class-line', '66'], base)
         self.assertIn('report', g)
         self.assertIn('name', g['report']['refs'])
         segs = segments.segment(g, max_lines=12, penalty=1.0)

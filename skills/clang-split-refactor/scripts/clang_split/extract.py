@@ -379,6 +379,10 @@ def run(plan, write=False):
         if m_ and frames[i_]:
             root_inc_frames[m_.group(1).decode()] = safe_frames(frames[i_])
 
+    pfx0_ = f"{plan['subdir']}/" if plan['subdir'] else ''
+    generated_ = {f'"{pfx0_}{g_[k_]}.hpp"' for g_ in plan['groups'] for k_ in ('stem', 'hoist_stem') if g_.get(k_)}
+    original_quoted = [i_ for i_ in root_direct if i_.startswith('"') and i_ not in generated_
+                       and not (plan['subdir'] and i_.startswith('"' + plan['subdir'] + '/'))]
     text_type_header = {}
     _counts = {}
     for inc_ in root_direct:
@@ -624,6 +628,12 @@ def run(plan, write=False):
                     continue
                 rel = project_include(f)
                 if rel:
+                    # Keep the source's include vocabulary: reach the file through
+                    # the smallest original include that brings it in, as the
+                    # original spells it. Boundary rules may allow only that one.
+                    via_ = [i_ for i_ in original_quoted if f in cache.get(i_, ())]
+                    if via_:
+                        rel = min(via_, key=lambda i_: len(cache[i_]))
                     project_file_of[rel] = f
                     choose(rel, f, chosen)
                     continue

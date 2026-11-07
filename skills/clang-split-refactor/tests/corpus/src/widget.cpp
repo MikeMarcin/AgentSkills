@@ -1,5 +1,6 @@
 #include "widget.hpp"
 #include "config.hpp"
+#include "palette.hpp"
 
 #include <map>
 #include <memory>
@@ -102,7 +103,7 @@ namespace demo {
 #else
 			out << " plain";
 #endif
-			out << ' ' << (platform_text[0] != 0);
+			out << ' ' << (platform_text[0] != 0) << ' ' << Color{}.level;
 #if DEMO_VERBOSE
 			out << " verbose";
 #endif

@@ -66,3 +66,8 @@ header happened to arrive transitively.
 `#if`/`#else` pair, libclang's extent ends inside the active branch. Every moved
 span is extended through the matching `#endif`, or the header gets an
 unterminated conditional and the source keeps a stray `#else`.
+
+**Keep the source's include vocabulary.** A generated file reaches a project
+header through the smallest of the source's own direct includes that brings it
+in, spelled as the source spells it. Including the declaring file directly can
+break boundary rules that allow only a façade header across a layer.
