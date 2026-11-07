@@ -54,7 +54,8 @@ def cmd_plan(a):
     segs = json.load(open(a.segments))
     names = json.load(open(a.names))
     base = json.load(open(a.base)) if a.base else {}
-    plan, sizes = segments.plan(g, segs, names, a.support, base)
+    support_max = a.ceiling - a.include_allowance if a.ceiling else None
+    plan, sizes = segments.plan(g, segs, names, a.support, base, support_max=support_max)
     # Private helpers land beside their users and includes add ~150 lines, so
     # a file can exceed the segment budget; report stems over the ceiling.
     over = {s: n + a.include_allowance for s, n in sizes.items() if n + a.include_allowance > a.ceiling} if a.ceiling else {}

@@ -112,6 +112,22 @@ class PurePythonTests(unittest.TestCase):
             out = _cli(['plan', 'g.json', 's.json', 'n.json', '--support', 'support', '--ceiling', '1000'], d)
         self.assertEqual(out['over_ceiling'], {'one': 1150})
 
+    def test_oversized_support_group_is_split_cohesively(self):
+        g = {
+            'a1': {'line': 1, 'end': 400, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': ['a2']},
+            'a2': {'line': 401, 'end': 800, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': ['a1']},
+            'b1': {'line': 801, 'end': 1200, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': ['b2']},
+            'b2': {'line': 1201, 'end': 1600, 'helper': True, 'kind': 'FUNCTION_DECL', 'refs': ['b1']},
+            'x': {'line': 1601, 'end': 1610, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['a1', 'b1']},
+            'y': {'line': 1611, 'end': 1620, 'helper': False, 'kind': 'CXX_METHOD', 'refs': ['a2', 'b2']},
+        }
+        plan, sizes = segments.plan(g, [['x'], ['y']], {'0': 'one', '1': 'two'}, 'support', {}, support_max=1000)
+        groups = {grp['stem']: grp['entities'] for grp in plan['groups']}
+        self.assertEqual(groups['support_1'], ['a1', 'a2'])
+        self.assertEqual(groups['support_2'], ['b1', 'b2'])
+        self.assertNotIn('support', sizes)
+        self.assertEqual(sizes['support_1'], 800)
+
     def test_plan_sends_records_to_the_support_header(self):
         g = {
             'Outer::Inner': {'line': 1, 'end': 5, 'helper': False, 'kind': 'STRUCT_DECL', 'refs': []},

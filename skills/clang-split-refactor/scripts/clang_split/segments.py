@@ -94,8 +94,10 @@ def analyze(build, src, alt_builds=()):
     return graph
 
 
-def segment(g, max_lines, penalty=1.0):
-    methods = [k for k in sorted(g, key=lambda k: g[k]['line']) if not g[k]['helper'] and g[k]['kind'] in METHOD_KINDS]
+def segment(g, max_lines, penalty=1.0, keys=None):
+    if keys is None:
+        keys = [k for k in g if not g[k]['helper'] and g[k]['kind'] in METHOD_KINDS]
+    methods = sorted(keys, key=lambda k: g[k]['line'])
     idx = {k: i for i, k in enumerate(methods)}
     size = [g[k]['end'] - g[k]['line'] + 1 for k in methods]
     adj = [set() for _ in methods]
@@ -131,7 +133,7 @@ def segment(g, max_lines, penalty=1.0):
             for si, s_ in enumerate(segs)]
 
 
-def plan(g, segs, names, support, base):
+def plan(g, segs, names, support, base, support_max=None, penalty=1.0):
     segs = [s['entities'] if isinstance(s, dict) else s for s in segs]
     names = {str(k): v for k, v in names.items()}
     home = {}
@@ -200,7 +202,22 @@ def plan(g, segs, names, support, base):
     if support in groups:
         sg = groups.pop(support)
         sg['doc'] = base.get('support_doc', '')
-        base['groups'].append(sg)
+        lines_of = lambda ks: sum(g[k]['end'] - g[k]['line'] + 1 for k in ks)
+        if support_max and lines_of(sg['entities']) > support_max:
+            # Shared helpers alone exceed the budget: propose cohesive support
+            # groups (rename them by subject); cross-group includes are generated.
+            parts = segment(g, support_max, penalty, keys=sg['entities'])
+            for i, part in enumerate(parts, start=1):
+                stem = f'{support}_{i}'
+                for k in part['entities']:
+                    if g[k]['helper']:
+                        place[k] = stem
+                    else:
+                        home[k] = stem
+                base['groups'].append({'stem': stem, 'doc': sg['doc'], 'entities': part['entities'],
+                                       'private': [], 'source_only': []})
+        else:
+            base['groups'].append(sg)
     for stem, grp in groups.items():
         grp['header'] = False
         base['groups'].append(grp)

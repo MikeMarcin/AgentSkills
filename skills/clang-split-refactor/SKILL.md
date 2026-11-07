@@ -47,7 +47,9 @@ post-processing) in the consumer; see
    field. Pass `--ceiling 2000`: private helpers land beside their only users,
    so files exceed the segment budget. Re-segment with a smaller `--max-lines`
    until `over_ceiling` is empty; a first guess is
-   ceiling × (method lines / total lines) − 150. Free functions segment like
+   ceiling × (method lines / total lines) − 150. When shared helpers alone pass
+   the ceiling, `plan` splits the support group into cohesive `STEM_1`, `STEM_2`
+   …; rename them by subject. Free functions segment like
    members and move as `source_only` definitions.
 6. **Dry run, then write.** `clang-split extract plan.json` reports notes,
    unresolved includes and per-file sizes. Resolve every note you do not
