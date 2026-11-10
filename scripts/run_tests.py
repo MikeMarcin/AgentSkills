@@ -31,6 +31,7 @@ def main():
         ('wizard', 'tests', 'test_*.py'),
         ('trellis-image-to-3d', 'tests', 'test_*.py'),
         ('sprite-sheet-animation-updater', 'tests', 'test_*.py'),
+        ('clang-split-refactor', 'tests', 'test_*.py'),
         ('concept-art-approval-pipeline', 'scripts', 'test_build_art_review.py'),
     ):
         print(f'Testing {skill}', flush=True)
