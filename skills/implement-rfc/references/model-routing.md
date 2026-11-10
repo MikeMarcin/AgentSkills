@@ -13,9 +13,9 @@ The coordinator's current route is never an implicit engineering override.
 | `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
 | `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 medium |
 | `rfc-integrator` | integration | Sol 6.1 high | Opus 5.5 high |
-| `rfc-worker-deep` | deep | Sol 6.1 max | Opus 5.5 max |
+| `rfc-worker-deep` | deep | Sol 6.1 max | Fable 5.2 xhigh |
 | `rfc-reviewer` | review | Sol 6.1 xhigh | Opus 5.5 xhigh |
-| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.1 xhigh |
+| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.2 xhigh |
 
 Standard is broad engineering; deep addresses named unresolved difficulty.
 Review is independently configurable from deep implementation. Critical review
@@ -25,7 +25,7 @@ See [delegated execution](delegated-execution.md) for selection and contracts.
 
 The owner authorized a public-evidence refresh of supporting roles on 2026-10-03
 and then amended the defaults above. Deep work remains reserved for named unresolved
-difficulty; its max effort reflects the owner's preference for these infrequent
+difficulty; Sol's max effort reflects the owner's preference for these infrequent
 assignments. Critical review retains Astra/Fable for model diversity.
 The owner selected Luna xhigh for mechanical roles after reviewing failure-reporting
 requirements and the comparison with Sonnet low. Similar aggregate intelligence
@@ -35,12 +35,17 @@ these choices, read [Selection evidence](model-selection-evidence.md) when revie
 or changing the allocation. On 2026-10-22 the owner requested a medium-effort trial
 for the Claude implementer and standard worker after reported Anthropic feedback.
 The worker already used medium; the implementer now does too. This is an owner
-choice, with no local quality comparison. The coordinator/implementer strategy,
+choice, with no local quality comparison. On 2026-11-10 the owner promoted
+Fable 5.2 xhigh to the Claude deep worker, replacing Opus 5.5 max, and to the
+Claude critical reviewer, replacing Fable 5.1 xhigh. The promotion rests on public
+launch evidence one day after release; no utility, scout, shadow-review or other
+local evaluation preceded it. The coordinator/implementer strategy,
 coordinator session routes and Codex implementation route retain their existing choices.
 The older integrator route is independently refreshed. Exact model IDs and requested
 effort live in configuration; `verified_as_of` dates the source/configuration review,
 not observed serving or measured RFC-task quality. No local model bakeoff was run.
-Claude's declared floor is 2.1.284 for Sonnet 5.5; Opus 5.5 requires at least 2.1.280.
+Claude's declared floor is 2.1.321 for Fable 5.2; Sonnet 5.5 requires at least
+2.1.284 and Opus 5.5 at least 2.1.280.
 Native adapters preserve the requested efforts. The existing Codex companion
 fallback for max is documented in [codex-lanes.md](codex-lanes.md). No automatic
 client upgrade, other effort clamp or model fallback, reset or credit purchase
@@ -71,6 +76,8 @@ session, native Claude agents are the default lane mechanism;
   risk. A second review, including another provider running the same role,
   requires an unresolved material concern or an explicit request. Reconcile
   findings using direct evidence, not a vote.
+- The Claude deep worker and critical reviewer share Fable 5.2. For critical
+  review of a Claude deep-worker diff, prefer the Codex Astra lane.
 - Prefer Codex for mechanical bulk when allowance economics favor it.
 - The designated integrator never runs through the launcher; it launches lanes only.
 

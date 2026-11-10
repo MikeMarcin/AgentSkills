@@ -41,9 +41,10 @@ Generated Claude agents:
 
 Parent permission modes can take precedence over a subagent's `permissionMode`. Before relying on read-only scouting or review, keep the parent in a permission mode that does not widen the child, and inspect `git status --short` after the run. The read-focused agents retain Bash for Git inspection and read-only verification commands, but `permissionMode: plan` denies mutating commands: configure, build, or test runs that write artifacts stay with the designated integrator, bounded worker, or test runner. Unexpected repository-source writes from a test runner invalidate the result.
 
-The checked-in route declares Claude Code 2.1.284 or later. Current
+The checked-in route declares Claude Code 2.1.321 or later. Current
 [model configuration documentation](https://code.claude.com/docs/en/model-config)
-requires 2.1.284 for Sonnet 5.5 and 2.1.280 for Opus 5.5 (checked 2026-10-03).
+requires 2.1.321 for Fable 5.2, 2.1.284 for Sonnet 5.5 and 2.1.280 for Opus 5.5
+(checked 2026-11-10).
 Verify the installed runtime before claiming native serving; configuration
 validation is not a live model-availability test. Worktree-isolated subagents
 received important main-checkout safety fixes by 2.1.210, but the default portable

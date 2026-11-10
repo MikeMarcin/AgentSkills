@@ -1,6 +1,6 @@
 {
   "schema": "implement-rfc.routing.v2",
-  "verified_as_of": "2026-10-22",
+  "verified_as_of": "2026-11-10",
   "assignments": {
     "rfc-utility": "mechanical",
     "rfc-scout": "balanced",
@@ -50,7 +50,7 @@
       }
     },
     "claude": {
-      "minimum_cli_version": "2.1.284",
+      "minimum_cli_version": "2.1.321",
       "classes": {
         "mechanical": {
           "model": "claude-sonnet-5-5",
@@ -65,11 +65,11 @@
           "effort": "medium"
         },
         "deep": {
-          "model": "claude-opus-5-5",
-          "effort": "max"
+          "model": "claude-fable-5-2",
+          "effort": "xhigh"
         },
         "critical": {
-          "model": "claude-fable-5-1",
+          "model": "claude-fable-5-2",
           "effort": "xhigh"
         },
         "review": {

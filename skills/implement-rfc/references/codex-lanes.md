@@ -116,7 +116,7 @@ closeout card:
 
 ```text
 Closeout review runtime: codex (gpt-6.1-sol, xhigh)
-Closeout review runtime: claude (claude-fable-5-1, xhigh)
+Closeout review runtime: claude (claude-fable-5-2, xhigh)
 Closeout review runtime: claude (claude-opus-5-5, xhigh) — waived: <reason cross-family was skipped>
 ```
 
