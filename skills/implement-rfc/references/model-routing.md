@@ -13,7 +13,7 @@ The coordinator's current route is never an implicit engineering override.
 | `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
 | `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 medium |
 | `rfc-integrator` | integration | Sol 6.1 high | Opus 5.5 high |
-| `rfc-worker-deep` | deep | Sol 6.1 max | Fable 5.2 xhigh |
+| `rfc-worker-deep` | deep | Sol 6.1 max | Fable 5.2 high |
 | `rfc-reviewer` | review | Sol 6.1 xhigh | Opus 5.5 xhigh |
 | `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.2 xhigh |
 
@@ -41,6 +41,8 @@ Claude critical reviewer, replacing Fable 5.1 xhigh. The promotion rests on publ
 launch evidence one day after release; no utility, scout, shadow-review or other
 local evaluation preceded it. The coordinator/implementer strategy,
 coordinator session routes and Codex implementation route retain their existing choices.
+On 2026-11-11 the owner lowered the Claude deep worker to Fable 5.2 high; the
+critical reviewer stays at xhigh. This is an owner choice without local evaluation.
 The older integrator route is independently refreshed. Exact model IDs and requested
 effort live in configuration; `verified_as_of` dates the source/configuration review,
 not observed serving or measured RFC-task quality. No local model bakeoff was run.

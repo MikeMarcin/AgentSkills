@@ -1,6 +1,6 @@
 {
   "schema": "implement-rfc.routing.v2",
-  "verified_as_of": "2026-11-10",
+  "verified_as_of": "2026-11-11",
   "assignments": {
     "rfc-utility": "mechanical",
     "rfc-scout": "balanced",
@@ -66,7 +66,7 @@
         },
         "deep": {
           "model": "claude-fable-5-2",
-          "effort": "xhigh"
+          "effort": "high"
         },
         "critical": {
           "model": "claude-fable-5-2",

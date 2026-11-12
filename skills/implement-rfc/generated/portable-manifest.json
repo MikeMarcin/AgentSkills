@@ -1,6 +1,18 @@
 {
   "files": [
     {
+      "path": "LICENSE",
+      "sha256": "fd359e0880c5abf44da78e805b6219d84793944859b8ae80341238facb3eaddb"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c6222637098db9ca4ced29a5ecdfd98c9f89e576c8a6f45ba04381438f180ce7"
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "3c33a5918f2543ce6593f8f9a48675e171f977789839028df75bb8dfaeed6bba"
+    },
+    {
       "path": "agents/openai.yaml",
       "sha256": "12b40a0311763ccebf45c2d882de6720099375992567c1b3b817be1f9d290f75"
     },
@@ -22,7 +34,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "eb67007889e848df27ece428af730dfdb416f55c1852081b1ec98c492e447bb9"
+      "sha256": "a706685e7350c1fb3375493417702719795c1c4538bb30391ef4b9690c2f88df"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -33,16 +45,16 @@
       "sha256": "5dce4bf092928bfa99fcf2c891522ee078bd0fbb38a60f0f82aeb61a50151065"
     },
     {
-      "path": "examples/milestone-plans/milestone-plan.json",
-      "sha256": "0e3d22c33f730254a78d6e8f036a351ffab01d7948357f273c0879fa717c3784"
-    },
-    {
       "path": "examples/milestone-plans/MILESTONES.md",
       "sha256": "8e6d264656b7facc48e11d82ddfc37f7673312b3c8ce3cc9a72dee47c7fde7bd"
     },
     {
       "path": "examples/milestone-plans/README.md",
       "sha256": "18b41598b577b89fbe9ba699771424c7a6487c9e2014f42bb284d6dde80cc979"
+    },
+    {
+      "path": "examples/milestone-plans/milestone-plan.json",
+      "sha256": "0e3d22c33f730254a78d6e8f036a351ffab01d7948357f273c0879fa717c3784"
     },
     {
       "path": "examples/milestone-plans/validate.py",
@@ -57,16 +69,8 @@
       "sha256": "49ea96abc8613b071ae105a40ee3e46f93e02d40454080d944ab273421f97e55"
     },
     {
-      "path": "LICENSE",
-      "sha256": "fd359e0880c5abf44da78e805b6219d84793944859b8ae80341238facb3eaddb"
-    },
-    {
       "path": "mask-workflow.json",
       "sha256": "8a51463e9274b68a95c4f5db33db208dccc8a8a787f616c1ae425aa2205ef5d3"
-    },
-    {
-      "path": "README.md",
-      "sha256": "c6222637098db9ca4ced29a5ecdfd98c9f89e576c8a6f45ba04381438f180ce7"
     },
     {
       "path": "references/attendance.md",
@@ -106,7 +110,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "f3b7394463455ffc322f72c889b6433f984767eb7809d784b19e659f46a7e7cb"
+      "sha256": "dc9d6d944ff0261592b4be03104b42e37ec3f67fc4ef8b56f3d7649da5fbae70"
     },
     {
       "path": "references/model-selection-evidence.md",
@@ -185,12 +189,12 @@
       "sha256": "166277c1dba4de2c7c202c1b152f27b2e7d4f9058f0bfae42d7c93c38a0f9592"
     },
     {
-      "path": "references/strategy-study/prompts.md",
-      "sha256": "10eac03908dfcdbec2e810b3b3634e65be9306672f55e7597fc907b2828479b4"
-    },
-    {
       "path": "references/strategy-study/README.md",
       "sha256": "6c92a8c71b7c6ed531cd540c54b372ae78bf3bfe1886545b42d1fb05f26f08d2"
+    },
+    {
+      "path": "references/strategy-study/prompts.md",
+      "sha256": "10eac03908dfcdbec2e810b3b3634e65be9306672f55e7597fc907b2828479b4"
     },
     {
       "path": "references/strategy-study/readout.md",
@@ -421,10 +425,6 @@
       "sha256": "dee945f83fd36fcdea7e2995896ce2b1a4e0c2784b48d445be77ec5079346342"
     },
     {
-      "path": "SKILL.md",
-      "sha256": "3c33a5918f2543ce6593f8f9a48675e171f977789839028df75bb8dfaeed6bba"
-    },
-    {
       "path": "tests/project_fixtures.py",
       "sha256": "7af10cd326600db6946babd1f702b9aa3a8deb6de3b56da98dcaff93bca2e04e"
     },
@@ -542,7 +542,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "9ee4cc3e0aa21a21c70527d6f7d4f782ab70d3c7511f5d4741e76a82002c9833"
+      "sha256": "27c6ae54d35af8e2a745ac0ef46b8148b791f6ab275d097fe865b7cfda4db481"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -629,6 +629,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "af90ac93de4a7bb1",
+  "portable_digest": "e1661420b8a3ed9e",
   "schema": "implement-rfc.portable-manifest.v1"
 }
