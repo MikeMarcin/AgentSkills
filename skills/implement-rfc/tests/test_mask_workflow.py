@@ -117,6 +117,21 @@ class StagingEntrypointTests(unittest.TestCase):
         self.assertIn("appeared after MASK observed it absent", result.stderr)
         self.assertEqual(self.staged(), [])
 
+    def test_stages_opus_fallback_from_reviewed_consumer_selection(self) -> None:
+        selection = self.consumer / '.mask/generated/implement-rfc/execution-selection.json'
+        selection.parent.mkdir(parents=True)
+        selection.write_text(json.dumps(dict(schema='implement-rfc.execution-selection.v1',
+                                              profile='fable-quota-fallback')))
+        roles = [dict(agent='claude', name=name)
+                 for name in ('rfc-worker-deep', 'rfc-reviewer-critical')]
+        result = self.run_entrypoint(self.request(roles))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for role, effort in zip(roles, ('max', 'xhigh')):
+            content = (self.stage / 'claude' / f"{role['name']}.md").read_text()
+            self.assertIn('model: "claude-opus-5-5"', content)
+            self.assertIn(f'effort: {effort}', content)
+        self.assertFalse((self.consumer / '.claude/agents').exists())
+
     def test_unknown_action_role_or_parameters_are_refused(self) -> None:
         for request in (self.request([dict(agent="codex", name="rfc-integrator")], action="other"),
                         self.request([dict(agent="codex", name="rfc-nonexistent")]),

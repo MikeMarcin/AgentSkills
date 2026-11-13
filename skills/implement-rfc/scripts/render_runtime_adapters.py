@@ -239,7 +239,12 @@ def select_routes(routing, roles, profiles, profile="baseline", capabilities=Non
             if not isinstance(changes, dict) or set(changes) - set(roles):
                 raise ValueError("invalid route override roles")
             for name, route in changes.items():
-                validate_capability(provider, route, capabilities)
+                # Reviewed package profiles can carry their compatibility declaration,
+                # like the baseline. Explicit host capabilities remain authoritative;
+                # other override sources still require the caller's attestation.
+                supported = (selected.get("capabilities")
+                             if origin == "profile" and capabilities is None else capabilities)
+                validate_capability(provider, route, supported)
                 routes[provider][name] = dict(route)
                 origins[provider][name] = origin
     encoded = json.dumps(selected, sort_keys=True, separators=(",", ":")).encode()

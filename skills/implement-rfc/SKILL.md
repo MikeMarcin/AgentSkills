@@ -22,6 +22,8 @@ with `scripts/project_config.py --repo-root ROOT` and read its `project.json`,
 `project.md` and applicable repository instructions.
 For managed-station launch, status, takeover or an ownership guard message, use
 the `remote-station` skill by name.
+For a model quota refusal, read [Model routing](references/model-routing.md)
+before selecting the approved Fable-to-Opus fallback or reporting unavailable capacity.
 
 For **status only**, inspect the selected live queue/closeout with existing helpers
 and report it without changing source, board or agents. For **usage only**, read

@@ -4,6 +4,26 @@
     "baseline": {
       "experiment": null,
       "overrides": {}
+    },
+    "fable-quota-fallback": {
+      "experiment": null,
+      "capabilities": {
+        "claude": {
+          "claude-opus-5-5": ["max", "xhigh"]
+        }
+      },
+      "overrides": {
+        "claude": {
+          "rfc-worker-deep": {
+            "model": "claude-opus-5-5",
+            "effort": "max"
+          },
+          "rfc-reviewer-critical": {
+            "model": "claude-opus-5-5",
+            "effort": "xhigh"
+          }
+        }
+      }
     }
   }
 }

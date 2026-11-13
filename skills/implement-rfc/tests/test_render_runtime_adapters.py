@@ -404,6 +404,15 @@ if __name__ == '__main__':
     unittest.main()
 
 class ProfileTests(MaskPathsFixture, unittest.TestCase):
+    def test_profile_capabilities_do_not_authorize_task_overrides(self):
+        renderer = VALIDATOR_MODULE.renderer
+        roles = renderer.load_json(SKILL_DIR / 'config/roles.json')['roles']
+        profiles = renderer.load_json(SKILL_DIR / 'config/routing-profiles.json')
+        with self.assertRaisesRegex(ValueError, 'unverified'):
+            renderer.select_routes(ROUTING, roles, profiles, 'fable-quota-fallback',
+                explicit_routes={'claude': {'rfc-worker':
+                    {'model': 'claude-opus-5-5', 'effort': 'max'}}})
+
     def test_explicit_override_is_capability_checked(self):
         import render_runtime_adapters as renderer
         roles = renderer.load_json(SKILL_DIR / 'config/roles.json')['roles']
@@ -446,7 +455,68 @@ class ProfileTests(MaskPathsFixture, unittest.TestCase):
             self.assertEqual(data['model'], 'gpt-6.1-sol')
             self.assertEqual(data['model_reasoning_effort'], 'high')
             profiles = json.loads((SKILL_DIR / 'config/routing-profiles.json').read_text())
-            self.assertEqual(set(profiles['profiles']), {'baseline'})
+            self.assertEqual(set(profiles['profiles']), {'baseline', 'fable-quota-fallback'})
+
+    def test_fable_quota_profile_renders_exact_opus_fallback_and_restores_baseline(self):
+        runner = RenderRuntimeAdaptersTests()
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            linked = base / 'linked-skill'
+            linked.symlink_to(SKILL_DIR, target_is_directory=True)
+            caps = base / 'caps.json'
+            caps.write_text(json.dumps({'claude': {'claude-opus-5-5': ['max', 'xhigh']}}))
+            fallback = {'rfc-worker-deep': 'max', 'rfc-reviewer-critical': 'xhigh'}
+            for consumer in ('one', 'two'):
+                root = base / consumer
+                root.mkdir()
+                self.assertEqual(runner.run_renderer(root).returncode, 0)
+                before = {path.relative_to(root): path.read_bytes()
+                          for folder in ('.claude/agents', '.codex/agents')
+                          for path in (root / folder).iterdir()}
+                unsupported = base / 'unsupported.json'
+                unsupported.write_text(json.dumps({'claude': {'claude-opus-5-5': ['high']}}))
+                refused = runner.run_renderer(root, '--profile', 'fable-quota-fallback',
+                                              '--capabilities', str(unsupported))
+                self.assertNotEqual(refused.returncode, 0)
+                self.assertIn('unverified', refused.stderr)
+                self.assertTrue(all((root / path).read_bytes() == data
+                                    for path, data in before.items()))
+                result = subprocess.run(
+                    [sys.executable, str(linked / 'scripts/render_runtime_adapters.py'),
+                     '--repo-root', str(root), '--profile', 'fable-quota-fallback',
+                     '--capabilities', str(caps)], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                for relative, original in before.items():
+                    role = relative.stem
+                    if relative.parts[0] == '.claude' and role in fallback:
+                        rendered = (root / relative).read_text()
+                        self.assertIn('model: "claude-opus-5-5"', rendered)
+                        self.assertIn(f'effort: {fallback[role]}', rendered)
+                        self.assertIn(f'Role: {role} | Model: claude-opus-5-5 | '
+                                      f'Effort: {fallback[role]}', rendered)
+                        # Routing changes preserve the role's tools and permissions.
+                        header = original.decode().split('---', 2)[1]
+                        for line in header.splitlines():
+                            if line.startswith(('tools:', 'permissionMode:', 'maxTurns:')):
+                                self.assertIn(line, rendered)
+                    else:
+                        self.assertEqual((root / relative).read_bytes(), original)
+                manifest = json.loads((root / '.mask/generated/implement-rfc/runtime-adapters.json').read_text())
+                self.assertIsNone(manifest['routing_provenance']['observed'])
+                # MASK staged setup reads the consumer selection without CLI options.
+                selection = root / '.mask/generated/implement-rfc/execution-selection.json'
+                selection.write_text(json.dumps({'schema': 'implement-rfc.execution-selection.v1',
+                                                  'profile': 'fable-quota-fallback'}))
+                generated, facts = VALIDATOR_MODULE.renderer.generate_roles(
+                    project_config.resolve_context(repo_root=root))
+                self.assertEqual(facts['provenance']['profile'], 'fable-quota-fallback')
+                for role in fallback:
+                    self.assertEqual(generated[('claude', role)],
+                                     (root / f'.claude/agents/{role}.md').read_text())
+                restored = runner.run_renderer(root, '--profile', 'baseline')
+                self.assertEqual(restored.returncode, 0, restored.stderr)
+                self.assertTrue(all((root / path).read_bytes() == data
+                                    for path, data in before.items()))
 
     def test_fallback_never_assumes_capacity_or_effort(self):
         import render_runtime_adapters as renderer

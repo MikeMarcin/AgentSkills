@@ -10,7 +10,7 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "3c33a5918f2543ce6593f8f9a48675e171f977789839028df75bb8dfaeed6bba"
+      "sha256": "09baddf0e599dcb87343399714271e1fc990e201a50a358cd0a11b498d60826b"
     },
     {
       "path": "agents/openai.yaml",
@@ -30,7 +30,7 @@
     },
     {
       "path": "config/routing-profiles.json",
-      "sha256": "0488576f1d4fdaf81d26838d0b181218711a5fb3ee44d5ce66bfabefca05c9a3"
+      "sha256": "a17a971736be4ab80e648be26da72c16168c54f2390de5b4702ffd84d14f2321"
     },
     {
       "path": "config/routing.json",
@@ -110,7 +110,7 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "dc9d6d944ff0261592b4be03104b42e37ec3f67fc4ef8b56f3d7649da5fbae70"
+      "sha256": "aa8d4af59c05090dc5dac05263c6a01bdc905c6332866ce6c09962450d7f922a"
     },
     {
       "path": "references/model-selection-evidence.md",
@@ -342,7 +342,7 @@
     },
     {
       "path": "scripts/render_runtime_adapters.py",
-      "sha256": "3f2021a1ced71e7b8600ab104a6d3ad665aa6bab289a2c2769bb0f25d618d868"
+      "sha256": "d32c5722d3a427065317d7df3957b62fd94303e00b2c41418132f8da2a6c06a7"
     },
     {
       "path": "scripts/role_usage.py",
@@ -462,7 +462,7 @@
     },
     {
       "path": "tests/test_mask_workflow.py",
-      "sha256": "55f065253cfaebdfb1300a15d22d093bdbe1f030172993d0539fc45c4dccbf45"
+      "sha256": "0f2754587a597e5cc40d838c1731a4b089a2edc51b027d3030b439ed08381f9a"
     },
     {
       "path": "tests/test_milestone_adaptive.py",
@@ -542,7 +542,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "27c6ae54d35af8e2a745ac0ef46b8148b791f6ab275d097fe865b7cfda4db481"
+      "sha256": "6f4d26d3509cb3f14b484452ba7e190f627bf45e54f7fa4133d1c5e54cc17e68"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -629,6 +629,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "e1661420b8a3ed9e",
+  "portable_digest": "04ef5961db5ad8cf",
   "schema": "implement-rfc.portable-manifest.v1"
 }

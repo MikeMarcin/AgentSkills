@@ -50,8 +50,49 @@ Claude's declared floor is 2.1.321 for Fable 5.2; Sonnet 5.5 requires at least
 2.1.284 and Opus 5.5 at least 2.1.280.
 Native adapters preserve the requested efforts. The existing Codex companion
 fallback for max is documented in [codex-lanes.md](codex-lanes.md). No automatic
-client upgrade, other effort clamp or model fallback, reset or credit purchase
-is authorized. Preserve processing speed.
+client upgrade, other effort clamp, reset or credit purchase is authorized.
+The bounded Fable quota fallback below is the approved model substitution.
+Preserve processing speed.
+
+## Fable quota fallback
+
+On 2026-11-13 the owner approved retaining Opus when Fable's model-specific
+allowance is exhausted before Opus. `config/routing-profiles.json` owns the exact
+`fable-quota-fallback` pairs: the deep worker returns to Opus 5.5 max, and the
+critical reviewer uses Opus 5.5 xhigh. Fable remains the baseline. The critical
+review fallback is newly approved; its preceding baseline was Fable 5.1 xhigh.
+
+After a confirmed Fable model-quota refusal, use this profile for new Claude
+deep-worker/critical-review assignments in the selected run when the same
+subscription has Opus allowance and the host supports each exact pair. This owner
+approval covers the normal role contracts without another confirmation. Preserve
+any task-specific Fable-only requirement, stricter capability floor or independent
+review condition; resolve a conflict before substituting. Shared quota exhaustion,
+authentication, request-size errors, server failures and task difficulty do not
+trigger this policy. It grants no provider, data-handling or paid-usage change.
+
+Preserve partial work and reconcile the failed child before reissuing its assignment.
+Allow one Opus fallback attempt per failed assignment; if unavailable or unsuccessful,
+retain its progress and report the remaining blocker. Record the requested Fable
+pair, actual refusal, this approval, selected Opus pair and attempt in the existing
+continuation (or `fallback_receipt`); keep observed serving unknown unless exposed.
+Report the effective request in the startup banner. Return to baseline for fresh
+assignments once Fable allowance is confirmed restored, without polling for capacity.
+
+The profile is route data, not a quota detector or a native automatic retry setting.
+Its package capability declaration retains the supported Opus efforts; a supplied
+host capability file takes precedence, including narrower support. This declaration
+does not prove current allowance, host loading or serving. For standalone adapters,
+use `render_runtime_adapters.py --repo-root ROOT --profile fable-quota-fallback`
+(optionally `--capabilities FILE`). Collect/reconcile active assignments before
+regeneration and confirm host loading before dispatch. MASK-managed project adapters
+select the profile in the consumer's generated `execution-selection.json` v1 and
+use reviewed `mask repair` setup; preserve its other fields. Restore `baseline`
+through the same path when Fable returns. Personal setup has no consumer selection;
+it needs a supported explicit native route or remains a capability gap. Direct
+rendering refuses MASK-managed destinations. If setup or the native host cannot
+express the selected exact pair, retain a capability gap rather than relabeling a
+Fable-bound custom role or substituting a family alias.
 
 ## Native dispatch arguments
 
