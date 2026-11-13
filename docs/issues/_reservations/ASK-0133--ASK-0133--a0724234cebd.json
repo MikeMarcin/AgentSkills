@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0133"
+  ],
+  "reserve_for": "fable-opus-fallback",
+  "purpose": "Preserve Opus deep-role fallback after Fable quota exhaustion",
+  "created": "2026-11-13T08:34:18.537508+00:00",
+  "base": "eecf7aba4bd3f5de414a408762305dc08a74a0d3"
+}
