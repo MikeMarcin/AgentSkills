@@ -59,7 +59,8 @@ def fingerprint(plan: dict) -> str:
 def validate_plan(value: Any, catalog: dict | None = None) -> list[str]:
     """Structural and optional reference checks; semantic coverage stays unproven.
 
-    catalog = {"issues": {ID: {"rfcs": [...]}}, "rfcs": [ID, ...]}.
+    catalog = {"issues": {ID: {"rfcs": [...]}}, "rfcs": [ID, ...], "rejected_rfcs": [ID, ...]}.
+    A Rejected RFC is terminal: it and its cards can never be scoped or scheduled.
     Criterion text resolution and acceptance truth intentionally remain out of scope.
     """
     errors: list[str] = []
@@ -157,16 +158,20 @@ def validate_plan(value: Any, catalog: dict | None = None) -> list[str]:
         known_issues=catalog.get('issues',{}); known_rfcs=set(catalog.get('rfcs',[]))
         scope_rfcs=set(scope.get('rfcs',[])) if isinstance(scope.get('rfcs',[]),list) and all(isinstance(x,str) for x in scope.get('rfcs',[])) else set()
         scope_issues=set(explicit) if isinstance(explicit,list) and all(isinstance(x,str) for x in explicit) else set()
+        rejected=set(catalog.get('rejected_rfcs',[]))
         for rid in scope_rfcs:
             if rid not in known_rfcs:fail(f'unresolved scoped RFC {rid}')
+            if rid in rejected:fail(f'scoped RFC {rid} is Rejected; reconsideration needs a new RFC')
         for iid in scope_issues:
             if iid not in known_issues:fail(f'unresolved scoped issue {iid}')
         for kind,name,sels,where in refs:
             if kind=='rfc':
                 if name not in known_rfcs:fail(f'unresolved RFC {name}')
                 if name not in scope_rfcs:fail(f'RFC outside declared scope {name}')
+                if name in rejected:fail(f'RFC {name} is Rejected and cannot be planned')
             else:
                 if name not in known_issues:fail(f'unresolved issue {name}');continue
+                if rejected.intersection(known_issues[name].get('rfcs',[])):fail(f'issue {name} belongs to a Rejected RFC and cannot be planned')
                 if name not in scope_issues and not scope_rfcs.intersection(known_issues[name].get('rfcs',[])):
                     fail(f'issue outside declared scope {name}')
     return sorted(set(errors))

@@ -43,6 +43,7 @@ frontier/explicit-answer mechanics. Test these branches where relevant:
   partial coverage. Structural validity alone does not settle material choices.
 
 Cover material design decisions even when optional implementation detail is deferred.
+Never grill a `Rejected` RFC back into play; reconsideration starts as a new RFC.
 Detailed internal design is available on request for the whole proposal or named
 areas. A focused deep review explores that area and reports its actual coverage;
 it does not certify untouched scope or force an interview of every internal choice.

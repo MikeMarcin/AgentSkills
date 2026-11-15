@@ -74,6 +74,10 @@ restarting intake. Missing optional companions do not block ordinary RFC authori
 
 Deliver the draft without requiring blanket confirmation. Seek an explicit answer
 when resolving a material choice or conducting requested shared-understanding review.
+A `Rejected` RFC is terminal and never reopened: do not edit it back to Proposed.
+To reconsider the idea, author a new RFC that argues for itself from scratch.
+Deferred may return; Rejected never does.
+
 Record only actual answers and their scope/version; earlier confirmation does not
 cover changed behavior. Hand over artifact paths, material open questions, relevant
 deferrals and checks actually performed in the reply. Keep authoring/check/runtime

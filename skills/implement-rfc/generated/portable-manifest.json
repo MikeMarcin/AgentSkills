@@ -78,7 +78,7 @@
     },
     {
       "path": "references/bookkeeping.md",
-      "sha256": "349a647f3e97f037c14470afa285d22da39165c7bcedb8055cc13bd94db98e71"
+      "sha256": "ccd4506414a9bb9f68c4fa8169590bb7486506399457bb34820f58dc71ae1276"
     },
     {
       "path": "references/bounded-execution.md",
@@ -106,7 +106,7 @@
     },
     {
       "path": "references/milestone-plans.md",
-      "sha256": "c9cd61aa422c2f956cd92e6367cc9e7e082cf4d75b7db53fc4964a3c5c733606"
+      "sha256": "cb80fce5ca429e6f931b0ced439a92b50c9659d237e75cf149de62b9762662bd"
     },
     {
       "path": "references/model-routing.md",
@@ -210,11 +210,11 @@
     },
     {
       "path": "references/verification-and-closeout.md",
-      "sha256": "eed1a7d9476f5bf918b0f75d6c76ae5a601262239ed37681a507ca14229d433d"
+      "sha256": "952ec1ab6f9034e2abc69f3a25a53da34b6e10d71170549c1c56e1f149884a80"
     },
     {
       "path": "schemas/issue-card.schema.json",
-      "sha256": "65f42d73b0ec9e030610a2bce99164e0aa9199e1a6dc022502679425a60cf76c"
+      "sha256": "8fa5d25e987b9a8404cdbec45db4eb98bd7fdeed52cfc3a5130ec98ed20c7658"
     },
     {
       "path": "schemas/milestone-assignment.schema.json",
@@ -254,7 +254,7 @@
     },
     {
       "path": "scripts/board_model.py",
-      "sha256": "b809e630545db62298303239e70a459bd8cd7379df96a95d067e3747d9394d0f"
+      "sha256": "acdd954ecd2158fdbe390d511af855d7ebdd3c2001875b81427df3eda0c1cd75"
     },
     {
       "path": "scripts/codex_lane.py",
@@ -270,7 +270,7 @@
     },
     {
       "path": "scripts/issue_board.py",
-      "sha256": "a254e690c319035e84a323802db422ed903c86a66abee6434bbd161449fd51e1"
+      "sha256": "64c426192bc2c0b7797d2835184de35d86e9d3d506769b0e39a292b4b44346d2"
     },
     {
       "path": "scripts/launch_remote_station.py",
@@ -286,11 +286,11 @@
     },
     {
       "path": "scripts/milestone_plan.py",
-      "sha256": "ffba6286bae69116df1b4aeb3952c0bf978d222c093f513492801eb26563e2ce"
+      "sha256": "ecee1e6c0b0b2cbe87646e3926871e639a825784decb5d04b149b441fcd6114e"
     },
     {
       "path": "scripts/milestone_plan_contract.py",
-      "sha256": "34f000169e748ea52abcfcb1ab897431d3ffae9581d29d3c409cd526ba242bff"
+      "sha256": "329ad8a47eba33e08af0df15bc2e9afdbc2cb6c1e2da3b9b104502363f682b8a"
     },
     {
       "path": "scripts/milestone_state.py",
@@ -458,7 +458,7 @@
     },
     {
       "path": "tests/test_issue_board.py",
-      "sha256": "216a04e4dc1a4b0105eed02f2a51a75d43d50450c547e060d1e549d3ae17a2cc"
+      "sha256": "fe830f54f23578d6836b5fa629ca3a870792c9454f2c0d0ab4449ffb3eaf9884"
     },
     {
       "path": "tests/test_mask_workflow.py",
@@ -486,7 +486,7 @@
     },
     {
       "path": "tests/test_milestone_plan.py",
-      "sha256": "4d102106f91d18276286d35970967be0679500cfbed3288447e883d0813a7dc7"
+      "sha256": "ea4761f9224ea0fb85cd18f967344fada5b038d3ebcdf4f67b1a6dea69b362c5"
     },
     {
       "path": "tests/test_milestone_public.py",
@@ -629,6 +629,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "04ef5961db5ad8cf",
+  "portable_digest": "c9b3a797ad1cdc5b",
   "schema": "implement-rfc.portable-manifest.v1"
 }

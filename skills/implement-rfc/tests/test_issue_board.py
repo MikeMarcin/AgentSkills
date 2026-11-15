@@ -235,6 +235,52 @@ class BoardTests(unittest.TestCase):
         self.assertNotIn('blocked_by', source.read_text())
         self.assertEqual(self.errors(), '')
 
+    def reject_rfc(self):
+        path = self.root / 'tracker/rfcs/RFC-XYZ-0001-feature.md'
+        path.write_text(path.read_text().replace('status: Proposed', 'status: Rejected'))
+
+    def test_rejected_rfc_cards_close_terminally_and_never_count_as_delivered(self):
+        rejected = 'metadata: {"resolution": "rejected", "owner_quote": "it should be rejected so it does not come back"}\n'
+        self.reject_rfc()
+        for lane in ('inbox', 'backlog', 'ready', 'working', 'parked', 'blocked'):
+            with self.subTest(lane=lane):
+                path = self.card(1, lane=lane, extra='parked_on: awaiting-person\n' if lane == 'parked'
+                                 else 'blocked_by: owner\n' if lane == 'blocked' else '')
+                self.assertIn('card for Rejected RFC-XYZ-0001 is non-terminal', self.errors())
+                path.unlink()
+        plain_done = self.card(1, lane='done')
+        self.assertIn('Done without metadata.resolution rejected', self.errors())
+        plain_done.unlink()
+        no_quote = self.card(1, lane='done', extra='metadata: {"resolution": "rejected"}\n')
+        self.assertEqual(self.errors(), '')  # owner_quote is optional; the body may carry the quote
+        no_quote.unlink()
+        self.card(1, lane='done', extra=rejected)
+        self.assertEqual(self.errors(), '')
+        # A rejected card never satisfies a live dependency or counts as done.
+        other = self.root / 'tracker/rfcs/RFC-XYZ-0002-other.md'
+        other.write_text('---\nid: RFC-XYZ-0002\nstatus: Proposed\n---\n')
+        dependent = self.card(2, lane='ready', deps=('XYZ-0001',))
+        dependent.write_text(dependent.read_text().replace('RFC-XYZ-0001', 'RFC-XYZ-0002'))
+        self.assertIn('XYZ-0001 was rejected, not delivered', self.errors())
+        dependent.unlink()
+        backlog = self.card(2, lane='backlog', deps=('XYZ-0001',))
+        backlog.write_text(backlog.read_text().replace('RFC-XYZ-0001', 'RFC-XYZ-0002'))
+        self.assertIn('XYZ-0001 was rejected, not delivered', self.errors())
+        # Rejected cards may depend on each other.
+        backlog.unlink()
+        self.card(3, lane='done', deps=('XYZ-0001',), extra=rejected)
+        self.assertEqual(self.errors(), '')
+        rows = {r['id']: r for r in self.public('queue', '--all')['cards']}
+        self.assertEqual(rows['XYZ-0001']['disposition'], 'rejected')
+        cards, _ = board.validate_board(self.root, self.config)
+        self.assertFalse(board.is_delivered(cards['XYZ-0001'], self.config))
+        with self.assertRaises(board.BoardError):
+            self.plan('backlog', 1)
+
+    def test_rejected_resolution_requires_rejected_rfc_and_done(self):
+        self.card(1, lane='done', extra='metadata: {"resolution": "rejected", "owner_quote": "no"}\n')
+        self.assertIn('requires a linked Rejected RFC', self.errors())
+
     def test_parked_requires_known_reason(self):
         self.card()
         for reason in (None, 'unknown', 'bad\nstatus: Done'):

@@ -119,6 +119,25 @@ class PlanTests(unittest.TestCase):
         self.adopt(self.roots[0])
         self.assertEqual(self.cli(self.roots[0], 'bind', '--target', 'ONE-0001', code=2)['references'], 'unresolved')
 
+    def test_rejected_rfc_and_its_cards_cannot_be_planned(self):
+        plan = copy.deepcopy(self.plan)
+        plan['scope'] = {'rfcs': ['RFC-ONE-0001']}
+        plan['milestones'][0]['work'] = [{'rfc': 'RFC-ONE-0001'}, {'issue': 'ONE-0001'}]
+        catalog = {'rfcs': ['RFC-ONE-0001'], 'issues': {'ONE-0001': {'rfcs': ['RFC-ONE-0001']}}}
+        self.assertEqual(mp.validate_plan(plan, catalog), [])
+        catalog['rejected_rfcs'] = ['RFC-ONE-0001']
+        errors = mp.validate_plan(plan, catalog)
+        self.assertTrue(any('scoped RFC RFC-ONE-0001 is Rejected' in e for e in errors), errors)
+        self.assertTrue(any('RFC RFC-ONE-0001 is Rejected and cannot be planned' in e for e in errors), errors)
+        self.assertTrue(any('issue ONE-0001 belongs to a Rejected RFC' in e for e in errors), errors)
+        # Live adoption reads RFC status from the consumer, so a Rejected RFC refuses import.
+        root = self.roots[0]
+        self.write(root / 'docs/rfcs/RFC-ONE-0001-demo.md', '---\nid: "RFC-ONE-0001"\nstatus: "Rejected"\n---\n# Demo\n')
+        card = root / 'docs/issues/20-ready/ONE-0001-demo.md'
+        card.write_text(card.read_text().replace('rfcs: []', 'rfcs: ["RFC-ONE-0001"]'))
+        out = self.cli(root, 'adopt', '--source-root', str(self.source), '--id-map', 'map.json', code=2)
+        self.assertIn('Rejected', json.dumps(out))
+
     def test_bounds_links_mapping_and_eligible_order(self):
         linked = self.source / 'linked.json'
         linked.symlink_to(self.source / 'milestone-plan.json')

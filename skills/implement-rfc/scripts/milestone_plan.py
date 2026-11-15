@@ -229,6 +229,13 @@ def project_work(milestone, projection):
     return selected
 
 
+def plan_catalog(docs):
+    return {'rfcs': [i for i in docs if i.startswith('RFC-')],
+            'rejected_rfcs': [i for i, row in docs.items() if i.startswith('RFC-')
+                              and row[2].values.get('status') == board_model.REJECTED_RFC_STATUS],
+            'issues': {i: row[2].values for i, row in docs.items() if not i.startswith('RFC-')}}
+
+
 def planning_observations(root, config, plan, work):
     docs = documents(root, config)
     selected = {r['issue'] for r in work if 'issue' in r}
@@ -245,7 +252,7 @@ def planning_observations(root, config, plan, work):
         rows[identity] = {'id': identity, 'status': values.get('status', 'unknown'),
             'depends_on': deps, 'excluded_prerequisites': [d for d in deps if d not in selected],
             'unresolved_prerequisites': [d for d in deps if d not in docs or
-                docs[d][2].values.get('status') != 'Done'],
+                docs[d][2].values.get('status') != 'Done' or board_model.is_rejected(docs[d][2].values)],
             'external_depends_on': values.get('external_depends_on', [])}
         pending.extend(d for d in deps if d not in rows)
     return {'issues': list(rows.values()), 'unplanned_work': plan.get('unplanned_work', []),
@@ -289,8 +296,7 @@ def resolve_binding(repo_root, plan_path, milestone_id, projection=None):
     milestone = milestones[milestone_id]
     docs = documents(root, ctx.config)
     require_live_linkage(root, path, plan, docs)
-    catalog = {'rfcs': [i for i in docs if i.startswith('RFC-')],
-               'issues': {i: row[2].values for i, row in docs.items() if not i.startswith('RFC-')}}
+    catalog = plan_catalog(docs)
     errors = validate_plan(plan, catalog)
     obligations = []
     work = project_work(milestone, projection)
@@ -371,8 +377,7 @@ def adopt(root, config, source, mapping):
     if existing is not None and load_plan(destination) != normalize(plan):
         raise PlanError('existing live plan conflicts with authored intent', 'ambiguous')
     docs = documents(root, config)
-    catalog = {'rfcs': [i for i in docs if i.startswith('RFC-')],
-               'issues': {i: row[2].values for i, row in docs.items() if not i.startswith('RFC-')}}
+    catalog = plan_catalog(docs)
     errors = validate_plan(plan, catalog)
     if errors:
         raise PlanError('; '.join(errors))
@@ -444,6 +449,9 @@ def main(argv=None):
             source = Path(args.source_root or root).resolve()
             proposal = load_plan(safe_path(source, args.proposal))
             if result['state'] == 'found':
+                rejected = [e for e in validate_plan(proposal, plan_catalog(documents(root, ctx.config))) if 'Rejected' in e]
+                if rejected:
+                    raise PlanError('; '.join(rejected))
                 result = check_amendment(load_plan(Path(result['path'])), proposal, args.reason, args.source_basis)
             elif args.operation == 'check-amendment':
                 raise PlanError('amendment requires an existing structured plan')

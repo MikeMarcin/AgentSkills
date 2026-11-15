@@ -61,6 +61,24 @@ Ready means local dependencies are Done. Parked requires its reason token;
 concrete detail in the body or metadata. Done is terminal; make follow-up cards
 for new work. Never rewrite historical acceptance to satisfy a validator.
 
+### Rejected RFCs
+
+`Rejected` is a terminal RFC status, distinct from Deferred: a Deferred RFC may
+return, a Rejected RFC never does. Record it only on an explicit owner decision.
+A Rejected RFC cannot be scheduled, scoped or imported into a milestone plan,
+named by a non-terminal card, or reactivated by an amendment or status flip.
+Reconsidering the idea requires a new RFC that argues for itself from scratch.
+
+Each card of a Rejected RFC closes into Done with
+`metadata: {"resolution": "rejected"}` and the owner's quote, either in the body
+or in optional `metadata.owner_quote`.
+`resolution: "rejected"` is valid only in Done on a card linked to a Rejected RFC,
+and a Done card of a Rejected RFC must carry it. A rejected card is not delivered:
+no card other than another rejected card may depend on it, the queue reports it as `rejected`, and closeout,
+done-counting and delivered-scope accounting exclude it as implemented evidence.
+`terminal_rfc_status` (normally Auto-Verified) stays the delivered terminal
+status; Rejected is terminal but never delivered. `issue_board.py validate`, `audit_board.py` and `milestone_plan.py` enforce these rules.
+
 ## Acceptance and explicit Git authority
 
 A finish decision file has this shape:

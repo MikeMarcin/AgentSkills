@@ -66,7 +66,8 @@ For partial plans, retain `unplanned_work` until decomposed. Use `check-amendmen
 --plan CURRENT --proposal PROPOSED --reason TEXT --source-basis TEXT` to check the
 refinement before publishing it. This observational check requires unchanged scope
 and plan identity, preserves all work selectors and exit text, and reports affected
-milestones. It does not authorize changed requirements or publication. Whole-source
+milestones. It refuses any proposal that still schedules a Rejected RFC or its
+cards; a rejection is never reversed by amendment. It does not authorize changed requirements or publication. Whole-source
 work cannot mechanically be replaced with a guessed criterion list. Reconcile such
 requirement changes explicitly under the existing mandate.
 

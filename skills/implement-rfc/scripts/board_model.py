@@ -179,6 +179,27 @@ def schema_errors(values: dict, path: Path, config: dict) -> list[Diagnostic]:
 
 CARD_SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding='utf-8'))
 
+# Rejected is a terminal RFC status distinct from Deferred: a Deferred RFC may
+# return, a Rejected RFC never does. Reconsideration needs a new RFC. Cards of a
+# rejected RFC close into Done with this resolution and are never delivered work.
+REJECTED_RFC_STATUS = 'Rejected'
+REJECTED_RESOLUTION = 'rejected'
+
+
+def resolution(fields: dict) -> str | None:
+    metadata = fields.get('metadata')
+    value = metadata.get('resolution') if isinstance(metadata, dict) else None
+    return value if isinstance(value, str) else None
+
+
+def is_rejected(fields: dict) -> bool:
+    return resolution(fields) == REJECTED_RESOLUTION
+
+
+def is_delivered(card: 'Card', config: dict) -> bool:
+    """Done and not closed by rejection; only delivered cards satisfy dependencies or count as evidence."""
+    return card.lane == config['lanes']['done'] and not is_rejected(card.fields)
+
 
 @dataclass
 class Card:
@@ -284,6 +305,8 @@ def validate_cards(cards: dict[str, Card], config: dict, scope: set[str] | None 
                 error('depends_on', 'self dependency')
             elif dep not in cards:
                 error('depends_on', f'depends_on {dep} not found')
+            elif is_rejected(cards[dep].fields) and not is_rejected(card.fields):
+                error('depends_on', f'{dep} was rejected, not delivered')
             elif card.lane not in rules['deferring_lanes'] and cards[dep].lane != done:
                 error('depends_on', f'{dep} is not Done ({cards[dep].lane})')
     # Iterative DFS handles large boards without Python recursion limits.
@@ -308,6 +331,26 @@ def validate_cards(cards: dict[str, Card], config: dict, scope: set[str] | None 
     return errors
 
 
+def rejection_errors(cards: dict[str, Card], config: dict, rfc_statuses: dict[str, str],
+                     scope: set[str] | None = None) -> list[Diagnostic]:
+    """Enforce terminal rejection: rejected RFCs own only Done cards resolved as rejected."""
+    errors: list[Diagnostic] = []
+    done = config['lanes']['done']
+    for card in cards.values():
+        if scope is not None and card.id not in scope:
+            continue
+        rejected_rfcs = [r for r in card.rfcs if rfc_statuses.get(r) == REJECTED_RFC_STATUS]
+        if is_rejected(card.fields):
+            if card.lane != done:
+                errors.append(Diagnostic(str(card.path), 'metadata.resolution', f'resolution rejected requires {done}'))
+            if not rejected_rfcs:
+                errors.append(Diagnostic(str(card.path), 'metadata.resolution', 'resolution rejected requires a linked Rejected RFC'))
+        elif rejected_rfcs:
+            where = 'is non-terminal' if card.lane != done else 'is Done without metadata.resolution rejected'
+            errors.append(Diagnostic(str(card.path), 'rfcs', f'card for Rejected {rejected_rfcs[0]} {where}'))
+    return errors
+
+
 def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None] | None = None, *, scope: set[str] | None = None
                    ) -> tuple[dict[str, Card], list[Diagnostic]]:
     cards, errors = read_cards(root, config, overrides)
@@ -315,6 +358,7 @@ def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None]
         scope = scope(cards)
     errors.extend(validate_cards(cards, config, scope))
     rfcs: dict[str, Path] = {}
+    rfc_statuses: dict[str, str] = {}
     rfc_root = safe_path(root, root / config['rfc_root'])
     for path in sorted(rfc_root.glob('RFC-*.md')):
         if path.name == 'README.md':
@@ -328,12 +372,14 @@ def validate_board(root: Path, config: dict, overrides: dict[Path, bytes | None]
             if rfc_id in rfcs:
                 raise BoardError(path, 'id', f'duplicate RFC id {rfc_id}')
             rfcs[rfc_id] = path
+            rfc_statuses[rfc_id] = metadata.get('status', '')
         except BoardError as exc:
             errors.append(exc.diagnostic)
     for card in cards.values():
         for rfc in card.rfcs:
             if rfc not in rfcs:
                 errors.append(Diagnostic(str(card.path), 'rfcs', f'linked {rfc} has no RFC file'))
+    errors.extend(rejection_errors(cards, config, rfc_statuses, scope))
     import allocation
     _, counter_errors, _ = allocation.inspect_counters(root, config, cards)
     errors.extend(counter_errors)

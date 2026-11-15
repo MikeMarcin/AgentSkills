@@ -71,7 +71,19 @@
       "uniqueItems": true
     },
     "metadata": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "resolution": {
+          "type": "string",
+          "minLength": 1,
+          "description": "\"rejected\" closes a Done card of a Rejected RFC as not delivered."
+        },
+        "owner_quote": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Owner's words recorded with resolution rejected."
+        }
+      }
     },
     "acceptance": {
       "type": "array",

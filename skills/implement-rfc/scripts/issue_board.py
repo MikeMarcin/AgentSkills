@@ -90,10 +90,10 @@ def queue(root: Path, config: dict, rfcs: list[str], platform: str, include: lis
     lanes = config['lanes']
     rows = []
     for card in chosen:
-        unmet = [dep for dep in card.deps if dep not in cards or cards[dep].lane != lanes['done']]
+        unmet = [dep for dep in card.deps if dep not in cards or not board.is_delivered(cards[dep], config)]
         platforms = card.fields.get('platforms', [])
         if card.lane == lanes['done']:
-            disposition = 'done'
+            disposition = 'rejected' if board.is_rejected(card.fields) else 'done'
         elif platforms and platform not in platforms:
             disposition = 'deferred_platform'
         elif card.lane == lanes['in_progress']:

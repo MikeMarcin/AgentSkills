@@ -76,6 +76,9 @@ RFC_BASE_SHA and account for every required card/criterion plus relevant in-scop
 discoveries. Reconcile the RFC/index and run the configured structure gate, coalesced
 for a pack where supported. Reuse unchanged evidence; full-pack closure is not
 repeated after each milestone. Implemented and Auto-Verified remain distinct.
+Cards closed with `metadata.resolution: "rejected"` are not delivered scope and
+never count toward implemented evidence; a Rejected RFC is closed, not verified
+(see bookkeeping.md, Rejected RFCs).
 
 Keep required human/native gaps open. Record actual commits, limitations and
 cleanup; remove only consumed task-owned temporary resources. Preserve partial
