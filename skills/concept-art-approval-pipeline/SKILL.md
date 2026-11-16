@@ -1,21 +1,21 @@
 ---
 name: concept-art-approval-pipeline
-description: Human-in-the-loop concept-art production workflow for imagegen-created game assets, including deterministic offline review pages with exact per-candidate decisions and batch-bound verdict export. Use when the agent needs to generate or revise concept art, review each kit piece with the user before approval, integrate approved images into an art bible, prepare clean alpha/keyed inputs and command records for TRELLIS image-to-3D generation, optionally route approved humanoid assets through Mixamo rigging/animation, and then hand approved/generated assets to a game/runtime integration pipeline. Configurable for projects with art-bible, generated-asset, and runtime-manifest workflows.
+description: Concept-art and character-asset production for games, from reference review through generated 3D assets and runtime handoff. Use for imagegen refs, art-bible approval, TRELLIS preparation, humanoid modeling/rigging/export, or game asset integration. Supports batch-bound offline verdicts and project-specific approval cadence.
 ---
 
 # Concept Art Approval Pipeline
 
 ## Core Rule
 
-Treat this as a gated production pipeline, not a batch image dump. For each asset or kit piece:
+Treat this as a production pipeline with distinct visual, source, export, and runtime gates. For each asset or kit piece:
 
 1. Define what the piece is and where it appears in the target scene.
 2. Generate or repair candidate image refs.
 3. Show the candidate in isolation and in context.
-4. Wait for explicit user approval.
-5. Integrate only the approved result into art-bible and downstream handoff records.
+4. Review against the user's criteria. Default to an explicit user decision at each visual gate unless the user authorizes autonomous progression; follow any stricter project gate.
+5. Integrate the accepted result into the appropriate art-bible or downstream handoff records, recording what was actually verified.
 
-Do not advance to the next piece, TRELLIS generation, rigging, or game integration while the current piece is unapproved.
+Keep an explicit pending human decision pending. Acceptance of appearance alone does not establish export or runtime readiness.
 
 ## Related Skills
 
@@ -43,6 +43,8 @@ Minimum project fields to establish before editing:
 
 ## Review Loop
 
+For modeled humanoid characters and equipment, read [references/character-assets.md](references/character-assets.md) before planning or exporting. Establish the actual consumer contract and source ownership so the high-detail source has a deliberate game-resolution conversion stage.
+
 For each asset:
 
 1. Identify the asset key, prompt/catalog id, dimensions, runtime family, and scene role.
@@ -54,9 +56,9 @@ For each asset:
    - a short description of what the piece is
    - a scene/context mockup showing where it is used
    - acceptance criteria and known concerns
-6. Show the review board to the user and stop.
-7. If the user requests changes, revise only that piece and show a new board.
-8. If the user approves, promote that exact approved direction into the configured art-bible and handoff paths.
+6. Inspect, critique, revise, and re-render obvious defects before presenting the board.
+7. Show the review board and follow the user's approval cadence. When a decision is required, stop; when autonomous progression is authorized, continue while retaining reviewable checkpoints.
+8. If the user requests changes, revise the directed piece and show a new board. Promote the accepted direction into configured art-bible and handoff paths.
 
 Use context mockups from the project’s actual concept scenes whenever possible. A generic schematic is acceptable only as a secondary diagram.
 
@@ -94,7 +96,7 @@ For art-bible refs:
 
 ## Approval Integration
 
-After explicit approval:
+After the applicable user decision or an authorized autonomous review:
 
 1. Copy approved alpha refs into the project art-bible/TRELLIS source package.
 2. Copy or prepare the matching runtime TRELLIS input package under the configured generated-asset root.
