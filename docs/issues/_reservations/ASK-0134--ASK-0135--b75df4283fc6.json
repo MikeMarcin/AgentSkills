@@ -1,0 +1,11 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0134",
+    "ASK-0135"
+  ],
+  "reserve_for": "attended-review-question-quality",
+  "purpose": "",
+  "created": "2026-11-16T03:45:54.813849+00:00",
+  "base": "5fd9ad3951934469593be781e6078927c9e20c23"
+}
