@@ -1,0 +1,53 @@
+{
+  "base": "5fd9ad3951934469593be781e6078927c9e20c23",
+  "cases": [
+    {
+      "manifest_version": 1,
+      "fingerprints_equal": true,
+      "fingerprints": {
+        "APP-0042-layout": "918c2164cfa85c20cde0040f1cd55652e97094d1ed1776bd72786b2fdd9f197e",
+        "pick": "607fd6e2a98d51c2508d043a0d1a5d4f58c4994386c5d1b90c20ac18402d95b9"
+      },
+      "outputs_equal_except_legacy_report": true,
+      "session_state_equal": true,
+      "state_schema_version": 2,
+      "legacy_report": {
+        "format": "unchecked legacy format",
+        "refused": false,
+        "rules": [
+          "build-now-image",
+          "no-long-hex",
+          "no-path-or-url",
+          "no-tracker-id",
+          "option-count",
+          "title-words"
+        ]
+      }
+    },
+    {
+      "manifest_version": 2,
+      "fingerprints_equal": true,
+      "fingerprints": {
+        "APP-0042-layout": "918c2164cfa85c20cde0040f1cd55652e97094d1ed1776bd72786b2fdd9f197e",
+        "death-C": "7b894ab98b0064a52853349110f557b4e5a5a3290ff695fb2914288b1e9f5776",
+        "pick": "607fd6e2a98d51c2508d043a0d1a5d4f58c4994386c5d1b90c20ac18402d95b9"
+      },
+      "outputs_equal_except_legacy_report": true,
+      "session_state_equal": true,
+      "state_schema_version": 2,
+      "legacy_report": {
+        "format": "unchecked legacy format",
+        "refused": false,
+        "rules": [
+          "build-now-image",
+          "no-long-hex",
+          "no-path-or-url",
+          "no-tracker-id",
+          "option-count",
+          "title-words"
+        ]
+      }
+    }
+  ],
+  "pass": true
+}

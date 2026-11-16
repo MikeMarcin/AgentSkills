@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0019"
 title: "Checked question format and authoring rules for attended-review"
-status: "Implementing"
+status: "Auto-Verified"
 metadata: {"milestone_plan":{"id":"attended-review-question-quality","path":"docs/rfcs/plans/attended-review-question-quality/milestone-plan.json"}}
 ---
 
@@ -9,8 +9,8 @@ metadata: {"milestone_plan":{"id":"attended-review-question-quality","path":"doc
 
 Imported from [RFC-DRAFT-0003](drafts/RFC-DRAFT-0003-attended-review-question-quality.md)
 ([live import record](plans/attended-review-question-quality/attended-review-question-quality.LIVE_IMPORT.md)).
-Cards: [ASK-0134](../issues/30-in-progress/ASK-0134-checked-question-format.md), closeout
-[ASK-0135](../issues/10-backlog/ASK-0135-close-question-quality-rfc.md). Grouping:
+Cards: [ASK-0134](../issues/60-done/ASK-0134-checked-question-format.md), closeout
+[ASK-0135](../issues/60-done/ASK-0135-close-question-quality-rfc.md). Grouping:
 [adopted plan](plans/attended-review-question-quality/milestone-plan.json).
 
 Mandate (owner, 2026-11-15): "Implement the RFC at
@@ -264,3 +264,24 @@ whole proposal.
 - **AC09:** SKILL.md, the authoring reference, the contract and the example
   describe the same parts, kinds, limits and rule IDs, and focused source checks
   cover the changed behavior without claiming a consumer migration.
+
+## Implementation record
+
+Implemented in `skills/attended-review` at `670238c425c0e2fcaa4475df9a1368c0eaac0f14`; the
+[verification checklist](plans/attended-review-question-quality/verification.md)
+records each criterion. The helper's contract is the
+[Question format](../../skills/attended-review/references/session-contract.md#question-format-manifest-version-3)
+section; drivers read [Writing review questions](../../skills/attended-review/references/question-authoring.md).
+
+Implementation choices within this RFC: manifest `schema_version: 3`; fields `kind`,
+`why`, `criteria` (What to check), `reference` (images or `"none"`), `now`, `launch`,
+`steps` (`{text, value?}`), `links`, `not_in_round`, `note`, `document` (material),
+`options`, `waivers` (`{RULE_ID: reason}`) and `setup` naming a top-level `setups`
+entry. `content`, `copy` and `question_type` are refused in version 3. A version-3
+session's state becomes `schema_version: 3` so an older helper cannot publish a build
+question without its launch check; decision intake stays version 2. Rule IDs and
+limits are those in the contract. Waivers apply to every rule except
+`kind-required`, `setup-note-words` and `waiver-reason-words`. Opening an openable
+design artifact and capturing the Now image from the candidate are driver
+self-checks; the helper cannot detect them.
+

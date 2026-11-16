@@ -46,4 +46,4 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 
 | RFC-ASK-0018 | Auto-Verified | Attended-review session publication to an optional review hub |
 
-| RFC-ASK-0019 | Implementing | Checked question format and authoring rules for attended-review |
+| RFC-ASK-0019 | Auto-Verified | Checked question format and authoring rules for attended-review |
