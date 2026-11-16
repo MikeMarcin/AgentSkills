@@ -27,6 +27,10 @@ python3 scripts/attended_review.py hub-config set https://HUB.ts.net
 
 The session directory is `<checkout>/.mask/attended-review/`. Ignore that generated directory in the consumer. Treat its verdicts as local acceptance records and transfer the relevant evidence to the authoritative issue/RFC records through the driver. Do not commit live host tokens, full incidental logs or unrelated session history.
 
+Write questions with [Writing review questions](references/question-authoring.md):
+manifest version 3 gives each question a kind and named parts, and `check --manifest
+FILE` reports rule violations before `init` refuses them.
+
 Run focused public-path tests:
 
 ```sh

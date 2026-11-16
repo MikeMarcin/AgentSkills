@@ -1,4 +1,6 @@
-# Portable mixed audio example
+# Portable examples
+
+## Mixed audio
 
 `mixed_audio.py` generates an inline version-2 manifest using six synthetic PCM
 tones with inline SVG waveforms, one ordinary brief and an intentionally invalid
@@ -40,3 +42,25 @@ Use `status --after SEQUENCE` to observe saved feedback and decisions, then
 Stop the fixture host with `stop` before deleting only the disposable consumer.
 The tones and fixture verdicts provide no Faraday rights, game or native Windows
 qualification and do not migrate a consumer.
+
+## Question kinds (manifest version 3)
+
+`question_kinds.py --output DIR` writes `passing.json`, with one passing question of
+each kind (two build questions sharing a setup, one with a waiver), and
+`failing.json`, one question that breaks several rules. Its images are flat
+synthetic placeholders and its launch command is representative; it never runs.
+
+```sh
+python /path/to/attended-review/examples/question_kinds.py --output /tmp/questions
+python HELPER --repo-root CONSUMER --registry REGISTRY check --manifest /tmp/questions/failing.json
+python HELPER --repo-root CONSUMER --registry REGISTRY init --manifest /tmp/questions/passing.json
+python HELPER --repo-root CONSUMER --registry REGISTRY prepare
+python HELPER --repo-root CONSUMER --registry REGISTRY ready import-preview-b --evidence "Launch check: ..."
+```
+
+`check` names every violation of the failing manifest, and `init` refuses it
+without creating a session. After `prepare`, the build questions wait for a launch
+check while the design, decision and audio questions are ready; `ready --evidence`
+records the check you performed. Serve or write offline HTML as above: the build
+question shows Reference beside Now, a copyable launch and step value, and the
+shared setup note once on entering its group.

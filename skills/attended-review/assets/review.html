@@ -88,11 +88,24 @@ main{padding:22px 0 0;min-width:0}
 .empty{max-width:var(--measure);font:17px/1.55 var(--serif);color:var(--ink-dim)}
 
 /* One question */
-.identity{font:12.5px var(--mono);color:var(--ink-faint);overflow-wrap:anywhere}
-.identity .id{color:var(--ink-dim)}
 #title{margin:6px 0 20px;max-width:var(--measure);font:600 28px/1.2 var(--serif);letter-spacing:-.005em;text-wrap:balance}
 article h3{font:600 13px/1.4 var(--sans);color:var(--ink-dim);margin:0 0 8px}
-.ask,.prose,.facts,.step,#wizard,#media,#comparison,#audio-controls,.checked,.answer,.onward{max-width:var(--measure);margin-bottom:24px}
+.ask,.prose,.facts,.step,#wizard,#media,#comparison,#audio-controls,.checked,.answer,.onward,.part{max-width:var(--measure);margin-bottom:24px}
+/* Named parts of a version-3 question, in their fixed order. */
+#why{margin:-12px 0 20px;max-width:var(--measure);font:18px/1.5 var(--serif);color:var(--ink-dim)}
+#setup-note{max-width:var(--measure);margin:0 0 14px;padding:8px 12px;border-left:3px solid var(--line-strong);background:var(--raised);font:15px/1.5 var(--sans);color:var(--ink-dim)}
+#setup-note b{color:var(--ink);font-weight:600}
+.part ul,.part ol{margin:0;padding-left:22px;font:16px/1.5 var(--serif)}
+.part li+li{margin-top:8px}
+.part li .step{margin:6px 0 0}
+#waiver-list{list-style:none;padding:0;border-left:3px solid var(--line-strong)}
+#waiver-list li{padding:2px 0 2px 14px;color:var(--ink-dim)}
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;margin-bottom:24px}
+.compare figure{margin:0 0 12px}
+.compare img{display:block;max-width:100%;max-height:60vh;border:1px solid var(--line);border-radius:3px;cursor:zoom-in;background:var(--sunk)}
+.compare figcaption{padding-top:6px;color:var(--ink-dim);font:14.5px/1.45 var(--sans)}
+.compare figcaption b{color:var(--ink);font-weight:600}
+#no-reference{color:var(--ink-faint);font-size:14px}
 .ask ul{list-style:none;padding:0;border-left:3px solid var(--pending)}
 .ask li{padding:2px 0 2px 16px;font:19px/1.45 var(--serif)}
 .ask li+li{margin-top:8px}
@@ -225,11 +238,21 @@ textarea::placeholder{color:var(--ink-faint)}
   <main>
     <p id="empty" class="empty" hidden></p>
     <article id="card" hidden>
-      <p id="identity" class="identity"></p>
+      <p id="setup-note" hidden></p>
       <h2 id="title" tabindex="-1"></h2>
+      <p id="why" hidden></p>
       <section class="ask"><h3>What to check</h3><ul id="criteria"></ul></section>
+      <section id="waivers" class="part" hidden><h3>Exceptions your driver stated</h3><ul id="waiver-list"></ul></section>
       <div id="content" class="prose"></div>
-      <div id="launch"></div><div id="copy-values"></div><div id="wizard"></div>
+      <section id="compare" class="compare" hidden><div id="reference-column"><h3>Reference</h3><div id="reference"></div></div><div id="now-column"><h3>Now</h3><div id="now"></div></div></section>
+      <section id="document" class="part" hidden><h3>Read</h3><div id="document-text" class="prose"></div></section>
+      <div id="launch"></div>
+      <section id="try" class="part" hidden><h3>Try</h3><ol id="steps"></ol></section>
+      <div id="copy-values"></div>
+      <section id="links" class="part" hidden><h3>Links</h3><ul id="link-list"></ul></section>
+      <section id="not-in-round" class="part" hidden><h3>Not in this round</h3><ul id="not-in-round-list"></ul></section>
+      <section id="note-part" class="part" hidden><h3>Note</h3><div id="note-text" class="prose"></div></section>
+      <div id="wizard"></div>
       <dl id="audio-context" class="facts"></dl><div id="comparison" class="controls"></div><div id="media"></div><p id="playback-error" role="alert"></p><div id="audio-controls" class="controls" hidden><button id="replay">Replay from the start</button><label><input id="loop" type="checkbox"> Loop this clip</label><button id="timestamp">Add playback time to note</button></div>
       <section id="checked" class="checked" hidden><h3>Already checked by your driver</h3><ul id="observations"></ul><p class="aside">Objective evidence, not a verdict. The decision below is yours.</p></section>
       <section id="answer" class="answer" aria-labelledby="answer-heading">
@@ -255,7 +278,7 @@ textarea::placeholder{color:var(--ink-faint)}
 <script>
 'use strict';
 const embedded=/*SESSION_DATA*/null;
-let state=embedded, current=null, local=[], drafts={}, diagnostics=[], saving=false, handingBack=false, polling=false, pending=[], editorKey=null, editorFeedbackId=null, mediaKey=null, saveTimer=null, saveChain=Promise.resolve();
+let state=embedded, current=null, enteredFrom=null, local=[], drafts={}, diagnostics=[], saving=false, handingBack=false, polling=false, pending=[], editorKey=null, editorFeedbackId=null, mediaKey=null, saveTimer=null, saveChain=Promise.resolve();
 const token=new URLSearchParams(location.hash.slice(1)).get('token');
 const online=!embedded&&['http:','https:'].includes(location.protocol);
 const el=id=>document.getElementById(id);
@@ -388,7 +411,7 @@ function flush(c=candidate()){
  const result=saveChain.then(task,task);saveChain=result.catch(()=>false);return result;
 }
 async function select(id){
- await flush(candidate());stopPlayback();if(current!==id)say('');current=id;editorKey=null;draw();
+ await flush(candidate());stopPlayback();if(current!==id){say('');enteredFrom=candidate()?.setup?.id??null;}current=id;editorKey=null;draw();
  if(!candidate())return;
  if(wide.matches)el('list').querySelector('[aria-current="true"]')?.scrollIntoView({block:'nearest'});
  else el('queue').open=false;
@@ -435,7 +458,8 @@ function draw(){
  if(!c){el('empty').textContent=!state.candidates.length?'Nothing to review yet. Your driver has not added any candidates.':ready?'Pick an item from the queue to begin.':waiting?'Nothing is ready yet. Preparation is still running; items move into the queue as they become ready.':'Every candidate is answered. Finish and hand back when you are done, or pick an answered item in the queue to change it.';return;}
  const d=decision(c),next=nextQuestion();el('next').disabled=!next||saving||handingBack||Boolean(state.handed_back);el('next').classList.toggle('primary',Boolean(d&&next&&!state.handed_back));
  el('navigation-status').textContent=state.handed_back?'':next?'':ready?'No other questions are ready. You can leave this question pending and hand back.':waiting?'No more questions are ready. You can hand back while preparation is pending.':'Every question is answered. Finish and hand back when you are done.';
- el('identity').replaceChildren(make('span','id',c.id),`  revision ${c.revision}`);el('title').textContent=c.title;el('content').textContent=c.content||'';el('content').hidden=!c.content;
+ el('title').textContent=c.title;el('content').textContent=c.content||'';el('content').hidden=!c.content;
+ drawParts(c);
  el('criteria').replaceChildren();for(const text of c.criteria){el('criteria').append(make('li',null,text));}
  loadEditor(c);feedbackStatus();
  const nextMediaKey=key(c);
@@ -462,11 +486,31 @@ function draw(){
  pending.forEach((a,index)=>{const figure=make('figure'),image=document.createElement('img'),caption=make('figcaption'),remove=make('button','quiet','Remove');image.src=a.data;image.alt=a.name;remove.setAttribute('aria-label',`Remove ${a.name}`);remove.disabled=!enabled;remove.onclick=()=>{pending.splice(index,1);edit();draw();};const name=make('span',null,a.name);name.title=a.name;caption.append(name,remove);figure.append(image,caption);el('attachments').append(figure);});
  el('answer').dataset.outcome=d?.outcome||'';
  const standing=el('standing');standing.hidden=Boolean(d)||c.phase==='ready';standing.textContent=c.phase==='ready'?'':c.error||'Preparation is pending. Other ready items are available.';
- el('launch').replaceChildren();if(c.launch)el('launch').append(copyRow(c.launch.label||'Open what this asks you to look at:',c.launch.command,'Command copied. Paste it in a terminal.'));
+ el('launch').replaceChildren();if(c.launch)el('launch').append(copyRow(c.launch.label||(c.kind?'Open it':'Open what this asks you to look at:'),c.launch.command,'Command copied. Paste it in a terminal.'));
  el('copy-values').replaceChildren();for(const value of c.copy||[])el('copy-values').append(copyRow(value.label,value.value,`${value.label} copied.`));
  const provenance=el('provenance');provenance.replaceChildren();
- const facts=[['revision',c.revision],['fingerprint',c.fingerprint],...Object.entries(c.metadata||{}).map(([k,v])=>[k,typeof v==='string'?v:JSON.stringify(v)]),['paths',(c.paths||[]).join('\n')],['resources',(c.resources||[]).join('\n')]];
+ const facts=[['candidate',c.id],['kind',c.kind],['revision',c.revision],['fingerprint',c.fingerprint],...Object.entries(c.metadata||{}).map(([k,v])=>[k,typeof v==='string'?v:JSON.stringify(v)]),['paths',(c.paths||[]).join('\n')],['resources',(c.resources||[]).join('\n')]];
  for(const [k,v] of facts){if(!v)continue;provenance.append(make('dt',null,k));const dd=make('dd',null,v);dd.style.whiteSpace='pre-wrap';provenance.append(dd);}
+}
+// A version-3 question's parts, each shown only when supplied. Shared setup is
+// said once, on entering its group; each question keeps its own launch copy.
+const webLink=url=>{try{return ['http:','https:'].includes(new URL(url).protocol);}catch(e){return false;}};
+function drawParts(c){
+ const note=el('setup-note'),entering=c.setup?.note&&c.setup.id!==enteredFrom;note.hidden=!entering;note.replaceChildren();
+ if(entering)note.append(make('b',null,'Setup for this group: '),c.setup.note);
+ el('why').textContent=c.why||'';el('why').hidden=!c.why;
+ const list=(id,items,render)=>{const node=el(id);node.replaceChildren();for(const item of items||[])node.append(render(item));return Boolean((items||[]).length);};
+ el('waivers').hidden=!list('waiver-list',Object.values(c.waivers||{}),reason=>make('li',null,reason));
+ const figures=(id,role,images)=>list(id,images,image=>{const figure=make('figure'),node=document.createElement('img'),caption=make('figcaption');node.src=image.url;node.alt=`${role}: ${image.label}`;node.title='Show at full size';node.onclick=()=>view(image.url,`${role}: ${image.label}`);caption.append(make('b',null,`${role}: `),image.label);figure.append(node,caption);return figure;});
+ const reference=Array.isArray(c.reference)?c.reference:[];
+ const hasReference=figures('reference','Reference',reference),hasNow=figures('now','Now',c.now);
+ if(c.reference==='none'){const none=make('p',null,'No earlier design exists for this.');none.id='no-reference';el('reference').append(none);}
+ el('reference-column').hidden=!hasReference&&c.reference!=='none';el('now-column').hidden=!hasNow;el('compare').hidden=!hasReference&&!hasNow&&c.reference!=='none';
+ el('document-text').textContent=c.document||'';el('document').hidden=!c.document;
+ el('try').hidden=!list('steps',c.steps,step=>{const li=make('li',null,step.text);if(step.value)li.append(copyRow(null,step.value,'Copied. Paste it where the step says.'));return li;});
+ el('links').hidden=!list('link-list',(c.links||[]).filter(link=>webLink(link.url)),link=>{const li=make('li'),a=make('a',null,link.label);a.href=link.url;a.target='_blank';a.rel='noopener noreferrer';li.append(a);return li;});
+ el('not-in-round').hidden=!list('not-in-round-list',c.not_in_round,text=>make('li',null,text));
+ el('note-text').textContent=c.note||'';el('note-part').hidden=!c.note;
 }
 const glyph=text=>{const node=make('span','glyph',text);node.setAttribute('aria-hidden','true');return node;};
 const checkedOptions=()=>[...el('options').querySelectorAll('input:checked')].map(v=>v.value);

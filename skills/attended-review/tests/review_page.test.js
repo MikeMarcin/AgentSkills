@@ -156,8 +156,58 @@ async function liveNotes(origin,token){
  settled(p,'accept','Written after rejecting, then revised');
  console.log('PASS: live host keeps the note typed before, between and after Accept and Reject');
 }
+// A version-3 session from the real helper: every named part renders in its
+// fixed order, the same way on the live and offline pages. Identity is only in
+// provenance; shared setup is said once on entering its group.
+async function parts(snapshotPath){
+ const saved=JSON.parse(fs.readFileSync(snapshotPath,'utf8'));
+ const order=['setup-note','title','why','criteria','waivers','compare','document','launch','try','links','not-in-round','note-part','checked','answer','provenance'];
+ const at=order.map(id=>html.indexOf(`id="${id}"`));assert.ok(at.every(i=>i>0),'every part is on the page');
+ assert.deepEqual([...at].sort((x,y)=>x-y),at,'parts appear in their defined order');
+ assert.equal(html.includes('id="identity"'),false,'no identity line above the title');
+ const shown=q=>{const visible=id=>!q.get(id).hidden;const text=node=>[node.textContent,...node.children.map(c=>typeof c==='string'?c:text(c))].join(' ').replace(/\s+/g,' ').trim();
+  return JSON.stringify({title:q.get('title').textContent,why:visible('why')&&q.get('why').textContent,setup:visible('setup-note')&&text(q.get('setup-note')),
+   reference:visible('reference-column')&&text(q.get('reference')),now:visible('now-column')&&text(q.get('now')),document:visible('document')&&q.get('document-text').textContent,
+   launch:text(q.get('launch')),steps:visible('try')&&text(q.get('steps')),links:visible('links')&&text(q.get('link-list')),
+   gaps:visible('not-in-round')&&text(q.get('not-in-round-list')),note:visible('note-part')&&q.get('note-text').textContent,waivers:visible('waivers')&&text(q.get('waiver-list')),
+   provenance:text(q.get('provenance'))});};
+ const views={};
+ for(const live of [false,true]){
+  storage.clear();const q=page(saved,{live});await q.ready;const copied=[];q.context.navigator.clipboard={writeText:async v=>{copied.push(v);}};
+  // Every question, entering the setup group from outside, moving within it and re-entering.
+  views[live]=[];
+  for(const id of ['toolbar-icons','import-preview-b','import-shortcut','release-notes','import-shortcut','launcher-A']){await q.run(`select(${JSON.stringify(id)})`);views[live].push(shown(q));}
+  await q.run("select('toolbar-icons')");await q.run("select('import-preview-b')");
+  const build=JSON.parse(shown(q));
+  assert.match(build.setup,/Setup for this group: Both build questions/);
+  assert.match(build.reference,/Reference: Option B as approved/);assert.match(build.now,/Now: Built preview with the sample file/);
+  assert.equal(q.get('compare').hidden,false);assert.equal(q.get('reference').children[0].children[0].alt,'Reference: Option B as approved');
+  assert.match(build.provenance,/import-preview-b/);assert.match(build.provenance,/workflow-import-v002/);assert.match(build.provenance,/BPR-2032/);
+  assert.doesNotMatch(build.title,/workflow-import-v002/);
+  // One action copies the launch command, and one copies the step's value.
+  const copy=node=>node.children[0].children.at(-1).children[1];
+  await copy(q.get('launch')).click();assert.equal(copied.at(-1),'python3 /Users/reviewer/workflow-import-v002/launch.py');
+  const step=q.get('steps').children[0];await step.children[0].children[0].children[1].click();
+  assert.equal(copied.at(-1),'/Users/reviewer/workflow-import-v002/look/synthetic-org.bpr-config.json');
+  assert.match(build.gaps,/Profiles page/);
+  await q.run("select('import-shortcut')");const within=JSON.parse(shown(q));
+  assert.equal(within.setup,false,'the setup note is not repeated inside its group');
+  assert.match(within.launch,/launch\.py/,'each question keeps its launch');
+  assert.match(within.waivers,/No screenshot: the change is a keyboard shortcut/);assert.match(within.reference,/No earlier design/);
+  await q.run("select('release-notes')");assert.match(JSON.parse(shown(q)).document,/nothing changes until you press Import/);
+  await q.run("select('import-shortcut')");assert.match(JSON.parse(shown(q)).setup,/Setup for this group/,'re-entering the group shows it again');
+  await q.run("select('toolbar-icons')");const design=JSON.parse(shown(q));assert.match(design.now,/Now: Outlined set[\s\S]*Now: Filled set/);assert.equal(design.reference,false);
+  // Links open http or https pages in a new tab; anything else is not linked.
+  q.run("candidate().links=[{label:'Design notes',url:'https://example.test/notes'},{label:'Local',url:'file:///etc/hosts'},{label:'Script',url:'javascript:alert(1)'}];draw()");
+  const links=q.get('link-list').children;assert.equal(links.length,1);assert.equal(links[0].children[0].href,'https://example.test/notes');
+  assert.equal(links[0].children[0].target,'_blank');assert.equal(links[0].children[0].rel,'noopener noreferrer');
+ }
+ assert.deepEqual(views[true],views[false],'live and offline pages render the same parts');
+ console.log('PASS: named parts in order on live and offline pages; identity only in provenance; one-action launch and step copies; reference beside Now with roles; waiver reasons; shared setup once per group; http(s) links only');
+}
 (async()=>{
  if(process.argv[2]==='--host'){await liveNotes(process.argv[3],process.argv[4]);return;}
+ if(process.argv[2]==='--parts'){await parts(process.argv[3]);return;}
  if(process.argv[2]==='--answers'){await liveAnswers(...process.argv.slice(3));return;}
  // Next follows original queue order even when the active question was answered.
  // Both viewport widths return focus and scroll to the question's beginning.

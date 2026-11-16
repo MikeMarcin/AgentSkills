@@ -24,12 +24,22 @@ import time
 import urllib.parse
 import urllib.request
 
-VERSION = 2
+VERSION = 2  # Decision intake and the state that feedback-aware intake upgrades to.
+QUESTION_VERSION = 3  # Manifests with named parts and question kinds; their state needs this helper.
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
 
 class ReviewError(ValueError):
     pass
+
+
+class ManifestRefused(ReviewError):
+    """A version-3 manifest broke question rules; it names every violation and saves nothing."""
+
+    def __init__(self, report):
+        lines = [f"{v['candidate'] or 'manifest'}: {v['rule']} ({v['part']}): {v['message']}. {v['fix']}" for v in report["violations"]]
+        super().__init__(f"Manifest refused with {len(lines)} violation(s); nothing was saved.\n" + "\n".join(lines))
+        self.report = report
 
 
 class WaitTimeout(ReviewError):
@@ -46,7 +56,7 @@ MAXIMUM_ATTACHMENT_BYTES = 4 * 1024 * 1024
 MAXIMUM_REQUEST_BYTES = 20 * 1024 * 1024
 # Presentation a candidate's fingerprint binds, and the bulk of a session: a
 # page that already holds it for that fingerprint need not download it again.
-MATERIAL = ("media", "audio")
+MATERIAL = ("media", "audio", "now", "reference")
 # Earlier answers and notes, with their images. The page shows only the current ones.
 HISTORY = ("decision_history", "feedback_history", "superseded")
 
@@ -122,24 +132,132 @@ def require_text(value, label):
 
 def canonical(candidate):
     """Only review material binds a decision; HEAD and preparation metadata do not."""
-    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch", "copy", "question_type", "audio")
+    keys = ("id", "revision", "title", "content", "criteria", "options", "media", "resource_versions", "launch", "copy", "question_type", "audio",
+            "kind", "why", "reference", "now", "steps", "links", "not_in_round", "note", "document", "waivers", "setup")
     material = {k: candidate[k] for k in keys if k in candidate}
     if "wizard" in candidate:
         material["wizard_instructions"] = candidate["wizard"].get("instructions", "")
     return hashlib.sha256(json.dumps(material, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
+LEGACY_FIELDS = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch", "copy", "question_type", "audio", "comparison_group"}
+# Version 3 names each part. Free text moves to note, pasted values to steps.
+QUESTION_FIELDS = (LEGACY_FIELDS - {"content", "copy", "question_type"}) | {"kind", "why", "reference", "now", "steps", "links", "not_in_round", "note", "document", "setup", "waivers"}
+KINDS = ("build", "design", "decision", "audio")
+
+
+def check_launch(launch, owner):
+    if not isinstance(launch, dict) or set(launch) - {"label", "command"}:
+        raise ReviewError("launch holds a label and a command")
+    require_text(launch.get("command"), f"{owner} launch command")
+    if "label" in launch and not isinstance(launch["label"], str):
+        raise ReviewError("launch label must be text")
+
+
+def labelled_images(value, label):
+    if not isinstance(value, list) or not value:
+        raise ReviewError(f"{label} is a nonempty array of labelled images")
+    for image in value:
+        if not isinstance(image, dict) or set(image) - {"url", "label", "option"}:
+            raise ReviewError(f"each {label} image is a url, a label and optionally the option it shows")
+        require_text(image.get("label"), f"{label} image label")
+        if not isinstance(image.get("url"), str) or not image["url"].startswith("data:image/"):
+            raise ReviewError(f"{label} images are inline data:image URLs")
+        if "option" in image:
+            require_text(image["option"], f"{label} image option")
+
+
+def question_parts(value):
+    """Structure of version-3 parts, and shared setup resolved into each question.
+
+    The question's identity then binds the setup note and launch it shows.
+    """
+    setups = value.get("setups", {})
+    if set(value) - {"schema_version", "candidates", "setups"}:
+        raise ReviewError(f"Unknown manifest fields: {sorted(set(value) - {'schema_version', 'candidates', 'setups'})}")
+    if not isinstance(setups, dict):
+        raise ReviewError("setups maps a setup ID to its launch and note")
+    for sid, setup in setups.items():
+        if not isinstance(setup, dict) or not setup or set(setup) - {"launch", "note"}:
+            raise ReviewError(f"setup {sid} holds a launch and a note")
+        if "note" in setup:
+            require_text(setup["note"], f"setup {sid} note")
+        if "launch" in setup:
+            check_launch(setup["launch"], f"setup {sid}")
+    for item in value["candidates"]:
+        if not isinstance(item, dict):
+            raise ReviewError("candidate must be an object")
+        if set(item).intersection({"content", "copy", "question_type"}):
+            raise ReviewError("manifest version 3 uses note, step values and kind in place of content, copy and question_type")
+        if "kind" in item and item["kind"] not in KINDS:
+            raise ReviewError(f"kind must be one of {', '.join(KINDS)}")
+        if item.get("kind") == "audio":
+            item["question_type"] = "audio"
+        for key in ("why", "note", "document"):
+            if key in item:
+                require_text(item[key], key)
+        if "now" in item:
+            labelled_images(item["now"], "now")
+        if "reference" in item and item["reference"] != "none":
+            labelled_images(item["reference"], "reference")
+        if "steps" in item:
+            if not isinstance(item["steps"], list) or not item["steps"]:
+                raise ReviewError("steps is a nonempty array")
+            for step in item["steps"]:
+                if not isinstance(step, dict) or set(step) - {"text", "value"}:
+                    raise ReviewError("a step is its text and optionally a value to paste")
+                require_text(step.get("text"), "step text")
+                if "value" in step:
+                    require_text(step["value"], "step value")
+        if "links" in item:
+            if not isinstance(item["links"], list) or not item["links"]:
+                raise ReviewError("links is a nonempty array")
+            for link in item["links"]:
+                if not isinstance(link, dict) or set(link) != {"label", "url"}:
+                    raise ReviewError("a link is a label and an http or https url")
+                require_text(link["label"], "link label")
+                parts = urllib.parse.urlsplit(link["url"]) if isinstance(link["url"], str) else None
+                if not parts or parts.scheme not in ("http", "https") or not parts.netloc:
+                    raise ReviewError("links open http or https pages; a local file is opened by a launch command")
+        if "not_in_round" in item:
+            if not isinstance(item["not_in_round"], list) or not item["not_in_round"]:
+                raise ReviewError("not_in_round is a nonempty array of text")
+            for entry in item["not_in_round"]:
+                require_text(entry, "not_in_round item")
+        if "waivers" in item:
+            waivers = item["waivers"]
+            if not isinstance(waivers, dict) or not waivers:
+                raise ReviewError("waivers map a rule ID to the reason shown to the reviewer")
+            for rule, reason in waivers.items():
+                if rule not in WAIVABLE:
+                    raise ReviewError(f"{rule} is not a waivable rule; waivable: {', '.join(sorted(WAIVABLE))}")
+                require_text(reason, f"waiver reason for {rule}")
+        if "setup" in item:
+            sid = item["setup"]
+            if not isinstance(sid, str) or sid not in setups:
+                raise ReviewError(f"setup {sid!r} is not declared in setups")
+            setup = setups[sid]
+            item["setup"] = {"id": sid, **({"note": setup["note"]} if "note" in setup else {})}
+            if "launch" in setup and "launch" not in item:
+                item["launch"] = setup["launch"]
+
+
 def manifest(value):
-    if not isinstance(value, dict) or value.get("schema_version") not in (1, VERSION):
-        raise ReviewError("manifest schema_version must be 1 or 2")
+    if not isinstance(value, dict) or value.get("schema_version") not in (1, VERSION, QUESTION_VERSION):
+        raise ReviewError("manifest schema_version must be 1, 2 or 3")
     if not isinstance(value.get("candidates"), list):
         raise ReviewError("manifest candidates must be an array")
+    version = value["schema_version"]
+    if version == QUESTION_VERSION:
+        question_parts(value)
+    elif "setups" in value:
+        raise ReviewError("shared setup requires manifest schema_version 3")
     ids = set()
     for item in value["candidates"]:
         if not isinstance(item, dict):
             raise ReviewError("candidate must be an object")
-        allowed = {"id", "title", "revision", "content", "criteria", "resources", "paths", "options", "media", "wizard", "prepare", "metadata", "resource_versions", "launch", "copy", "question_type", "audio", "comparison_group"}
-        if value["schema_version"] == 1 and set(item).intersection({"question_type", "audio", "comparison_group"}):
+        allowed = QUESTION_FIELDS | {"question_type"} if version == QUESTION_VERSION else LEGACY_FIELDS
+        if version == 1 and set(item).intersection({"question_type", "audio", "comparison_group"}):
             raise ReviewError("audio questions require manifest schema_version 2")
         if set(item) - allowed:
             raise ReviewError(f"Unknown candidate fields: {sorted(set(item) - allowed)}")
@@ -201,12 +319,7 @@ def manifest(value):
         # packet that names a path in prose makes them navigate a file tree by
         # hand; this is the command, shown for copying and never run.
         if "launch" in item:
-            launch = item["launch"]
-            if not isinstance(launch, dict) or set(launch) - {"label", "command"}:
-                raise ReviewError("launch holds a label and a command")
-            require_text(launch.get("command"), f"{cid} launch command")
-            if "label" in launch and not isinstance(launch["label"], str):
-                raise ReviewError("launch label must be text")
+            check_launch(item["launch"], cid)
         # What the candidate asks the reviewer to paste somewhere else: a
         # pull request link, an identifier. Offered for copying, next to the
         # command that opens what they are looking at.
@@ -230,6 +343,161 @@ def manifest(value):
             if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not 0 < timeout <= 86400:
                 raise ReviewError("prepare timeout_seconds must be between 0 and 86400")
     return value
+
+
+# Question rules. Each has a stable ID, what it limits and how to satisfy it.
+# Budgets count words of driver-written text. Material the reviewer judges (a
+# document, audio, images) and values for copying (launch commands, step
+# values, link URLs) are not budgeted or scanned.
+RULES = {
+    "title-words": ("Title is at most 12 words", "State the decision in the reviewer's words."),
+    "why-words": ("Why is at most 25 words", "Say in one sentence why the reviewer is asked."),
+    "check-count": ("What to check has at most 3 statements", "Keep the observable statements that decide the answer; ask a separate question for others."),
+    "check-words": ("Each What to check statement is at most 20 words", "Write one short observable statement."),
+    "step-count": ("Try has at most 5 steps", "Exercise the surface under review, not the way to reach it."),
+    "step-words": ("Each step is at most 20 words", "Move a pasted value into the step's value."),
+    "not-in-round-count": ("Not in this round has at most 3 items", "Name only gaps the reviewer would otherwise judge."),
+    "not-in-round-words": ("Each Not in this round item is at most 15 words", "Name the gap, not its history."),
+    "note-words": ("Note is at most 60 words", "Move material to a document or image and setup to shared setup; drop instructions the page already gives."),
+    "option-count": ("A question has at most 6 options", "Ask independent choices as separate questions."),
+    "option-words": ("Each option is at most 15 words", "Name the option; show it in a labelled image."),
+    "image-label-words": ("Each image label is at most 12 words", "Say what the image shows."),
+    "setup-note-words": ("A shared setup note is at most 40 words", "Say only what every question in the group shares."),
+    "waiver-reason-words": ("A waiver reason is at most 25 words", "Tell the reviewer in one sentence why the rule does not apply."),
+    "no-path-or-url": ("Text contains an absolute path or URL", "Put it in a step value, the launch command or a link."),
+    "no-long-hex": ("Text contains a hex string of 12 or more characters", "Put revisions and digests in metadata; provenance shows them."),
+    "no-tracker-id": ("Title, Why or What to check contains a tracker ID", "Describe the behavior; put tracker IDs in metadata."),
+    "kind-required": ("A version-3 question declares its kind", "Set kind to build, design, decision or audio."),
+    "build-launch": ("A build question has a launch command", "Add launch, or a shared setup with one."),
+    "build-now-image": ("A build question shows at least one Now image of the candidate", "Capture what the reviewer should see from this candidate."),
+    "build-reference": ("A build question states its reference", "Add the approved design's images, or set reference to \"none\" when no earlier design exists."),
+    "design-image": ("A design question shows at least one image", "Add the mockup, render or art as a Now or Reference image."),
+    "design-option-image": ("Each option of a design question has its own labelled image", "Add a Now image whose option names it."),
+    "decision-material": ("A decision question offers its alternatives as options or its document as material", "Add two or more options, or the document to read."),
+}
+LAUNCH_CHECK_PENDING = ("Build question waits for a launch check: give it a prepare command that starts the build and checks it, "
+                        "or check it yourself and record ready ID --evidence TEXT")
+UNWAIVABLE = {"kind-required", "setup-note-words", "waiver-reason-words"}
+WAIVABLE = set(RULES) - UNWAIVABLE
+PATH_OR_URL = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*://|(?:^|[\s(\[\"'`])(?:~/|/[^\s/]+/|[A-Za-z]:\\|\\\\[^\s\\]+\\)")
+LONG_HEX = re.compile(r"(?<![0-9A-Za-z])[0-9a-fA-F]{12,}(?![0-9A-Za-z])")
+# Standards spelled like tracker IDs are not tracker IDs.
+TRACKER_ID = re.compile(r"(?<![A-Za-z0-9])(?!(?:SHA|ISO|UTF|MD|AES|RGB)-)[A-Z][A-Z0-9]{1,9}-\d{2,}(?![0-9])")
+BUDGETS = (  # field, part, count rule, most items, words rule, most words
+    ("criteria", "What to check", "check-count", 3, "check-words", 20),
+    ("steps", "Try", "step-count", 5, "step-words", 20),
+    ("not_in_round", "Not in this round", "not-in-round-count", 3, "not-in-round-words", 15),
+    ("options", "Options", "option-count", 6, "option-words", 15),
+)
+
+
+def words(text):
+    return len(text.split())
+
+
+def question_images(item, every=False):
+    """Reference and Now images, plus image media (every medium's label when asked)."""
+    reference = item["reference"] if isinstance(item.get("reference"), list) else []
+    media = [m for m in item.get("media", []) if every or m.get("kind") == "image"]
+    return [*reference, *item.get("now", []), *media]
+
+
+def question_text(item):
+    """Driver-written text: (part, text, scan for hex, scan for tracker IDs)."""
+    parts = [("Title", item["title"], True, True)]
+    if "why" in item:
+        parts.append(("Why", item["why"], True, True))
+    parts += [(f"What to check {n}", text, True, True) for n, text in enumerate(item["criteria"], 1)]
+    parts += [(f"Try step {n}", step["text"], True, False) for n, step in enumerate(item.get("steps", []), 1)]
+    parts += [(f"Option {n}", text, True, False) for n, text in enumerate(item.get("options", []), 1)]
+    parts += [(f"Not in this round {n}", text, False, False) for n, text in enumerate(item.get("not_in_round", []), 1)]
+    for key in ("note", "content"):
+        if key in item:
+            parts.append(("Note", item[key], False, False))
+    parts += [("Image label", image["label"], False, False) for image in question_images(item, every=True) if image.get("label")]
+    parts += [("Link label", link["label"], False, False) for link in item.get("links", [])]
+    if item.get("launch", {}).get("label"):
+        parts.append(("Launch label", item["launch"]["label"], False, False))
+    parts += [(f"Copy label {n}", entry["label"], False, False) for n, entry in enumerate(item.get("copy", []), 1)]
+    parts += [(f"Waiver {rule}", reason, False, False) for rule, reason in item.get("waivers", {}).items()]
+    return parts
+
+
+def question_report(value):
+    """Check every question. Version 3 is refused on any unwaived violation;
+    versions 1 and 2 are admitted and the same checks are reported as legacy."""
+    checked = value["schema_version"] == QUESTION_VERSION
+    report = {"schema_version": value["schema_version"], "format": "checked" if checked else "unchecked legacy format",
+              "refused": False, "violations": [], "waived": [], "waivers": 0,
+              "words": {item["id"]: sum(words(part[1]) for part in question_text(item)) for item in value["candidates"]}}
+
+    def add(cid, rule, part, detail=None, waivers=None):
+        entry = {"candidate": cid, "rule": rule, "part": part, "message": detail or RULES[rule][0], "fix": RULES[rule][1]}
+        if waivers and rule in waivers and rule in WAIVABLE:
+            report["waived"].append({**entry, "reason": waivers[rule]})
+        else:
+            report["violations"].append(entry)
+
+    if checked:
+        for sid, setup in value.get("setups", {}).items():
+            if "note" in setup and words(setup["note"]) > 40:
+                add(None, "setup-note-words", f"setup {sid}", f"Shared setup note has {words(setup['note'])} words; the limit is 40")
+            if "note" in setup and PATH_OR_URL.search(setup["note"]):
+                add(None, "no-path-or-url", f"setup {sid}")
+    for item in value["candidates"]:
+        cid, waivers = item["id"], item.get("waivers", {}) if checked else None
+        report["waivers"] += len(waivers or {})
+        for part, text, hexed, tracked in question_text(item):
+            if PATH_OR_URL.search(text):
+                add(cid, "no-path-or-url", part, waivers=waivers)
+            if hexed and LONG_HEX.search(text):
+                add(cid, "no-long-hex", part, waivers=waivers)
+            if tracked and TRACKER_ID.search(text):
+                add(cid, "no-tracker-id", part, f"{part} names {TRACKER_ID.search(text).group(0)}", waivers=waivers)
+        for rule, limit, part, text in (("title-words", 12, "Title", item["title"]), ("why-words", 25, "Why", item.get("why")),
+                                        ("note-words", 60, "Note", item.get("note", item.get("content")))):
+            if text and words(text) > limit:
+                add(cid, rule, part, f"{part} has {words(text)} words; the limit is {limit}", waivers)
+        for field, part, count_rule, most, words_rule, limit in BUDGETS:
+            entries = [entry["text"] if isinstance(entry, dict) else entry for entry in item.get(field, [])]
+            if len(entries) > most:
+                add(cid, count_rule, part, f"{part} has {len(entries)} items; the limit is {most}", waivers)
+            for n, text in enumerate(entries, 1):
+                if words(text) > limit:
+                    add(cid, words_rule, f"{part} {n}", f"{part} {n} has {words(text)} words; the limit is {limit}", waivers)
+        images = question_images(item)
+        for image in images:
+            if words(image.get("label", "")) > 12:
+                add(cid, "image-label-words", "Image label", f"Image label has {words(image['label'])} words; the limit is 12", waivers)
+        for rule, reason in (waivers or {}).items():
+            if words(reason) > 25:
+                add(cid, "waiver-reason-words", f"Waiver {rule}", f"Waiver reason has {words(reason)} words; the limit is 25")
+        if not checked:
+            if "launch" in item and not images:
+                add(cid, "build-now-image", "Now", "Launch command with no image")
+            continue
+        kind = item.get("kind")
+        if kind is None:
+            add(cid, "kind-required", "Kind")
+        elif kind == "build":
+            if "launch" not in item:
+                add(cid, "build-launch", "Open it", waivers=waivers)
+            if not item.get("now"):
+                add(cid, "build-now-image", "Now", waivers=waivers)
+            if "reference" not in item:
+                add(cid, "build-reference", "Reference", waivers=waivers)
+        elif kind == "design":
+            if not images:
+                add(cid, "design-image", "Now", waivers=waivers)
+            shown = {image.get("option") for image in images}
+            for option in item.get("options", []):
+                if option not in shown:
+                    add(cid, "design-option-image", "Now", f"Option {option!r} has no image", waivers)
+        elif kind == "decision":
+            if len(item.get("options", [])) < 2 and "document" not in item:
+                add(cid, "decision-material", "Options", waivers=waivers)
+    report["refused"] = checked and bool(report["violations"])
+    return report
 
 
 class Session:
@@ -296,14 +564,16 @@ class Session:
 
     @staticmethod
     def check_version(state):
-        if state is not None and state.get("schema_version") not in (1, VERSION):
+        if state is not None and state.get("schema_version") not in (1, VERSION, QUESTION_VERSION):
             raise ReviewError("Unsupported session state; resume with a compatible attended-review helper")
 
     @staticmethod
-    def upgrade(state):
-        state["schema_version"] = VERSION
-        state["runtime_format"] = "attended-review.state.v2"
-        state["minimum_helper_version"] = VERSION
+    def upgrade(state, version=VERSION):
+        """Raise the state's required helper version; never lower it."""
+        version = max(version, state.get("schema_version", 1))
+        state["schema_version"] = version
+        state["runtime_format"] = f"attended-review.state.v{version}"
+        state["minimum_helper_version"] = version
 
     @staticmethod
     def event(state, kind, **fields):
@@ -338,6 +608,9 @@ class Session:
 
     def initialize(self, value):
         value = manifest(value)
+        report = question_report(value)
+        if report["refused"]:
+            raise ManifestRefused(report)
         # Bootstrap under same locks as all subsequent operations.
         with lock(self.registry / ".lock"):
             with lock(self.directory / ".lock"):
@@ -347,8 +620,9 @@ class Session:
                 if state is None:
                     state = {"schema_version": 1, "id": secrets.token_hex(16), "checkout": str(self.root), "sequence": 0, "events": [], "candidates": {}, "history": [], "paused": False, "host": None}
                 self.check_version(state)
-                if value["schema_version"] == 2:
-                    self.upgrade(state)
+                if value["schema_version"] in (VERSION, QUESTION_VERSION):
+                    # An older helper would publish a build question without its launch check.
+                    self.upgrade(state, value["schema_version"])
                 for candidate in value["candidates"]:
                     cid = candidate["id"]
                     fingerprint = canonical(candidate)
@@ -370,7 +644,7 @@ class Session:
                         state["handed_back"] = None
                     self.event(state, "candidate", candidate=cid, fingerprint=fingerprint)
                 atomic_json(self.path, state)
-        return self.status()
+        return {**self.status(), "checks": report}
 
     def status(self, after=None, full=False):
         state = self.load()
@@ -454,6 +728,15 @@ class Session:
                 continue
             if max_items is not None and processed >= max_items:
                 break
+            if candidate.get("kind") == "build" and not prep:
+                # Static publication never checked that the launch starts, stays open
+                # and lands on the surface under review. It waits for a launch check.
+                with self.transaction() as (state, _):
+                    item = self.item(state, cid)
+                    if item["phase"] == "waiting" and not item.get("decision") and item.get("error") != LAUNCH_CHECK_PENDING:
+                        item["error"] = LAUNCH_CHECK_PENDING
+                        self.event(state, "preparation-stopped", candidate=cid, reason=LAUNCH_CHECK_PENDING)
+                continue
             try:
                 with self.transaction() as (state, resources):
                     if state.get("preparation_epoch", 0) != epoch:
@@ -1568,6 +1851,7 @@ def main(argv=None):
     parser.add_argument("--registry", help="Shared resource registry; all drivers using a resource must use the same registry")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("init").add_argument("--manifest", required=True)
+    sub.add_parser("check", help="Report question-rule violations without touching a session; exit 1 when init would refuse").add_argument("--manifest", required=True)
     p = sub.add_parser("status"); p.add_argument("--after", type=int); p.add_argument("--full", action="store_true")
     p = sub.add_parser("prepare"); p.add_argument("--candidate", action="append"); p.add_argument("--include-slow", action="store_true"); p.add_argument("--max-items", type=int)
     p = sub.add_parser("ready"); p.add_argument("candidate"); p.add_argument("--evidence", required=True)
@@ -1600,6 +1884,10 @@ def main(argv=None):
         if command == "hub-config":
             print(json.dumps(hub_config(args.action, getattr(args, "url", None))))
             return 0
+        if command == "check":
+            report = question_report(manifest(read_json(Path(args.manifest))))
+            print(json.dumps(report))
+            return 1 if report["refused"] else 0
         session = Session(args.repo_root, args.registry, args.state)
         if command == "init": result = session.initialize(read_json(Path(args.manifest)))
         elif command == "status": result = session.status(args.after, args.full)
@@ -1629,6 +1917,8 @@ def main(argv=None):
         return 0
     except (ReviewError, OSError, ValueError) as exc:
         failure = {"error": str(exc)}
+        if isinstance(exc, ManifestRefused):
+            failure.update(exc.report)
         if isinstance(exc, WaitTimeout):
             failure["sequence"] = exc.sequence
         print(json.dumps(failure), file=sys.stderr)

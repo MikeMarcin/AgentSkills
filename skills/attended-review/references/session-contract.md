@@ -1,4 +1,4 @@
-# Session contract, versions 1 and 2
+# Session contract, versions 1, 2 and 3
 
 ## External runtime state
 
@@ -18,6 +18,11 @@ An extension mutation upgrades state to `schema_version: 2`, identifies
 Resume that state with this version-2-compatible helper, using the same source,
 state and registry paths; keep the upgrade with the session when transferring it.
 An old helper is not a compatible downgrade. Future unsupported state versions refuse.
+
+Manifest version 3 adds [named question parts and kinds](#question-format-manifest-version-3).
+Initializing one upgrades state to `schema_version: 3`
+(`attended-review.state.v3`, `minimum_helper_version: 3`): an older helper would
+publish a build question without its launch check. Decision intake stays version 2.
 
 ## Manifest
 
@@ -55,7 +60,7 @@ An optional `resource_versions` map can share a **static** resource with the sam
 
 Both the existing and joining candidates must have no `prepare` command to share a claim. A preparation command owns an exclusive claim even if it declares the same resource version. The driver must truthfully identify the installed build and ensure it remains stable. Resources without matching versions conflict. Registrations are machine-local, at `~/.mask/attended-review-resources/`; all processes coordinating a resource must use that same directory. For fixtures or a configured shared location use `--registry PATH` or `ATTENDED_REVIEW_REGISTRY`. Remote device/farm ownership requires the repository's existing station adapter; this local registry does not coordinate disconnected machines.
 
-`prepare` is optional. Without it, `prepare` makes already assembled static review material ready. With it, `argv` is a nonempty string array executed directly in the checkout without a shell; `speed` is `quick` (default) or `slow`; `timeout_seconds` defaults to 300, at most 86400. Only explicit CLI preparation executes commands; HTTP never does. Review these arguments as code and prefer existing repository tools. Logs remain in the session directory. Failed/conflicting preparations remain waiting with a concise reason while other candidates proceed. Preparation exit 0 records only that objective result. Use an adapter's readiness check or driver `ready --evidence` when a successful installer alone is insufficient.
+`prepare` is optional. Without it, `prepare` makes already assembled static review material ready, except a version-3 build question, which waits for a launch check. With it, `argv` is a nonempty string array executed directly in the checkout without a shell; `speed` is `quick` (default) or `slow`; `timeout_seconds` defaults to 300, at most 86400. Only explicit CLI preparation executes commands; HTTP never does. Review these arguments as code and prefer existing repository tools. Logs remain in the session directory. Failed/conflicting preparations remain waiting with a concise reason while other candidates proceed. Preparation exit 0 records only that objective result. Use an adapter's readiness check or driver `ready --evidence` when a successful installer alone is insufficient.
 
 Optional presentation:
 
@@ -113,11 +118,85 @@ text to feedback; it does not transform audio or create a second feedback system
 
 See [the portable example](../examples/README.md) for a mixed session.
 
+## Question format (manifest version 3)
+
+Version 3 gives each question named parts and a kind, and checks them. The
+[authoring reference](question-authoring.md) explains how to write them, with a
+template per kind and a before-and-after example. This section is the helper's
+contract; both name the same parts, kinds, limits and rule IDs.
+
+A candidate keeps `id`, `revision`, `title`, `criteria` (What to check), `options`,
+`media`, `audio`, `comparison_group`, `paths`, `resources`, `resource_versions`,
+`prepare`, `wizard` and `metadata`. `content`, `copy` and `question_type` are
+refused; version 3 uses these instead:
+
+- `kind`: `build`, `design`, `decision` or `audio` (`audio` implies the
+  [audio question](#audio-questions-manifest-version-2) fields).
+- `why`: one sentence. `note`: free text for what fits nowhere else.
+- `reference`: labelled images of what was approved, or the string `"none"` when
+  no earlier design exists. `now`: labelled images of what the reviewer should
+  see. Each image is `{url: "data:image/...", label, option?}`; `option` names the
+  option a design image shows.
+- `steps`: `[{text, value?}]`, numbered; `value` is offered for copying.
+- `links`: `[{label, url}]`, `http` or `https` only, opened in a new tab. A local
+  file is opened by `launch`, never linked.
+- `not_in_round`: known gaps the reviewer should not judge.
+- `document`: text the reviewer is asked to read. It is material: not budgeted or
+  scanned.
+- `waivers`: `{RULE_ID: reason}`; the page shows each reason on that question.
+- `setup`: the ID of a top-level `setups` entry, `{launch?, note?}`. The helper
+  copies the setup's `launch` into each question without its own, and stores
+  `setup` as `{id, note}`. The page shows the note once on entering the group.
+
+Every part binds the candidate fingerprint, including waivers and the resolved
+setup. The page renders the parts in this order on the live and offline pages:
+setup note (on entering its group), title, Why, What to check, waiver reasons,
+Reference beside Now, other material (document, audio, media), Open it (`launch`),
+Try, Links, Not in this round, Note, then the decision and collapsed provenance.
+Provenance lists the candidate ID, kind, revision, fingerprint, metadata, paths and
+resources; no version shows the revision above the title.
+
+Required parts by kind, with their rule IDs: build needs `launch` (`build-launch`),
+a Now image (`build-now-image`) and a stated reference (`build-reference`); design
+needs an image (`design-image`) and an image for each option
+(`design-option-image`); decision needs two or more options or a document
+(`decision-material`). A question without a kind breaks `kind-required`.
+
+Limits on driver-written text, by rule ID: `title-words` 12; `why-words` 25;
+`check-count` 3 and `check-words` 20; `step-count` 5 and `step-words` 20;
+`not-in-round-count` 3 and `not-in-round-words` 15; `note-words` 60;
+`option-count` 6 and `option-words` 15; `image-label-words` 12;
+`waiver-reason-words` 25; `setup-note-words` 40. Words are whitespace-separated.
+`no-path-or-url` refuses an absolute path or URL in any of that text;
+`no-long-hex` a hex string of 12 or more characters in the title, Why, What to
+check, steps or options; `no-tracker-id` an ID such as `ABC-123` in the title, Why
+or What to check, except standards such as SHA-256, ISO-8601 and UTF-8. Launch
+commands, step values, link URLs, metadata, `document` and audio fields are not
+checked.
+
+A build question becomes ready only after a launch check: a `prepare` command that
+exits 0, or the driver's `ready ID --evidence TEXT`. Without a command, `prepare`
+leaves it waiting with a `preparation-stopped` reason naming the missing check;
+static publication does not make it ready. The helper never runs a launch command.
+
+`init` refuses a version-3 manifest that breaks any unwaived rule and saves
+nothing. Its error JSON keeps `error` and adds the report: `format: "checked"`,
+`refused`, every `violations` entry as `{candidate, rule, part, message, fix}`,
+`waived`, `waivers` and per-question driver-written `words`. A successful `init`
+returns that report as `checks`. `check --manifest FILE` prints the same report
+without reading or writing a session and exits 1 when `init` would refuse.
+Versions 1 and 2 are admitted unchanged; their report has `format: "unchecked legacy
+format"`, never refuses, and maps `content` to Note and a launch with no image to
+`build-now-image`. Waivers apply to every rule except `kind-required`,
+`setup-note-words` and `waiver-reason-words`; an empty reason or unknown rule is a
+format error.
+
 ## Commands and driver contract
 
 | Command | Behavior |
 |---|---|
-| `init --manifest FILE` | Merge selected candidate definitions into the checkout's one session. |
+| `init --manifest FILE` | Merge selected candidate definitions into the checkout's one session. Version 3 refuses rule violations; every version reports `checks`. |
+| `check --manifest FILE` | Report question-rule violations without a session; exit 1 when `init` would refuse. |
 | `prepare [--candidate ID] [--max-items N] [--include-slow]` | Publish static candidates first, then quick preparation, optionally slow. Each result is immediately durable. |
 | `ready ID --evidence TEXT` | Driver records relevant preparation evidence and protects a candidate after its own adapter work. |
 | `observe ID --evidence TEXT` | Append an objective observation; never a human decision. |
@@ -221,7 +300,7 @@ The live page reads the whole session once. Inline images can make it megabytes
 long, and re-reading all of it after every answer, over a slow tailnet link,
 held Accept, Reject and Next disabled until it arrived. So every later read
 (after an answer, a note save, pause, start or handback, and the 1.5-second poll)
-asks `/api/status?material=omit`: each candidate's `media` and `audio`, which its
+asks `/api/status?material=omit`: each candidate's `media`, `audio`, `now` and `reference`, which its
 fingerprint binds, are left out and named in `material_omitted`, and the page
 keeps the copy it holds for that fingerprint. Earlier answers and notes
 (`decision_history`, `feedback_history`, `superseded`) are left out too. A
