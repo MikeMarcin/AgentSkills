@@ -1,0 +1,31 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "attended-review-question-quality",
+  "scope": {
+    "issues": [
+      "ASK-0134",
+      "ASK-0135"
+    ]
+  },
+  "milestones": [
+    {
+      "id": "checked-question-format",
+      "outcome": "A new manifest version gives attended-review questions named parts and kinds, refuses rule violations with per-question waivers, gates build questions on a recorded launch check, and documents one consistent authoring guide, while version 1 and 2 behavior is unchanged.",
+      "work": [
+        {
+          "issue": "ASK-0134"
+        },
+        {
+          "issue": "ASK-0135"
+        }
+      ],
+      "depends_on": [],
+      "exit_criteria": [
+        "AC01\u2013AC09 are demonstrated through focused public CLI, real-page and fixture evidence.",
+        "Version 1 and 2 golden fingerprints, sessions, verdicts and imports are unchanged; legacy manifests are admitted with reported violations.",
+        "SKILL.md, authoring reference, contract, example and acceptance records agree; task commands and writers are quiescent."
+      ],
+      "boundary": "Source-only AgentSkills attended-review change; no consumer migration, deployment or consumer session mutation."
+    }
+  ]
+}
