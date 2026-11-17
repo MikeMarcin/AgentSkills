@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0136"
 title: "Check paragraph rhythm in the technical book humanizer"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"baseline":"6e3d868070a0a17e149e287d78f75b25529c1db6","requested_on":"2026-11-17"}
