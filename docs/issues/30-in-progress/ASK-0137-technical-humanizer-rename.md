@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0137"
 title: "Rename and deploy the medium-sensitive technical humanizer"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: ["ASK-0136"]
 metadata: {"baseline":"049c3732fff39e462fbb6e20e9b3c9dde7815473","requested_on":"2026-11-17"}
