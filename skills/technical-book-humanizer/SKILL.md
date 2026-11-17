@@ -1015,6 +1015,9 @@ Before returning the rewrite, scan for:
 17. ambiguous modifiers, referents, noun strings, or condition grouping
 18. instructions whose prerequisites appear too late or whose results are invented
 19. changes to passage purpose, stance, or technical meaning that the request does not justify
+20. repetitive paragraph-level rhythm or formulaic openings across neighboring paragraphs
+
+Read neighboring paragraphs as a sequence. Watch for the same opening formula, sentence-length pattern, or setup-and-closer shape repeated without serving the explanation, even when the nouns change. Where this makes the prose mechanical, remove an empty lead-in or reshape a paragraph around its particular claim, condition, or consequence. Do not force variety: preserve stable technical terms, parallel definitions and procedures, useful teaching recaps, and deliberate repetition for comparison or emphasis. A shared opening word is not itself a fault. Keep technical claims, conditions, qualifications, and relationships intact.
 
 Then revise once.
 

@@ -95,3 +95,7 @@ critique into an original workflow covering composition, implementation and
 verification for web, mobile and desktop. Platform references and interface
 metadata were authored for this package. This change adds the source package and
 catalog entry; it does not select or install the skill for existing consumers.
+
+## Technical book humanizer paragraph rhythm
+
+On 2026-11-17, the paragraph-rhythm check in `skills/technical-book-humanizer/SKILL.md` was informed by [blader/humanizer](https://github.com/blader/humanizer/blob/main/SKILL.md), whose reviewed metadata version was 4.0.0. The addition uses original wording to check recurring paragraph shapes and formulaic openings while preserving technical meaning and useful repetition. No upstream files or other upstream rules were imported. This changes the canonical source only; it does not update existing MASK selections or installed artifacts.
