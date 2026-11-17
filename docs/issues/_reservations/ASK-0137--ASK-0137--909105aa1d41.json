@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0137"
+  ],
+  "reserve_for": "technical-humanizer-rename-20261117",
+  "purpose": "",
+  "created": "2026-11-17T04:06:02.296051+00:00",
+  "base": "049c3732fff39e462fbb6e20e9b3c9dde7815473"
+}
