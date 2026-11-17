@@ -99,3 +99,5 @@ catalog entry; it does not select or install the skill for existing consumers.
 ## Technical book humanizer paragraph rhythm
 
 On 2026-11-17, the paragraph-rhythm check in `skills/technical-book-humanizer/SKILL.md` was informed by [blader/humanizer](https://github.com/blader/humanizer/blob/main/SKILL.md), whose reviewed metadata version was 4.0.0. The addition uses original wording to check recurring paragraph shapes and formulaic openings while preserving technical meaning and useful repetition. No upstream files or other upstream rules were imported. This changes the canonical source only; it does not update existing MASK selections or installed artifacts.
+
+On 2026-11-17, `technical-book-humanizer` was renamed to `technical-humanizer`. The programming-book register remains the default for technical books and manuscripts; other formats follow their medium and supplied voice. The paragraph-rhythm guidance is unchanged. Live catalog, source-manifest, and coauthoring references use the new name; historical records retain the original name. Managed deployment outcomes are recorded in the rename maintenance card.

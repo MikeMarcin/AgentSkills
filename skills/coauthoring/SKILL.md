@@ -1,6 +1,6 @@
 ---
 name: coauthoring
-description: Collaborative writing workflow for books, blog posts, essays, technical articles, documentation, chapters, outlines, revisions, voice matching, and reader testing. Use when the user wants help drafting, coauthoring, restructuring, expanding, cutting, or polishing long-form prose while preserving their voice; especially for technical prose where the technical-book-humanizer skill may also apply.
+description: Collaborative writing workflow for books, blog posts, essays, technical articles, documentation, chapters, outlines, revisions, voice matching, and reader testing. Use when the user wants help drafting, coauthoring, restructuring, expanding, cutting, or polishing long-form prose while preserving their voice; especially for technical prose where the technical-humanizer skill may also apply.
 ---
 
 # Coauthoring
@@ -29,7 +29,7 @@ Protect the author's ownership of the piece. Do not change the thesis, claims, a
    Apply the user's requested changes directly. Infer style preferences from edits and use them in later sections. Keep revisions surgical unless the user asks for a rewrite or the structure is failing.
 
 6. Run the technical prose pass when appropriate.
-   For technical explanations, apply the standards from `$technical-book-humanizer` if that skill is available or already triggered. Use it to remove AI texture, vague significance, filler, and unsupported certainty. Do not let it erase the user's personal blog voice, experiment-log structure, or useful informality.
+   For technical explanations, apply the standards from `$technical-humanizer` if that skill is available or already triggered. Use it to remove AI texture, vague significance, filler, and unsupported certainty. Do not let it erase the user's personal blog voice, experiment-log structure, or useful informality.
 
 7. Reader-test substantial pieces.
    For a long article, proposal, chapter, or book section, test whether a fresh reader can recover the intended argument. If subagents are available and the task merits it, use a fresh subagent with only the draft and reader questions. Otherwise simulate the reader questions yourself and report concrete gaps.

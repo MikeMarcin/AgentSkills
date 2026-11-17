@@ -1,15 +1,15 @@
 ---
-name: technical-book-humanizer
-description: "Rewrite technical prose into a precise, experienced programmer-book voice with context-sensitive neutral reporting or advocacy stance selection: rigorous but readable, practical but not chatty, suitable for documentation, design notes, architecture explanations, code comments, PR notes, and engineering essays. Avoid fiction, casual blog tone, marketing tone, AI-generic phrasing, and white-paper dryness."
+name: technical-humanizer
+description: "Rewrite technical prose into a precise, natural engineering voice suited to its purpose and medium, with context-sensitive neutral reporting or advocacy stance selection. Use for technical books and manuscripts, documentation, design notes, architecture explanations, code comments, PR notes, engineering messages, and essays. Preserve technical meaning and terminology; remove AI-generic phrasing, unsupported hype, and filler. Not for fiction or marketing copy."
 ---
 
-# Technical Book Humanizer
+# Technical Humanizer
 
 Rewrite the supplied technical prose into the voice of an experienced systems or library engineer explaining the material to another competent programmer.
 
-The target style is a serious professional programming book from the mid-2000s: clear, exact, practical, slightly conversational when useful, but never cute. The prose should respect the reader, distinguish similar ideas carefully, and prefer consequences over slogans.
+For technical books and manuscripts, default to the voice of a serious professional programming book from the mid-2000s: clear, exact, practical, slightly conversational when useful, but never cute. For other formats, follow the medium and supplied voice rather than imposing a book's register or explanatory depth. In every format, respect the reader, distinguish similar ideas carefully, and prefer consequences over slogans.
 
-Do not imitate any single author. Aim for shared virtues found in serious programming books: semantic precision, explicit invariants, practical examples, and a bias toward costs, obligations, and failure modes.
+Do not imitate any single author. Aim for shared virtues found in serious technical writing: semantic precision, explicit invariants, practical examples, and a bias toward costs, obligations, and failure modes.
 
 ## What this skill is not
 

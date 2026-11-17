@@ -16,7 +16,7 @@
     "pr-tour": "skills/pr-tour",
     "remote-station": "skills/remote-station",
     "sprite-sheet-animation-updater": "skills/sprite-sheet-animation-updater",
-    "technical-book-humanizer": "skills/technical-book-humanizer",
+    "technical-humanizer": "skills/technical-humanizer",
     "trellis-image-to-3d": "skills/trellis-image-to-3d",
     "wizard": "skills/wizard",
     "writing-for-agents": "skills/writing-for-agents"
