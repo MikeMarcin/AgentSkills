@@ -1,3 +1,24 @@
+# Codex 6.2 owner-directed promotion, 2026-11-18
+
+Michael approved updating the Codex role allocation to Sol 6.2 and Astra 6.2,
+preserving existing effort levels and the coordinator-implementer topology.
+Sol 6.2 is the coordinator at low, implementer at xhigh, integrator and standard
+worker at high, scout at medium, deep worker at max, and ordinary reviewer at
+xhigh. Astra 6.2 is the critical reviewer at xhigh and the explicit direct-max,
+native-ultra and planner-max strategy model. Mechanical utility/test-runner roles
+remain Luna xhigh; Claude routes and the Fable quota fallback are unchanged.
+
+The decision is an owner-directed version promotion, not a measured comparison.
+It preserves the prior division between routine engineering, named difficult
+engineering, and critical counterexample search. No new benchmark figures,
+representative RFC trials, reviewer recall, token cost, latency or serving results
+are asserted. Configuration validation and adapter fixtures only establish that
+the requested routes are rendered consistently. Native max/ultra availability and
+actual serving remain host-dependent; the companion still maps max to xhigh.
+No fleet rollout or changes to already active assignments are implied.
+
+The historical evidence below records earlier decisions, not current model IDs.
+
 # Supporting role selection, 2026-10-03
 
 The owner authorized refreshing the supporting roles from recent public sentiment,

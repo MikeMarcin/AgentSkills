@@ -9,13 +9,13 @@ The coordinator's current route is never an implicit engineering override.
 | Role | Class | Codex | Claude |
 |---|---|---|---|
 | `rfc-utility`, `rfc-test-runner` | mechanical | GPT-6 Luna xhigh | Sonnet 5.5 low |
-| `rfc-scout` | balanced | Sol 6.1 medium | Sonnet 5.5 medium |
-| `rfc-worker` | standard | Sol 6.1 high | Opus 5.5 medium |
-| `rfc-implementer` | implementation | Sol 6.1 xhigh | Opus 5.5 medium |
-| `rfc-integrator` | integration | Sol 6.1 high | Opus 5.5 high |
-| `rfc-worker-deep` | deep | Sol 6.1 max | Fable 5.2 high |
-| `rfc-reviewer` | review | Sol 6.1 xhigh | Opus 5.5 xhigh |
-| `rfc-reviewer-critical` | critical | Astra xhigh | Fable 5.2 xhigh |
+| `rfc-scout` | balanced | Sol 6.2 medium | Sonnet 5.5 medium |
+| `rfc-worker` | standard | Sol 6.2 high | Opus 5.5 medium |
+| `rfc-implementer` | implementation | Sol 6.2 xhigh | Opus 5.5 medium |
+| `rfc-integrator` | integration | Sol 6.2 high | Opus 5.5 high |
+| `rfc-worker-deep` | deep | Sol 6.2 max | Fable 5.2 high |
+| `rfc-reviewer` | review | Sol 6.2 xhigh | Opus 5.5 xhigh |
+| `rfc-reviewer-critical` | critical | Astra 6.2 xhigh | Fable 5.2 xhigh |
 
 Standard is broad engineering; deep addresses named unresolved difficulty.
 Review is independently configurable from deep implementation. Critical review
@@ -53,6 +53,22 @@ fallback for max is documented in [codex-lanes.md](codex-lanes.md). No automatic
 client upgrade, other effort clamp, reset or credit purchase is authorized.
 The bounded Fable quota fallback below is the approved model substitution.
 Preserve processing speed.
+
+## Codex 6.2 promotion, 2026-11-18
+
+The owner approved Sol 6.2 for the coordinator (low), implementer (xhigh),
+integrator (high), scout (medium), worker (high), deep worker (max), and ordinary
+reviewer (xhigh). Astra 6.2 replaces Astra in critical review (xhigh) and in the
+explicit direct-max, native-ultra and planner-max strategy presets. Luna mechanical
+routes and all Claude routes are unchanged. This is a model-version promotion,
+not a change to role authority, topology, effort or active assignments.
+
+This owner-directed allocation preserves Sol for routine and deep engineering and
+Astra for named critical review or explicit Astra strategies. No local quality,
+latency, cost, reviewer-recall or native-serving trial is claimed. Deterministic
+configuration tests do not establish model quality or host availability. The
+Codex companion's existing max-to-xhigh fallback is unchanged; verify the effective
+request at the actual host before dispatch. Source updates do not deploy the fleet.
 
 ## Fable quota fallback
 

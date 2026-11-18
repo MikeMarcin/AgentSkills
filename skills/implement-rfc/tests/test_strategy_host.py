@@ -11,14 +11,22 @@ import strategy_host as host
 
 
 class HostTests(unittest.TestCase):
+    def test_astra_presets_use_62_with_preserved_efforts(self):
+        for preset, effort in [('direct-astra-max', 'max'),
+                               ('native-astra-ultra', 'ultra'),
+                               ('planner-cheaper-worker-strict', 'max')]:
+            with self.subTest(preset=preset):
+                self.assertEqual(strategy.resolve(preset)['routing']['primary'],
+                                 {'provider': 'codex', 'model': 'gpt-6.2-astra', 'effort': effort})
+
     def test_default_coordinator_and_leaf_implementer_controls(self):
         selected = strategy.resolve()
         parent = tomllib.loads(host.render(selected))
         child = tomllib.loads(host.render_implementer(selected))
-        self.assertEqual((parent['model'], parent['model_reasoning_effort']), ('gpt-5.6-sol', 'low'))
+        self.assertEqual((parent['model'], parent['model_reasoning_effort']), ('gpt-6.2-sol', 'low'))
         self.assertEqual(parent['agents'], dict(enabled=True, max_concurrent_threads_per_session=1,
-                                              default_subagent_model='gpt-6.1-sol', default_subagent_reasoning_effort='xhigh'))
-        self.assertEqual((child['model'], child['model_reasoning_effort']), ('gpt-6.1-sol', 'xhigh'))
+                                              default_subagent_model='gpt-6.2-sol', default_subagent_reasoning_effort='xhigh'))
+        self.assertEqual((child['model'], child['model_reasoning_effort']), ('gpt-6.2-sol', 'xhigh'))
         self.assertEqual(child['agents'], {'enabled': False})
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / 'coordinator.toml'

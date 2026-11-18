@@ -85,15 +85,15 @@ class RenderRuntimeAdaptersTests(MaskPathsFixture, unittest.TestCase):
         # Approved role assignments are an independent expectation, not derived
         # from the routing file whose accidental edits this test should catch.
         expected = {
-            "rfc-integrator": ("gpt-6.1-sol", "high", "claude-opus-5-5", "high", "workspace-write", True),
+            "rfc-integrator": ("gpt-6.2-sol", "high", "claude-opus-5-5", "high", "workspace-write", True),
             "rfc-utility": ("gpt-6-luna", "xhigh", "claude-sonnet-5-5", "low", "read-only", False),
             "rfc-test-runner": ("gpt-6-luna", "xhigh", "claude-sonnet-5-5", "low", "build-write", False),
-            "rfc-scout": ("gpt-6.1-sol", "medium", "claude-sonnet-5-5", "medium", "read-only", False),
-            "rfc-worker": ("gpt-6.1-sol", "high", "claude-opus-5-5", "medium", "workspace-write", False),
-            "rfc-implementer": ("gpt-6.1-sol", "xhigh", "claude-opus-5-5", "medium", "workspace-write", False),
-            "rfc-worker-deep": ("gpt-6.1-sol", "max", "claude-fable-5-2", "high", "workspace-write", False),
-            "rfc-reviewer": ("gpt-6.1-sol", "xhigh", "claude-opus-5-5", "xhigh", "read-only", False),
-            "rfc-reviewer-critical": ("gpt-6-astra", "xhigh", "claude-fable-5-2", "xhigh", "read-only", False),
+            "rfc-scout": ("gpt-6.2-sol", "medium", "claude-sonnet-5-5", "medium", "read-only", False),
+            "rfc-worker": ("gpt-6.2-sol", "high", "claude-opus-5-5", "medium", "workspace-write", False),
+            "rfc-implementer": ("gpt-6.2-sol", "xhigh", "claude-opus-5-5", "medium", "workspace-write", False),
+            "rfc-worker-deep": ("gpt-6.2-sol", "max", "claude-fable-5-2", "high", "workspace-write", False),
+            "rfc-reviewer": ("gpt-6.2-sol", "xhigh", "claude-opus-5-5", "xhigh", "read-only", False),
+            "rfc-reviewer-critical": ("gpt-6.2-astra", "xhigh", "claude-fable-5-2", "xhigh", "read-only", False),
         }
         self.assertEqual(set(ROUTING["assignments"]), set(expected))
         with tempfile.TemporaryDirectory() as temp:
@@ -452,7 +452,7 @@ class ProfileTests(MaskPathsFixture, unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(config.read_text(), 'model = "user-choice"\n')
             data = tomllib.loads((root / '.codex/agents/rfc-worker.toml').read_text())
-            self.assertEqual(data['model'], 'gpt-6.1-sol')
+            self.assertEqual(data['model'], 'gpt-6.2-sol')
             self.assertEqual(data['model_reasoning_effort'], 'high')
             profiles = json.loads((SKILL_DIR / 'config/routing-profiles.json').read_text())
             self.assertEqual(set(profiles['profiles']), {'baseline', 'fable-quota-fallback'})
