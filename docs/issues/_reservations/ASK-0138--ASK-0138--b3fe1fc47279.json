@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0138"
+  ],
+  "reserve_for": "attended-review-sqlite-20261119",
+  "purpose": "",
+  "created": "2026-11-19T15:50:05.855417+00:00",
+  "base": "9e11ff876c623711a0c5929564466ad159c8e352"
+}
