@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0138"
 title: "Isolate active attended-review state and deploy the SQLite publisher"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: ["ASK-0129"]
 metadata: {"baseline":"9e11ff876c623711a0c5929564466ad159c8e352","requested_on":"2026-11-19"}
