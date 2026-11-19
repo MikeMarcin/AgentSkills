@@ -15,8 +15,11 @@ function page(seed=snapshot,settings={}){
  const nodes=new Map(),requests=[],backend=structuredClone(seed);let document;
  class Element{
   constructor(tag,id){this.tag=tag;this.id=id;this.children=[];this.classList={toggle(){}};this.style={};this.dataset={};this.attrs={};this.value='';this.textContent='';this.paused=true;this.currentTime=0;this.hidden=false;this.checked=false;}
-  append(...items){this.children.push(...items);}
-  replaceChildren(...items){this.children=[...items];}
+  append(...items){for(const item of items){if(item instanceof Element){item.remove();item.parentElement=this;}this.children.push(item);}}
+  replaceChildren(...items){for(const item of this.children)if(item instanceof Element)item.parentElement=null;this.children=[];this.append(...items);}
+  remove(){if(this.parentElement){const siblings=this.parentElement.children;siblings.splice(siblings.indexOf(this),1);this.parentElement=null;}}
+  get nextElementSibling(){if(!this.parentElement)return null;const siblings=this.parentElement.children;return siblings.slice(siblings.indexOf(this)+1).find(item=>item instanceof Element)||null;}
+  insertBefore(item,next){if(next===null){this.append(item);return;}item.remove();item.parentElement=this;this.children.splice(this.children.indexOf(next),0,item);}
   setAttribute(k,v){this.attrs[k]=v;}
   removeAttribute(k){delete this.attrs[k];}
   focus(options){document.activeElement=this;this.focusOptions=options;}
@@ -249,6 +252,43 @@ async function parts(snapshotPath){
  await reordered.get('next').click();assert.equal(reordered.run('current'),'clip-B');
  const reload=page(JSON.parse(reordered.run('JSON.stringify(state)')),{live:true});await reload.ready;
  await reload.run("select('clip-A')");await reload.get('next').click();assert.equal(reload.run('current'),'clip-B');
+ // An unrelated delta moves only its existing rail row and keeps the selected
+ // card, editor focus and dirty note while preserving the old fingerprint.
+ storage.clear();const stable=page(snapshot);
+ await stable.run("select('A')");
+ const rail=stable.get('list'),rows=rail.querySelectorAll('button');
+ const selected=rail.querySelector('[aria-current="true"]'),editor=stable.get('note');
+ const audioNode=stable.get('media').querySelector('audio');
+ editor.focus();editor.value='Keep this dirty note across a delta';stable.run('edit()');
+ stable.run(`{
+  const previous=state.candidates.find(card=>card.id==='B');
+  const changed={...previous,decision:{outcome:'accept'}};
+  receive({...state,sequence:state.sequence+1,candidates:state.candidates.map(card=>card===previous?changed:card)},
+          [changed],new Map([['B',previous]]));
+  draw();
+ }`);
+ assert.ok(rail.querySelectorAll('button').every(row=>rows.includes(row)));
+ assert.equal(rail.querySelector('[aria-current="true"]'),selected);
+ assert.equal(stable.context.document.activeElement,editor);
+ assert.equal(editor.value,'Keep this dirty note across a delta');
+ assert.equal(stable.get('media').querySelector('audio'),audioNode);
+ assert.equal(stable.run('current'),'A');
+ stable.run(`{
+  const previous=candidate(),changed={...previous,fingerprint:'fp-replacement'};
+  receive({...state,sequence:state.sequence+1,candidates:state.candidates.map(card=>card===previous?changed:card)},
+          [changed],new Map([['A',previous]]));
+  draw();
+ }`);
+ assert.equal(stable.run('candidate().fingerprint'),'fp-A');
+ assert.match(stable.get('answer-notice').textContent,/older draft is retained/);
+ assert.equal(editor.value,'Keep this dirty note across a delta');
+ // Moving the focused rail row to Answered keeps that exact node and focus.
+ storage.clear();const focused=page(snapshot);
+ const focusRow=focused.get('list').querySelector('[aria-current="true"]');
+ focusRow.focus();await focused.get('reject').click();
+ assert.equal(focused.get('list').querySelector('[aria-current="true"]'),focusRow);
+ assert.equal(focused.context.document.activeElement,focusRow);
+ assert.equal(focusRow.parentElement.children[0].textContent,'Answered (1)');
  // Both handback buttons run one handler. A failed draft on a previous question
  // blocks handback; retry saves it before the public handback request.
  for(const entry of ['finish','finish-answer']){
