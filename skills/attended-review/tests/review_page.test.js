@@ -58,7 +58,7 @@ function page(seed=snapshot,settings={}){
  // With a live host the note's save debounce runs on real timers.
  const timers=settings.host?{setTimeout,clearTimeout}:{setTimeout:()=>1,clearTimeout(){}};
  const context={console,document,fetch,polls:[],location:{hash:settings.host?`#token=${settings.host.token}`:'',protocol:settings.live?(settings.protocol||'http:'):'file:',pathname:'/fixture.html'},history:{replaceState(){}},localStorage:settings.storageThrows?{getItem(){throw Error('storage denied');},setItem(){throw Error('storage denied');},removeItem(){throw Error('storage denied');}}:{getItem:k=>storage.get(k),setItem(k,v){if(rejectStorage)throw Error('storage full');storage.set(k,v);},removeItem:k=>storage.delete(k)},matchMedia:()=>({matches:settings.wide!==false,addEventListener(){}}),...timers,setInterval(callback){context.polls.push(callback);},URL,URLSearchParams,Blob,window:{addEventListener(){}},navigator:{},crypto:{randomUUID:()=>`id-${Math.random()}`},getSelection:()=>({removeAllRanges(){},addRange(){}})};
- vm.createContext(context);vm.runInContext(script.replace('/*SESSION_DATA*/null',settings.live?'null':JSON.stringify(seed)).replace('\nboot();','\nglobalThis.ready=boot();'),context);
+ vm.createContext(context);vm.runInContext(script.replace('/*INDEXED*/false',settings.indexed?'true':'false').replace('/*SESSION_DATA*/null',settings.live?'null':JSON.stringify(seed)).replace('\nboot();','\nglobalThis.ready=boot();'),context);
  const run=code=>vm.runInContext(code,context);
  return {run,get,context,requests,settings,backend,ready:context.ready};
 }
@@ -90,9 +90,18 @@ function linked(host,requests){
 async function liveAnswers(origin,token,prefix,authority,browserOrigin){
  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  const link=3000000,ids=[1,2,3].map(n=>`${prefix}-${n}`);
- storage.clear();const p=page(null,{live:true,protocol:authority?'https:':'http:',host:{origin,token,authority,browserOrigin,link}});await p.ready;
- const full=p.requests.find(r=>r.url==='/api/status');assert.ok(full&&full.status===200,'the page loaded its session');
- const fullDelay=full.bytes/link*1000;assert.ok(full.bytes>4000000,`fixture is megabytes long (${full.bytes})`);
+ storage.clear();const p=page(null,{live:true,indexed:true,protocol:authority?'https:':'http:',host:{origin,token,authority,browserOrigin,link}});await p.ready;
+ const lean=p.requests.find(r=>r.url==='/api/status?material=omit');
+ assert.ok(lean&&lean.status===200&&lean.bytes<20000,'the page loaded a small review index');
+ const loaded=async()=>{
+  for(let i=0;i<80&&p.run('candidate().media_lazy');i++)await wait(25);
+  assert.equal(p.run('candidate().media_lazy'),undefined,'selected media finished loading');
+ };
+ await loaded();
+ const selected=p.requests.filter(r=>r.url.startsWith('/api/card-material?'));
+ assert.equal(selected.length,1,'the page loaded only the selected card');
+ assert.ok(selected[0].bytes>500000,'selected fixture is large');
+ const fullDelay=6*selected[0].bytes/link*1000;
  const told=()=>`${p.get('answer-notice').textContent} ${p.get('navigation-status').textContent}`;
  const usable=()=>{for(const id of ['accept','reject'])assert.equal(p.get(id).disabled,false,`${id} is usable: ${told()}`);
   assert.equal(p.get('next').disabled,!p.run('nextQuestion()'),`next is usable while a question is left: ${told()}`);};
@@ -103,12 +112,13 @@ async function liveAnswers(origin,token,prefix,authority,browserOrigin){
  const act=async(id,expect)=>{
   const from=p.requests.length,started=Date.now();await p.get(id).click();const elapsed=Date.now()-started;
   const moved=p.requests.slice(from).reduce((n,r)=>n+r.bytes,0);
-  assert.ok(moved<full.bytes/4,`${id} read ${moved} bytes; the session is ${full.bytes}`);
-  assert.ok(elapsed<fullDelay,`${id} took ${elapsed}ms; one full read takes ${Math.round(fullDelay)}ms`);
+  assert.ok(moved<20000,`${id} read ${moved} bytes before loading newly selected media`);
+  assert.ok(elapsed<fullDelay,`${id} took ${elapsed}ms; reading all media takes ${Math.round(fullDelay)}ms`);
+  await loaded();
   if(expect)assert.equal(p.run('candidate().decision?.outcome'),expect,told());
   usable();
  };
- await p.run(`select(${JSON.stringify(ids[0])})`);usable();
+ await p.run(`select(${JSON.stringify(ids[0])})`);await loaded();usable();
  await act('accept','accept');assert.equal(p.get('accept').attrs['aria-pressed'],'true');assert.match(p.get('answer-notice').textContent,/Answer saved/);
  await act('next');assert.equal(p.run('current'),ids[1]);
  await act('reject','reject');assert.equal(p.get('reject').attrs['aria-pressed'],'true');
@@ -118,7 +128,7 @@ async function liveAnswers(origin,token,prefix,authority,browserOrigin){
  assert.equal(p.get('media').querySelectorAll('img').length,1);assert.ok(p.run('candidate().media[0].url.length')>500000);
  await p.run(`select(${JSON.stringify(ids[0])})`);assert.equal(p.run('candidate().media.length'),1);
  // A later poll sees the answers and still leaves the images where they are.
- const after=p.requests.length;await p.context.polls[0]();assert.ok(p.requests.slice(after).every(r=>r.bytes<full.bytes/4));
+ const after=p.requests.length;await p.context.polls[0]();assert.ok(p.requests.slice(after).every(r=>r.bytes<20000));
  assert.equal(p.run(`state.candidates.filter(c=>${JSON.stringify(ids)}.includes(c.id)).map(c=>c.decision?.outcome).join()`),'accept,reject,reject');
  await wait(0);
  console.log(`PASS: Accept, Reject and Next answer promptly ${authority?'through the tailnet review listener':'on loopback'}; polls are short and never overlap`);
@@ -129,7 +139,7 @@ async function liveNotes(origin,token){
  const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  const debounce=()=>wait(800);
  const type=(p,text)=>{p.get('note').value=text;p.get('note').oninput();};
- const open=async id=>{storage.clear();const p=page(null,{live:true,host:{origin,token}});await p.ready;await p.run(`select(${JSON.stringify(id)})`);return p;};
+ const open=async id=>{storage.clear();const p=page(null,{live:true,indexed:true,host:{origin,token}});await p.ready;await p.run(`select(${JSON.stringify(id)})`);return p;};
  const answer=p=>p.run('JSON.stringify(candidate().decision)');
  const told=p=>`${p.get('feedback-status').textContent} ${p.get('answer-notice').textContent}`;
  const settled=(p,outcome,note)=>{

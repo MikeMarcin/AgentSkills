@@ -166,6 +166,7 @@ class ReviewTests(unittest.TestCase):
             self.assertEqual(self.intake(self.feedback_packet(old), success=False).returncode, 1)
             self.assertIsNone(self.cli("status")["candidates"][0]["feedback"])
             changed = replacement
+        self.cli("hand-back")
         self.assertTrue(review_module.Session(self.root, self.registry).load()["history"])
 
     def test_v2_http_feedback_diagnostics_and_handback_only_wait(self):
@@ -274,7 +275,7 @@ class ReviewTests(unittest.TestCase):
         _, host = self.host()
         self.intake(self.decision(state))
         self.intake(self.decision(state, outcome="reject", decision_id="verdict-A-revised"))
-        with self.request(host, "/api/status") as response:
+        with self.request(host, "/api/status?material=include") as response:
             full = json.load(response)
         held = {c["id"]: c for c in full["candidates"]}
         self.assertEqual(held["A"]["media"][0]["url"], image)
@@ -294,7 +295,9 @@ class ReviewTests(unittest.TestCase):
             self.assertEqual(caught.exception.code, 400, query); caught.exception.close()
 
     def test_v2_formats_refuse_silent_loss_and_keep_bounds(self):
-        self.init(self.candidate()); state = self.cli("prepare")
+        legacy = review_module.Session(self.root, self.registry)
+        legacy.initialize({"schema_version": 1, "candidates": [self.candidate()]})
+        state = self.cli("prepare")
         packet = self.feedback_packet(state);packet["schema_version"] = 1
         self.assertEqual(self.intake(packet, success=False).returncode, 1)
         for invalid in (self.audio(options=["A", "B"]), self.candidate(question_type="audio")):
@@ -320,6 +323,9 @@ class ReviewTests(unittest.TestCase):
         self.cli("--state", str(state), "prepare")
         conflicts = self.cli("--state", str(state), "conflicts", "--paths", "product.txt")
         self.assertIn("protected paths", json.dumps(conflicts))
+        self.assertTrue((state / "session.sqlite3").exists())
+        self.assertFalse((state / "session.json").exists())
+        self.cli("--state", str(state), "hand-back")
         self.assertTrue((state / "session.json").exists())
         self.assertEqual(sorted(p.name for p in self.root.iterdir()), ["product.txt"])
         other = self.base / "other"; other.mkdir()
@@ -720,7 +726,7 @@ class ReviewTests(unittest.TestCase):
             if mode == "consent":
                 self.assertIn("https://login.tailscale.com/f/serve?node=disposable", failed.stderr)
             self.assertEqual(json.loads((fake / "config.json").read_text()), original)
-            self.assertIsNone(json.loads((self.root / ".mask/attended-review/session.json").read_text()).get("host"))
+            self.assertIsNone(self.cli("status").get("host"))
 
     def test_tailscale_concurrent_port_claim_refuses_and_preserves_other_owner(self):
         fake, executable, env = self.fake_tailscale(mode="race")
@@ -805,7 +811,7 @@ class ReviewTests(unittest.TestCase):
         process.wait(timeout=4)
         self.assertEqual(process.returncode, 1)
         self.assertIn("Tailscale Serve stopped", process.stderr.read())
-        self.assertIsNone(json.loads((self.root / ".mask/attended-review/session.json").read_text()).get("host"))
+        self.assertIsNone(self.cli("status").get("host"))
         self.assertEqual(json.loads((fake / "config.json").read_text()), {})
 
     def test_selective_release_preserves_static_and_completed_verdict(self):
@@ -906,8 +912,9 @@ class ReviewTests(unittest.TestCase):
             process.stdout.close(); process.stderr.close()
 
     def test_start_after_acquisition_before_publication_releases_candidate(self):
-        self.init(self.candidate("A", resources=["install"]), self.candidate("B"))
         session = review_module.Session(self.root, self.registry)
+        session.initialize({"schema_version": 1, "candidates": [
+            self.candidate("A", resources=["install"]), self.candidate("B")]})
         original = session.transaction
         interrupted = False
 
@@ -954,9 +961,9 @@ class ReviewTests(unittest.TestCase):
             process.stdout.close(); process.stderr.close()
 
     def test_release_write_failure_never_exposes_resource_before_invalidation(self):
-        self.init(self.candidate(resources=["shared-install"]))
-        prepared = self.cli("prepare")
         session = review_module.Session(self.root, self.registry)
+        session.initialize({"schema_version": 1, "candidates": [self.candidate(resources=["shared-install"])]})
+        prepared = self.cli("prepare")
         real_write = review_module.atomic_json
         other = self.base / "other"; other.mkdir()
         self.init(self.candidate("B", resources=["shared-install"]), root=other)

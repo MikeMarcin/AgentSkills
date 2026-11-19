@@ -247,14 +247,14 @@ class HubPublicationTests(unittest.TestCase):
         self.cli("ready", "B", "--evidence", "after host")
         time.sleep(.5)
         self.assertEqual(self.hub.bodies(), [])
-        self.assertEqual(self.files(), ["session.json"])
+        self.assertEqual(self.files(), [".export-lock.sqlite3", "session.json", "session.sqlite3"])
         status = self.cli("status")
         self.assertNotIn("hub", status)
         # An environment destination alone, outside serve, enables nothing.
         self.cli("observe", "B", "--evidence", "again", env=self.environment(ATTENDED_REVIEW_HUB=HUB))
         time.sleep(.3)
         self.assertEqual(self.hub.bodies(), [])
-        self.assertEqual(self.files(), ["session.json"])
+        self.assertEqual(self.files(), [".export-lock.sqlite3", "session.json", "session.sqlite3"])
 
     # AC02
     def test_exact_wire_contract_at_publication_points_without_private_material(self):
@@ -390,7 +390,7 @@ class HubPublicationTests(unittest.TestCase):
                                         capture_output=True, text=True, timeout=10, env=env)
                 self.assertEqual(result.returncode, 1, (bad, result.stdout))
                 self.assertIn("hub must be a Tailscale Serve HTTPS origin", result.stderr)
-        self.assertEqual(self.files(), ["session.json"])
+        self.assertEqual(self.files(), ["session.sqlite3"])
         self.assertEqual(self.hub.bodies(), [])
         # A certificate the configured name cannot verify gets no request at all.
         process, host = self.serve("--hub", HUB, env=self.environment(hub=self.impostor))
@@ -535,7 +535,7 @@ class HubPublicationTests(unittest.TestCase):
         self.init(self.candidate(), self.candidate("B")); self.cli("prepare")
         process, _ = self.serve("--no-hub")
         self.stop(process)
-        self.assertEqual(self.files(), ["session.json"])
+        self.assertEqual(self.files(), ["session.sqlite3"])
         self.assertFalse(self.machine.exists())
         # hub-config needs no session, validates first and writes an owner-only file atomically.
         refused = self.cli("hub-config", "set", "https://hub.example.com", success=False)
@@ -621,7 +621,7 @@ class HubPublicationTests(unittest.TestCase):
                 time.sleep(.4)
                 self.assertEqual(len(self.hub.requests), count)
                 if fresh:
-                    self.assertEqual(self.files(), ["session.json"])
+                    self.assertEqual(self.files(), ["session.sqlite3"])
                 else:
                     self.assertIsNone(metadata()["hub"])
             self.assertNotIn("leak-secret", json.dumps(self.cli("hub-config", "show")))
@@ -637,7 +637,7 @@ class HubPublicationTests(unittest.TestCase):
         self.assertNotIn("hub", self.cli("status"))
         self.stop(process)
         time.sleep(.3)
-        self.assertEqual((len(self.hub.requests), self.files()), (count, ["session.json"]))
+        self.assertEqual((len(self.hub.requests), self.files()), (count, ["session.sqlite3"]))
         self.root = original
 
     def test_symlinked_skill_in_two_consumers_publishes_independent_sessions(self):

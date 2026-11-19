@@ -324,6 +324,13 @@ function receive(next){
   return;
  }
  for(const v of next.candidates){
+  if(v.media_lazy){
+   const held=state?.candidates.find(o=>key(o)===key(v));
+   if(held&&!held.media_lazy){
+    for(const k of ['media','audio','now','reference'])if(k in held)v[k]=held[k];
+    delete v.media_lazy;
+   }
+  }
   if(!v.material_omitted)continue;
   const held=state?.candidates.find(o=>key(o)===key(v));
   for(const k of v.material_omitted)if(held&&k in held)v[k]=held[k];
@@ -338,6 +345,24 @@ async function api(path,body){const r=await fetch(path,{method:body===undefined?
 // answer controls disabled until it arrived, and polls piled up behind it.
 // A changed candidate brings a full read. A poll names the sequence it holds.
 async function refresh(after){
+ if(indexed&&state){
+  let moved=false;
+  while(true){
+   const after=state.sequence;
+   const delta=await api(`/api/changes?after=${after}&limit=100`);
+   if(state.sequence!==after)continue;
+   if(delta.cursor===after)return moved;
+   const updated=new Map(delta.candidates.map(c=>[c.id,c]));
+   const candidates=state.candidates.map(c=>updated.get(c.id)||c);
+   const seen=new Set(candidates.map(c=>c.id));
+   candidates.push(...delta.candidates.filter(c=>!seen.has(c.id)));
+   receive({...state,candidates,sequence:delta.cursor,paused:delta.paused,handed_back:delta.handed_back});
+   // A replaced candidate with an unsaved draft holds the old view.
+   if(state.sequence===after)return moved;
+   moved=true;
+   if(!delta.has_more)return moved;
+  }
+ }
  const next=await api(`/api/status?material=omit${after===undefined?'':`&after=${after}`}`);
  if(next.unchanged)return false;
  const held=v=>!v.material_omitted||state?.candidates.some(o=>key(o)===key(v));
@@ -436,6 +461,20 @@ function drawRail(){
   for(const c of items){const d=decision(c),b=make('button','row');const stateName=d?d.outcome:c.phase==='ready'?'ready':'waiting';b.dataset.state=stateName;b.setAttribute('aria-current',c.id===current?'true':'false');b.append(make('span','mark',d?(d.outcome==='reject'?'✕':'✓'):c.phase==='ready'?'○':'…'),make('span','name',c.title));b.onclick=()=>select(c.id);list.append(b);}}
 }
 function copyRow(what,value,done){const step=make('div','step'),row=make('div','copyrow'),code=make('code',null,value),copy=make('button',null,'Copy');if(what)step.append(make('p','what',what));copy.onclick=async()=>{try{await navigator.clipboard.writeText(value);say(done);}catch(e){const range=document.createRange();range.selectNodeContents(code);getSelection().removeAllRanges();getSelection().addRange(range);say('Copy the selected text using your keyboard.');}};row.append(code,copy);step.append(row);return step;}
+const indexed=/*INDEXED*/false;
+const loadingMaterial=new Set(), unavailableMaterial=new Set();
+function loadCardMaterial(c){
+ const k=key(c);
+ if(!c.media_lazy||loadingMaterial.has(k)||unavailableMaterial.has(k))return;
+ loadingMaterial.add(k);
+ api(`/api/card-material?id=${encodeURIComponent(c.id)}&fingerprint=${encodeURIComponent(c.fingerprint)}`).then(material=>{
+  const live=state?.candidates.find(v=>key(v)===k);
+  if(live){Object.assign(live,material);delete live.media_lazy;}
+ }).catch(()=>{unavailableMaterial.add(k);}).finally(()=>{
+  loadingMaterial.delete(k);
+  if(state&&candidate()&&key(candidate())===k)draw();
+ });
+}
 function draw(){
  if(!state)return;
  const done=state.candidates.filter(decision).length,ready=state.candidates.filter(c=>c.phase==='ready'&&!decision(c)).length,waiting=state.candidates.length-done-ready,total=state.candidates.length||1;
@@ -459,22 +498,30 @@ function draw(){
  const d=decision(c),next=nextQuestion();el('next').disabled=!next||saving||handingBack||Boolean(state.handed_back);el('next').classList.toggle('primary',Boolean(d&&next&&!state.handed_back));
  el('navigation-status').textContent=state.handed_back?'':next?'':ready?'No other questions are ready. You can leave this question pending and hand back.':waiting?'No more questions are ready. You can hand back while preparation is pending.':'Every question is answered. Finish and hand back when you are done.';
  el('title').textContent=c.title;el('content').textContent=c.content||'';el('content').hidden=!c.content;
+ if(c.media_lazy)loadCardMaterial(c);
  drawParts(c);
  el('criteria').replaceChildren();for(const text of c.criteria){el('criteria').append(make('li',null,text));}
  loadEditor(c);feedbackStatus();
- const nextMediaKey=key(c);
+ const nextMediaKey=key(c)+(c.media_lazy?":pending":"");
  if(mediaKey!==nextMediaKey){stopPlayback();mediaKey=nextMediaKey;el('media').replaceChildren();el('audio-context').replaceChildren();el('playback-error').textContent='';el('loop').checked=false;
  const a=c.question_type==='audio'?c.audio:null;el('audio-controls').hidden=!a;
  if(a){for(const [label,value] of [['Variant',a.variant],['Purpose',a.purpose],['Scope',a.scope],['Playback context',a.context],['Listen for',a.listen_for],['Reject if',a.reject_if]])if(value)el('audio-context').append(make('dt',null,label),make('dd',null,value));}
  for(const m of [...(a?[{kind:'audio',url:a.url,label:a.variant||c.title}]:[]),...(c.media||[])]){const figure=make('figure'),node=document.createElement(m.kind==='image'?'img':m.kind);node.src=m.url;node.alt=m.label||'';if(m.kind!=='image'){node.controls=true;node.preload='metadata';node.onplay=()=>{for(const other of el('media').querySelectorAll('audio,video'))if(other!==node)other.pause();};node.onerror=()=>playbackError(c,`Could not load or decode ${m.label||'this clip'}. Playback has not succeeded.`);}else{node.title='Show at full size';node.onclick=()=>view(m.url,m.label||'');}figure.append(node);if(m.label)figure.append(make('figcaption',null,m.label));el('media').append(figure);}
  const failures=[...(c.playback_errors||[]),...diagnostics.filter(d=>d.candidate===c.id&&d.fingerprint===c.fingerprint)];if(failures.length)el('playback-error').textContent=failures.at(-1).message;
  }
- el('comparison').replaceChildren();if(c.question_type==='audio'&&c.comparison_group){el('comparison').append(make('span','group','Compare clips (each has its own answer):'));for(const sibling of state.candidates.filter(v=>v.question_type==='audio'&&v.comparison_group===c.comparison_group)){const b=make('button',null,sibling.audio.variant||sibling.title);b.disabled=sibling.id===c.id;b.onclick=()=>select(sibling.id);el('comparison').append(b);}}
+ if(c.media_lazy){
+  const media=el('media');media.replaceChildren();
+  if(unavailableMaterial.has(key(c))){
+   const retry=make('button',null,'Could not load review media. Retry');
+   retry.onclick=()=>{unavailableMaterial.delete(key(c));draw();};media.append(retry);
+  }else media.append(make('p',null,'Loading review media…'));
+ }
+ el('comparison').replaceChildren();if(c.question_type==='audio'&&c.comparison_group){el('comparison').append(make('span','group','Compare clips (each has its own answer):'));for(const sibling of state.candidates.filter(v=>v.question_type==='audio'&&v.comparison_group===c.comparison_group)){const b=make('button',null,sibling.audio?.variant||sibling.title);b.disabled=sibling.id===c.id;b.onclick=()=>select(sibling.id);el('comparison').append(b);}}
  const observations=(c.observations||[]).filter(o=>o.evidence);el('checked').hidden=!observations.length;el('observations').replaceChildren();
  for(const o of observations){const li=make('li');if(o.time){const t=document.createElement('time');t.dateTime=o.time;t.textContent=o.time.replace('T',' ').replace(/\.\d+.*$/,'');li.append(t);}li.append(o.evidence);el('observations').append(li);}
  el('wizard').replaceChildren();if(c.wizard){el('wizard').append(make('p',null,c.wizard.instructions||'Follow the companion wizard, then return here for your decision.'));if(c.wizard.url){try{const url=new URL(c.wizard.url);if(['http:','https:','file:'].includes(url.protocol)){const a=document.createElement('a');a.href=url.href;a.textContent='Open manual steps';a.target='_blank';a.rel='noopener noreferrer';el('wizard').append(a);}}catch(e){}}}
  el('options').hidden=!(c.options||[]).length;
- const enabled=c.phase==='ready'&&c.protected&&!saving&&!handingBack&&!state.handed_back;
+ const enabled=!c.media_lazy&&c.phase==='ready'&&c.protected&&!saving&&!handingBack&&!state.handed_back;
  // The decision is the pair of buttons; the one pressed is the recorded answer.
  const [acceptLabel,rejectLabel]=decisionLabels(c,d);
  el('accept').replaceChildren(glyph('✓'),acceptLabel);el('reject').replaceChildren(glyph('✕'),rejectLabel);
@@ -585,7 +632,7 @@ try{applyTheme(localStorage.getItem(themeKey));}catch(e){applyTheme('system');}
 const wide=matchMedia('(min-width:900px)');
 function fold(){el('queue').open=wide.matches;}
 wide.addEventListener('change',fold);fold();
-async function boot(){try{if(online){receive(await api('/api/status'));history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');restore();stamp();draw();if(online)setInterval(poll,1500);}catch(e){say(e.message);}}
+async function boot(){try{if(online){receive(await api(indexed?'/api/status?material=omit':'/api/status'));history.replaceState(null,'',location.pathname+location.hash);}if(!state)throw Error('Open the complete URL printed by serve, or generate an offline HTML file.');restore();stamp();draw();if(online)setInterval(poll,1500);}catch(e){say(e.message);}}
 // One poll at a time: a slow reply is never joined by another.
 async function poll(){
  if(saving||polling)return;polling=true;

@@ -5,7 +5,7 @@
 For personal workflows, pass `--repo-root SOURCE --state RUNTIME/attended-review` on every command. The explicit state directory must be outside the source checkout; symlink resolution applies before this check. Session reuse refuses a different source checkout. Candidate path protection and preparation command working directories remain anchored to SOURCE. Use the same external `--registry` across cooperating drivers.
 
 
-All commands print JSON. Errors print JSON to stderr and return 1. Supply `--repo-root ABSOLUTE_CHECKOUT` before the subcommand. The root is resolved, so both drivers pointing at the same checkout share its `.mask/attended-review/session.json`; separate Git worktrees resolve to distinct roots. The tool does not infer roots from installed skill links.
+All commands print JSON. Errors print JSON to stderr and return 1. Supply `--repo-root ABSOLUTE_CHECKOUT` before the subcommand. Drivers for the same resolved checkout share its `.mask/attended-review/` runtime directory. Separate Git worktrees resolve to distinct roots. The tool does not infer roots from installed skill links.
 
 ## Formats and compatible resume
 
@@ -204,7 +204,7 @@ format error.
 | `start [--keep-preparing]` | Resume review and request cancellation of active prep by default. The current invocation stops, including its remaining queued preparation commands. Previously ready items remain available. |
 | `pause` | Record a pause; preserve candidate protection and partial verdicts. |
 | `hand-back` | The reviewer has finished. Records nothing; marks the session handed back and reports what was decided and what was left, including `feedback_pending` IDs for unanswered questions with saved feedback. `handed_back` clears again when a candidate is added or re-prepared, review starts, or resume-development releases candidates, so it describes only the current queue. |
-| `wait [--after SEQUENCE] [--kind KIND ...] [--timeout SECONDS]` | Block until an event newer than the cursor of a requested kind exists (default `handed-back` and `decision`), print those events on one line and exit 0. A timeout exits 1 with the current sequence. Use `--kind handed-back` for the normal review boundary. Host orchestration follows [Driver waiting](driver-wait.md); process exit alone does not guarantee a model wake. It polls the file's modification time and reads under the ordinary lock only when that moves. |
+| `wait [--after SEQUENCE] [--kind KIND ...] [--timeout SECONDS]` | Block until an event newer than the cursor of a requested kind exists (default `handed-back` and `decision`), print those events on one line and exit 0. A timeout exits 1 with the current sequence. Use `--kind handed-back` for the normal review boundary. Host orchestration follows [Driver waiting](driver-wait.md); process exit alone does not guarantee a model wake. It inspects the active event cursor. Legacy sessions wait on the JSON file's modification time. |
 | `conflicts --paths PATH ... --resources KEY ...` | Return overlapping local path/shared resource protections before modifying them. |
 | `resume-development --paths PATH ... --resources KEY ... [--candidate ID]` | Release only selected affected candidates; unanswered ones become waiting. `--all` explicitly releases the whole checkout session. |
 | `serve [--tailscale] [--tailscale-port PORT] [--tailscale-bin FILE] [--hub ORIGIN \| --no-hub]` | Start a foreground host or attach to this checkout's host. `--hub`/`--no-hub` configure optional [hub publication](#optional-hub-publication). Agents choose `serve --tailscale` by default for every session under the [Tailscale contract](tailscale-serve.md); bare `serve` retains loopback for explicit local choice or deliberate fallback. |
@@ -215,7 +215,7 @@ format error.
 
 Prepare runs outside state locks, so other drivers and the UI can use already ready work immediately. Start/interruption cancels the current preparation invocation and its remaining queue, including interruption between commands. It cancels the current command tree (native Windows `taskkill`, POSIX process group). The cancelling item remains protected until the process exits and cleanup releases it. A command intentionally launching a detached/background installation must supply its own bounded adapter and cleanup; do not use such commands as generic prepare steps. Independent completed candidates remain ready. Ctrl-C retains prior progress.
 
-`status` reports `waiting`, `preparing`, `cancelling` or `ready`, plus explicit decision/protection state. Preparation failures are waiting, not human rejection. New events are `candidate`, `preparing`, `ready`, `preparation-stopped`, `observation`, `decision`, `feedback`, `playback-error`, `handed-back`, `paused`, `review-start` and `resume-development`. Only `decision` is a user verdict; `handed-back` says the reviewer stopped, not that anything was approved. Complete acceptance in the authoritative board via the driver; never infer it from phase, pause or observation. If a host dies, decisions remain in the session file and `serve` replaces its stale host entry. Session hosts do not own protection lifetimes.
+`status` reports `waiting`, `preparing`, `cancelling` or `ready`, plus explicit decision/protection state. Preparation failures are waiting, not human rejection. New events are `candidate`, `preparing`, `ready`, `preparation-stopped`, `observation`, `decision`, `feedback`, `playback-error`, `handed-back`, `paused`, `review-start` and `resume-development`. Only `decision` is a user verdict; `handed-back` says the reviewer stopped, not that anything was approved. Complete acceptance in the authoritative board via the driver; never infer it from phase, pause or observation. If a host dies, decisions remain in active state and `serve` replaces the stale host entry. Session hosts do not own protection lifetimes.
 
 ## Decision intake and offline fallback
 
@@ -296,19 +296,18 @@ editor. Browser storage failures warn that export is required. Offline storage i
 only a convenience until the driver imports the partial version-2 export; offline
 answer withdrawal is exported explicitly even for an answer embedded in the page.
 
-The live page reads the whole session once. Inline images can make it megabytes
-long, and re-reading all of it after every answer, over a slow tailnet link,
-held Accept, Reject and Next disabled until it arrived. So every later read
-(after an answer, a note save, pause, start or handback, and the 1.5-second poll)
-asks `/api/status?material=omit`: each candidate's `media`, `audio`, `now` and `reference`, which its
-fingerprint binds, are left out and named in `material_omitted`, and the page
-keeps the copy it holds for that fingerprint. Earlier answers and notes
-(`decision_history`, `feedback_history`, `superseded`) are left out too. A
-candidate whose fingerprint the page has not seen brings one full read. A poll
-also names the sequence it holds (`after=SEQUENCE`) and is told only that
-nothing changed; one poll runs at a time, and a reply older than the page's
-state is ignored. A reply the page abandons by reloading or closing is dropped
-quietly by the host.
+For SQLite sessions, the live page opens a compact queue from `/api/status`.
+It fetches only the selected card's presentation from `/api/card-material`
+using the candidate ID and fingerprint. After a save or poll, `/api/changes`
+returns the changed cards and current review markers in pages of committed
+revisions. An unchanged cursor has an empty delta. The browser retains material
+for a fingerprint it already loaded and leaves dirty drafts in place. Use
+`/api/status?material=include` for an explicit full snapshot.
+
+An existing JSON session still serves its initial full snapshot and uses
+`/api/status?material=omit` for refreshes. Omitted presentation fields are listed
+in `material_omitted`, and older decision and feedback histories are left out.
+Both runtimes run one poll at a time and ignore stale replies.
 
 Optional `diagnostics` entries hold candidate, fingerprint, `diagnostic_id` and a
 nonempty `message` of at most 2000 characters. They record playback errors only,
@@ -319,7 +318,7 @@ playback activity; no driver/model loop is added.
 The UI has direct Accept/Reject controls (Choose selected/Reject all for
 options); the pressed control is the recorded answer, and pressing it again
 records nothing new. A System/Light/Dark theme control is a browser preference
-kept only in local storage; it is never session state, exported or logged. It has one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. The session file is the durable record; browser localStorage is only a convenience cache until import.
+kept only in local storage; it is never session state, exported or logged. It has one-click partial export/copy/download and no large Markdown packet. Live API errors never display a false saved confirmation. Offline storage failures explicitly prompt export before closing. Active session state is the durable record; browser localStorage is only a convenience cache until import.
 
 ## Optional hub publication
 
@@ -348,7 +347,7 @@ Delivery verifies the certificate for that name, refuses redirects and sends no
 credential; tailnet access rules are the hub's only access boundary.
 
 The setting, the publication revision and the current diagnostic live in
-`hub.json` (and a transient `.hub-lock`) beside `session.json`, outside the event
+`hub.json` (and a transient `.hub-lock`) in the runtime directory, outside the event
 stream. A session that never enabled publication, on a machine without a machine
 default, gains no files, fields, output or network activity.
 
@@ -469,10 +468,32 @@ routes the TCP connection to a loopback fixture while TLS still verifies the
 configured name, and `ATTENDED_REVIEW_HUB_FIXTURE_HEARTBEAT=SECONDS` shortens the
 heartbeat. Never set them for a real hub.
 
+## Session storage and Hand Back
+
+A new session uses `session.sqlite3` in the runtime directory. An existing
+`session.json` without that database still uses the original runtime. This also
+applies with `--state`. Use the current helper against an active SQLite session
+for host control, preparation, resource leases, and driver status.
+
+Each successful SQLite Hand Back publishes the same session schema as readable
+UTF-8 `session.json` in that directory. The file contains the decisions, notes,
+versions, attachments, and events through exactly that Hand Back marker. The
+next Hand Back replaces it atomically. Use the active helper's `status` or
+`wait` for later commits, and use the JSON archive for past review inspection,
+literal text search, or an older reader. Keep older helpers read-only when
+pointed at this archive.
+
+If publication is interrupted, repeat Hand Back to recover its original marker.
+Starting `serve` or `wait` also replays a pending export. The outstanding marker
+becomes visible through status, wait, and hub publication after the file is
+durable. Other card changes can commit during export. A SQLite backup uses
+SQLite's backup API with a separate destination. Copy the JSON archive
+separately if you need the already published revision.
+
 ## Local host and recovery boundaries
 
 The printed URL carries a random token in its fragment. The page sends it as an Authorization header. The server binds `127.0.0.1` only, validates Host and browser Origin, limits intake to 20 MiB, denies arbitrary commands/files, disables remote content and framing with CSP, and never performs Git operations. Keep the URL private; do not publish host tokens. The default private HTTPS review follows the [Tailscale transport contract](tailscale-serve.md), including a separate loopback review listener and local-only controls. Separate worktrees/projects use separate session files and ephemeral ports. A second driver verifies the token before attaching to an existing host. Stopping one session cannot target another host.
 
-Mutations use exclusive directory locks and atomic replace on both Windows and POSIX. Acquisitions are persisted before session readiness, and session invalidation is persisted before resource release. A conservative union of old and new claims bridges these writes, so an interruption leaves protection instead of admitting a conflicting preparation. Commands report a busy lock rather than guessing that a concurrent writer is dead. After an abrupt process kill, verify no controller/prepare command is using the affected lock before removing only its empty `.lock` directory. To clear a conservatively retained claim, use the owning checkout's explicit `resume-development --candidate ID` after restoring access; do not delete the entire registry or force another session through it. These are crash recovery steps, not routine approval checkpoints.
+SQLite sessions use rollback-journal transactions. Legacy JSON sessions use an exclusive directory lock and atomic replace. Both runtimes keep the shared resource registry under its existing directory lock. Acquisitions are persisted before session readiness, and session invalidation is persisted before resource release. A conservative union of old and new claims bridges these writes, so an interruption leaves protection instead of admitting a conflicting preparation. Commands report a busy lock rather than guessing that a concurrent writer is dead. After an abrupt process kill, verify no controller/prepare command is using the affected lock before removing only its empty `.lock` directory. To clear a conservatively retained claim, use the owning checkout's explicit `resume-development --candidate ID` after restoring access; do not delete the entire registry or force another session through it. These are crash recovery steps, not routine approval checkpoints.
 
 If a preparation controller is abruptly killed, its command tree may outlive it. Verify and stop that specific tree using the repository/native process adapter, then use `resume-development --candidate ID --preparation-stopped` to record that recovery attestation and release the stale preparation. This flag is not a normal cancellation shortcut; a live controller normally acknowledges `start`/`resume-development` itself. It does not kill an arbitrary stale PID.

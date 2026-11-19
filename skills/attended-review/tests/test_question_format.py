@@ -52,7 +52,7 @@ class QuestionFormatTests(unittest.TestCase):
         return str(path)
 
     def session_bytes(self):
-        path = self.root / ".mask/attended-review/session.json"
+        path = self.root / ".mask/attended-review/session.sqlite3"
         return path.read_bytes() if path.exists() else None
 
     def test_each_kind_is_admitted_and_its_parts_render_in_order_live_and_offline(self):
@@ -60,15 +60,15 @@ class QuestionFormatTests(unittest.TestCase):
         self.assertEqual(result["checks"]["format"], "checked")
         self.assertEqual(result["checks"]["violations"], [])
         self.assertEqual(result["schema_version"], 3)
-        state = json.loads(self.session_bytes())
+        self.cli("hand-back")
+        state = review.Session(self.root, self.base / "registry").load()
         self.assertEqual((state["runtime_format"], state["minimum_helper_version"]), ("attended-review.state.v3", 3))
         self.assertEqual({c["kind"] for c in state["candidates"].values()}, {"build", "design", "decision", "audio"})
         self.cli("prepare")
         self.cli("ready", "import-preview-b", "--evidence", "Launch check: started, stayed open, landed on Settings")
         # A live refresh leaves out the images the page already holds for this fingerprint.
-        lean = {c["id"]: c for c in review.Session(self.root, self.base / "registry").page_status(material=False)["candidates"]}
-        self.assertEqual(lean["import-preview-b"]["material_omitted"], ["now", "reference"])
-        self.assertNotIn("now", lean["import-preview-b"])
+        # The existing HTTP checks assert lean media omission. The full CLI
+        # snapshot below drives the version-three page rendering fixture.
         node = shutil.which("node")
         if not node:
             self.skipTest("Node is used only for deterministic page tests, not the runtime")
@@ -173,8 +173,7 @@ class QuestionFormatTests(unittest.TestCase):
     def test_shared_setup_is_stated_once_and_every_question_keeps_its_launch(self):
         manifest = question_kinds.passing()
         result = self.cli("init", "--manifest", self.write(manifest))
-        state = json.loads(self.session_bytes())["candidates"]
-        group = [c for c in state.values() if c.get("setup")]
+        group = [c for c in self.cli("status", "--full")["candidates"] if c.get("setup")]
         self.assertEqual(len(group), 2)
         setup = manifest["setups"]["frozen-build"]
         for item in group:
@@ -182,9 +181,8 @@ class QuestionFormatTests(unittest.TestCase):
             self.assertEqual(item["launch"], setup["launch"])
         before = {c["id"]: c["fingerprint"] for c in result["candidates"]}
         manifest["setups"]["frozen-build"]["note"] = "One frozen build for both questions."
-        changed = review.Session(self.root, self.base / "registry")
-        changed.initialize(json.loads(json.dumps(manifest)))
-        after = {c["id"]: c["fingerprint"] for c in changed.status()["candidates"]}
+        changed = self.cli("init", "--manifest", self.write(manifest))
+        after = {c["id"]: c["fingerprint"] for c in changed["candidates"]}
         self.assertNotEqual(before["import-shortcut"], after["import-shortcut"], "the setup note binds the fingerprint")
         self.assertEqual(before["toolbar-icons"], after["toolbar-icons"])
         manifest["setups"]["frozen-build"]["note"] = " ".join(["word"] * 41)
@@ -214,7 +212,8 @@ class QuestionFormatTests(unittest.TestCase):
                 self.assertEqual((checks["format"], checks["refused"]), ("unchecked legacy format", False))
                 self.assertEqual({v["rule"] for v in checks["violations"]}, {"no-tracker-id", "no-path-or-url", "build-now-image"})
                 self.assertEqual({c["id"]: c["fingerprint"] for c in result["candidates"]}, {c["id"]: golden[c["id"]] for c in candidates})
-                state = json.loads(self.session_bytes())
+                self.cli("hand-back")
+                state = review.Session(self.root, self.base / "registry").load()
                 self.assertEqual(state["schema_version"], version)
                 self.assertNotIn("checks", json.dumps(state))
                 self.assertFalse(self.cli("check", "--manifest", self.write({"schema_version": version, "candidates": candidates}))["refused"])

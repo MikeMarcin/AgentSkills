@@ -501,12 +501,15 @@ def question_report(value):
 
 
 class Session:
+    indexed = False
+
     def __init__(self, root, registry=None, state=None):
         self.root = Path(root).resolve()
         if not self.root.is_dir():
             raise ReviewError("checkout root must exist")
         self.directory = Path(state).expanduser().resolve() if state else self.root / ".mask" / "attended-review"
         self.path = self.directory / "session.json"
+        self.active_path = self.path
         self.registry = Path(registry or os.environ.get("ATTENDED_REVIEW_REGISTRY", Path.home() / ".mask" / "attended-review-resources")).resolve()
         if state:
             protected = [self.root]
@@ -540,11 +543,7 @@ class Session:
                 yield state, resources
                 # Publish acquisitions before readiness, and invalidation before
                 # releases. A crash at either boundary leaves conservative claims.
-                previous_resources = json.loads(before_resources)
-                retained = {key: list(entries) for key, entries in previous_resources.items()}
-                for key, entries in resources.items():
-                    union = retained.setdefault(key, [])
-                    union.extend(entry for entry in entries if entry not in union)
+                retained = retain_claims(json.loads(before_resources), resources)
                 if json.dumps(retained, sort_keys=True) != before_resources:
                     atomic_json(self.registry / "resources.json", retained)
                 if state is not None and json.dumps(state, sort_keys=True) != before_state:
@@ -611,56 +610,70 @@ class Session:
         report = question_report(value)
         if report["refused"]:
             raise ManifestRefused(report)
-        # Bootstrap under same locks as all subsequent operations.
-        with lock(self.registry / ".lock"):
-            with lock(self.directory / ".lock"):
-                state = read_json(self.path)
-                if state is not None and state.get("checkout") != str(self.root):
-                    raise ReviewError("session state belongs to another source checkout")
-                if state is None:
-                    state = {"schema_version": 1, "id": secrets.token_hex(16), "checkout": str(self.root), "sequence": 0, "events": [], "candidates": {}, "history": [], "paused": False, "host": None}
-                self.check_version(state)
-                if value["schema_version"] in (VERSION, QUESTION_VERSION):
-                    # An older helper would publish a build question without its launch check.
-                    self.upgrade(state, value["schema_version"])
-                for candidate in value["candidates"]:
-                    cid = candidate["id"]
-                    fingerprint = canonical(candidate)
-                    previous = state["candidates"].get(cid)
-                    if previous and previous["fingerprint"] != fingerprint:
-                        if previous.get("protected"):
-                            raise ReviewError(f"{cid} is protected; resume-development for its affected paths/resources before replacing its candidate")
-                        state["history"].append(previous)
-                        previous = None
-                    if previous:
-                        # Changing protection/preparation definitions must be deliberate too.
-                        if previous.get("protected") and any(previous.get(k) != candidate.get(k) for k in ("resources", "resource_versions", "paths", "prepare")):
-                            raise ReviewError(f"{cid} protection changed; release it before updating")
-                        if "comparison_group" not in candidate:
-                            previous.pop("comparison_group", None)
-                        previous.update(candidate)
-                    else:
-                        state["candidates"][cid] = {**candidate, "fingerprint": fingerprint, "phase": "waiting", "protected": False, "decision": None, "observations": []}
-                        state["handed_back"] = None
-                    self.event(state, "candidate", candidate=cid, fingerprint=fingerprint)
-                atomic_json(self.path, state)
+        with self.initialization() as state:
+            self.apply_manifest(state, value)
         return {**self.status(), "checks": report}
+
+    def seed(self):
+        return {"schema_version": 1, "id": secrets.token_hex(16), "checkout": str(self.root),
+                "sequence": 0, "paused": False, "host": None}
+
+    @contextmanager
+    def initialization(self):
+        with lock(self.registry / ".lock"), lock(self.directory / ".lock"):
+            state = read_json(self.path)
+            if state is not None and state.get("checkout") != str(self.root):
+                raise ReviewError("session state belongs to another source checkout")
+            if state is None:
+                state = {**self.seed(), "candidates": {}, "events": [], "history": []}
+            yield state
+            atomic_json(self.path, state)
+
+    def apply_manifest(self, state, value):
+        self.check_version(state)
+        if value["schema_version"] in (VERSION, QUESTION_VERSION):
+            # An older helper would publish a build question without its launch check.
+            self.upgrade(state, value["schema_version"])
+        for candidate in value["candidates"]:
+            cid = candidate["id"]
+            fingerprint = canonical(candidate)
+            previous = state["candidates"].get(cid)
+            if previous and previous["fingerprint"] != fingerprint:
+                if previous.get("protected"):
+                    raise ReviewError(f"{cid} is protected; resume-development for its affected paths/resources before replacing its candidate")
+                state["history"].append(previous)
+                previous = None
+            if previous:
+                # Changing protection/preparation definitions must be deliberate too.
+                if previous.get("protected") and any(previous.get(k) != candidate.get(k) for k in ("resources", "resource_versions", "paths", "prepare")):
+                    raise ReviewError(f"{cid} protection changed; release it before updating")
+                if "comparison_group" not in candidate:
+                    previous.pop("comparison_group", None)
+                previous.update(candidate)
+            else:
+                state["candidates"][cid] = {**candidate, "fingerprint": fingerprint, "phase": "waiting", "protected": False, "decision": None, "observations": []}
+                state["handed_back"] = None
+            self.event(state, "candidate", candidate=cid, fingerprint=fingerprint)
 
     def status(self, after=None, full=False):
         state = self.load()
-        result = {"schema_version": state["schema_version"], "session": state["id"], "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"], "handed_back": state.get("handed_back"), "candidates": []}
+        cards = []
         for item in state["candidates"].values():
             record = {k: item.get(k) for k in ("id", "title", "revision", "fingerprint", "phase", "protected", "decision", "feedback", "playback_errors")}
-            if item.get("superseded"):
-                record["superseded"] = item["superseded"]
-            if item.get("error"):
-                record["error"] = item["error"]
-            if full:
-                record = dict(item)
-            result["candidates"].append(record)
+            for key in ("superseded", "error"):
+                if item.get(key):
+                    record[key] = item[key]
+            cards.append(dict(item) if full else record)
+        events = [e for e in state["events"] if e["sequence"] > after] if after is not None else None
+        return self.format_status(state, cards, events)
+
+    def format_status(self, state, cards, events=None):
+        result = {"schema_version": state["schema_version"], "session": state["id"],
+                  "checkout": state["checkout"], "sequence": state["sequence"], "paused": state["paused"],
+                  "handed_back": state.get("handed_back"), "candidates": cards}
         result["candidates"].sort(key=lambda c: (c["phase"] != "ready", bool(c["decision"]), c["id"]))
-        if after is not None:
-            result["events"] = [e for e in state["events"] if e["sequence"] > after]
+        if events is not None:
+            result["events"] = events
         if state.get("host"):
             result["host"] = state["host"]
         warning = HubPublisher(self).warning(state["id"])
@@ -712,8 +725,14 @@ class Session:
             raise ReviewError(f"Unknown candidate {cid}")
         return state["candidates"][cid]
 
+    def preparation_state(self, selected):
+        return self.load()
+
+    def preparation_candidate(self, cid):
+        return self.load()["candidates"][cid]
+
     def prepare(self, selected=None, include_slow=False, max_items=None):
-        snapshot = self.load()
+        snapshot = self.preparation_state(selected)
         candidates = [v for v in snapshot["candidates"].values() if not selected or v["id"] in selected]
         candidates.sort(key=lambda v: (bool(v.get("prepare")), v.get("prepare", {}).get("speed", "quick") == "slow", v["id"]))
         processed = 0
@@ -765,7 +784,7 @@ class Session:
                             while process.poll() is None:
                                 if time.monotonic() >= deadline:
                                     raise ReviewError(f"Preparation timed out; see {log}")
-                                current = self.load()["candidates"][cid]
+                                current = self.preparation_candidate(cid)
                                 if current.get("preparation_id") != preparation_id or current["phase"] != "preparing":
                                     raise ReviewError("Preparation interrupted by review-start or resume-development")
                                 time.sleep(0.15)
@@ -798,7 +817,7 @@ class Session:
 
     def observe(self, cid, evidence):
         require_text(evidence, "evidence")
-        with self.transaction() as (state, _):
+        with self.local_edit() as state:
             item = self.item(state, cid)
             item["observations"].append({"time": now(), "evidence": evidence})
             self.event(state, "observation", candidate=cid, evidence=evidence)
@@ -846,6 +865,18 @@ class Session:
                                 "attachments": clean.get("attachments", []), "saved_at": now()}
         self.event(state, "feedback", candidate=item["id"], feedback=saved)
 
+    @contextmanager
+    def local_edit(self):
+        with self.transaction() as (state, _):
+            yield state
+
+    def head(self):
+        return self.load()
+
+    def publication_snapshot(self):
+        state = self.load()
+        return state, hub_counts(state)
+
     def intake(self, payload):
         if len(json.dumps(payload).encode("utf-8")) > MAXIMUM_REQUEST_BYTES:
             raise ReviewError("Intake exceeds the 20 MiB request bound")
@@ -859,7 +890,7 @@ class Session:
         if not isinstance(feedback, list) or not isinstance(diagnostics, list):
             raise ReviewError("feedback and diagnostics must be arrays")
         accepted, saved_feedback, saved_diagnostics = [], [], []
-        with self.transaction() as (state, _):
+        with self.local_edit() as state:
             if state is None or payload.get("session") != state["id"]:
                 raise ReviewError("Intake belongs to a different session")
             if version == 2:
@@ -936,7 +967,7 @@ class Session:
                     self.event(state, "decision", candidate=item["id"], decision=item["decision"], withdrawn=clean["outcome"] == "withdrawn")
                     accepted.append(item["id"])
         return {"accepted": accepted, "feedback_saved": saved_feedback, "diagnostics_saved": saved_diagnostics,
-                "sequence": self.load()["sequence"]}
+                "sequence": state["sequence"]}
 
     def hand_back(self):
         """The reviewer has finished. Nothing is decided here; the driver is told."""
@@ -977,7 +1008,7 @@ class Session:
             time.sleep(interval)
 
     def pause(self, paused=True, interrupt=False):
-        with self.transaction() as (state, _):
+        with self.local_edit() as state:
             if state is None:
                 raise ReviewError("No session")
             state["paused"] = paused
@@ -1040,6 +1071,133 @@ class Session:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(text, encoding="utf-8")
         return {"html": str(destination), "session": snapshot["session"]}
+
+
+class SQLiteSession(Session):
+    """The ordinary driver and HTTP API backed by indexed active state."""
+
+    indexed = True
+
+    def __init__(self, root, registry=None, state=None):
+        from review_store import DATABASE, SQLiteStore
+
+        super().__init__(root, registry, state)
+        self.active_path = self.directory / DATABASE
+        self.store = SQLiteStore(self.active_path, self.root, ReviewError)
+
+    @contextmanager
+    def initialization(self):
+        # Arbitrate first initialization with running legacy helpers.
+        with lock(self.registry / ".lock"), lock(self.directory / ".lock"):
+            if self.path.exists() and not self.active_path.exists():
+                raise ReviewError("Existing JSON session; retry init to use its current runtime")
+            with self.store.edit(seed=self.seed()) as state:
+                yield state
+
+    @contextmanager
+    def local_edit(self):
+        with self.store.edit() as state:
+            self.check_version(state)
+            yield state
+
+    @contextmanager
+    def transaction(self):
+        with lock(self.registry / ".lock"):
+            path = self.registry / "resources.json"
+            original = read_json(path, {})
+            resources = {key: list(entries) for key, entries in original.items()}
+            with self.local_edit() as state:
+                yield state, resources
+                retained = retain_claims(original, resources)
+                if retained != original:
+                    atomic_json(path, retained)
+            if resources != retained:
+                atomic_json(path, resources)
+
+    def head(self):
+        with self.store.connection() as db:
+            return self.store.header(db)
+
+    def preparation_state(self, selected):
+        with self.store.connection() as db:
+            state = self.store.header(db)
+            rows = self.store.working_cards(db, selected)
+            return {**state, "candidates": {card["id"]: card for card in rows}}
+
+    def preparation_candidate(self, cid):
+        return self.preparation_state([cid])["candidates"][cid]
+
+    def status(self, after=None, full=False):
+        state, cards, events = self.store.status(full, after)
+        return self.format_status(state, cards, events if after is not None else None)
+
+    def page_status(self, after=None, material=True):
+        if material:
+            state, cards, _ = self.store.status(full=True, after=after, page=True)
+        else:
+            state, cards = self.store.page(after)
+        if after == state["sequence"]:
+            return {"session": state["id"], "sequence": after, "unchanged": True}
+        result = self.format_status(state, cards)
+        result.pop("host", None)
+        result.pop("hub", None)
+        return result
+
+    def changes(self, after, limit):
+        state, cards, more = self.store.changes(after, limit)
+        return {"cursor": state["sequence"], "has_more": more, "candidates": cards,
+                "paused": state["paused"], "handed_back": state.get("handed_back")}
+
+    def card_material(self, cid, fingerprint):
+        return self.store.selected_material(cid, fingerprint)
+
+    def publication_snapshot(self):
+        return self.store.publication()
+
+    def recover_export(self):
+        sequence = self.store.pending_export()
+        if sequence is not None:
+            self.export(sequence)
+
+    def export(self, sequence):
+        try:
+            return self.store.publish_export(sequence, self.path)
+        except (OSError, ReviewError) as exc:
+            raise ReviewError(f"Hand Back archive is pending. Retry Hand Back to resume: {exc}") from exc
+
+    def hand_back(self):
+        return self.export(self.store.enqueue_export(now()))
+
+    def wait(self, after=None, kinds=("handed-back", "decision"), timeout=None, interval=0.5):
+        self.recover_export()
+        kinds = tuple(kinds) or ("handed-back", "decision")
+        cursor = self.store.wait_snapshot(None, kinds)[0]["sequence"] if after is None else after
+        deadline = None if timeout is None else time.monotonic() + timeout
+        while True:
+            state, events = self.store.wait_snapshot(cursor, kinds)
+            if events:
+                return {"session": state["id"], "sequence": state["sequence"],
+                        "handed_back": state.get("handed_back"), "events": events}
+            if deadline is not None and time.monotonic() >= deadline:
+                raise WaitTimeout(f"No {'/'.join(kinds)} event after sequence {cursor} within {timeout:g}s", state["sequence"])
+            time.sleep(interval)
+
+
+def retain_claims(original, resources):
+    retained = {key: list(entries) for key, entries in original.items()}
+    for key, entries in resources.items():
+        union = retained.setdefault(key, [])
+        union.extend(entry for entry in entries if entry not in union)
+    return retained
+
+
+def open_session(root, registry=None, state=None, *, initialize=False):
+    from review_store import DATABASE
+
+    legacy = Session(root, registry, state)
+    if (legacy.directory / DATABASE).exists() or initialize and not legacy.path.exists():
+        return SQLiteSession(root, registry, state)
+    return legacy
 
 
 HUB_RECORD = "attended-review.hub-record.v1"
@@ -1294,7 +1452,7 @@ class HubPublisher:
                 return
         try:
             with lock(self.lock_path, 1):
-                state = self.session.load()
+                state = self.session.head()
                 meta = self.read()
                 mine = meta if meta and meta.get("session") == state["id"] else None
                 fresh = {"schema": HUB_METADATA, "session": state["id"], "publication_revision": 0, "served": False}
@@ -1346,7 +1504,7 @@ class HubPublisher:
             meta = self.read()
             if not meta or not meta.get("hub"):
                 return None
-            state = self.session.load()
+            state, counts = self.session.publication_snapshot()
             if meta.get("session") != state["id"]:
                 return None
             before = json.dumps(meta, sort_keys=True)
@@ -1357,7 +1515,6 @@ class HubPublisher:
             if meta.get("served"):
                 if not meta.get("repo"):
                     meta["repo"] = repository_label(self.session.root)
-                counts = hub_counts(state)
                 url = url if isinstance(url, str) and url.startswith("https://") and "#token=" in url else None
                 current = {"schema": HUB_RECORD, "session_id": state["id"], "repo": meta["repo"],
                            "machine": socket.gethostname()[:HUB_LABEL_LIMIT], "harness": meta.get("harness", "unknown"),
@@ -1424,7 +1581,7 @@ def publish_after_command(session):
         meta = publisher.read() if publisher.path.exists() else None
         if not meta or not meta.get("hub") or not meta.get("served"):
             return
-        host = session.load().get("host")
+        host = session.head().get("host")
         if host:
             try:
                 if host_request(host, "/api/ping").get("token") == host["token"]:
@@ -1451,7 +1608,7 @@ class HubWorker(threading.Thread):
 
     def stamps(self):
         result = []
-        for path in (self.publisher.session.path, self.publisher.path):
+        for path in (self.publisher.session.active_path, self.publisher.path):
             try:
                 result.append(path.stat().st_mtime_ns)
             except OSError:
@@ -1711,20 +1868,42 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
         def do_GET(self):
             if not self.permitted():
                 return
+            try:
+                self.get_review()
+            except (ReviewError, OSError, ValueError) as exc:
+                self.answer(400, {"error": str(exc)})
+
+        def get_review(self):
+            parsed = urllib.parse.urlsplit(self.path)
+            query = urllib.parse.parse_qs(parsed.query, keep_blank_values=True)
             if self.path == "/":
                 html = (ASSETS / "review.html").read_text(encoding="utf-8")
+                html = html.replace("/*INDEXED*/false", "true") if session.indexed else html
                 self.answer(200, html, "text/html")
             elif self.path == "/api/ping":
                 self.answer(200, {"token": token})
-            elif urllib.parse.urlsplit(self.path).path == "/api/status":
-                query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query, keep_blank_values=True)
-                if set(query) - {"after", "material"} or any(len(v) != 1 for v in query.values()) \
-                        or query.get("material", ["include"])[0] not in ("include", "omit") \
-                        or not re.fullmatch(r"\d{1,18}", query.get("after", ["0"])[0]):
-                    self.answer(400, {"error": "status takes after=SEQUENCE and material=include|omit"})
-                    return
+            elif parsed.path == "/api/status":
+                if (set(query) - {"after", "material"} or any(len(v) != 1 for v in query.values())
+                        or query.get("material", ["include"])[0] not in ("include", "omit")
+                        or not re.fullmatch(r"\d{1,18}", query.get("after", ["0"])[0])):
+                    raise ReviewError("status takes after=SEQUENCE and material=include|omit")
                 after = int(query["after"][0]) if "after" in query else None
-                self.answer(200, session.page_status(after, query.get("material", ["include"])[0] == "include"))
+                default_material = "omit" if session.indexed else "include"
+                self.answer(200, session.page_status(after, query.get("material", [default_material])[0] == "include"))
+            elif session.indexed and parsed.path == "/api/changes":
+                if (set(query) - {"after", "limit"} or any(len(v) != 1 for v in query.values())
+                        or not re.fullmatch(r"\d{1,18}", query.get("after", [""])[0])
+                        or not re.fullmatch(r"[1-9]\d{0,2}", query.get("limit", ["100"])[0])):
+                    raise ReviewError("changes takes after=SEQUENCE and optional limit=1..200")
+                limit = int(query.get("limit", ["100"])[0])
+                if limit > 200:
+                    raise ReviewError("changes limit must be at most 200")
+                self.answer(200, session.changes(int(query["after"][0]), limit))
+            elif session.indexed and parsed.path == "/api/card-material":
+                if (set(query) != {"id", "fingerprint"} or any(len(v) != 1 for v in query.values())
+                        or not re.fullmatch(r"[0-9a-f]{64}", query["fingerprint"][0])):
+                    raise ReviewError("card material requires id and fingerprint")
+                self.answer(200, session.card_material(query["id"][0], query["fingerprint"][0]))
             else:
                 self.answer(404, {"error": "Unknown endpoint"})
 
@@ -1764,7 +1943,7 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
     host["url"] = f"http://127.0.0.1:{host['port']}/#token={token}"
     host["local_url"] = host["url"]
     attached = None
-    with session.transaction() as (state, _):
+    with session.local_edit() as state:
         if state is None:
             server.server_close()
             raise ReviewError("No session")
@@ -1810,7 +1989,7 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
             host["url"] = f"{transport.origin}/#token={token}"
             host["tailscale"] = {"origin": transport.origin, "port": transport.port,
                                  "foreground_session": transport.session_id, "pid": transport.process.pid}
-            with session.transaction() as (state, _):
+            with session.local_edit() as state:
                 state["host"] = host
             public["url"] = host["url"]
             publisher.wake.set()
@@ -1834,7 +2013,7 @@ def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscal
                 transport.close()
         finally:
             try:
-                with session.transaction() as (state, _):
+                with session.local_edit() as state:
                     if state and (state.get("host") or {}).get("token") == token:
                         state["host"] = None
             finally:
@@ -1888,7 +2067,7 @@ def main(argv=None):
             report = question_report(manifest(read_json(Path(args.manifest))))
             print(json.dumps(report))
             return 1 if report["refused"] else 0
-        session = Session(args.repo_root, args.registry, args.state)
+        session = open_session(args.repo_root, args.registry, args.state, initialize=command == "init")
         if command == "init": result = session.initialize(read_json(Path(args.manifest)))
         elif command == "status": result = session.status(args.after, args.full)
         elif command == "prepare": result = session.prepare(args.candidate, args.include_slow, args.max_items)
@@ -1906,10 +2085,12 @@ def main(argv=None):
             hub = ("disable", None) if args.no_hub else None
             if not args.no_hub and (args.hub is not None or os.environ.get("ATTENDED_REVIEW_HUB")):
                 hub = ("set", hub_origin(args.hub if args.hub is not None else os.environ["ATTENDED_REVIEW_HUB"]))
+            if session.indexed:
+                session.recover_export()
             serve(session, args.tailscale, args.tailscale_port, args.tailscale_bin, hub)
             return 0
         elif command == "stop":
-            host = session.load().get("host")
+            host = session.head().get("host")
             result = host_request(host, "/api/stop", {}) if host else {"stopped": False, "reason": "No host"}
         print(json.dumps(result))
         return 0
