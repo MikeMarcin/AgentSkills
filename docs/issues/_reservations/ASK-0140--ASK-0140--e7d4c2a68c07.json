@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0140"
+  ],
+  "reserve_for": "roblox-art-export",
+  "purpose": "",
+  "created": "2026-11-22T23:18:32.074852+00:00",
+  "base": "0373147d69f81ee6e7bd70271ed8e6f05472f41a"
+}
