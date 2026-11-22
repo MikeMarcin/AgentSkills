@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0140"
 title: "Carry a TRELLIS export through Roblox Studio"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
