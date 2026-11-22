@@ -2,9 +2,10 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0139"
 title: "Route visual art approvals through the attended review hub"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
+acceptance: [{"criterion":"AC01","outcome":"pass","revision":"433ad418a19e336987f7109e448fcdb96cd2c1c1","evidence":{"kind":"observation","detail":"Disposable MASK consumer installed agentskills/art-review from the committed Git source. Both skills matched the canonical files under both discovery adapters. Skill validation and documentation checks passed."}},{"criterion":"AC02","outcome":"pass","revision":"433ad418a19e336987f7109e448fcdb96cd2c1c1","evidence":{"kind":"observation","detail":"Five real submitted concepts were matched to all five human outcomes from the configured hub. The original visual manifest validated the resulting verdict. Five source tests passed, including refusal of missing, changed, wrong-session and post-handback decisions and changed source bytes."}}]
 ---
 
 # Route visual art approvals through the attended review hub
