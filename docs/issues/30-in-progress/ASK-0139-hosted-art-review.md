@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0139"
 title: "Route visual art approvals through the attended review hub"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 ---
