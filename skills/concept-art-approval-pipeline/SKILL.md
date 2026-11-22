@@ -1,6 +1,6 @@
 ---
 name: concept-art-approval-pipeline
-description: Concept-art and character-asset production for games, from reference review through generated 3D assets and runtime handoff. Use for imagegen refs, art-bible approval, TRELLIS preparation, humanoid modeling/rigging/export, or game asset integration. Supports batch-bound offline verdicts and project-specific approval cadence.
+description: Concept-art and character-asset production for games, from reference review through generated 3D assets and runtime handoff. Use for imagegen refs, art-bible approval, TRELLIS preparation, humanoid modeling/rigging/export, or game asset integration. Uses attended-review for hosted human visual gates and preserves exact offline verdicts.
 ---
 
 # Concept Art Approval Pipeline
@@ -18,6 +18,8 @@ Treat this as a production pipeline with distinct visual, source, export, and ru
 Keep an explicit pending human decision pending. Acceptance of appearance alone does not establish export or runtime readiness.
 
 ## Related Skills
+
+- Human visual review requires the `attended-review` companion. Resolve it by name in the current host. Its hosted session, hub registration, partial decisions and handback are the default for one candidate or a batch.
 
 - Use `imagegen` when generating or editing bitmap concept refs, chroma-key sources, clean reference plates, context mockups, or transparent-background cutouts.
 - Use `trellis-image-to-3d` when preparing or running TRELLIS image-to-3D generation. Read that skill before writing final TRELLIS commands or running generation.
@@ -57,25 +59,18 @@ For each asset:
    - a scene/context mockup showing where it is used
    - acceptance criteria and known concerns
 6. Inspect, critique, revise, and re-render obvious defects before presenting the board.
-7. Show the review board and follow the user's approval cadence. When a decision is required, stop; when autonomous progression is authorized, continue while retaining reviewable checkpoints.
+7. Route each required human decision through the hosted visual review below. When the user delegates visual review, retain the evidence and continue within that authorization.
 8. If the user requests changes, revise the directed piece and show a new board. Promote the accepted direction into configured art-bible and handoff paths.
 
 Use context mockups from the project’s actual concept scenes whenever possible. A generic schematic is acceptable only as a secondary diagram.
 
-## Offline Batch Review
+## Hosted visual review
 
-Use the bundled offline review package for multi-candidate or multi-piece waves, or whenever the user needs persistent and exportable decisions. A single immediate candidate may still use an in-chat review board.
+Build the exact art batch with the [package builder](references/offline-review.md#build-and-review). Use one stable candidate ID per decision. Read [the attended art handoff](references/attended-review.md) and use `attended-review` to present each candidate’s isolation and context media in the consumer’s hosted queue. Serve it privately, verify publication on the configured review hub, and share the private link. Wait for the owner’s saved decisions while unrelated work can proceed.
 
-Read [references/offline-review.md](references/offline-review.md) before building a page or processing its export. In summary:
+Consume the attended handback directly. Validate accepted and rejected identities against the art batch and gate. An unanswered question stays pending. A visual decision applies only at its recorded gate. Keep every downstream claim false in the visual verdict.
 
-1. Write a `sample_studio.art_review_batch_input` manifest with one stable `candidate_id` per item, isolation media, context media, and any exact non-preview identity files.
-2. Build the file-local package with `scripts/build_art_review.py build`. The builder derives candidate digests from metadata and file bytes and derives a deterministic batch ID.
-3. Present the generated `index.html` to the user and stop. Do not create placeholder decisions or an empty verdict when no art is awaiting review.
-4. Ask the user to resolve every candidate and paste the complete exported JSON back to Codex.
-5. Save the export to a temporary file and run `scripts/build_art_review.py validate-verdict` against the package manifest.
-6. Apply only accepted exact candidate ID/digest pairs to the current gate’s normal integration procedure. Keep rejected candidates as evidence only.
-
-The page stores local progress but cannot write repo evidence. Its `human_visual_isolation_only` verdict covers only the named `review_gate`; every downstream claim remains false. Never infer a complete verdict from partial page state, screenshots, conversational shorthand, or an older batch whose candidate bytes have changed.
+When the owner chooses offline review or hosted transport is unavailable, explain the applicable fallback and follow [offline review](references/offline-review.md). A missing companion or hub setup should be reported when it prevents the requested hosted review. Honor an explicitly requested in-chat review or delegated approval cadence.
 
 ## Image Requirements
 
@@ -179,7 +174,7 @@ Run the project’s configured checks. At minimum, validate:
 - alpha PNGs have transparent corners
 - TRELLIS command docs use the approved input set
 - post-generation texture repair, when used, compares against freshly de-lit approved refs and keeps repaired GLBs non-destructive
-- offline verdicts, when used, validate against the exact generated batch manifest before any integration
+- hosted and offline visual verdicts validate against the exact generated batch and gate before integration
 - JSON/YAML manifests parse
 - provenance rows distinguish rejected, needs-generation, approved-for-promotion, and promoted states correctly
 - `git diff --check` is clean

@@ -37,7 +37,7 @@ and security-reporting preparation.
 | [trellis-image-to-3d](skills/trellis-image-to-3d/SKILL.md) | Prepare images and use hosted TRELLIS providers, with offline validation and optional ExampleWorkflow receipts. |
 | [pr-tour](skills/pr-tour/SKILL.md) | Build, edit, rehearse or resume an author's guided GitHub pull-request tour through the `bpr tour` CLI, without publishing on the author's behalf. |
 | [bpr-cycle](skills/bpr-cycle/SKILL.md) | Read a BetterPullReview Review Cycle round the reviewer granted, through the `bpr cycle` consumer commands, act on it in the active harness and report by item. |
-| [concept-art-approval-pipeline](skills/concept-art-approval-pipeline/SKILL.md) | Produce and review concept-art candidates with exact, persistent approval records. |
+| [concept-art-approval-pipeline](skills/concept-art-approval-pipeline/SKILL.md) | Produce game art and use the required attended-review companion for human visual gates. |
 | [sprite-sheet-animation-updater](skills/sprite-sheet-animation-updater/SKILL.md) | Preserve character identity and validate fixed-cell sprite animation layouts. |
 | [clang-split-refactor](skills/clang-split-refactor/SKILL.md) | Split oversized C++ files into responsibility-named files with libclang, keeping behavior, includes and guards correct. |
 
@@ -70,6 +70,8 @@ mask uninstall manage-agent-skills --project /absolute/path/to/project --dry-run
 existing declaration in a fresh clone or worktree.
 
 Commit `.mask.json`, `.mask.lock.json` and consumer context so other checkouts can restore the same selections and versions. Ignore generated entries under `.agents/skills/` and `.claude/skills/`. Preserve unrelated real skills.
+
+For hosted art approvals, install the flat `agentskills/art-review` bundle. It selects `concept-art-approval-pipeline` and its required `attended-review` companion together. Run `mask bundle install agentskills/art-review --project /absolute/path/to/project --dry-run --json`, inspect the two selections, then apply the same command with `--approve-plan RETURNED_HASH` in place of `--dry-run`.
 
 ## Personal selections and project context
 

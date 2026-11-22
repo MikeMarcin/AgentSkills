@@ -46,6 +46,19 @@
           "id": "remote-station"
         }
       ]
+    },
+    "art-review": {
+      "description": "Produce concept art and host its human visual gates in attended review.",
+      "skills": [
+        {
+          "source": "agentskills",
+          "id": "concept-art-approval-pipeline"
+        },
+        {
+          "source": "agentskills",
+          "id": "attended-review"
+        }
+      ]
     }
   }
 }

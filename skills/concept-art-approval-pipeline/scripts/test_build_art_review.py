@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import base64
 import copy
 import json
 import shutil
@@ -16,6 +17,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 import build_art_review as review  # noqa: E402
+import attended_verdict  # noqa: E402
 
 
 PNG_A = b"\x89PNG\r\n\x1a\nfixture-isolation-a"
@@ -148,6 +150,42 @@ class ArtReviewPackageTests(unittest.TestCase):
         elevated["downstream_claims"]["runtime_promotion_approved"] = True
         with self.assertRaisesRegex(review.ReviewError, "false-only claim set"):
             review.validate_verdict(manifest, elevated)
+
+    def test_attended_handback_requires_exact_saved_decisions_and_media(self) -> None:
+        folder = self.root / "attended-art"
+        batch = review.build(self.input_path, folder)
+        path = folder / "art-review-manifest.json"
+        subject = batch["candidates"][0]
+        digest = subject["candidate_digest"]
+        cid = subject["candidate_id"]
+        initial = {"id": "chair", "revision": batch["batch_id"] + "@" + digest,
+                   "fingerprint": "fixture-question-fingerprint"}
+        prepared = {"session": "session-a", "sequence": 3, "candidates": [initial]}
+        card = {**initial, "metadata": {"batch_id": batch["batch_id"], "gate": batch["review_gate"],
+                                        "candidate_id": cid, "candidate_digest": digest},
+                "now": [{"url": "data:image/png;base64," + base64.b64encode(PNG_A).decode()}],
+                "reference": [{"url": "data:image/png;base64," + base64.b64encode(PNG_B).decode()}],
+                "decision": {"actor": "human", "candidate": "chair", "fingerprint": initial["fingerprint"],
+                             "outcome": "reject", "note": "Bring the feet forward."}}
+        returned = {"session": prepared["session"], "handed_back": "a recorded time", "candidates": [card],
+                    "events": [{"kind": "handed-back", "sequence": 6}]}
+        verdict = attended_verdict.collect(path, prepared, returned)
+        self.assertEqual(verdict["accepted_candidates"], [])
+        self.assertEqual(verdict["rejected_candidates"][0]["candidate_digest"], digest)
+        self.assertEqual(verdict["notes_by_candidate_identity"][cid + "@" + digest], "Bring the feet forward.")
+
+        for field, value in (("decision", None), ("now", card["reference"]), ("revision", "another-art-batch"),
+                             ("fingerprint", "changed-question")):
+            with self.subTest(field=field), self.assertRaises(review.ReviewError):
+                attended_verdict.collect(path, prepared, {**returned, "candidates": [{**card, field: value}]})
+        for field, value in (("session", "different-session"), ("handed_back", None), ("events", []),
+                             ("events", returned["events"] + [{"sequence": 7, "candidate": "chair", "kind": "feedback"}])):
+            with self.subTest(field=field), self.assertRaises(review.ReviewError):
+                attended_verdict.collect(path, prepared, {**returned, field: value})
+        identity_file = folder / subject["identity_files"][0]["path"]
+        identity_file.write_bytes(b"changed model")
+        with self.assertRaisesRegex(review.ReviewError, "changed art package file"):
+            attended_verdict.collect(path, prepared, returned)
 
     @unittest.skipUnless(shutil.which("node"), "Node.js is required for the browserless runtime test")
     def test_browserless_runtime(self) -> None:
