@@ -61,6 +61,19 @@ class ArtReviewPackageTests(unittest.TestCase):
     def write_source(self) -> None:
         self.input_path.write_text(json.dumps(self.source), encoding="utf-8")
 
+    def test_game_export_requires_and_binds_the_derivative(self) -> None:
+        self.source["review_gate"] = "game_export"
+        self.write_source()
+        first = review.build(self.input_path, self.root / "first")
+        (self.root / "model.glb").write_bytes(b"new export bytes")
+        second = review.build(self.input_path, self.root / "second")
+        self.assertNotEqual(first["batch_id"], second["batch_id"])
+        self.assertNotEqual(first["candidates"][0]["candidate_digest"], second["candidates"][0]["candidate_digest"])
+        self.source["candidates"][0]["identity_files"] = []
+        self.write_source()
+        with self.assertRaisesRegex(review.ReviewError, "game_export requires"):
+            review.build(self.input_path, self.root / "no-derivative")
+
     def test_build_is_deterministic_and_path_local(self) -> None:
         first = self.root / "out-a"
         second = self.root / "out-b"

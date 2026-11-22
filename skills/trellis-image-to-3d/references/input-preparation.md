@@ -19,8 +19,8 @@ TRELLIS works best when the input is one object centered on a plain or transpare
 The command writes:
 
 - `target_name_crop.png`: the selected crop fitted onto a square neutral-gray canvas.
-- `target_name_alpha.png`: the same image with connected neutral border background removed to transparency.
-- `target_name_prepare-run.json`: the preparation manifest.
+- `target_name_alpha.png`: the cropped subject on a transparent square. The default preserves the source alpha when the crop contains transparency. An opaque crop uses the connected neutral-border mask.
+- `target_name_prepare-run.json`: the manifest with the source digest, crop box and applied alpha method.
 
 Use `target_name_alpha.png` for TRELLIS generation first.
 
@@ -36,7 +36,9 @@ That selects the left three-quarter artifact view from `sample_object_sheet.png`
 
 ## Alpha Cleanup
 
-The preparation script removes background by flood-filling only neutral, border-connected pixels. It is intentionally conservative:
+Use `--alpha-mode neutral-border` when the existing alpha is unusable and the RGB image has a neutral background. With native alpha, inspect fine edges, detached parts and internal holes against light and dark backgrounds. A fully transparent crop has no subject.
+
+The neutral-border method flood-fills eligible pixels from the image edge.
 
 - Background eligibility uses HSV saturation/value thresholds.
 - Pixels must connect to an image border to become transparent.

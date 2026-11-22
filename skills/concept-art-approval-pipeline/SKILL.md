@@ -1,6 +1,6 @@
 ---
 name: concept-art-approval-pipeline
-description: Concept-art and character-asset production for games, from reference review through generated 3D assets and runtime handoff. Use for imagegen refs, art-bible approval, TRELLIS preparation, humanoid modeling/rigging/export, or game asset integration. Uses attended-review for hosted human visual gates and preserves exact offline verdicts.
+description: Concept-art and character-asset production for games, from reference review through generated 3D assets and runtime handoff. Use for imagegen refs, art-bible approval, TRELLIS preparation, humanoid modeling, rigging and export, or game asset integration including Roblox Studio. Uses attended-review for hosted human visual gates and preserves exact offline verdicts.
 ---
 
 # Concept Art Approval Pipeline
@@ -150,6 +150,8 @@ When needed:
 5. Only then update runtime manifests or playable bindings.
 
 ## Game Integration Stage
+
+For a Roblox experience, use the [Roblox asset handoff](references/roblox.md) when preparing generation inputs, reviewing a game-resolution export or binding the model in Studio. Reference preparation and generation can run alongside gameplay once the applicable source decision is recorded.
 
 Enter game integration only after source refs and generated assets pass their gates.
 

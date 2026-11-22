@@ -1,6 +1,6 @@
 ---
 name: trellis-image-to-3d
-description: Generate 3D assets from concept art or reference images with provider-aware hosted TRELLIS v1 and Microsoft TRELLIS.2 Gradio adapters. Use when the agent needs to prepare or isolate concept art, probe and record live provider capabilities, preserve existing TRELLIS v1 single or multi-image workflows, request TRELLIS.2 PBR-capable outputs, execute ExampleWorkflow provider work orders, write redacted attempt receipts, troubleshoot Hugging Face quota or Space API changes, or capture reproducible GLB and preview settings.
+description: Generate 3D assets from concept art or reference images with provider-aware hosted TRELLIS v1 and Microsoft TRELLIS.2 Gradio adapters. Use when the agent needs to prepare or isolate concept art, probe and record live provider capabilities, preserve existing TRELLIS v1 single or multi-image workflows, request TRELLIS.2 PBR-capable outputs, execute ExampleWorkflow provider work orders, write redacted attempt receipts, troubleshoot Hugging Face quota or Space API changes, capture reproducible GLB and preview settings, or check a Roblox export against Studio mesh budgets.
 ---
 
 # Trellis Image To 3d
@@ -145,6 +145,8 @@ map to `waiting_for_provider`.
     snapshot digest, seed, and settings.
 13. If the mesh is acceptable but the embedded texture color drifts from the approved refs, use the project workflow for a non-destructive, UV-preserving texture repair before regenerating. Compare against freshly de-lit approved refs, not lit approval plates. Keep the original `model.glb` unchanged and write repaired candidates as sibling GLBs with their own run records.
 
+For a Roblox target, follow the [Roblox GLB export](references/roblox-export.md) to measure the game-resolution derivative and hand it to Studio. Run the hosted generation steps above with the selected provider and input views.
+
 ## Generation Defaults
 
 TRELLIS v1 keeps the established defaults unless the user asks for quality or
@@ -191,7 +193,7 @@ for MCP.
 Use `--prepare-image` for art-bible renders before calling the remote Space unless the input is already a single isolated object. The local preparation writes:
 
 - `<stem>_crop.png`: square RGB crop on neutral gray.
-- `<stem>_alpha.png`: same image with connected neutral border background removed to alpha.
+- `<stem>_alpha.png`: same crop with its source alpha preserved, or a neutral-border mask for opaque input.
 - `<stem>_prepare-run.json`: source, crop box, alpha thresholds, and output paths.
 
 Feed `_alpha.png` to TRELLIS first. Use `_crop.png` only if the alpha mask damages the object.

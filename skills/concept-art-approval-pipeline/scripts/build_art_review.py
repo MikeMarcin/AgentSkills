@@ -22,6 +22,7 @@ REVIEW_SCOPE = "human_visual_isolation_only"
 ALLOWED_GATES = {
     "concept_source",
     "generated_model",
+    "game_export",
     "texture_repair",
     "runtime_visual",
 }
@@ -248,6 +249,8 @@ def build_manifest(source: dict[str, Any], input_path: Path, output_root: Path) 
         )
         for index, raw in enumerate(raw_candidates)
     ]
+    if review_gate == "game_export" and any(not candidate["identity_files"] for candidate in candidates):
+        raise ReviewError("game_export requires the reviewed export in each candidate's identity_files")
     candidate_ids = [candidate["candidate_id"] for candidate in candidates]
     if len(candidate_ids) != len(set(candidate_ids)):
         raise ReviewError("candidate_id values must be unique within a batch")

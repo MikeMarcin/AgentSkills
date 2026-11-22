@@ -46,6 +46,7 @@ Allowed `review_gate` values are:
 - `concept_source`: approve an exact concept direction for art-bible integration and later source preparation.
 - `generated_model`: review an exact generated model candidate. Put its GLB in `identity_files` and its preview in `isolation_media`.
 - `texture_repair`: review an exact repaired GLB/texture pair. Put both files in `identity_files` and show de-lit comparisons in the media groups.
+- `game_export`: review the game-resolution export when the project calls for a separate export decision. Include its exact file in `identity_files`.
 - `runtime_visual`: review an exact runtime visual candidate in isolation and project context. This remains separate from gameplay acceptance.
 
 Every candidate requires at least one `isolation_media` item and one `context_media` item. Preview media may be PNG, JPEG, WebP, GIF, MP4, or WebM. `identity_files` may contain any exact artifact whose bytes must be bound to the decision, such as a GLB, texture atlas, or sidecar record.

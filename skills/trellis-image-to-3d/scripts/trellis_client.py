@@ -27,6 +27,7 @@ from typing import Any, Iterable
 
 from providers import get_provider
 from providers.common import capability_snapshot
+from roblox_geometry import MAX_TRIANGLES_PER_PART, audit_geometry
 
 MAX_SEED = 2_147_483_647
 GLB_JSON_CHUNK = 0x4E4F534A
@@ -267,39 +268,51 @@ def run_prepare_image(args: argparse.Namespace) -> dict[str, Any]:
     output.mkdir(parents=True, exist_ok=True)
     stem = args.output_stem or source.stem
 
-    image = Image.open(source).convert("RGB")
-    validate_crop_box(args.crop_box, image.size)
+    with Image.open(source) as opened:
+        validate_crop_box(args.crop_box, opened.size)
+        image = opened.convert("RGBA")
     crop = image.crop(args.crop_box) if args.crop_box else image
-    canvas = square_canvas(
-        crop,
+    minimum, maximum = crop.getchannel("A").getextrema()
+    source_alpha = args.alpha_mode == "auto" and minimum < 255
+    if source_alpha and maximum == 0:
+        raise SystemExit("selected crop is fully transparent")
+    fitted = square_canvas(
+        crop if source_alpha else crop.convert("RGB"),
         Image,
         size=args.canvas_size,
         padding=args.padding,
-        background=args.background_rgb,
+        background=(0, 0, 0, 0) if source_alpha else args.background_rgb,
     )
 
     crop_path = output / f"{stem}_crop.png"
     alpha_path = output / f"{stem}_alpha.png"
     manifest_path = output / f"{stem}_prepare-run.json"
 
+    if source_alpha:
+        rgba = fitted
+        canvas = Image.new("RGB", rgba.size, args.background_rgb)
+        canvas.paste(rgba, mask=rgba.getchannel("A"))
+    else:
+        canvas = fitted
+        rgba = canvas.convert("RGBA")
+        rgba.putalpha(neutral_border_alpha(
+            rgba,
+            Image,
+            ImageFilter,
+            saturation_threshold=args.alpha_sat_threshold,
+            value_min=args.alpha_value_min,
+            value_max=args.alpha_value_max,
+            blur_radius=args.alpha_blur,
+        ))
     canvas.save(crop_path)
-    rgba = canvas.convert("RGBA")
-    alpha = neutral_border_alpha(
-        rgba,
-        Image,
-        ImageFilter,
-        saturation_threshold=args.alpha_sat_threshold,
-        value_min=args.alpha_value_min,
-        value_max=args.alpha_value_max,
-        blur_radius=args.alpha_blur,
-    )
-    rgba.putalpha(alpha)
     rgba.save(alpha_path)
 
     manifest = {
         "source": str(source),
+        "source_sha256": sha256_file(source),
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "preparation": {
+            "alpha_method": "source" if source_alpha else "neutral_border",
             "crop_box": list(args.crop_box) if args.crop_box else None,
             "canvas_size": args.canvas_size,
             "padding": args.padding,
@@ -334,7 +347,7 @@ def square_canvas(
     *,
     size: int,
     padding: int,
-    background: tuple[int, int, int],
+    background: tuple[int, ...],
 ) -> Any:
     if size <= 0:
         raise SystemExit("--canvas-size must be positive")
@@ -343,9 +356,9 @@ def square_canvas(
 
     max_width = size - (padding * 2)
     scale = min(max_width / image.width, max_width / image.height)
-    resized_size = (round(image.width * scale), round(image.height * scale))
+    resized_size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
     resized = image.resize(resized_size, image_module.Resampling.LANCZOS)
-    canvas = image_module.new("RGB", (size, size), background)
+    canvas = image_module.new(image.mode, (size, size), background)
     offset = ((size - resized.width) // 2, (size - resized.height) // 2)
     canvas.paste(resized, offset)
     return canvas
@@ -674,7 +687,7 @@ def glb_json(path: Path) -> dict[str, Any]:
     raise ValueError("GLB has no JSON chunk")
 
 
-def audit_glb(path: Path) -> dict[str, Any]:
+def audit_glb(path: Path, *, roblox_budget: int | None = None) -> dict[str, Any]:
     document = glb_json(path)
     materials = document.get("materials", [])
     rows: list[dict[str, Any]] = []
@@ -706,7 +719,7 @@ def audit_glb(path: Path) -> dict[str, Any]:
             }
         )
 
-    return {
+    report = {
         "schema_name": "example-scene.trellis_glb_pbr_audit",
         "schema_version": 1,
         "path": str(path),
@@ -720,6 +733,9 @@ def audit_glb(path: Path) -> dict[str, Any]:
         "pbr_required_complete": bool(rows) and all(row["pbr_required_complete"] for row in rows),
         "materials": rows,
     }
+    if roblox_budget is not None:
+        report["roblox_geometry"] = audit_geometry(document, roblox_budget)
+    return report
 
 
 def artifact_record(path: Path, role: str, stored_path: str) -> dict[str, Any]:
@@ -1020,6 +1036,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--request-id", help="ExampleWorkflow generation request identity for an ad hoc attempt receipt.")
     parser.add_argument("--attempt-id", help="ExampleWorkflow generation attempt identity for an ad hoc attempt receipt.")
     parser.add_argument("--audit-glb", type=existing_file, help="Audit one local GLB for material channels without contacting a provider.")
+    parser.add_argument("--target", choices=["roblox"], help="Also check a local --audit-glb against the target importer’s mesh budget.")
+    parser.add_argument("--max-triangles-per-part", type=int, metavar="N", help="Use a tighter project budget with --target roblox (default: 20000).")
     parser.add_argument("--audit-out", type=output_file, help="Write GLB PBR audit JSON; generation defaults to <output-dir>/pbr-audit.json.")
     parser.add_argument("--check-token", action="store_true", help="Verify that a Hugging Face token is configured without printing it.")
     parser.add_argument("--setup-token", action="store_true", help="Store a Hugging Face token in the local cache using a hidden prompt when possible.")
@@ -1030,6 +1048,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--canvas-size", type=int, default=768, help="Square prepared image size in pixels.")
     parser.add_argument("--padding", type=int, default=64, help="Padding around fitted crop in pixels.")
     parser.add_argument("--background-rgb", type=parse_rgb, default=(128, 128, 128), help="Neutral canvas RGB, e.g. 128,128,128.")
+    parser.add_argument("--alpha-mode", choices=["auto", "neutral-border"], default="auto", help="Preserve usable source alpha by default. Select neutral-border to rekey an existing alpha channel.")
     parser.add_argument("--alpha-sat-threshold", type=float, default=0.13, help="Maximum HSV saturation for neutral border background.")
     parser.add_argument("--alpha-value-min", type=float, default=0.22, help="Minimum HSV value for neutral border background.")
     parser.add_argument("--alpha-value-max", type=float, default=0.86, help="Maximum HSV value for neutral border background.")
@@ -1064,11 +1083,19 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def validate_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.target and (not args.audit_glb or args.info or args.probe or args.check_token or args.setup_token
+                        or args.work_order or args.prepare_image or args.image or args.multi_image):
+        parser.error("--target roblox applies to a local --audit-glb operation")
+    if args.max_triangles_per_part is not None:
+        if args.target != "roblox" or not 1 <= args.max_triangles_per_part <= MAX_TRIANGLES_PER_PART:
+            parser.error("--max-triangles-per-part requires --target roblox and a budget of 1..20000")
     if args.info or args.probe or args.check_token or args.setup_token:
         return
     if args.audit_glb:
         if args.audit_glb.suffix.lower() != ".glb":
             parser.error("--audit-glb requires a .glb file")
+        if args.audit_out and args.audit_out.resolve() == args.audit_glb.resolve():
+            parser.error("--audit-out must differ from the input GLB")
         return
     if args.prepare_image:
         validate_prepare_args(parser, args)
@@ -1138,12 +1165,18 @@ def main() -> int:
         if args.setup_token:
             return setup_token(args.token)
         if args.audit_glb:
-            report = audit_glb(args.audit_glb)
+            budget = (args.max_triangles_per_part or MAX_TRIANGLES_PER_PART) if args.target == "roblox" else None
+            try:
+                report = audit_glb(args.audit_glb, roblox_budget=budget)
+            except (ValueError, OSError) as exc:
+                print(f"Cannot audit {args.audit_glb}: {exc}", file=sys.stderr)
+                return 1
             if args.audit_out:
                 args.audit_out.parent.mkdir(parents=True, exist_ok=True)
                 args.audit_out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
             print(json.dumps(report, indent=2))
-            return 0 if not args.pbr_required or report["pbr_required_complete"] else 1
+            geometry_passed = budget is None or report["roblox_geometry"]["within_budget"]
+            return 0 if geometry_passed and (not args.pbr_required or report["pbr_required_complete"]) else 1
         if args.prepare_image:
             manifest = run_prepare_image(args)
             print(json.dumps(manifest, indent=2))
