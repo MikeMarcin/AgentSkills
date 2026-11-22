@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0139"
+  ],
+  "reserve_for": "art-attended-handoff",
+  "purpose": "",
+  "created": "2026-11-22T21:05:26.979902+00:00",
+  "base": "fec339314b799460204e58ca26c27ff0f6b31361"
+}
