@@ -25,3 +25,5 @@ python3 "$concept_art_skill_root/scripts/attended_verdict.py" \
 ```
 
 The helper checks the session, handback event, prepared question fingerprint, visible file bytes, exact art batch and gate. It preserves the saved notes and validates the usual gate-scoped verdict. Record the consumed event cursor after reconciliation. Export only the validated art verdict into project records. Keep session capabilities private.
+
+If a hosted card displays a current in-scene render beside the isolation view in **Now**, keep the original snapshots and run the same command with `--context-in-now CANDIDATE_SHA256 IMAGE_SHA256`. Copy both digests from the canonical manifest, including their `sha256:` prefixes. Repeat the flag for each such still. The card must also show a distinct isolation still in **Now** and a separate submitted reference still in **Reference**. The helper verifies the render in its actual column and compares the outcome and latest feedback with the saved attendance events. Record the displayed placement and digests with the handoff so the verdict can be reproduced.

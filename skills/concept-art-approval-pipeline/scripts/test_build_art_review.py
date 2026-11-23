@@ -200,6 +200,55 @@ class ArtReviewPackageTests(unittest.TestCase):
         with self.assertRaisesRegex(review.ReviewError, "changed art package file"):
             attended_verdict.collect(path, prepared, returned)
 
+    def test_context_still_in_now_replays_the_original_question_and_notes(self) -> None:
+        folder = self.root / "attended-placement"
+        reference = b"original approved source"
+        (self.root / "source.png").write_bytes(reference)
+        self.source["candidates"][0]["context_media"].append({"label": "Approved source", "path": "source.png"})
+        self.write_source()
+        batch = review.build(self.input_path, folder)
+        path = folder / "art-review-manifest.json"
+        subject = batch["candidates"][0]
+        digest, cid = subject["candidate_digest"], subject["candidate_id"]
+        def displayed(data):
+            return {"url": "data:image/png;base64," + base64.b64encode(data).decode()}
+        initial = {"id": "fixture", "revision": batch["batch_id"] + "@" + digest, "fingerprint": "original"}
+        prepared = {"session": "visual", "sequence": 3, "candidates": [initial]}
+        record = {"actor": "human", "candidate": initial["id"], "fingerprint": initial["fingerprint"]}
+        decision = {**record, "decision_id": "d7", "outcome": "accept", "note": "Improve the rim."}
+        feedback = {**record, "feedback_id": "f8", "note": "Polish the rim and keep the feet."}
+        card = {**initial, "metadata": {"batch_id": batch["batch_id"], "gate": batch["review_gate"],
+                                       "candidate_id": cid, "candidate_digest": digest},
+                "now": [displayed(PNG_A), displayed(PNG_B)], "reference": [displayed(reference)],
+                "decision": decision.copy(), "feedback": feedback.copy()}
+        returned = {"session": "visual", "handed_back": "recorded", "candidates": [card], "events": [
+            {"kind": "decision", "candidate": initial["id"], "sequence": 7, "decision": decision},
+            {"kind": "feedback", "candidate": initial["id"], "sequence": 8, "feedback": feedback},
+            {"kind": "handed-back", "sequence": 9, "decided": [initial["id"]]}]}
+        binding = [(digest, review.sha256_bytes(PNG_B))]
+        with self.assertRaisesRegex(review.ReviewError, "context_media file was not shown"):
+            attended_verdict.collect(path, prepared, returned)
+        verdict = attended_verdict.collect(path, prepared, returned, binding)
+        self.assertEqual(verdict["accepted_candidates"], [{"candidate_id": cid, "candidate_digest": digest}])
+        self.assertEqual(verdict["notes_by_candidate_identity"], {cid + "@" + digest: feedback["note"]})
+        self.assertEqual(verdict["downstream_claims"], review.DOWNSTREAM_CLAIMS)
+        for field, value in (
+            ("now", [displayed(PNG_A)]), ("now", [displayed(PNG_A), displayed(b"other view")]),
+            ("now", [displayed(PNG_B)]), ("reference", []), ("reference", [displayed(PNG_B)]),
+            ("decision", {**decision, "fingerprint": "different"}),
+            ("decision", {**decision, "outcome": "reject"}), ("fingerprint", "different"),
+            ("feedback", {**feedback, "note": ""}), ("feedback", None),
+        ):
+            with self.subTest(field=field, value=value), self.assertRaises(review.ReviewError):
+                attended_verdict.collect(path, prepared, {**returned, "candidates": [{**card, field: value}]}, binding)
+        for bad in ([("wrong candidate", binding[0][1])], [(digest, "wrong bytes")], binding * 2,
+                    binding + [(digest, review.sha256_bytes(reference))]):
+            with self.subTest(placement=bad), self.assertRaises(review.ReviewError):
+                attended_verdict.collect(path, prepared, returned, bad)
+        (folder / subject["context_media"][0]["path"]).write_bytes(b"changed after the decision")
+        with self.assertRaisesRegex(review.ReviewError, "changed art package file"):
+            attended_verdict.collect(path, prepared, returned, binding)
+
     @unittest.skipUnless(shutil.which("node"), "Node.js is required for the browserless runtime test")
     def test_browserless_runtime(self) -> None:
         runtime = SCRIPT_DIR.parent / "assets" / "art_review_runtime.js"
