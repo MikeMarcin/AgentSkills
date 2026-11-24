@@ -37,5 +37,5 @@ output. Live rollout and consumer installation are outside this scope.
   remains compatible and hosted transport authenticates its configured TLS
   endpoint without redirecting credentials.
 
-[Work card](../issues/20-ready/ASK-0141-hosted-review-producer.md) and
+[Work card](../issues/30-in-progress/ASK-0141-hosted-review-producer.md) and
 [closeout](../issues/10-backlog/ASK-0142-close-hosted-review-producer.md).
