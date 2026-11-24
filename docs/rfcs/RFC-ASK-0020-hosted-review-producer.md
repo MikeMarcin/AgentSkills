@@ -1,7 +1,7 @@
 ---
 id: "RFC-ASK-0020"
 title: "Publish and receive hosted attended reviews"
-status: "Implementing"
+status: "Auto-Verified"
 metadata: {"milestone_plan":{"id":"hosted-review-producer","path":"docs/rfcs/plans/hosted-review-producer/milestone-plan.json"}}
 ---
 
@@ -38,4 +38,4 @@ output. Live rollout and consumer installation are outside this scope.
   endpoint without redirecting credentials.
 
 [Work card](../issues/60-done/ASK-0141-hosted-review-producer.md) and
-[closeout](../issues/30-in-progress/ASK-0142-close-hosted-review-producer.md).
+[closeout](../issues/60-done/ASK-0142-close-hosted-review-producer.md).
