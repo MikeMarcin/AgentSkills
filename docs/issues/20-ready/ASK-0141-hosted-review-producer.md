@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0141"
 title: "Integrate the native hosted review producer"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0020"]
 depends_on: []
 metadata: {"milestone_plan":{"id":"hosted-review-producer","path":"docs/rfcs/plans/hosted-review-producer/milestone-plan.json"}}
