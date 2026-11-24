@@ -9,7 +9,7 @@ metadata: {"milestone_plan":{"id":"hosted-review-producer","path":"docs/rfcs/pla
 
 On 2026-11-24 the owner authorized the native AgentSkills producer integration
 with local commits and loopback verification. The hub owns the hosted v1 wire
-contract in  at AttendedReviewHub .
+contract in `docs/hosted-reviews.md` at AttendedReviewHub `c9e38c56ae9902baa57850a5e5b64d90a16fb5b0`.
 The source requirements are RFC-ARH-0003 and RFC-ARH-0004. This work covers the
 producer counterpart and native integration prerequisite ARH-0012.
 

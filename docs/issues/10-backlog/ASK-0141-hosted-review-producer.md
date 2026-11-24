@@ -12,5 +12,5 @@ metadata: {"milestone_plan":{"id":"hosted-review-producer","path":"docs/rfcs/pla
 
 Implement and exercise the native producer against the local hub. The hub
 publication contract is verified in AttendedReviewHub ARH-0010 and its durable
-freeze and delivery are verified in ARH-0011, both present at .
+freeze and delivery are verified in ARH-0011, both present at `c9e38c56ae9902baa57850a5e5b64d90a16fb5b0`.
 Verify RFC-ASK-0020 AC01–AC03 using disposable loopback fixtures.
