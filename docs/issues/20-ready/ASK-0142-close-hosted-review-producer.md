@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0142"
 title: "Close out RFC-ASK-0020"
-status: "Backlog"
+status: "Ready"
 rfcs: ["RFC-ASK-0020"]
 depends_on: ["ASK-0141"]
 closeout_for: ["RFC-ASK-0020"]
