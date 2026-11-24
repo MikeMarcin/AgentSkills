@@ -35,13 +35,13 @@ def openssl(*args, cwd):
     subprocess.run(["openssl", *args], cwd=cwd, check=True, capture_output=True)
 
 
-def issue(directory, ca, name):
+def issue(directory, ca, name, hosts=("hub.example.ts.net", "second.example.ts.net")):
     """A fixture CA and a server certificate it signs, accepted by strict verification."""
     openssl("req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", f"{ca}.key", "-out", f"{ca}.pem",
             "-days", "2", "-subj", f"/CN={ca}", "-addext", "basicConstraints=critical,CA:TRUE",
             "-addext", "keyUsage=critical,keyCertSign,cRLSign", cwd=directory)
     (directory / f"{name}.ext").write_text(
-        "subjectAltName=DNS:hub.example.ts.net,DNS:second.example.ts.net\nbasicConstraints=CA:FALSE\n"
+        "subjectAltName=" + ",".join("DNS:" + host for host in hosts) + "\nbasicConstraints=CA:FALSE\n"
         "keyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\n"
         "authorityKeyIdentifier=keyid\nsubjectKeyIdentifier=hash\n")
     openssl("req", "-newkey", "rsa:2048", "-nodes", "-keyout", f"{name}.key", "-out", f"{name}.csr",

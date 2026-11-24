@@ -322,6 +322,9 @@ kept only in local storage; it is never session state, exported or logged. It ha
 
 ## Optional hub publication
 
+This section covers pass-through summaries. For reviews conducted on the hub's
+collaboration page, see [Hosted review](hosted-review.md).
+
 A session can publish a private summary to a review hub: one always-on page that
 lists active reviews across checkouts, harnesses and machines. Publication is opt-in,
 per session or once per machine, best effort, and changes nothing about review,

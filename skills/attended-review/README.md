@@ -25,6 +25,11 @@ configure a [machine default](references/session-contract.md#machine-default) on
 python3 scripts/attended_review.py hub-config set https://HUB.ts.net
 ```
 
+An explicitly enrolled project can also choose [hosted review](references/hosted-review.md).
+The hub stores the selected review material and accepts the owner's decisions
+while the work machine is offline. The native helper receives the frozen Hand Back
+when the machine reconnects.
+
 The session directory is `<checkout>/.mask/attended-review/`. Ignore that generated directory in the consumer. Treat its verdicts as local acceptance records and transfer the relevant evidence to the authoritative issue/RFC records through the driver. Do not commit live host tokens, full incidental logs or unrelated session history.
 
 Write questions with [Writing review questions](references/question-authoring.md):

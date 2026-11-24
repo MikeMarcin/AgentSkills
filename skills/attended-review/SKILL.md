@@ -7,6 +7,11 @@ description: Prepare and conduct resumable human review sessions with an HTML qu
 
 Use this companion only for acceptance that actually needs human attention. Ordinary automated verification does not gain a new human checkpoint. `implement-rfc` owns card selection, acceptance judgment and Git operations; this skill owns candidate presentation, preparation and immediate decision intake. The same commands work for Claude and Codex.
 
+When the owner explicitly selects an enrolled hub for hosted decisions, follow
+[Hosted review](references/hosted-review.md) from `init --hosted` through
+`hosted-poll`. Use the hub collaboration page for that session's decisions and
+Hand Back.
+
 1. Select the current repository's human waits through its board tooling. Read only the selected cards and relevant acceptance. Keep repositories independent. Group coupled choices as one candidate; keep independent decisions separate.
 2. Write a manifest using [the contract](references/session-contract.md). **Read [Writing review questions](references/question-authoring.md) first and write version 3**: each question has a kind (build, design, decision, audio) and named parts with word limits; tracker IDs, digests and paths go in metadata, steps and launch, never prose. Run `check --manifest FILE`; `init` refuses what it reports unless a rule is waived with a reason the reviewer sees. Name the actual candidate revision and relevant paths/resources. **For audio auditions, follow [Audio questions](references/session-contract.md#audio-questions-manifest-version-2) before preparation**, including its default waveform and conditional spectrogram guidance. Put mechanical preparation in reviewed argument-array commands or existing repository adapters. Do not put secrets in review content or logs.
 3. Run `init --manifest FILE`, then `prepare`. Already available material becomes ready immediately; quick commands run first. Known slow work waits for `prepare --include-slow`, and `--max-items` bounds a batch. A driver may use `ready ID --evidence TEXT` after performing the relevant installation/check itself. A build question becomes ready only after a launch check: a preparation command that exits 0, or that evidence. Do not equate process exit with human approval.

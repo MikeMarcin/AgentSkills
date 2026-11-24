@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+import stat
 import tempfile
 
 
@@ -40,6 +41,10 @@ CREATE INDEX IF NOT EXISTS events_by_kind ON events (kind, sequence);
 CREATE TABLE IF NOT EXISTS exports (sequence INTEGER PRIMARY KEY, header TEXT NOT NULL, receipt TEXT);
 CREATE INDEX IF NOT EXISTS pending_exports ON exports (sequence) WHERE receipt IS NULL;
 """
+
+
+class ArchiveConflict(ValueError):
+    pass
 
 
 def pack(value):
@@ -147,7 +152,7 @@ class SQLiteStore:
                 db.close()
 
     def header(self, db, *, missing=False):
-        if db.execute("PRAGMA user_version").fetchone()[0] != 1:
+        if db.execute("PRAGMA user_version").fetchone()[0] not in (1, 2):
             raise self.error("Unsupported attended review database version")
         row = db.execute("SELECT payload FROM metadata WHERE singleton=1").fetchone()
         if row is None:
@@ -165,34 +170,42 @@ class SQLiteStore:
     @contextmanager
     def edit(self, seed=None):
         with self.connection(writer=True, create=seed is not None) as db:
+            with self.editing(db, seed) as state:
+                yield state
+
+    @contextmanager
+    def editing(self, db, seed=None):
+        if seed is not None:
             version = db.execute("PRAGMA user_version").fetchone()[0]
-            if seed is not None and version == 0:
+            if version == 0:
                 for ddl in SCHEMA.split(";"):
                     if ddl.strip():
                         db.execute(ddl)
-                db.execute("PRAGMA user_version=1")
-            header = self.header(db, missing=seed is not None)
-            if header is None:
-                header = seed
-                self.write_header(db, header)
-                self.write_commit(db, header)
-            before = dict(header)
-            cards = Cards(db)
-            events, history = [], []
-            state = {**header, "candidates": cards, "events": events, "history": history}
-            yield state
-            for item in history:
-                body, media, _ = cards.original[item["id"]]
-                db.execute("INSERT INTO history(sequence, body, media) VALUES (?,?,?)",
-                           (state["sequence"], body, media))
-            cards.write(state["sequence"])
-            for event in events:
-                self.write_event(db, event)
-            header = {k: v for k, v in state.items() if k not in ("candidates", "events", "history")}
-            if before != header:
-                self.write_header(db, header)
-            if events:
-                self.write_commit(db, header)
+                # Older helpers must refuse an active hosted database. The
+                # JSON archive retains the existing reader schema.
+                db.execute("PRAGMA user_version=2" if seed.get("hosted") else "PRAGMA user_version=1")
+        header = self.header(db, missing=seed is not None)
+        if header is None:
+            header = seed
+            self.write_header(db, header)
+            self.write_commit(db, header)
+        before = dict(header)
+        cards = Cards(db)
+        events, history = [], []
+        state = {**header, "candidates": cards, "events": events, "history": history}
+        yield state
+        for item in history:
+            body, media, _ = cards.original[item["id"]]
+            db.execute("INSERT INTO history(sequence, body, media) VALUES (?,?,?)",
+                       (state["sequence"], body, media))
+        cards.write(state["sequence"])
+        for event in events:
+            self.write_event(db, event)
+        header = {k: v for k, v in state.items() if k not in ("candidates", "events", "history")}
+        if before != header:
+            self.write_header(db, header)
+        if events:
+            self.write_commit(db, header)
 
     @staticmethod
     def write_event(db, event):
@@ -333,6 +346,8 @@ class SQLiteStore:
     def enqueue_export(self, at):
         with self.connection(writer=True) as db:
             header = self.header(db)
+            if header.get("hosted"):
+                raise self.error("Use hosted-poll to receive the hosted Hand Back")
             pending = db.execute("SELECT sequence FROM exports WHERE receipt IS NULL").fetchone()
             if pending:
                 return pending[0]
@@ -344,8 +359,14 @@ class SQLiteStore:
             self.write_header(db, header)
             self.write_commit(db, header)
             self.write_event(db, {"sequence": sequence, "time": at, "kind": "handed-back"})
-            db.execute("INSERT INTO exports VALUES (?,?,NULL)", (sequence, pack({**header, "host": None})))
+            self.queue_archive(db, header)
             return sequence
+
+    @staticmethod
+    def queue_archive(db, header):
+        archive = {k: v for k, v in header.items() if k not in ("hosted", "hosted_bound")}
+        archive["host"] = None
+        db.execute("INSERT INTO exports VALUES (?,?,NULL)", (archive["sequence"], pack(archive)))
 
     def pending_export(self):
         with self.connection() as db:
@@ -359,13 +380,15 @@ class SQLiteStore:
             with self.connection() as db:
                 current = self.header(db)
                 raw, saved = db.execute("SELECT header, receipt FROM exports WHERE sequence=?", (sequence,)).fetchone()
-                if saved is not None:
+                exclusive = bool(current.get("hosted"))
+                if saved is not None and not exclusive:
                     return {"handed_back": json.loads(raw)["handed_back"], **json.loads(saved)}
                 if db.execute("SELECT 1 FROM exports WHERE sequence>? AND receipt IS NOT NULL", (sequence,)).fetchone():
                     raise self.error("A newer Hand Back archive is already published")
                 if json.loads(raw)["id"] != current["id"]:
                     raise self.error("Hand Back archive belongs to another session")
-            receipt = self.write_archive(path, json.loads(raw))
+            header = json.loads(raw)
+            receipt = self.write_archive(path, header, exclusive=True) if exclusive else self.write_archive(path, header)
             with self.connection(writer=True) as db:
                 db.execute("UPDATE exports SET receipt=? WHERE sequence=?", (pack(receipt), sequence))
             return {"handed_back": json.loads(raw)["handed_back"], **receipt}
@@ -406,7 +429,7 @@ class SQLiteStore:
                 """, (number,)).fetchone()
             yield self.archive_event(body, pack(receipt) if number == sequence else saved)
 
-    def write_archive(self, path, header):
+    def write_archive(self, path, header, *, exclusive=False):
         receipt = {"decided": [], "pending": [], "feedback_pending": []}
         sequence = header["sequence"]
 
@@ -444,7 +467,10 @@ class SQLiteStore:
                 stream.write("\n}\n")
                 stream.flush()
                 os.fsync(stream.fileno())
-            replace_durably(name, path)
+            if exclusive:
+                install_archive(name, path)
+            else:
+                replace_durably(name, path)
         finally:
             Path(name).unlink(missing_ok=True)
         return receipt
@@ -452,16 +478,51 @@ class SQLiteStore:
 
 def replace_durably(source, target):
     if os.name == "nt":
-        import ctypes
-        from ctypes import wintypes
-
-        move = ctypes.WinDLL("kernel32", use_last_error=True).MoveFileExW
-        move.argtypes = (wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD)
-        move.restype = wintypes.BOOL
-        if not move(source, str(target), 0x1 | 0x8):  # REPLACE_EXISTING | WRITE_THROUGH
-            raise ctypes.WinError(ctypes.get_last_error())
+        windows_move(source, target, replace=True)
         return
     os.replace(source, target)
+    sync_parent(target)
+
+
+def install_archive(source, target):
+    """Publish once, or verify the exact output after an interrupted receipt."""
+    try:
+        if os.name == "nt":
+            windows_move(source, target, replace=False)
+            return
+        os.link(source, target)
+    except FileExistsError:
+        verify_archive(source, target)
+    if os.name != "nt":
+        sync_parent(target)
+
+
+def verify_archive(source, target):
+    conflict = ArchiveConflict("Existing Hand Back archive conflicts with the hosted delivery")
+    if not stat.S_ISREG(target.lstat().st_mode):
+        raise conflict
+    fd = os.open(target, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+                 | getattr(os, "O_BINARY", 0))
+    with os.fdopen(fd, "rb") as existing, open(source, "rb") as expected:
+        if not stat.S_ISREG(os.fstat(fd).st_mode) or hashlib.file_digest(existing, "sha256").digest() != hashlib.file_digest(expected, "sha256").digest():
+            raise conflict
+        if os.name != "nt":
+            os.fsync(fd)
+
+
+def windows_move(source, target, *, replace):
+    import ctypes
+    from ctypes import wintypes
+
+    move = ctypes.WinDLL("kernel32", use_last_error=True).MoveFileExW
+    move.argtypes = (wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD)
+    move.restype = wintypes.BOOL
+    flags = 0x8 | int(replace)  # WRITE_THROUGH and optional REPLACE_EXISTING.
+    if not move(source, str(target), flags):
+        raise ctypes.WinError(ctypes.get_last_error())
+
+
+def sync_parent(target):
     fd = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
     try:
         os.fsync(fd)

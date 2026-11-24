@@ -575,9 +575,9 @@ class Session:
         state["minimum_helper_version"] = version
 
     @staticmethod
-    def event(state, kind, **fields):
+    def event(state, kind, *, at=None, **fields):
         state["sequence"] += 1
-        state["events"].append({"sequence": state["sequence"], "time": now(), "kind": kind, **fields})
+        state["events"].append({"sequence": state["sequence"], "time": at or now(), "kind": kind, **fields})
 
     def owner(self, state, cid):
         return {"checkout": str(self.root), "session": state["id"], "candidate": cid}
@@ -605,12 +605,12 @@ class Session:
                 del resources[key]
         item["protected"] = False
 
-    def initialize(self, value):
+    def initialize(self, value, *, hosted=False):
         value = manifest(value)
         report = question_report(value)
         if report["refused"]:
             raise ManifestRefused(report)
-        with self.initialization() as state:
+        with self.initialization(hosted=hosted) as state:
             self.apply_manifest(state, value)
         return {**self.status(), "checks": report}
 
@@ -619,7 +619,9 @@ class Session:
                 "sequence": 0, "paused": False, "host": None}
 
     @contextmanager
-    def initialization(self):
+    def initialization(self, *, hosted=False):
+        if hosted:
+            raise ReviewError("Hosted review requires a new SQLite session directory")
         with lock(self.registry / ".lock"), lock(self.directory / ".lock"):
             state = read_json(self.path)
             if state is not None and state.get("checkout") != str(self.root):
@@ -676,7 +678,9 @@ class Session:
             result["events"] = events
         if state.get("host"):
             result["host"] = state["host"]
-        warning = HubPublisher(self).warning(state["id"])
+        warning = None if state.get("hosted") else HubPublisher(self).warning(state["id"])
+        if state.get("hosted"):
+            result["mode"] = "hosted"
         if warning:
             result["hub"] = {"warning": warning}
         return result
@@ -852,18 +856,38 @@ class Session:
             raise ReviewError(f"{id_key} was already used for different content")
         return False
 
-    def save_feedback(self, state, item, clean, update_answer=True):
+    def save_feedback(self, state, item, clean, update_answer=True, *, at=None, actor="human"):
         self.upgrade(state)
         previous = item.get("feedback")
         if previous:
             item.setdefault("feedback_history", []).append(previous)
-        saved = {**clean, "saved_at": now(), "actor": "human"}
+        saved = {**clean, "saved_at": at or now(), "actor": actor}
         item["feedback"] = saved
         if update_answer and item.get("decision"):
             item.setdefault("superseded", []).append(item["decision"])
             item["decision"] = {**item["decision"], "note": clean.get("note", ""),
                                 "attachments": clean.get("attachments", []), "saved_at": now()}
-        self.event(state, "feedback", candidate=item["id"], feedback=saved)
+        self.event(state, "feedback", at=at, candidate=item["id"], feedback=saved)
+
+    def save_decision(self, state, item, clean, version=VERSION, *, at=None, actor="human"):
+        item.setdefault("decision_history", []).append(clean)
+        withdrawn = clean["outcome"] == "withdrawn"
+        if item.get("decision"):
+            item.setdefault("superseded", []).append(item["decision"])
+            if withdrawn and not item.get("feedback"):
+                previous = item["decision"]
+                self.save_feedback(state, item, {"candidate": item["id"], "fingerprint": item["fingerprint"],
+                    "feedback_id": "retained:" + clean["decision_id"], "note": previous.get("note", ""),
+                    "attachments": previous.get("attachments", [])}, update_answer=False)
+        if withdrawn:
+            item["decision"] = None
+        else:
+            item["decision"] = {**clean, "saved_at": at or now(), "actor": actor}
+            if version == VERSION or "note" in clean or "attachments" in clean:
+                self.save_feedback(state, item, {"candidate": item["id"], "fingerprint": item["fingerprint"],
+                    "feedback_id": "answer:" + clean["decision_id"], "note": clean.get("note", ""),
+                    "attachments": clean.get("attachments", [])}, update_answer=False, at=at, actor=actor)
+        self.event(state, "decision", at=at, candidate=item["id"], decision=item["decision"], withdrawn=withdrawn)
 
     @contextmanager
     def local_edit(self):
@@ -893,6 +917,7 @@ class Session:
         with self.local_edit() as state:
             if state is None or payload.get("session") != state["id"]:
                 raise ReviewError("Intake belongs to a different session")
+            self.require_local(state)
             if version == 2:
                 self.upgrade(state)
             # The transaction publishes only after every supplied entry validates.
@@ -947,24 +972,7 @@ class Session:
                         self.save_feedback(state, item, clean)
                         saved_feedback.append(item["id"])
                         continue
-                    item.setdefault("decision_history", []).append(clean)
-                    if item.get("decision"):
-                        item.setdefault("superseded", []).append(item["decision"])
-                        if clean["outcome"] == "withdrawn" and not item.get("feedback"):
-                            previous = item["decision"]
-                            self.save_feedback(state, item, {"candidate": item["id"], "fingerprint": item["fingerprint"],
-                                "feedback_id": "retained:" + clean[id_key], "note": previous.get("note", ""),
-                                "attachments": previous.get("attachments", [])}, update_answer=False)
-                    # Withdrawal changes only the answer; keep current feedback.
-                    if clean["outcome"] == "withdrawn":
-                        item["decision"] = None
-                    else:
-                        item["decision"] = {**clean, "saved_at": now(), "actor": "human"}
-                        if version == 2 or "note" in clean or "attachments" in clean:
-                            self.save_feedback(state, item, {"candidate": item["id"], "fingerprint": item["fingerprint"],
-                                "feedback_id": "answer:" + clean[id_key], "note": clean.get("note", ""),
-                                "attachments": clean.get("attachments", [])}, update_answer=False)
-                    self.event(state, "decision", candidate=item["id"], decision=item["decision"], withdrawn=clean["outcome"] == "withdrawn")
+                    self.save_decision(state, item, clean, version)
                     accepted.append(item["id"])
         return {"accepted": accepted, "feedback_saved": saved_feedback, "diagnostics_saved": saved_diagnostics,
                 "sequence": state["sequence"]}
@@ -1059,6 +1067,8 @@ class Session:
 
     def html(self, output):
         snapshot = self.status(full=True)
+        if snapshot.get("mode") == "hosted":
+            raise ReviewError("Hosted sessions use the hub collaboration page")
         snapshot.pop("host", None)
         snapshot.pop("hub", None)
         # A static file cannot know what was decided after it was written; it
@@ -1071,6 +1081,11 @@ class Session:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(text, encoding="utf-8")
         return {"html": str(destination), "session": snapshot["session"]}
+
+    @staticmethod
+    def require_local(state):
+        if state.get("hosted"):
+            raise ReviewError("Hosted sessions use the hub collaboration page for decisions and Hand Back")
 
 
 class SQLiteSession(Session):
@@ -1086,12 +1101,19 @@ class SQLiteSession(Session):
         self.store = SQLiteStore(self.active_path, self.root, ReviewError)
 
     @contextmanager
-    def initialization(self):
+    def initialization(self, *, hosted=False):
         # Arbitrate first initialization with running legacy helpers.
         with lock(self.registry / ".lock"), lock(self.directory / ".lock"):
             if self.path.exists() and not self.active_path.exists():
                 raise ReviewError("Existing JSON session; retry init to use its current runtime")
-            with self.store.edit(seed=self.seed()) as state:
+            seed = self.seed()
+            if hosted:
+                seed["hosted"] = True
+            with self.store.edit(seed=seed) as state:
+                if bool(state.get("hosted")) != hosted:
+                    raise ReviewError("Session mode is fixed at first init; use a new state directory")
+                if state.get("hosted") and state.get("hosted_bound"):
+                    raise ReviewError("Hosted package is immutable; use a new state directory for a new review")
                 yield state
 
     @contextmanager
@@ -1581,7 +1603,10 @@ def publish_after_command(session):
         meta = publisher.read() if publisher.path.exists() else None
         if not meta or not meta.get("hub") or not meta.get("served"):
             return
-        host = session.head().get("host")
+        state = session.head()
+        if state.get("hosted"):
+            return
+        host = state.get("host")
         if host:
             try:
                 if host_request(host, "/api/ping").get("token") == host["token"]:
@@ -1810,6 +1835,7 @@ class TailscaleServe:
 
 
 def serve(session, tailscale=False, tailscale_port=None, tailscale_bin="tailscale", hub=None):
+    session.require_local(session.head())
     if tailscale_port is not None and (not tailscale or not 1 <= tailscale_port <= 65535):
         raise ReviewError("--tailscale-port requires --tailscale and a port between 1 and 65535")
     token = secrets.token_urlsafe(32)
@@ -2029,7 +2055,9 @@ def main(argv=None):
     parser.add_argument("--state", help="External session directory; source checks and preparation retain --repo-root")
     parser.add_argument("--registry", help="Shared resource registry; all drivers using a resource must use the same registry")
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("init").add_argument("--manifest", required=True)
+    p = sub.add_parser("init")
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--hosted", action="store_true", help="Create a new SQLite session for hub-hosted decisions")
     sub.add_parser("check", help="Report question-rule violations without touching a session; exit 1 when init would refuse").add_argument("--manifest", required=True)
     p = sub.add_parser("status"); p.add_argument("--after", type=int); p.add_argument("--full", action="store_true")
     p = sub.add_parser("prepare"); p.add_argument("--candidate", action="append"); p.add_argument("--include-slow", action="store_true"); p.add_argument("--max-items", type=int)
@@ -2056,6 +2084,8 @@ def main(argv=None):
     action.add_parser("set", help="Save ORIGIN as this user's default hub").add_argument("url", metavar="ORIGIN")
     action.add_parser("show", help="Report the file location and its validated origin")
     action.add_parser("clear", help="Remove the machine default")
+    from hosted_review import add_commands, run as run_hosted
+    add_commands(sub)
     args = parser.parse_args(argv)
     session = None
     command = args.command
@@ -2068,7 +2098,9 @@ def main(argv=None):
             print(json.dumps(report))
             return 1 if report["refused"] else 0
         session = open_session(args.repo_root, args.registry, args.state, initialize=command == "init")
-        if command == "init": result = session.initialize(read_json(Path(args.manifest)))
+        if command == "init": result = session.initialize(read_json(Path(args.manifest)), hosted=args.hosted)
+        elif command in {"hosted-publish", "hosted-poll"}:
+            result = run_hosted(session, args, hub_origin, canonical)
         elif command == "status": result = session.status(args.after, args.full)
         elif command == "prepare": result = session.prepare(args.candidate, args.include_slow, args.max_items)
         elif command == "ready": session.ready(args.candidate, args.evidence); result = session.status()
@@ -2095,6 +2127,9 @@ def main(argv=None):
         print(json.dumps(result))
         return 0
     except KeyboardInterrupt:
+        if command in {"hosted-publish", "hosted-poll"}:
+            print(json.dumps({"error": "Hosted command interrupted; retry from the saved session"}), file=sys.stderr)
+            return 130
         return 0
     except (ReviewError, OSError, ValueError) as exc:
         failure = {"error": str(exc)}

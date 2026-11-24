@@ -1,0 +1,356 @@
+"""Exercise the native CLI using isolated consumers and the actual hub backends."""
+
+import base64
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
+import hashlib
+import http.server
+import json
+import os
+from pathlib import Path
+import secrets
+import shutil
+import sqlite3
+import ssl
+import subprocess
+import sys
+import tempfile
+import threading
+import unittest
+
+from test_hub_publication import issue
+
+SKILL = Path(__file__).resolve().parents[1]
+HUB_ROOT = os.environ.get("ATTENDED_REVIEW_HUB_ROOT")
+BASELINE = "d06e564f94697d2f2419d27fd4fbce97f4472c17"
+TOKEN_ENV = "ATTENDED_REVIEW_HOSTED_TOKEN"
+CONNECTION_ENV = "ATTENDED_REVIEW_HOSTED_FIXTURE_CONNECT"
+
+if HUB_ROOT:
+    sys.path.insert(0, str(Path(HUB_ROOT).resolve()))
+    from tests.test_hosted_access import COLLABORATION, OWNER, PRODUCER, REVIEWER
+    from tests.test_hosted_handback import HandbackFixture as HubFixture
+    from tests.test_hosted_publication import png, wav
+else:
+    HubFixture = unittest.TestCase
+
+
+class Consumer:
+    def __init__(self, fixture, name, candidates, hosted=True, version=1):
+        self.fixture = fixture
+        self.directory = fixture.root / name
+        self.directory.mkdir()
+        self.checkout = self.directory / "checkout"
+        self.checkout.mkdir()
+        self.state = self.directory / "state"
+        self.link = self.checkout / "attended-review"
+        self.link.symlink_to(SKILL, target_is_directory=True)
+        self.env = {**os.environ, "ATTENDED_REVIEW_HUB_CONFIG": str(self.directory / "machine-hub.json"),
+                    TOKEN_ENV: fixture.tokens["alpha"] if hasattr(fixture, "tokens") else secrets.token_urlsafe(32)}
+        self.manifest = self.directory / "manifest.json"
+        self.manifest.write_text(json.dumps({"schema_version": version, "candidates": candidates}))
+        self.init = ["init", "--manifest", str(self.manifest)]
+        self.initial = self.run(*self.init, *(["--hosted"] if hosted else []))
+
+    def invoke(self, *args, code=0, script=None, state=None, env=None):
+        helper = script or self.link / "scripts" / "attended_review.py"
+        command = [sys.executable, "-B", str(helper), "--repo-root", str(self.checkout),
+                   "--state", str(state or self.state), "--registry", str(self.directory / "registry"), *args]
+        trial = subprocess.run(command, capture_output=True, text=True, timeout=15,
+                               env={**self.env, **(env or {})})
+        case = self.fixture
+        case.assertNotIn((env or {}).get(TOKEN_ENV, self.env[TOKEN_ENV]), trial.stdout + trial.stderr)
+        case.assertEqual(trial.returncode, code, trial.stderr or trial.stdout)
+        return trial
+
+    def run(self, *args, code=0, **kwargs):
+        trial = self.invoke(*args, code=code, **kwargs)
+        return json.loads(trial.stdout if code == 0 else trial.stderr)
+
+    def publish(self, *ids, **kwargs):
+        picks = [word for cid in ids for word in ("--candidate", cid)]
+        return self.run("hosted-publish", "--origin", "https://" + PRODUCER, "--project", "alpha",
+                        "--installation", "desk", "--owner", OWNER, "--title", "Synthetic review",
+                        "--include-media", *picks, **kwargs)
+
+    def database(self):
+        return closing(sqlite3.connect(self.state / "session.sqlite3"))
+
+
+def card(cid, **values):
+    return {"id": cid, "title": "Check the draft", "revision": "fixture-v1",
+            "criteria": ["Check that the caption is legible."], **values}
+
+
+@unittest.skipIf(os.name == "nt", "Temporary consumer links use the local POSIX fixture")
+class HostedModeTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory(prefix="ask-hosted-mode-")
+        self.addCleanup(directory.cleanup)
+        self.root = Path(directory.name)
+
+    def test_explicit_mode_isolated_through_two_consumer_links(self):
+        hosted = Consumer(self, "hosted", [card("Proof")])
+        local = Consumer(self, "local", [card("Proof")], hosted=False)
+        self.assertNotEqual(hosted.initial["session"], local.initial["session"])
+        self.assertEqual(hosted.initial["mode"], "hosted")
+        self.assertNotIn("mode", local.initial)
+        for consumer in (hosted, local):
+            self.assertEqual(consumer.run("prepare")["candidates"][0]["phase"], "ready")
+        self.assertIn("mode is fixed", hosted.run(*hosted.init, code=1)["error"])
+        self.assertIn("mode is fixed", local.run(*local.init, "--hosted", code=1)["error"])
+        for args in [("serve",), ("html", "--output", str(self.root / "offline.html")), ("hand-back",)]:
+            hosted.run(*args, code=1)
+        self.assertFalse((self.root / "offline.html").exists())
+        payload = self.root / "intake.json"
+        payload.write_text(json.dumps({"schema_version": 2, "session": hosted.initial["session"], "decisions": []}))
+        self.assertIn("collaboration", hosted.run("import", "--file", str(payload), code=1)["error"])
+        self.assertTrue(local.run("hand-back")["handed_back"])
+        self.assertFalse((hosted.state / "session.json").exists())
+        self.assertFalse((hosted.state / "hub.json").exists())
+        self.assertEqual(hosted.run("status")["checkout"], str(hosted.checkout.resolve()))
+
+
+@unittest.skipUnless(HUB_ROOT and shutil.which("openssl") and os.name != "nt",
+                     "Set ATTENDED_REVIEW_HUB_ROOT to the local hub checkout and provide openssl")
+class NativeHubTests(HubFixture):
+    def setUp(self):
+        super().setUp()
+        issue(self.root, "test-ca", "producer", hosts=(PRODUCER, "redirect.example.ts.net"))
+        self.actions = {}
+        self.requests = []
+        self.proxies = []
+        self.port = self.proxy()
+
+    def proxy(self):
+        fixture = self
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def log_message(self, *_):
+                pass
+
+            def forward(self):
+                body = self.rfile.read(int(self.headers.get("Content-Length", "0")))
+                action = self.path.rsplit("/", 1)[-1] if self.command != "GET" else "poll"
+                fixture.requests.append((self.server.server_port, self.command, action, self.headers["Host"]))
+                headers = [(key, self.headers[key]) for key in
+                           ("Authorization", "Content-Type", "Content-Length", "X-Hosted-Revision")
+                           if key in self.headers]
+                override = fixture.actions.pop(action, None)
+                if override == "redirect":
+                    self.send_response(307)
+                    self.send_header("Location", f"https://redirect.example.ts.net:{fixture.proxies[-1]}/capture")
+                    self.end_headers()
+                    return
+                status, _, result = fixture.via_socket("producer", self.path, self.command, headers, body)
+                if override == "drop":
+                    self.close_connection = True
+                    return
+                if callable(override):
+                    result = override(result)
+                self.send_response(status)
+                self.send_header("Content-Length", str(len(result)))
+                self.end_headers()
+                self.wfile.write(result)
+
+            do_PUT = do_POST = do_GET = forward
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(self.root / "producer.pem", self.root / "producer.key")
+        server.socket = context.wrap_socket(server.socket, server_side=True)
+        worker = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": .01})
+        worker.start()
+
+        def stop():
+            server.shutdown()
+            worker.join(timeout=5)
+            server.server_close()
+
+        self.addCleanup(stop)
+        self.proxies.append(server.server_port)
+        return server.server_port
+
+    def consumer(self, name, *candidates, version=1):
+        consumer = Consumer(self, name, list(candidates), version=version)
+        consumer.env.update({CONNECTION_ENV: f"127.0.0.1:{self.port}", "SSL_CERT_FILE": str(self.root / "test-ca.pem")})
+        consumer.run("prepare")
+        return consumer
+
+    def endpoints(self, consumer, receipt):
+        path = "/api/projects/alpha/reviews/" + receipt["review"]
+        return path, self.scope(consumer.initial["session"]) + "/handback/" + receipt["review"]
+
+    def legacy_reader(self):
+        upstream = SKILL.parents[1]
+        reader = self.root / "baseline-reader"
+        reader.mkdir()
+        for file in ("attended_review.py", "review_store.py"):
+            old = subprocess.check_output(["git", "-C", str(upstream), "show",
+                                           f"{BASELINE}:skills/attended-review/scripts/{file}"])
+            (reader / file).write_bytes(old)
+        return reader / "attended_review.py"
+
+    def test_actual_hub_offline_publication_and_durable_handback(self):
+        assets = [("image/png", png(), "image"), ("audio/wav", wav(), "audio")]
+        media = [{"kind": kind, "url": f"data:{mime};base64,{base64.b64encode(raw).decode()}", "label": kind}
+                 for mime, raw, kind in assets]
+        consumer = self.consumer("alpha-origin", card("Verdict", kind="design", paths=["private/file"], media=media,
+                                                     note="Café caption", launch={"command": "private-command"}),
+                                 card("Pick", kind="decision", options=["First", "Second"]),
+                                 card("Pending", kind="decision", document="Draft copy"),
+                                 card("Unshared", kind="decision", document="Other draft"), version=3)
+        consumer.run("observe", "Verdict", "--evidence", "Origin-only prior observation")
+        selected = ("Pick", "Verdict", "Pending")
+        self.actions[hashlib.sha256(assets[0][1]).hexdigest()] = "drop"
+        self.assertIn("retry", consumer.publish(*selected, code=1)["error"])
+        with consumer.database() as db:
+            original, revision = db.execute("SELECT manifest, revision FROM hosted_package").fetchone()
+        for private in ("private/file", "private-command", "Unshared", consumer.env[TOKEN_ENV]):
+            self.assertNotIn(private.encode(), original)
+        self.assertEqual(hashlib.sha256(original).hexdigest(), revision)
+        self.assertEqual([entry["id"] for entry in json.loads(original)["items"]], list(selected))
+        self.actions["commit"] = "drop"
+        consumer.run("hosted-publish", code=1)
+        receipt = consumer.run("hosted-publish")
+        self.assertEqual((receipt["state"], receipt["revision"]), ("committed", revision))
+        self.assertEqual(consumer.run("hosted-poll"), {"state": "waiting"})
+        self.assertIn("immutable", consumer.run(*consumer.init, "--hosted", code=1)["error"])
+        path, endpoint = self.endpoints(consumer, receipt)
+        self.stop(self.processes["producer"])
+        self.assertEqual(self.sharing(path)[0], 200)
+        self.assertEqual(self.human(path + "/items/Pick/feedback", method="PUT", actor=REVIEWER,
+                                    payload={"version": 0, "note": "Hub-only collaboration note"})[0], 200)
+        self.assertEqual(self.decision(path, "Pick", version=1, outcome="select", selected=["Second"])[0], 200)
+        verdict = json.loads(self.decision(path, "Verdict", version=0, outcome="accept", note="Ship café ☕")[2])["decision"]
+        frozen = json.loads(self.freeze(path, revision)[2])
+        self.assertEqual(frozen["state"], "waiting")
+        self.assertIsNone(consumer.run("status")["handed_back"])
+        archive = consumer.state / "session.json"
+        self.assertFalse(archive.exists())
+        self.restart("collaboration", COLLABORATION)
+        self.start("producer", PRODUCER)
+        exported = self.human(path + "/handback")[2]
+        self.assertEqual(self.producer(endpoint, "GET", revision=revision)[2], exported)
+        export_lock = consumer.state / ".export-lock.sqlite3"
+        export_lock.mkdir()
+        try:
+            self.assertIn("pending", consumer.run("hosted-poll", code=1)["error"])
+            self.assertIsNone(consumer.run("status")["handed_back"])
+            self.assertFalse(archive.exists())
+            self.assertEqual(json.loads(self.human(path)[2])["delivery"], "waiting")
+        finally:
+            export_lock.rmdir()
+        crash = consumer.directory / "interrupt_after_archive.py"
+        crash.write_text(f"""import os, sys
+sys.path.insert(0, {str(SKILL / 'scripts')!r})
+import attended_review, review_store
+install = review_store.install_archive
+def interrupt(*args):
+    install(*args)
+    os._exit(91)
+review_store.install_archive = interrupt
+raise SystemExit(attended_review.main())
+""")
+        consumer.invoke("hosted-poll", script=crash, code=91)
+        saved = archive.read_bytes()
+        self.assertIsNone(consumer.run("status")["handed_back"])
+        self.assertEqual(json.loads(self.human(path)[2])["delivery"], "waiting")
+        saved_at = consumer.directory / "copied-archive.json"
+        archive.rename(saved_at)
+        archive.write_text("Unrelated local result")
+        self.assertIn("conflicts", consumer.run("hosted-poll", code=1)["error"])
+        self.assertEqual(archive.read_text(), "Unrelated local result")
+        self.assertEqual(json.loads(self.human(path)[2])["delivery"], "needs_attention")
+        archive.unlink()
+        saved_at.rename(archive)
+        self.actions["ack"] = "drop"
+        consumer.run("hosted-poll", code=1)
+        self.assertEqual(json.loads(self.human(path)[2])["delivery"], "delivered")
+        with ThreadPoolExecutor(max_workers=2) as workers:
+            replies = list(workers.map(lambda _: consumer.run("hosted-poll"), range(2)))
+        self.assertEqual(replies[0], replies[1])
+        self.assertEqual(replies[0]["delivery"], frozen["delivery"])
+        self.assertEqual(archive.read_bytes(), saved)
+        self.assertEqual([action for _, _, action, _ in self.requests].count("poll"), 2)
+        self.assertNotIn(b"Hub-only collaboration note", saved)
+        archive_data = json.loads(saved)
+        events = archive_data["events"]
+        self.assertEqual([event["kind"] for event in events].count("handed-back"), 1)
+        self.assertEqual(events[-1]["sequence"], replies[0]["sequence"])
+        self.assertEqual(events[-1]["kind"], "handed-back")
+        self.assertEqual(events[-1]["decided"], ["Pick", "Verdict"])
+        self.assertEqual(events[-1]["pending"], ["Pending", "Unshared"])
+        self.assertEqual(archive_data["candidates"]["Pick"]["decision"]["selected"], ["Second"])
+        self.assertEqual(archive_data["candidates"]["Verdict"]["decision"]["actor"], verdict["actor"])
+        self.assertEqual(archive_data["candidates"]["Verdict"]["media"], media)
+        self.assertIn(b"Origin-only prior observation", saved)
+        self.assertIn("Ship café ☕".encode(), saved)
+        old = self.legacy_reader()
+        self.assertIn("database version", consumer.run("status", script=old, code=1)["error"])
+        archive_copy = consumer.directory / "legacy-archive"
+        archive_copy.mkdir()
+        (archive_copy / "session.json").write_bytes(saved)
+        old_status = consumer.run("status", "--after", "0", "--full", script=old, state=archive_copy)
+        self.assertEqual(old_status["handed_back"], archive_data["handed_back"])
+        self.assertEqual(old_status["events"], events)
+        self.assertEqual(consumer.run("wait", "--after", "0", "--kind", "handed-back")["events"], [events[-1]])
+
+    def test_binding_conflicts_and_transport_refusals(self):
+        consumer = self.consumer("beta-origin", card("Proof"))
+        request_count = len(self.requests)
+        refusal = consumer.run("hosted-publish", "--origin", "https://" + PRODUCER, "--project", "alpha",
+                               "--installation", "desk", "--owner", OWNER, "--title=" + self.tokens["alpha"],
+                               "--candidate", "Proof", code=1)
+        self.assertIn("contains the producer credential", refusal["error"])
+        failed = consumer.run("hosted-publish", "--origin", "https://wrong.example.ts.net", "--project", "alpha",
+                              "--installation", "desk", "--owner", OWNER, "--title", "Test connection",
+                              "--candidate", "Proof", code=1)
+        self.assertIn("certificate verification", failed["error"])
+        self.assertEqual(len(self.requests), request_count)
+        other = self.consumer("other-origin", card("Proof"))
+        redirect_port = self.proxy()
+        self.actions[other.initial["session"]] = "redirect"
+        self.assertIn("redirect refused", other.publish("Proof", code=1)["error"])
+        self.assertFalse(any(port == redirect_port for port, _, _, _ in self.requests))
+        self.assertIn("HTTP 404", other.run("hosted-publish", code=1, env={TOKEN_ENV: self.tokens["beta"]})["error"])
+        receipt = other.run("hosted-publish")
+        path, endpoint = self.endpoints(other, receipt)
+        self.assertNotEqual(consumer.initial["session"], other.initial["session"])
+        self.assertEqual(self.decision(path, "Proof", version=0, outcome="reject")[0], 200)
+        self.assertEqual(self.freeze(path, receipt["revision"])[0], 200)
+        archive = other.state / "session.json"
+
+        def alter(raw, field):
+            envelope = json.loads(raw)
+            snapshot = envelope["snapshot"]
+            if field == "target":
+                snapshot["target"]["session"] = consumer.initial["session"]
+            elif field == "item":
+                snapshot["items"][0]["fingerprint"] = "0" * 64
+            if field != "digest":
+                data = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+                envelope["digest"] = hashlib.sha256(data).hexdigest()
+            else:
+                envelope["digest"] = "0" * 64
+            return json.dumps(envelope).encode()
+
+        for field in ("digest", "target", "item"):
+            self.actions["poll"] = lambda raw, field=field: alter(raw, field)
+            self.assertIn("snapshot does not match", other.run("hosted-poll", code=1)["error"])
+            self.assertEqual(json.loads(self.human(path)[2])["delivery"], "waiting")
+        self.assertFalse(archive.exists())
+        other.run("resume-development", "--candidate", "Proof")
+        self.assertIn("unprotected", other.run("hosted-poll", code=1)["error"])
+        self.assertEqual(json.loads(self.human(path)[2])["delivery"], "needs_attention")
+        other.run("prepare")
+        conflict = b'{"unrelated":true}\n'
+        archive.write_bytes(conflict)
+        self.assertIn("conflicts", other.run("hosted-poll", code=1)["error"])
+        self.assertEqual(archive.read_bytes(), conflict)
+        self.assertIsNone(other.run("status")["candidates"][0]["decision"])
+        archive.rename(other.directory / "retained.json")
+        self.assertEqual(other.run("hosted-poll")["state"], "delivered")
+        self.assertEqual(self.producer(endpoint, "GET", revision=receipt["revision"])[0], 204)
+        self.assertEqual((other.directory / "retained.json").read_bytes(), conflict)
+        self.assertFalse((consumer.state / "session.json").exists())
