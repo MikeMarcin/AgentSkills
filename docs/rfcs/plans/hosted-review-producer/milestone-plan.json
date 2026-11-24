@@ -1,0 +1,18 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "hosted-review-producer",
+  "scope": {"rfcs": ["RFC-ASK-0020"], "issues": ["ASK-0141", "ASK-0142"]},
+  "coverage": "complete",
+  "milestones": [
+    {
+      "id": "native-hosted-producer",
+      "outcome": "AgentSkills publishes hosted reviews and durably receives native handbacks.",
+      "work": [{"issue": "ASK-0141"}, {"issue": "ASK-0142"}],
+      "depends_on": [],
+      "exit_criteria": [
+        "Native local publication and handback pass with the actual hub, including replay and the existing JSON reader."
+      ],
+      "boundary": "Disposable fixtures only, with no deployment or push."
+    }
+  ]
+}
