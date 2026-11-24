@@ -1,0 +1,11 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0141",
+    "ASK-0142"
+  ],
+  "reserve_for": "hosted-review-producer",
+  "purpose": "",
+  "created": "2026-11-24T22:12:48.382322+00:00",
+  "base": "7f0c43af728dea5a7eaa4cb8932e7a67b25f8e18"
+}
