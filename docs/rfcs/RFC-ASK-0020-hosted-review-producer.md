@@ -38,4 +38,4 @@ output. Live rollout and consumer installation are outside this scope.
   endpoint without redirecting credentials.
 
 [Work card](../issues/60-done/ASK-0141-hosted-review-producer.md) and
-[closeout](../issues/20-ready/ASK-0142-close-hosted-review-producer.md).
+[closeout](../issues/30-in-progress/ASK-0142-close-hosted-review-producer.md).
