@@ -110,3 +110,25 @@ preserving other claims, issuing zero requests and leaving delivery waiting.
 The nested release response can still show the earlier protection flag in
 that legacy pending-export scenario. Windows and live Serve were outside
 this recheck.
+
+## Legacy release response correction
+
+On the same local-only mandate, the follow-up from
+`ceb4925e2e5bfe80583338151d61353d61baeba7` fixed the stale protection flag
+in `resume-development`. Source
+`b7e5bcfb9d644704e942d2b84f7d1bd3dafc337c` reports protection from the
+committed legacy release while keeping decisions, feedback and the Hand Back
+marker on the pre-export status view.
+
+The prior producer CLI queued an actual frozen decision from AttendedReviewHub
+`4530e3b295664086f28a7fec5f672b4a1c788f4f` without publishing an archive.
+The new direct test failed on the prior code because the released candidate
+still appeared protected. It passed on the corrected source and confirmed
+that the other claim stayed protected, the decision stayed hidden, and
+the release issued no producer request, archive write or ACK.
+
+All nine focused hosted tests and both SQLite lifecycle tests passed using
+the commands above. Four existing release tests also passed with
+`python3 -B -m unittest discover -s skills/attended-review/tests -p test_attended_review.py -k release -v`.
+The worktree is quiescent. The same independent critical reviewer recheck
+is pending on this source.
