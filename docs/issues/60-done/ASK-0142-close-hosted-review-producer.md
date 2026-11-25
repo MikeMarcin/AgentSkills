@@ -136,3 +136,24 @@ interrupted-export check confirmed that sequential releases reported both
 released claims accurately, preserved an unrelated claim, and left staged
 handback data hidden. Standalone status still reads the durable snapshot
 preceding the pending export. Verification used macOS and loopback services.
+
+## Standalone legacy status correction
+
+The owner extended the same local-only mandate to standalone `status`. From
+AgentSkills `1cd3a3509089d2e705364a1f120571b65e86ff47`, the correction landed
+in `994e3267c07393e26c024cafde2a5229c95ecc1a`. On a legacy published session
+with an export pending, SQLite status now reads current protection while
+keeping decisions, feedback, events and the cursor at the visible pre-export
+snapshot. The release response uses the same read.
+
+The direct CLI regression failed on the preceding source with a stale
+protection flag. With the correction and Hub
+`4530e3b295664086f28a7fec5f672b4a1c788f4f`, both plain `status` and
+`status --after 0 --full` showed the release, preserved the unrelated claim,
+and left staged Hand Back data hidden. The old origin sent no requests and
+wrote no archive or ACK. The nine hosted tests, two SQLite lifecycle tests
+and four existing release tests passed using the commands above. Documentation,
+board validation and the staged BetterLeaks scan passed.
+
+All task-owned tests and listeners exited. The same critical reviewer recheck
+is pending on the corrected source.
