@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0144"
 title: "Update deep worker turn budget and Codex route"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: ["ASK-0046"]
 ---
