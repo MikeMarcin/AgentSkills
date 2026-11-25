@@ -78,7 +78,10 @@ Earlier hosted databases without a directory binding cannot publish or receive
 an ACK. Preserve the database and any archive. For an unpublished draft, use
 its manifest to start a new hosted session in a separate state directory. For
 a published review, ask the enrolled owner to export the frozen result for
-manual reconciliation or start a new hosted review. Owner export is also the
+manual reconciliation or start a new hosted review. If the old session holds
+exclusive resources needed by the replacement, use its original checkout,
+state directory and registry to run `REVIEW resume-development --candidate ID`
+for each affected candidate. Then prepare the replacement. Owner export is also the
 recovery path when the hub has already acknowledged the delivery and the
 restored origin lacks its receipt.
 

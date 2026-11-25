@@ -13,6 +13,7 @@ import tempfile
 
 DATABASE = "session.sqlite3"
 HOSTED_DB_VERSION = 3
+UNBOUND_HOSTED = "Hosted session has no recorded state directory; preserve it and create a new hosted session"
 MATERIAL = ("media", "audio", "now", "reference")
 HISTORY = ("decision_history", "feedback_history", "superseded")
 SUMMARY = ("id", "title", "revision", "fingerprint", "phase", "protected",
@@ -167,9 +168,11 @@ class SQLiteStore:
         if version == HOSTED_DB_VERSION:
             if header.get("hosted") is not True or header.get("hosted_directory") != self.hosted_directory():
                 raise self.error("Hosted session belongs to its original state directory")
-        elif header.get("hosted_bound"):
-            raise self.error("Published hosted session has no recorded state directory; preserve it and create a new hosted session")
         return header
+
+    def require_export_binding(self, header):
+        if header.get("hosted") and "hosted_directory" not in header:
+            raise self.error(UNBOUND_HOSTED)
 
     def hosted_directory(self):
         if self.path.is_symlink():
@@ -180,13 +183,13 @@ class SQLiteStore:
         db.execute("INSERT OR REPLACE INTO metadata VALUES (1,?)", (pack(header),))
 
     @contextmanager
-    def edit(self, seed=None):
+    def edit(self, seed=None, *, release_legacy_hosted=False):
         with self.connection(writer=True, create=seed is not None) as db:
-            with self.editing(db, seed) as state:
+            with self.editing(db, seed, release_legacy_hosted=release_legacy_hosted) as state:
                 yield state
 
     @contextmanager
-    def editing(self, db, seed=None):
+    def editing(self, db, seed=None, *, release_legacy_hosted=False):
         if seed is not None:
             version = db.execute("PRAGMA user_version").fetchone()[0]
             if version == 0:
@@ -202,6 +205,8 @@ class SQLiteStore:
             header = seed
             self.write_header(db, header)
             self.write_commit(db, header)
+        if header.get("hosted_bound") and not release_legacy_hosted:
+            self.require_export_binding(header)
         before = dict(header)
         cards = Cards(db)
         events, history = [], []
@@ -391,7 +396,7 @@ class SQLiteStore:
 
     def pending_export(self):
         with self.connection() as db:
-            self.header(db)
+            self.require_export_binding(self.header(db))
             return db.execute("SELECT min(sequence) FROM exports WHERE receipt IS NULL").fetchone()[0]
 
     def publish_export(self, sequence, path):
@@ -400,6 +405,7 @@ class SQLiteStore:
         with self.connection(writer=True, create=True, path=path.parent / ".export-lock.sqlite3", timeout=30):
             with self.connection() as db:
                 current = self.header(db)
+                self.require_export_binding(current)
                 raw, saved = db.execute("SELECT header, receipt FROM exports WHERE sequence=?", (sequence,)).fetchone()
                 exclusive = bool(current.get("hosted"))
                 if saved is not None and not exclusive:

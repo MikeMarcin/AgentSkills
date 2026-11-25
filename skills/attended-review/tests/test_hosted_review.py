@@ -180,7 +180,7 @@ class NativeHubTests(HubFixture):
     def consumer(self, name, *candidates, version=1, initializer=None):
         consumer = Consumer(self, name, list(candidates), version=version, initializer=initializer)
         consumer.env.update({CONNECTION_ENV: f"127.0.0.1:{self.port}", "SSL_CERT_FILE": str(self.root / "test-ca.pem")})
-        consumer.run("prepare")
+        consumer.run("prepare", script=initializer)
         return consumer
 
     def endpoints(self, consumer, receipt):
@@ -311,6 +311,35 @@ class NativeHubTests(HubFixture):
             self.assertIn("no recorded state directory", old_published.run(*args, code=1)["error"])
         self.assertEqual(len(self.requests), requests)
         self.assertFalse((old_published.state / "session.json").exists())
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
+
+    def test_unbound_published_origin_can_release_resources_for_replacement_offline(self):
+        earlier = self.earlier_helper(UNBOUND_HOSTED_BASELINE, "hosted_review.py")
+        original = self.consumer("old-resource-owner", card("Proof", resources=["fixture-installation"]),
+                                 initializer=earlier)
+        receipt = original.publish("Proof", script=earlier)
+        review, _ = self.endpoints(original, receipt)
+        self.assertEqual(self.freeze(review, receipt["revision"])[0], 200)
+        requests = len(self.requests)
+
+        replacement_state = original.directory / "replacement-state"
+        fallback = original.run(*original.init, "--hosted", state=replacement_state)
+        self.assertNotEqual(fallback["session"], original.initial["session"])
+        blocked = original.run("prepare", state=replacement_state)["candidates"][0]
+        self.assertEqual(blocked["phase"], "waiting")
+        self.assertIn("protected", blocked["error"])
+
+        released = original.run("resume-development", "--candidate", "Proof")
+        self.assertEqual(released["affected"], ["Proof"])
+        self.assertFalse(released["status"]["candidates"][0]["protected"])
+        prepared = original.run("prepare", state=replacement_state)["candidates"][0]
+        self.assertEqual(prepared["phase"], "ready")
+        self.assertTrue(prepared["protected"])
+        for args in (("hosted-publish",), ("hosted-poll",), ("wait", "--timeout", "0"),
+                     ("observe", "Proof", "--evidence", "fixture observation")):
+            self.assertIn("no recorded state directory", original.run(*args, code=1)["error"])
+        self.assertEqual(len(self.requests), requests)
+        self.assertFalse((original.state / "session.json").exists())
         self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
 
     def test_actual_hub_offline_publication_and_durable_handback(self):

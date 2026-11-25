@@ -529,7 +529,7 @@ class Session:
                     raise ReviewError("explicit state and registry must be separate from the source repository")
 
     @contextmanager
-    def transaction(self):
+    def transaction(self, *, release_legacy_hosted=False):
         # One lock order, including across processes and independent worktrees.
         with lock(self.registry / ".lock"):
             with lock(self.directory / ".lock"):
@@ -1033,7 +1033,7 @@ class Session:
     def resume_development(self, paths=(), resource_keys=(), selected=(), all_candidates=False, preparation_stopped=False):
         if not (paths or resource_keys or selected or all_candidates):
             raise ReviewError("Select affected --paths, --resources or --candidate; --all explicitly releases everything")
-        with self.transaction() as (state, resources):
+        with self.transaction(release_legacy_hosted=True) as (state, resources):
             if state is None:
                 raise ReviewError("No session")
             affected = []
@@ -1118,18 +1118,18 @@ class SQLiteSession(Session):
                 yield state
 
     @contextmanager
-    def local_edit(self):
-        with self.store.edit() as state:
+    def local_edit(self, *, release_legacy_hosted=False):
+        with self.store.edit(release_legacy_hosted=release_legacy_hosted) as state:
             self.check_version(state)
             yield state
 
     @contextmanager
-    def transaction(self):
+    def transaction(self, *, release_legacy_hosted=False):
         with lock(self.registry / ".lock"):
             path = self.registry / "resources.json"
             original = read_json(path, {})
             resources = {key: list(entries) for key, entries in original.items()}
-            with self.local_edit() as state:
+            with self.local_edit(release_legacy_hosted=release_legacy_hosted) as state:
                 yield state, resources
                 retained = retain_claims(original, resources)
                 if retained != original:

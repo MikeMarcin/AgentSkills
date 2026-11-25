@@ -13,7 +13,7 @@ import struct
 from urllib.parse import urlsplit
 import zlib
 
-from review_store import ArchiveConflict
+from review_store import ArchiveConflict, UNBOUND_HOSTED
 
 IDENTIFIER = re.compile(r"[a-z0-9][a-z0-9_-]{0,63}")
 ITEM_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,95}")
@@ -242,7 +242,7 @@ def require_hosted(header):
     if not header.get("hosted"):
         raise HostedError("Hosted commands require a new SQLite session created with init --hosted")
     if "hosted_directory" not in header:
-        raise HostedError("Hosted session has no recorded state directory; preserve it and create a new hosted session")
+        raise HostedError(UNBOUND_HOSTED)
 
 
 def load_binding(session):
@@ -353,7 +353,7 @@ def save_publication(session, receipt, revision, allowed_state):
             or receipt["state"] not in allowed_state):
         raise HostedError("Hosted publication receipt does not match the saved revision")
     with session.store.connection(writer=True) as db:
-        session.store.header(db)
+        require_hosted(session.store.header(db))
         current = binding(db)
         if current["review"] not in (None, receipt["review"]) or current["revision"] != revision:
             raise HostedError("Hosted publication receipt conflicts with the saved binding")
@@ -445,7 +445,7 @@ def stage_delivery(session, current, snapshot, digest, canonical):
     delivery = snapshot["delivery"]
     at = timestamp(snapshot["handed_back_at"])
     with session.store.connection(writer=True) as db:
-        session.store.header(db)
+        require_hosted(session.store.header(db))
         latest = binding(db)
         if latest["delivery"]:
             if (latest["delivery"], latest["digest"]) != (delivery, digest):
@@ -512,7 +512,7 @@ def poll(session, current, transport, canonical):
     # against the current hub after the local archive is durable.
     transport.request("PUT", path + "/ack", {204}, encode(receipt), "application/json")
     with session.store.connection(writer=True) as db:
-        session.store.header(db)
+        require_hosted(session.store.header(db))
         db.execute("UPDATE hosted_package SET acknowledged=1 WHERE singleton=1 AND delivery=? AND digest=?",
                    (receipt["delivery"], receipt["digest"]))
     return {"state": "delivered", "delivery": receipt["delivery"], "sequence": sequence}
