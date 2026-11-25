@@ -1109,6 +1109,7 @@ class SQLiteSession(Session):
             seed = self.seed()
             if hosted:
                 seed["hosted"] = True
+                seed["hosted_directory"] = self.store.hosted_directory()
             with self.store.edit(seed=seed) as state:
                 if bool(state.get("hosted")) != hosted:
                     raise ReviewError("Session mode is fixed at first init; use a new state directory")

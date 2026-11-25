@@ -229,18 +229,20 @@ def prepared_item(session, db, ident, canonical, fingerprint=None):
 
 def binding(db):
     row = db.execute("""SELECT origin, manifest, revision, review, committed, delivery, digest,
-                      export_sequence, acknowledged FROM hosted_package WHERE singleton=1""").fetchone()
-    origin, raw, revision, review, committed, delivery, digest, sequence, ack = row
+                      export_sequence FROM hosted_package WHERE singleton=1""").fetchone()
+    origin, raw, revision, review, committed, delivery, digest, sequence = row
     if sha256(raw) != revision:
         raise HostedError("Stored hosted manifest digest is inconsistent")
     manifest = json.loads(raw)
     return {"origin": origin, "raw": raw, "manifest": manifest, "revision": revision, "review": review,
-            "committed": bool(committed), "delivery": delivery, "digest": digest, "sequence": sequence, "acked": bool(ack)}
+            "committed": bool(committed), "delivery": delivery, "digest": digest, "sequence": sequence}
 
 
 def require_hosted(header):
     if not header.get("hosted"):
         raise HostedError("Hosted commands require a new SQLite session created with init --hosted")
+    if "hosted_directory" not in header:
+        raise HostedError("Hosted session has no recorded state directory; preserve it and create a new hosted session")
 
 
 def load_binding(session):
@@ -351,6 +353,7 @@ def save_publication(session, receipt, revision, allowed_state):
             or receipt["state"] not in allowed_state):
         raise HostedError("Hosted publication receipt does not match the saved revision")
     with session.store.connection(writer=True) as db:
+        session.store.header(db)
         current = binding(db)
         if current["review"] not in (None, receipt["review"]) or current["revision"] != revision:
             raise HostedError("Hosted publication receipt conflicts with the saved binding")
@@ -442,6 +445,7 @@ def stage_delivery(session, current, snapshot, digest, canonical):
     delivery = snapshot["delivery"]
     at = timestamp(snapshot["handed_back_at"])
     with session.store.connection(writer=True) as db:
+        session.store.header(db)
         latest = binding(db)
         if latest["delivery"]:
             if (latest["delivery"], latest["digest"]) != (delivery, digest):
@@ -449,8 +453,6 @@ def stage_delivery(session, current, snapshot, digest, canonical):
             return latest["sequence"]
         if (latest["review"], latest["revision"]) != (current["review"], current["revision"]):
             raise NeedsAttention("Hosted publication binding changed")
-        if os.path.lexists(session.path):
-            raise NeedsAttention("Existing Hand Back archive conflicts with the hosted delivery")
         with session.store.editing(db) as state:
             require_hosted(state)
             if state.get("handed_back") or state["id"] != snapshot["target"]["session"]:
@@ -469,7 +471,12 @@ def stage_delivery(session, current, snapshot, digest, canonical):
             state["handed_back"] = at
             session.event(state, "handed-back", at=at)
             sequence = state["sequence"]
-        session.store.queue_archive(db, session.store.header(db))
+        header = session.store.header(db)
+        if os.path.lexists(session.path):
+            # The database may have been restored to before this delivery.
+            # Compare the exact projected archive while changes can roll back.
+            session.store.verify_staged_archive(db, session.path, header)
+        session.store.queue_archive(db, header)
         db.execute("UPDATE hosted_package SET delivery=?, digest=?, export_sequence=? WHERE singleton=1",
                    (delivery, digest, sequence))
         return sequence
@@ -479,8 +486,6 @@ def poll(session, current, transport, canonical):
     if not current["committed"]:
         raise HostedError("Complete hosted-publish before polling for Hand Back")
     path = "/handback/" + current["review"]
-    if current["acked"]:
-        return {"state": "delivered", "delivery": current["delivery"], "sequence": current["sequence"]}
     if current["delivery"]:
         receipt = {"delivery": current["delivery"], "digest": current["digest"]}
         sequence = current["sequence"]
@@ -495,7 +500,7 @@ def poll(session, current, transport, canonical):
         receipt = {"delivery": snapshot["delivery"], "digest": envelope["digest"]}
         try:
             sequence = stage_delivery(session, current, snapshot, envelope["digest"], canonical)
-        except NeedsAttention:
+        except (NeedsAttention, ArchiveConflict):
             transport.request("PUT", path + "/attention", {204}, encode(receipt), "application/json")
             raise
     try:
@@ -503,8 +508,11 @@ def poll(session, current, transport, canonical):
     except ArchiveConflict as error:
         transport.request("PUT", path + "/attention", {204}, encode(receipt), "application/json")
         raise NeedsAttention(str(error)) from None
+    # A restored hub can have forgotten an ACK. Confirm this exact delivery
+    # against the current hub after the local archive is durable.
     transport.request("PUT", path + "/ack", {204}, encode(receipt), "application/json")
     with session.store.connection(writer=True) as db:
+        session.store.header(db)
         db.execute("UPDATE hosted_package SET acknowledged=1 WHERE singleton=1 AND delivery=? AND digest=?",
                    (receipt["delivery"], receipt["digest"]))
     return {"state": "delivered", "delivery": receipt["delivery"], "sequence": sequence}

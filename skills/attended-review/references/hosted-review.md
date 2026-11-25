@@ -48,7 +48,9 @@ and review shown by the receipt.
 
 After the owner selects **Freeze and hand back** on the collaboration page,
 run `REVIEW hosted-poll` from the original checkout using its original session
-directory. A poll returns `waiting` if no delivery is ready. A valid frozen
+directory. Restoring a database backup requires that same directory. A copy in
+another directory cannot receive or acknowledge the review. A poll returns
+`waiting` if the hub has no queued delivery and the origin has no receipt. A valid frozen
 delivery adds the owner's current decisions and the Hand Back marker to
 the native session. It writes searchable `session.json` through that marker
 before acknowledging delivery and returning `delivered`. Existing JSON readers
@@ -57,15 +59,28 @@ archive together for recovery.
 
 Repeat `hosted-poll` after interruption. The saved delivery lets the command
 recover archive creation or retry an ACK without adding duplicate decisions
-or a second Hand Back marker. Use `status --after SEQUENCE` with the consumed
+or a second Hand Back marker. For a recorded delivery, every poll checks the
+archive and confirms the matching ACK with the hub. This also restores delivery
+status if the hub was restored to a backup taken before acknowledging it.
+Use `status --after SEQUENCE` with the consumed
 cursor to reconcile the decision events and marker. The hub retains attributed
 collaboration feedback in the review and audit views.
 
 If the hub reports **Needs attention**, inspect the original session. A
 candidate that lost protection must be prepared again against the same
-fingerprint. If another file occupies `session.json`, preserve it elsewhere
-before retrying. For material that has changed, use a new hosted session
-for a new review.
+fingerprint. If a restored origin database lacks the local delivery receipt
+and the hub still has the frozen delivery queued, the helper checks any existing
+`session.json` against the exact archive it would write. It keeps a matching
+file in place. Preserve a conflicting file elsewhere before retrying. For
+material that has changed, use a new hosted session for a new review.
+
+Earlier hosted databases without a directory binding cannot publish or receive
+an ACK. Preserve the database and any archive. For an unpublished draft, use
+its manifest to start a new hosted session in a separate state directory. For
+a published review, ask the enrolled owner to export the frozen result for
+manual reconciliation or start a new hosted review. Owner export is also the
+recovery path when the hub has already acknowledged the delivery and the
+restored origin lacks its receipt.
 
 ## Local integration verification
 

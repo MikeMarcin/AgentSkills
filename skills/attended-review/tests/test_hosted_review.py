@@ -23,6 +23,7 @@ from test_hub_publication import issue
 SKILL = Path(__file__).resolve().parents[1]
 HUB_ROOT = os.environ.get("ATTENDED_REVIEW_HUB_ROOT")
 BASELINE = "d06e564f94697d2f2419d27fd4fbce97f4472c17"
+UNBOUND_HOSTED_BASELINE = "8bdb8ea8e05bae4affe68f0b48f9c12d36601c94"
 TOKEN_ENV = "ATTENDED_REVIEW_HOSTED_TOKEN"
 CONNECTION_ENV = "ATTENDED_REVIEW_HOSTED_FIXTURE_CONNECT"
 
@@ -36,7 +37,7 @@ else:
 
 
 class Consumer:
-    def __init__(self, fixture, name, candidates, hosted=True, version=1):
+    def __init__(self, fixture, name, candidates, hosted=True, version=1, initializer=None):
         self.fixture = fixture
         self.directory = fixture.root / name
         self.directory.mkdir()
@@ -50,7 +51,7 @@ class Consumer:
         self.manifest = self.directory / "manifest.json"
         self.manifest.write_text(json.dumps({"schema_version": version, "candidates": candidates}))
         self.init = ["init", "--manifest", str(self.manifest)]
-        self.initial = self.run(*self.init, *(["--hosted"] if hosted else []))
+        self.initial = self.run(*self.init, *(["--hosted"] if hosted else []), script=initializer)
 
     def invoke(self, *args, code=0, script=None, state=None, env=None):
         helper = script or self.link / "scripts" / "attended_review.py"
@@ -80,6 +81,11 @@ class Consumer:
 def card(cid, **values):
     return {"id": cid, "title": "Check the draft", "revision": "fixture-v1",
             "criteria": ["Check that the caption is legible."], **values}
+
+
+def sqlite_backup(source, destination):
+    with closing(sqlite3.connect(source)) as original, closing(sqlite3.connect(destination)) as copy:
+        original.backup(copy)
 
 
 @unittest.skipIf(os.name == "nt", "Temporary consumer links use the local POSIX fixture")
@@ -171,8 +177,8 @@ class NativeHubTests(HubFixture):
         self.proxies.append(server.server_port)
         return server.server_port
 
-    def consumer(self, name, *candidates, version=1):
-        consumer = Consumer(self, name, list(candidates), version=version)
+    def consumer(self, name, *candidates, version=1, initializer=None):
+        consumer = Consumer(self, name, list(candidates), version=version, initializer=initializer)
         consumer.env.update({CONNECTION_ENV: f"127.0.0.1:{self.port}", "SSL_CERT_FILE": str(self.root / "test-ca.pem")})
         consumer.run("prepare")
         return consumer
@@ -181,15 +187,131 @@ class NativeHubTests(HubFixture):
         path = "/api/projects/alpha/reviews/" + receipt["review"]
         return path, self.scope(consumer.initial["session"]) + "/handback/" + receipt["review"]
 
-    def legacy_reader(self):
+    def earlier_helper(self, revision, *files):
         upstream = SKILL.parents[1]
-        reader = self.root / "baseline-reader"
+        reader = self.root / ("helper-" + revision[:7])
         reader.mkdir()
-        for file in ("attended_review.py", "review_store.py"):
+        for file in ("attended_review.py", "review_store.py", *files):
             old = subprocess.check_output(["git", "-C", str(upstream), "show",
-                                           f"{BASELINE}:skills/attended-review/scripts/{file}"])
+                                           f"{revision}:skills/attended-review/scripts/{file}"])
             (reader / file).write_bytes(old)
         return reader / "attended_review.py"
+
+    def frozen_consumer(self, name):
+        consumer = self.consumer(name, card("Proof"))
+        receipt = consumer.publish("Proof")
+        review, _ = self.endpoints(consumer, receipt)
+        self.assertEqual(self.decision(review, "Proof", version=0, outcome="accept", note="Ship café ☕")[0], 200)
+        status, _, data = self.freeze(review, receipt["revision"])
+        self.assertEqual(status, 200)
+        return consumer, review, json.loads(data)["delivery"]
+
+    def restore_hub(self, backup):
+        for boundary in ("producer", "collaboration"):
+            self.stop(self.processes[boundary])
+        sqlite_backup(backup, self.root / "data" / "hosted.sqlite3")
+        self.start("producer", PRODUCER)
+        self.start("collaboration", COLLABORATION)
+
+    def test_locally_acknowledged_delivery_reconciles_restored_hub(self):
+        consumer, review, delivery = self.frozen_consumer("ack-recovery")
+        hub_backup = self.root / "hub-before-ack.sqlite3"
+        sqlite_backup(self.root / "data" / "hosted.sqlite3", hub_backup)
+        first = consumer.run("hosted-poll")
+        self.assertEqual((first["state"], first["delivery"]), ("delivered", delivery))
+        archive = consumer.state / "session.json"
+        saved = archive.read_bytes()
+        original_status = consumer.run("status", "--after", "0")
+        with consumer.database() as db:
+            self.assertEqual(db.execute("SELECT acknowledged FROM hosted_package").fetchone(), (1,))
+        self.restore_hub(hub_backup)
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
+        requests = len(self.requests)
+        self.assertEqual(consumer.run("hosted-poll"), first)
+        self.assertEqual([request[2] for request in self.requests[requests:]], ["ack"])
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "delivered")
+        self.assertEqual(consumer.run("status", "--after", "0"), original_status)
+        self.assertEqual(archive.read_bytes(), saved)
+
+    def test_hosted_database_copy_cannot_write_or_ack_in_a_different_state(self):
+        consumer, review, delivery = self.frozen_consumer("directory-binding")
+        copied = consumer.directory / "copied-state"
+        copied.mkdir()
+        sqlite_backup(consumer.state / "session.sqlite3", copied / "session.sqlite3")
+        requests = len(self.requests)
+        for command in ("hosted-poll", "hosted-publish"):
+            self.assertIn("original state directory", consumer.run(command, state=copied, code=1)["error"])
+        self.assertEqual(len(self.requests), requests)
+        self.assertFalse((copied / "session.json").exists())
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
+        alias = consumer.directory / "original-state-alias"
+        alias.symlink_to(consumer.state, target_is_directory=True)
+        result = consumer.run("hosted-poll", state=alias)
+        self.assertEqual((result["state"], result["delivery"]), ("delivered", delivery))
+        self.assertTrue((consumer.state / "session.json").is_file())
+
+    def test_restored_origin_adopts_only_the_exact_existing_archive(self):
+        consumer, review, delivery = self.frozen_consumer("archive-recovery")
+        native_db = consumer.state / "session.sqlite3"
+        native_backup = self.root / "origin-before-poll.sqlite3"
+        hub_backup = self.root / "hub-before-ack.sqlite3"
+        sqlite_backup(native_db, native_backup)
+        sqlite_backup(self.root / "data" / "hosted.sqlite3", hub_backup)
+        baseline = consumer.run("status", "--after", "0")
+        first = consumer.run("hosted-poll")
+        self.assertEqual(first["delivery"], delivery)
+        archive = consumer.state / "session.json"
+        saved = consumer.directory / "original-archive.json"
+        archive.rename(saved)
+        original_bytes = saved.read_bytes()
+        sqlite_backup(native_backup, native_db)
+        self.restore_hub(hub_backup)
+        self.assertEqual(consumer.run("status", "--after", "0"), baseline)
+
+        conflict = b'{"other":"local result"}\n'
+        archive.write_bytes(conflict)
+        self.assertIn("conflicts", consumer.run("hosted-poll", code=1)["error"])
+        self.assertEqual(consumer.run("status", "--after", "0"), baseline)
+        self.assertEqual(archive.read_bytes(), conflict)
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "needs_attention")
+        with consumer.database() as db:
+            self.assertEqual(db.execute("SELECT delivery FROM hosted_package").fetchone(), (None,))
+            self.assertEqual(db.execute("SELECT count(*) FROM exports").fetchone(), (0,))
+
+        archive.rename(consumer.directory / "preserved-conflict.json")
+        saved.rename(archive)
+        inode = archive.stat().st_ino
+        self.assertEqual(consumer.run("hosted-poll"), first)
+        self.assertEqual(archive.read_bytes(), original_bytes)
+        self.assertEqual(archive.stat().st_ino, inode)
+        current = consumer.run("status", "--after", "0")
+        self.assertEqual([event["kind"] for event in current["events"]].count("handed-back"), 1)
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "delivered")
+
+    def test_previous_schema_requires_a_new_session_instead_of_rebinding(self):
+        earlier = self.earlier_helper(UNBOUND_HOSTED_BASELINE, "hosted_review.py")
+        unpublished = self.consumer("old-unpublished", card("Proof"), initializer=earlier)
+        requests = len(self.requests)
+        self.assertEqual(unpublished.run("status")["session"], unpublished.initial["session"])
+        self.assertIn("no recorded state directory", unpublished.publish("Proof", code=1)["error"])
+        self.assertEqual(len(self.requests), requests)
+        with unpublished.database() as db:
+            self.assertEqual(db.execute("PRAGMA user_version").fetchone(), (2,))
+        replacement = self.consumer("bound-replacement", card("Proof"))
+        self.assertNotEqual(replacement.initial["session"], unpublished.initial["session"])
+        self.assertEqual(replacement.publish("Proof")["state"], "committed")
+        self.assertIn("database version", replacement.run("status", script=earlier, code=1)["error"])
+
+        old_published = self.consumer("old-published", card("Proof"), initializer=earlier)
+        receipt = old_published.publish("Proof", script=earlier)
+        review, _ = self.endpoints(old_published, receipt)
+        self.assertEqual(self.freeze(review, receipt["revision"])[0], 200)
+        requests = len(self.requests)
+        for args in (("hosted-poll",), ("hosted-publish",), ("wait", "--timeout", "0")):
+            self.assertIn("no recorded state directory", old_published.run(*args, code=1)["error"])
+        self.assertEqual(len(self.requests), requests)
+        self.assertFalse((old_published.state / "session.json").exists())
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
 
     def test_actual_hub_offline_publication_and_durable_handback(self):
         assets = [("image/png", png(), "image"), ("audio/wav", wav(), "audio")]
@@ -286,7 +408,7 @@ raise SystemExit(attended_review.main())
         self.assertEqual(archive_data["candidates"]["Verdict"]["media"], media)
         self.assertIn(b"Origin-only prior observation", saved)
         self.assertIn("Ship café ☕".encode(), saved)
-        old = self.legacy_reader()
+        old = self.earlier_helper(BASELINE)
         self.assertIn("database version", consumer.run("status", script=old, code=1)["error"])
         archive_copy = consumer.directory / "legacy-archive"
         archive_copy.mkdir()

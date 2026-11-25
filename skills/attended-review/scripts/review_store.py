@@ -1,7 +1,7 @@
 """Indexed attended-review state. Published JSON is an archive, never active state."""
 
 from collections.abc import MutableMapping
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import hashlib
 import json
 import os
@@ -12,6 +12,7 @@ import tempfile
 
 
 DATABASE = "session.sqlite3"
+HOSTED_DB_VERSION = 3
 MATERIAL = ("media", "audio", "now", "reference")
 HISTORY = ("decision_history", "feedback_history", "superseded")
 SUMMARY = ("id", "title", "revision", "fingerprint", "phase", "protected",
@@ -152,7 +153,8 @@ class SQLiteStore:
                 db.close()
 
     def header(self, db, *, missing=False):
-        if db.execute("PRAGMA user_version").fetchone()[0] not in (1, 2):
+        version = db.execute("PRAGMA user_version").fetchone()[0]
+        if version not in (1, 2, HOSTED_DB_VERSION):
             raise self.error("Unsupported attended review database version")
         row = db.execute("SELECT payload FROM metadata WHERE singleton=1").fetchone()
         if row is None:
@@ -162,7 +164,17 @@ class SQLiteStore:
         header = json.loads(row[0])
         if header["checkout"] != self.checkout:
             raise self.error("session state belongs to another source checkout")
+        if version == HOSTED_DB_VERSION:
+            if header.get("hosted") is not True or header.get("hosted_directory") != self.hosted_directory():
+                raise self.error("Hosted session belongs to its original state directory")
+        elif header.get("hosted_bound"):
+            raise self.error("Published hosted session has no recorded state directory; preserve it and create a new hosted session")
         return header
+
+    def hosted_directory(self):
+        if self.path.is_symlink():
+            raise self.error("Hosted session database must be a regular file in its original state directory")
+        return str(self.path.parent.resolve())
 
     def write_header(self, db, header):
         db.execute("INSERT OR REPLACE INTO metadata VALUES (1,?)", (pack(header),))
@@ -183,7 +195,8 @@ class SQLiteStore:
                         db.execute(ddl)
                 # Older helpers must refuse an active hosted database. The
                 # JSON archive retains the existing reader schema.
-                db.execute("PRAGMA user_version=2" if seed.get("hosted") else "PRAGMA user_version=1")
+                version = HOSTED_DB_VERSION if seed.get("hosted") else 1
+                db.execute(f"PRAGMA user_version={version}")
         header = self.header(db, missing=seed is not None)
         if header is None:
             header = seed
@@ -363,10 +376,18 @@ class SQLiteStore:
             return sequence
 
     @staticmethod
-    def queue_archive(db, header):
-        archive = {k: v for k, v in header.items() if k not in ("hosted", "hosted_bound")}
-        archive["host"] = None
+    def archive_header(header):
+        return {**{k: v for k, v in header.items() if k not in ("hosted", "hosted_bound", "hosted_directory")},
+                "host": None}
+
+    def queue_archive(self, db, header):
+        archive = self.archive_header(header)
         db.execute("INSERT INTO exports VALUES (?,?,NULL)", (archive["sequence"], pack(archive)))
+
+    def verify_staged_archive(self, db, path, header):
+        """Compare a pre-existing archive before committing a recovered delivery."""
+        with self.render_archive(path, self.archive_header(header), db=db) as (expected, _):
+            verify_archive(expected, path)
 
     def pending_export(self):
         with self.connection() as db:
@@ -393,10 +414,10 @@ class SQLiteStore:
                 db.execute("UPDATE exports SET receipt=? WHERE sequence=?", (pack(receipt), sequence))
             return {"handed_back": json.loads(raw)["handed_back"], **receipt}
 
-    def archive_cards(self, sequence):
+    def archive_cards(self, sequence, transaction=None):
         position = -1
         while True:
-            with self.connection() as db:
+            with (self.connection() if transaction is None else nullcontext(transaction)) as db:
                 row = db.execute("""
                     SELECT c.position, c.id, v.body, v.media FROM cards c JOIN versions v ON v.id=c.id
                     AND v.sequence=(SELECT max(sequence) FROM versions WHERE id=c.id AND sequence<=?)
@@ -408,10 +429,10 @@ class SQLiteStore:
                 card = self.card(db, body, media)
             yield cid, card
 
-    def archive_history(self, sequence):
+    def archive_history(self, sequence, transaction=None):
         position = 0
         while True:
-            with self.connection() as db:
+            with (self.connection() if transaction is None else nullcontext(transaction)) as db:
                 row = db.execute("SELECT position, body, media FROM history WHERE position>? AND sequence<=? ORDER BY position LIMIT 1",
                                  (position, sequence)).fetchone()
                 if row is None:
@@ -420,9 +441,9 @@ class SQLiteStore:
                 card = self.card(db, body, media)
             yield card
 
-    def archive_events(self, sequence, receipt):
+    def archive_events(self, sequence, receipt, transaction=None):
         for number in range(1, sequence + 1):
-            with self.connection() as db:
+            with (self.connection() if transaction is None else nullcontext(transaction)) as db:
                 body, saved = db.execute("""
                     SELECT e.body, x.receipt FROM events e LEFT JOIN exports x ON x.sequence=e.sequence
                     WHERE e.sequence=?
@@ -430,12 +451,21 @@ class SQLiteStore:
             yield self.archive_event(body, pack(receipt) if number == sequence else saved)
 
     def write_archive(self, path, header, *, exclusive=False):
+        with self.render_archive(path, header) as (name, receipt):
+            if exclusive:
+                install_archive(name, path)
+            else:
+                replace_durably(name, path)
+            return receipt
+
+    @contextmanager
+    def render_archive(self, path, header, *, db=None):
         receipt = {"decided": [], "pending": [], "feedback_pending": []}
         sequence = header["sequence"]
 
         def candidates(stream):
             stream.write("{")
-            for index, (cid, card) in enumerate(self.archive_cards(sequence)):
+            for index, (cid, card) in enumerate(self.archive_cards(sequence, db)):
                 if card.get("decision"):
                     receipt["decided"].append(cid)
                 else:
@@ -461,19 +491,15 @@ class SQLiteStore:
                 stream.write(json.dumps(header, ensure_ascii=False, indent=2).removesuffix("\n}") + ',\n  "candidates": ')
                 candidates(stream)
                 stream.write(',\n  "history": ')
-                array(stream, self.archive_history(sequence))
+                array(stream, self.archive_history(sequence, db))
                 stream.write(',\n  "events": ')
-                array(stream, self.archive_events(sequence, receipt))
+                array(stream, self.archive_events(sequence, receipt, db))
                 stream.write("\n}\n")
                 stream.flush()
                 os.fsync(stream.fileno())
-            if exclusive:
-                install_archive(name, path)
-            else:
-                replace_durably(name, path)
+            yield name, receipt
         finally:
             Path(name).unlink(missing_ok=True)
-        return receipt
 
 
 def replace_durably(source, target):
