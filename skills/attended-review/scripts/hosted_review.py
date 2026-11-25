@@ -1,4 +1,4 @@
-"""Explicit hosted v1 publication and Hand Back for a native SQLite session."""
+"""Hosted publication and Hand Back for a native SQLite session."""
 
 import base64
 from datetime import datetime, timedelta, timezone
@@ -471,14 +471,24 @@ def validate_snapshot(envelope, current):
     if not fields(envelope, {"digest", "snapshot"}) or not matches(DIGEST, envelope["digest"]):
         raise problem
     snapshot = envelope["snapshot"]
-    if not fields(snapshot, {"schema", "delivery", "target", "handed_back_at", "items"}):
+    if not isinstance(snapshot, dict):
+        raise problem
+    required = {"schema", "delivery", "target", "handed_back_at", "items"}
+    schema = snapshot.get("schema")
+    if schema == "attended-review.hosted-handback.v2":
+        required.add("handed_back_by")
+        if not matches(LOGIN, snapshot.get("handed_back_by")) or len(snapshot["handed_back_by"]) > 254:
+            raise problem
+    elif schema != "attended-review.hosted-handback.v1":
+        raise problem
+    if not fields(snapshot, required):
         raise problem
     target = {**current["manifest"]["origin"], "review": current["review"], "revision": current["revision"]}
     try:
         digest_ok = sha256(encode(snapshot)) == envelope["digest"]
     except (ValueError, RecursionError):
         digest_ok = False
-    if (snapshot["schema"] != "attended-review.hosted-handback.v1" or snapshot["target"] != target
+    if (snapshot["target"] != target
             or not matches(REVIEW_ID, snapshot["delivery"]) or not digest_ok):
         raise problem
     timestamp(snapshot["handed_back_at"])
@@ -486,6 +496,7 @@ def validate_snapshot(envelope, current):
     items = snapshot["items"]
     if not isinstance(items, list) or len(items) != len(published):
         raise problem
+    actors = {current["manifest"]["owner"], snapshot.get("handed_back_by", current["manifest"]["owner"])}
     for item, original in zip(items, published):
         if (not fields(item, {"id", "fingerprint", "version", "decision"})
                 or any(item[key] != original[key] for key in ("id", "fingerprint"))
@@ -493,11 +504,11 @@ def validate_snapshot(envelope, current):
             raise problem
         decision = item["decision"]
         if decision is not None:
-            validate_decision(decision, original, current["manifest"]["owner"], item["version"])
+            validate_decision(decision, original, actors, item["version"])
     return snapshot
 
 
-def validate_decision(decision, original, owner, version):
+def validate_decision(decision, original, actors, version):
     problem = HostedError("Invalid final decision in hosted Hand Back")
     if not isinstance(decision, dict) or not version:
         raise problem
@@ -512,7 +523,7 @@ def validate_decision(decision, original, owner, version):
             raise problem
     elif not (outcome == "reject" or outcome == "accept" and original["type"] == "verdict"):
         raise problem
-    if not fields(decision, expected) or decision["actor"] != owner:
+    if not fields(decision, expected) or not isinstance(decision["actor"], str) or decision["actor"] not in actors:
         raise problem
     timestamp(decision["at"])
     display_text(decision["note"], 2000, empty=True)
@@ -546,7 +557,8 @@ def stage_delivery(session, current, snapshot, digest, canonical):
                              attachments=(item.get("feedback") or {}).get("attachments", []))
                 session.save_decision(state, item, clean, at=timestamp(decision["at"]), actor=decision["actor"])
             state["handed_back"] = at
-            session.event(state, "handed-back", at=at)
+            attribution = {"actor": snapshot["handed_back_by"]} if "handed_back_by" in snapshot else {}
+            session.event(state, "handed-back", at=at, **attribution)
             sequence = state["sequence"]
         header = session.store.header(db)
         if os.path.lexists(session.path):

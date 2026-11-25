@@ -299,6 +299,43 @@ class NativeHubTests(HubFixture):
         self.start("producer", PRODUCER)
         self.start("collaboration", COLLABORATION)
 
+    def test_delegated_handback_preserves_attribution_in_native_archive(self):
+        reviewer = "reviewer@example.invalid"
+        self.members["alpha"][reviewer] = "reviewer-handback"
+        self.write_memberships()
+        consumer = self.consumer("delegated-handback", card("Proof"), card("OwnerProof"))
+        receipt = consumer.publish("Proof", "OwnerProof")
+        review, _ = self.endpoints(consumer, receipt)
+        revision = receipt["revision"]
+        self.assertEqual(self.freeze(review, revision, actor=reviewer)[0], 404)
+        self.assertEqual(self.sharing(review)[0], 200)
+        self.assertTrue(json.loads(self.human(review, actor=reviewer)[2])["can_handback"])
+        self.assertEqual(self.freeze(review, revision, actor="viewer@example.invalid")[0], 404)
+        self.assertEqual(self.human(review + "/items/Proof/feedback", method="PUT", actor=reviewer,
+                                    payload={"version": 0, "outcome": "accept", "note": "Accepted by reviewer"})[0], 200)
+        self.assertEqual(self.human(review + "/items/Proof/feedback", method="PUT",
+                                    payload={"version": 1, "note": "Owner context stays on the hub"})[0], 200)
+        self.assertEqual(self.decision(review, "OwnerProof", version=0, outcome="reject", note="Owner rejection")[0],
+                         200)
+        first = self.freeze(review, revision, actor=reviewer)
+        self.assertEqual(first[0], 200)
+        self.assertEqual(self.freeze(review, revision)[2], first[2])
+        self.assertEqual(self.human(review + "/handback", actor=reviewer)[0], 404)
+        self.assertEqual(self.human(review + "/items/Proof/audit", actor=reviewer)[0], 404)
+        summary = json.loads(self.human(review, actor=reviewer)[2])
+        self.assertEqual((summary["handed_back_by"], summary["delivery"]), (reviewer, "waiting"))
+        self.assertFalse(summary["can_handback"])
+        frozen = json.loads(self.human(review + "/items/Proof")[2])
+        self.assertEqual(frozen["decision"]["actor"], reviewer)
+        self.assertEqual(len(frozen["feedback"]), 2)
+        self.assertEqual(consumer.run("hosted-poll")["state"], "delivered")
+        archive = json.loads((consumer.state / "session.json").read_bytes())
+        event = next(event for event in archive["events"] if event["kind"] == "handed-back")
+        self.assertEqual(event["actor"], reviewer)
+        self.assertEqual(archive["candidates"]["Proof"]["decision"]["outcome"], "accept")
+        self.assertEqual(archive["candidates"]["Proof"]["decision"]["note"], "Accepted by reviewer")
+        self.assertEqual(archive["candidates"]["OwnerProof"]["decision"]["outcome"], "reject")
+
     def test_locally_acknowledged_delivery_reconciles_restored_hub(self):
         consumer, review, delivery = self.frozen_consumer("ack-recovery")
         hub_backup = self.root / "hub-before-ack.sqlite3"
