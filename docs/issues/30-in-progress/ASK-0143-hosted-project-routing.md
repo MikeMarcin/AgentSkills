@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0143"
 title: "Configure hosted attended-review routing per project"
-status: "Ready"
+status: "In Progress"
 rfcs: ["RFC-ASK-0021"]
 depends_on: ["ASK-0142"]
 closeout_for: ["RFC-ASK-0021"]

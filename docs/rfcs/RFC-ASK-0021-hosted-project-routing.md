@@ -26,4 +26,4 @@ Athens changes and live enrollment are outside the assignment.
   change. Credentials, HTTPS validation and redirect refusal retain the native
   producer's boundaries.
 
-[Work and closeout](../issues/20-ready/ASK-0143-hosted-project-routing.md).
+[Work and closeout](../issues/30-in-progress/ASK-0143-hosted-project-routing.md).
