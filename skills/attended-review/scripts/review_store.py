@@ -153,6 +153,12 @@ class SQLiteStore:
             if db is not None:
                 db.close()
 
+    def initialized(self):
+        if not self.path.exists():
+            return False
+        with self.connection() as db:
+            return db.execute("PRAGMA user_version").fetchone()[0] != 0
+
     def header(self, db, *, missing=False):
         version = db.execute("PRAGMA user_version").fetchone()[0]
         if version not in (1, 2, HOSTED_DB_VERSION):

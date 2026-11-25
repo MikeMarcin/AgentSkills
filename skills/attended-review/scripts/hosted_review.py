@@ -9,6 +9,7 @@ import os
 import re
 import socket
 import ssl
+import stat
 import struct
 from urllib.parse import urlsplit
 import zlib
@@ -27,6 +28,10 @@ MAX_PACKAGE = 128 * 1024 * 1024
 MAX_SNAPSHOT = 24 * 1024 * 1024
 TOKEN_ENV = "ATTENDED_REVIEW_HOSTED_TOKEN"
 FIXTURE_CONNECT = "ATTENDED_REVIEW_HOSTED_FIXTURE_CONNECT"
+PROJECT_CONFIG = ".mask/skill-config/attended-review/project.json"
+PROJECT_SCHEMA = "attended-review.project.v1"
+PROJECT_CONFIG_LIMIT = 64 * 1024
+ROUTE_FIELDS = ("origin", "project", "owner", "installation")
 PACKAGE_TABLE = """
 CREATE TABLE hosted_package (
     singleton INTEGER PRIMARY KEY CHECK (singleton=1),
@@ -76,6 +81,80 @@ def document(raw):
 
 def fields(value, required):
     return isinstance(value, dict) and value.keys() == required
+
+
+def valid_owner(value):
+    return matches(LOGIN, value) and len(value) <= 254
+
+
+def hosted_defaults(root, origin_validator):
+    """Read project defaults from the selected checkout. An absent file selects legacy."""
+    config = root / PROJECT_CONFIG
+    try:
+        path = config.resolve()
+        if not path.is_relative_to(root):
+            raise HostedError("Attended review project config must resolve inside the checkout")
+        if not stat.S_ISREG(path.stat().st_mode):
+            raise HostedError("Attended review project config must be a regular file")
+        with path.open("rb") as stream:
+            raw = stream.read(PROJECT_CONFIG_LIMIT + 1)
+    except FileNotFoundError:
+        if config.is_symlink():
+            raise HostedError("Attended review project config link has no target") from None
+        return {}
+    except (OSError, RuntimeError):
+        raise HostedError("Cannot read attended review project config") from None
+
+    if len(raw) > PROJECT_CONFIG_LIMIT:
+        raise HostedError("Attended review project config exceeds 64 KiB")
+    try:
+        settings = document(raw)
+    except HostedError:
+        raise HostedError("Attended review project config must be valid JSON with unique keys") from None
+
+    if isinstance(settings, dict) and settings.get("schema") == PROJECT_SCHEMA:
+        if fields(settings, {"schema", "mode"}) and settings["mode"] == "legacy":
+            return {}
+        if fields(settings, {"schema", "mode", "hosted"}) and settings["mode"] == "hosted":
+            return hosted_route(settings["hosted"], origin_validator)
+    raise HostedError("Invalid attended review project config schema or mode")
+
+
+def hosted_route(route, origin_validator):
+    required = {"origin", "project", "owner"}
+    if (not isinstance(route, dict) or not required <= route.keys() <= set(ROUTE_FIELDS)
+            or not matches(IDENTIFIER, route["project"]) or not valid_owner(route["owner"])
+            or ("installation" in route and not matches(IDENTIFIER, route["installation"]))):
+        raise HostedError("Invalid hosted project config routing fields")
+    try:
+        return {**route, "origin": origin_validator(route["origin"])}
+    except ValueError:
+        raise HostedError("Hosted project config origin must be a Tailscale Serve HTTPS producer origin") from None
+
+
+def describe_project(root, origin_validator):
+    if not root.is_dir():
+        raise HostedError("checkout root must exist")
+    route = hosted_defaults(root, origin_validator)
+    return {"mode": "hosted" if route else "legacy", "hosted": route or None,
+            "path": str(root / PROJECT_CONFIG)}
+
+
+def publication_route(root, args, origin_validator):
+    explicit = {field: value for field, value in vars(args).items() if field in ROUTE_FIELDS and value is not None}
+    if "origin" in explicit:
+        explicit["origin"] = origin_validator(explicit["origin"])
+    if len(explicit) == len(ROUTE_FIELDS):
+        route = explicit
+    else:
+        defaults = hosted_defaults(root, origin_validator)
+        if any(field in defaults and defaults[field] != value for field, value in explicit.items()):
+            raise HostedError("Partial routing flags must match the project config; supply all four routing flags to override it")
+        route = {**defaults, **explicit}
+    if (route.keys() != set(ROUTE_FIELDS) or not matches(IDENTIFIER, route["project"])
+            or not matches(IDENTIFIER, route["installation"]) or not valid_owner(route["owner"])):
+        raise HostedError("First publication needs --origin, --project, --installation and --owner or project defaults")
+    return route
 
 
 def display_text(value, limit, *, empty=False):
@@ -240,7 +319,7 @@ def binding(db):
 
 def require_hosted(header):
     if not header.get("hosted"):
-        raise HostedError("Hosted commands require a new SQLite session created with init --hosted")
+        raise HostedError("Hosted commands require a new SQLite session initialized in hosted mode")
     if "hosted_directory" not in header:
         raise HostedError(UNBOUND_HOSTED)
 
@@ -256,19 +335,17 @@ def load_binding(session):
 
 def create_package(session, args, origin_validator, canonical, token):
     selection = args.candidate
-    if (not all((args.origin, args.project, args.installation, args.owner, args.title, selection))
-            or not matches(IDENTIFIER, args.project) or not matches(IDENTIFIER, args.installation)
-            or len(args.owner) > 254 or not matches(LOGIN, args.owner)):
-        raise HostedError("First publication needs --origin, --project, --installation, --owner, --title and --candidate")
-    if not 1 <= len(selection) <= 1000 or len(set(selection)) != len(selection) or not all(ITEM_ID.fullmatch(cid) for cid in selection):
-        raise HostedError("Hosted publication needs 1–1000 distinct protocol item IDs")
-    origin = origin_validator(args.origin)
-    title = display_text(args.title, 200)
     with session.store.connection(writer=True) as db:
         header = session.store.header(db)
         require_hosted(header)
         if header.get("hosted_bound"):
             raise HostedError("Hosted package already exists; repeat hosted-publish without selection or enrollment flags")
+        if not args.title or not selection:
+            raise HostedError("First publication needs an explicit --title and --candidate selection")
+        if len(selection) > 1000 or len(set(selection)) != len(selection) or not all(ITEM_ID.fullmatch(cid) for cid in selection):
+            raise HostedError("Hosted publication needs 1–1000 distinct protocol item IDs")
+        route = publication_route(session.root, args, origin_validator)
+        title = display_text(args.title, 200)
         assets = {}
         items = []
         for cid in selection:
@@ -277,9 +354,9 @@ def create_package(session, args, origin_validator, canonical, token):
             if len(assets) > 1000 or sum(len(data) for _, data in assets.values()) > MAX_PACKAGE:
                 raise HostedError("Hosted package exceeds its total media bound")
         media = [{"sha256": digest, "type": mime, "bytes": len(content)} for digest, (mime, content) in assets.items()]
-        manifest = {"schema": "attended-review.hosted-package.v1", "mode": "hosted", "owner": args.owner,
+        manifest = {"schema": "attended-review.hosted-package.v1", "mode": "hosted", "owner": route["owner"],
                     "title": title, "items": items, "media": media,
-                    "origin": {"project": args.project, "installation": args.installation, "session": header["id"]}}
+                    "origin": {"project": route["project"], "installation": route["installation"], "session": header["id"]}}
         raw = encode(manifest)
         if token.encode("ascii") in raw:
             raise HostedError("Hosted package contains the producer credential")
@@ -288,7 +365,7 @@ def create_package(session, args, origin_validator, canonical, token):
         db.execute(PACKAGE_TABLE)
         db.execute(MEDIA_TABLE)
         db.execute("INSERT INTO hosted_package (singleton, origin, manifest, revision) VALUES (1, ?, ?, ?)",
-                   (origin, raw, sha256(raw)))
+                   (route["origin"], raw, sha256(raw)))
         db.executemany("INSERT INTO hosted_assets VALUES (?, ?)", ((digest, pair[1]) for digest, pair in assets.items()))
         session.store.write_header(db, {**header, "hosted_bound": True})
         return binding(db)
@@ -521,8 +598,10 @@ def poll(session, current, transport, canonical):
 def add_commands(sub):
     parser = sub.add_parser("hosted-publish", help="Freeze selected prepared material and publish it to the hosted hub")
     parser.add_argument("--origin", help="Producer Tailscale Serve HTTPS origin")
-    for flag in ("project", "installation", "owner", "title"):
-        parser.add_argument("--" + flag)
+    parser.add_argument("--project", help="Enrolled project slug")
+    parser.add_argument("--installation", help="Enrolled installation slug")
+    parser.add_argument("--owner", help="Review owner login on the collaboration origin")
+    parser.add_argument("--title", help="Title to display in the hosted review")
     parser.add_argument("--candidate", action="append", help="Prepared candidate ID to publish, repeatable in review order")
     parser.add_argument("--include-media", action="store_true", help="Include the selected candidates' supported inline media")
     parser.add_argument("--include-links", action="store_true", help="Include the selected candidates' safe HTTPS links")
@@ -531,7 +610,7 @@ def add_commands(sub):
 
 def run(session, args, origin_validator, canonical):
     if not session.indexed:
-        raise HostedError("Hosted commands require a new SQLite session created with init --hosted")
+        raise HostedError("Hosted commands require a new SQLite session initialized in hosted mode")
     token = os.environ.get(TOKEN_ENV, "")
     if not re.fullmatch(r"[A-Za-z0-9_-]{43}", token):
         raise HostedError(f"Set {TOKEN_ENV} to the enrolled producer credential")

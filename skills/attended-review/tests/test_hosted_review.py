@@ -26,10 +26,11 @@ BASELINE = "d06e564f94697d2f2419d27fd4fbce97f4472c17"
 UNBOUND_HOSTED_BASELINE = "8bdb8ea8e05bae4affe68f0b48f9c12d36601c94"
 TOKEN_ENV = "ATTENDED_REVIEW_HOSTED_TOKEN"
 CONNECTION_ENV = "ATTENDED_REVIEW_HOSTED_FIXTURE_CONNECT"
+PROJECT_CONFIG = ".mask/skill-config/attended-review/project.json"
 
 if HUB_ROOT:
     sys.path.insert(0, str(Path(HUB_ROOT).resolve()))
-    from tests.test_hosted_access import COLLABORATION, OWNER, PRODUCER, REVIEWER
+    from tests.test_hosted_access import COLLABORATION, OWNER, PRODUCER, REVIEWER, VIEWER
     from tests.test_hosted_handback import HandbackFixture as HubFixture
     from tests.test_hosted_publication import png, wav
 else:
@@ -37,7 +38,7 @@ else:
 
 
 class Consumer:
-    def __init__(self, fixture, name, candidates, hosted=True, version=1, initializer=None):
+    def __init__(self, fixture, name, candidates, hosted=True, version=1, initializer=None, config=None):
         self.fixture = fixture
         self.directory = fixture.root / name
         self.directory.mkdir()
@@ -48,10 +49,17 @@ class Consumer:
         self.link.symlink_to(SKILL, target_is_directory=True)
         self.env = {**os.environ, "ATTENDED_REVIEW_HUB_CONFIG": str(self.directory / "machine-hub.json"),
                     TOKEN_ENV: fixture.tokens["alpha"] if hasattr(fixture, "tokens") else secrets.token_urlsafe(32)}
+        self.config = self.checkout / PROJECT_CONFIG
+        if config is not None:
+            self.configure(config)
         self.manifest = self.directory / "manifest.json"
         self.manifest.write_text(json.dumps({"schema_version": version, "candidates": candidates}))
         self.init = ["init", "--manifest", str(self.manifest)]
         self.initial = self.run(*self.init, *(["--hosted"] if hosted else []), script=initializer)
+
+    def configure(self, config):
+        self.config.parent.mkdir(parents=True, exist_ok=True)
+        self.config.write_text(json.dumps(config))
 
     def invoke(self, *args, code=0, script=None, state=None, env=None):
         helper = script or self.link / "scripts" / "attended_review.py"
@@ -83,6 +91,11 @@ def card(cid, **values):
             "criteria": ["Check that the caption is legible."], **values}
 
 
+def routing(project="alpha", origin="https://producer.example.ts.net", owner="owner@example.invalid", **defaults):
+    return {"schema": "attended-review.project.v1", "mode": "hosted",
+            "hosted": {"origin": origin, "project": project, "owner": owner, **defaults}}
+
+
 def sqlite_backup(source, destination):
     with closing(sqlite3.connect(source)) as original, closing(sqlite3.connect(destination)) as copy:
         original.backup(copy)
@@ -103,7 +116,7 @@ class HostedModeTests(unittest.TestCase):
         self.assertNotIn("mode", local.initial)
         for consumer in (hosted, local):
             self.assertEqual(consumer.run("prepare")["candidates"][0]["phase"], "ready")
-        self.assertIn("mode is fixed", hosted.run(*hosted.init, code=1)["error"])
+        self.assertIn("mode is fixed", hosted.run(*hosted.init, "--legacy", code=1)["error"])
         self.assertIn("mode is fixed", local.run(*local.init, "--hosted", code=1)["error"])
         for args in [("serve",), ("html", "--output", str(self.root / "offline.html")), ("hand-back",)]:
             hosted.run(*args, code=1)
@@ -115,6 +128,78 @@ class HostedModeTests(unittest.TestCase):
         self.assertFalse((hosted.state / "session.json").exists())
         self.assertFalse((hosted.state / "hub.json").exists())
         self.assertEqual(hosted.run("status")["checkout"], str(hosted.checkout.resolve()))
+
+    def test_project_mode_defaults_and_existing_modes_through_two_links(self):
+        hosted = Consumer(self, "configured", [card("Proof")], hosted=False, config=routing())
+        legacy = Consumer(self, "unconfigured", [card("Proof")], hosted=False)
+        self.assertEqual(hosted.initial["mode"], "hosted")
+        self.assertNotIn("mode", legacy.initial)
+        self.assertNotEqual(hosted.initial["session"], legacy.initial["session"])
+        inspect_state = hosted.directory / "inspection-only"
+        self.assertEqual(hosted.run("project-config", state=inspect_state),
+                         {"mode": "hosted", "hosted": routing()["hosted"], "path": str(hosted.config.resolve())})
+        self.assertFalse(inspect_state.exists())
+        self.assertEqual(legacy.run("project-config"),
+                         {"mode": "legacy", "hosted": None, "path": str(legacy.config.resolve())})
+        fallback = hosted.directory / "legacy"
+        self.assertNotIn("mode", hosted.run(*hosted.init, "--legacy", state=fallback))
+        self.assertNotIn("mode", hosted.run(*hosted.init, state=fallback))
+        legacy.configure(routing(project="beta"))
+        self.assertNotIn("mode", legacy.run(*legacy.init))
+        self.assertTrue(legacy.run("hand-back")["handed_back"])
+        archive_state = legacy.directory / "existing-json"
+        archive_state.mkdir()
+        shutil.copyfile(legacy.state / "session.json", archive_state / "session.json")
+        self.assertNotIn("mode", legacy.run(*legacy.init, state=archive_state))
+        self.assertFalse((archive_state / "session.sqlite3").exists())
+        self.assertEqual(legacy.run(*legacy.init, state=legacy.directory / "fresh")["mode"], "hosted")
+        hosted.config.unlink()
+        self.assertEqual(hosted.run(*hosted.init)["mode"], "hosted")
+        hosted.configure({"schema": "attended-review.project.v1", "mode": "legacy"})
+        self.assertNotIn("mode", hosted.run(*hosted.init, state=hosted.directory / "declared-legacy"))
+        self.assertEqual(hosted.run(*hosted.init, "--hosted", state=hosted.directory / "explicit")["mode"], "hosted")
+        refusal = hosted.invoke(*hosted.init, "--hosted", "--legacy", code=2)
+        self.assertIn("not allowed with", refusal.stderr)
+
+    def test_malformed_and_cross_project_config_fail_when_consulted(self):
+        consumer = Consumer(self, "source", [card("Proof")], hosted=False)
+        other = Consumer(self, "neighbor", [card("Proof")], hosted=False, config=routing(project="beta"))
+        fresh = consumer.directory / "fresh"
+        marker = secrets.token_urlsafe(32)
+        invalid = [
+            b"not JSON",
+            b'{"schema":"attended-review.project.v1","mode":"hosted","mode":"legacy"}',
+            b" " * (64 * 1024 + 1),
+            json.dumps(routing(project="Invalid Project")).encode(),
+            json.dumps(routing(origin="http://producer.example.ts.net")).encode(),
+            json.dumps(routing(origin="https://[invalid")).encode(),
+            json.dumps(routing(owner=False)).encode(),
+            json.dumps(routing(installation=None)).encode(),
+            json.dumps(routing(token=marker)).encode(),
+        ]
+        consumer.config.parent.mkdir(parents=True)
+        for raw in invalid:
+            consumer.config.write_bytes(raw)
+            result = consumer.run(*consumer.init, state=fresh, code=1)
+            self.assertIn("project config", result["error"])
+            self.assertNotIn(marker, result["error"])
+            self.assertFalse((fresh / "session.sqlite3").exists())
+        refusal = consumer.run("project-config", code=1)
+        self.assertIn("project config", refusal["error"])
+        self.assertNotIn(marker, refusal["error"])
+        self.assertNotIn("mode", consumer.run(*consumer.init))
+        self.assertNotIn("mode", consumer.run(*consumer.init, "--legacy", state=consumer.directory / "fallback"))
+        self.assertEqual(consumer.run(*consumer.init, "--hosted", state=consumer.directory / "explicit")["mode"], "hosted")
+        consumer.config.unlink()
+        consumer.config.symlink_to(other.config)
+        self.assertIn("inside the checkout", consumer.run(*consumer.init, state=fresh, code=1)["error"])
+        self.assertFalse((fresh / "session.sqlite3").exists())
+        self.assertEqual(other.run("status")["mode"], "hosted")
+        consumer.config.unlink()
+        consumer.configure(routing())
+        fresh.mkdir(exist_ok=True)
+        (fresh / "session.sqlite3").touch()
+        self.assertEqual(consumer.run(*consumer.init, state=fresh)["mode"], "hosted")
 
 
 @unittest.skipUnless(HUB_ROOT and shutil.which("openssl") and os.name != "nt",
@@ -177,8 +262,9 @@ class NativeHubTests(HubFixture):
         self.proxies.append(server.server_port)
         return server.server_port
 
-    def consumer(self, name, *candidates, version=1, initializer=None):
-        consumer = Consumer(self, name, list(candidates), version=version, initializer=initializer)
+    def consumer(self, name, *candidates, version=1, initializer=None, config=None):
+        consumer = Consumer(self, name, list(candidates), hosted=config is None, version=version,
+                            initializer=initializer, config=config)
         consumer.env.update({CONNECTION_ENV: f"127.0.0.1:{self.port}", "SSL_CERT_FILE": str(self.root / "test-ca.pem")})
         consumer.run("prepare", script=initializer)
         return consumer
@@ -389,6 +475,73 @@ class NativeHubTests(HubFixture):
             self.assertEqual(db.execute("SELECT acknowledged FROM hosted_package").fetchone(), (0,))
             self.assertEqual(db.execute("SELECT receipt FROM exports").fetchall(), [(None,)])
         self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
+
+    def test_project_routes_publish_to_actual_hub_and_freeze_saved_binding(self):
+        alpha = self.consumer("configured-alpha", card("Proof"), card("Unshared"),
+                              config=routing(origin="https://" + PRODUCER, owner=OWNER))
+        beta = self.consumer("configured-beta", card("Proof"),
+                             config=routing(project="beta", origin="https://" + PRODUCER, owner=VIEWER,
+                                            installation="desk"))
+        beta.env[TOKEN_ENV] = self.tokens["beta"]
+        self.assertEqual([alpha.initial["mode"], beta.initial["mode"]], ["hosted", "hosted"])
+        before = len(self.requests)
+        self.assertEqual(alpha.run("project-config")["hosted"]["project"], "alpha")
+        self.assertEqual(beta.run("project-config")["hosted"]["project"], "beta")
+        self.assertIn("Create the package", alpha.run("hosted-publish", code=1)["error"])
+        self.assertIn("--candidate", alpha.run("hosted-publish", "--installation", "desk",
+                                               "--title", "Review caption", code=1)["error"])
+        self.assertIn("--title", alpha.run("hosted-publish", "--installation", "desk",
+                                           "--candidate", "Proof", code=1)["error"])
+        self.assertIn("--installation", alpha.run("hosted-publish", "--title", "Review caption",
+                                                  "--candidate", "Proof", code=1)["error"])
+        self.assertEqual(len(self.requests), before)
+
+        picks = ("--title", "Review caption", "--candidate", "Proof")
+        self.actions["commit"] = "drop"
+        self.assertIn("retry", alpha.run("hosted-publish", "--installation", "desk", *picks, code=1)["error"])
+        with alpha.database() as db:
+            saved = db.execute("SELECT origin, manifest, revision FROM hosted_package").fetchone()
+        alpha.configure(routing(project="beta", owner=VIEWER, installation="different"))
+        self.assertIn("already exists", alpha.run("hosted-publish", *picks, code=1)["error"])
+        alpha.config.write_text("invalid settings")
+        receipt = alpha.run("hosted-publish")
+        self.assertEqual(receipt["revision"], saved[2])
+        with alpha.database() as db:
+            self.assertEqual(db.execute("SELECT origin, manifest, revision FROM hosted_package").fetchone(), saved)
+        self.assertEqual(saved[0], "https://" + PRODUCER)
+        self.assertEqual(set(json.loads(saved[1])["origin"].items()),
+                         {("project", "alpha"), ("installation", "desk"), ("session", alpha.initial["session"])})
+        self.assertEqual([item["id"] for item in json.loads(saved[1])["items"]], ["Proof"])
+        self.assertNotIn(alpha.env[TOKEN_ENV].encode(), saved[1])
+
+        published = beta.run("hosted-publish", "--project", "beta", *picks)
+        path, _ = self.endpoints(alpha, receipt)
+        beta_path = "/api/projects/beta/reviews/" + published["review"]
+        self.assertEqual(self.human(beta_path, actor=VIEWER)[0], 200)
+        self.assertEqual(self.human(beta_path.replace("/beta/", "/alpha/"), actor=VIEWER)[0], 404)
+        self.assertEqual(self.decision(path, "Proof", version=0, outcome="accept")[0], 200)
+        self.assertEqual(self.freeze(path, receipt["revision"])[0], 200)
+        self.assertEqual(alpha.run("hosted-poll")["state"], "delivered")
+        self.assertFalse((beta.state / "session.json").exists())
+
+    def test_explicit_publication_flags_override_checked_project_defaults(self):
+        consumer = self.consumer("config-overrides", card("Proof"),
+                                 config=routing(project="beta", origin="https://wrong.example.ts.net",
+                                                owner=VIEWER, installation="wrong"))
+        picks = ("--title", "Review caption", "--candidate", "Proof")
+        before = len(self.requests)
+        for option in (("--origin", "https://" + PRODUCER), ("--project", "alpha"),
+                       ("--installation", "desk"), ("--owner", OWNER)):
+            refusal = consumer.run("hosted-publish", *option, *picks, code=1)
+            self.assertIn("Partial routing flags must match", refusal["error"])
+        self.assertEqual(len(self.requests), before)
+        with consumer.database() as db:
+            self.assertIsNone(db.execute("SELECT name FROM sqlite_master WHERE name='hosted_package'").fetchone())
+        consumer.config.write_text("full explicit routing bypasses invalid settings")
+        result = consumer.run("hosted-publish", "--origin", "https://" + PRODUCER,
+                              "--project", "alpha", "--installation", "desk", "--owner", OWNER, *picks)
+        path, _ = self.endpoints(consumer, result)
+        self.assertEqual(self.decision(path, "Proof", version=0, outcome="accept")[0], 200)
 
     def test_actual_hub_offline_publication_and_durable_handback(self):
         assets = [("image/png", png(), "image"), ("audio/wav", wav(), "audio")]

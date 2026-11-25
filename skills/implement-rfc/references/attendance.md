@@ -26,15 +26,24 @@ concrete failure, while independent judgeable candidates can proceed. Repair a r
 prerequisite and rerun its affected path before rebuilding that review bundle.
 Required human judgment remains pending.
 
-Use the configured attended-review skill's default private Tailscale Serve for
-every session; loopback/offline are explicit choices or deliberate setup fallbacks.
-Present the complete capability URL and practical evidence promptly. Read its
-Driver waiting instructions before sharing. Keep coordinating useful independent
-work that respects prepared-candidate protection, inspecting durable intake at
-natural task boundaries. A blocking outer wait parks the coordinator and delays
-its attention to agent results or integration.
+Follow the attended-review helper's configured mode when preparing a new
+session, and its saved mode on resume. For hosted mode, use the companion's
+Hosted review instructions to explicitly publish selected material, share the
+collaboration review and receive the frozen Hand Back with `hosted-poll`.
+Record the project, review ID, saved state location, candidate identities and
+consumed sequence. Check for a frozen Hand Back at natural work boundaries and
+give the reviewer a manual resume path if only their decision remains. The
+Serve and automatic wait steps in execution recipes apply to legacy sessions.
 
-When only human input remains, the coordinator owns qualified automatic wait/resume:
+For legacy sessions, use private Tailscale Serve by default, with loopback or
+offline for explicit choices or deliberate setup fallbacks. Present the complete
+private capability URL and evidence promptly. Read the companion's Driver waiting
+instructions. Keep coordinating independent work within the prepared candidates'
+protection and inspect saved intake at natural task boundaries. A blocking outer
+wait parks the coordinator and delays attention to agent results or integration.
+
+When only human input remains in a legacy session, the coordinator owns qualified
+automatic wait/resume:
 check status from the consumed cursor and reconcile any saved handback before
 arming `wait --after CHECKED_SEQUENCE --kind handed-back`. Follow the companion's
 race-safe cursor and Claude/Codex host procedures. Persist consumed events after

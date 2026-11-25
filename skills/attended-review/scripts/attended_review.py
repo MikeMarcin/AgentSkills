@@ -1106,12 +1106,16 @@ class SQLiteSession(Session):
         with lock(self.registry / ".lock"), lock(self.directory / ".lock"):
             if self.path.exists() and not self.active_path.exists():
                 raise ReviewError("Existing JSON session; retry init to use its current runtime")
+            if hosted is None and not self.store.initialized():
+                from hosted_review import hosted_defaults
+
+                hosted = bool(hosted_defaults(self.root, hub_origin))
             seed = self.seed()
             if hosted:
                 seed["hosted"] = True
                 seed["hosted_directory"] = self.store.hosted_directory()
             with self.store.edit(seed=seed) as state:
-                if bool(state.get("hosted")) != hosted:
+                if hosted is not None and bool(state.get("hosted")) != hosted:
                     raise ReviewError("Session mode is fixed at first init; use a new state directory")
                 if state.get("hosted") and state.get("hosted_bound"):
                     raise ReviewError("Hosted package is immutable; use a new state directory for a new review")
@@ -2058,8 +2062,13 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("init")
     p.add_argument("--manifest", required=True)
-    p.add_argument("--hosted", action="store_true", help="Create a new SQLite session for hub-hosted decisions")
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument("--hosted", dest="hosted", action="store_const", const=True,
+                      help="Select hub-hosted decisions for a new session")
+    mode.add_argument("--legacy", dest="hosted", action="store_const", const=False,
+                      help="Select local decisions and optional pass-through publication for a new session")
     sub.add_parser("check", help="Report question-rule violations without touching a session; exit 1 when init would refuse").add_argument("--manifest", required=True)
+    sub.add_parser("project-config", help="Show this checkout's default review mode and hosted producer route")
     p = sub.add_parser("status"); p.add_argument("--after", type=int); p.add_argument("--full", action="store_true")
     p = sub.add_parser("prepare"); p.add_argument("--candidate", action="append"); p.add_argument("--include-slow", action="store_true"); p.add_argument("--max-items", type=int)
     p = sub.add_parser("ready"); p.add_argument("candidate"); p.add_argument("--evidence", required=True)
@@ -2085,7 +2094,7 @@ def main(argv=None):
     action.add_parser("set", help="Save ORIGIN as this user's default hub").add_argument("url", metavar="ORIGIN")
     action.add_parser("show", help="Report the file location and its validated origin")
     action.add_parser("clear", help="Remove the machine default")
-    from hosted_review import add_commands, run as run_hosted
+    from hosted_review import add_commands, describe_project, run as run_hosted
     add_commands(sub)
     args = parser.parse_args(argv)
     session = None
@@ -2093,6 +2102,9 @@ def main(argv=None):
     try:
         if command == "hub-config":
             print(json.dumps(hub_config(args.action, getattr(args, "url", None))))
+            return 0
+        if command == "project-config":
+            print(json.dumps(describe_project(Path(args.repo_root).resolve(), hub_origin)))
             return 0
         if command == "check":
             report = question_report(manifest(read_json(Path(args.manifest))))

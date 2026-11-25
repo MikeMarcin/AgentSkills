@@ -7,8 +7,13 @@ Resolve the installed `attended-review` skill by name. Follow its question-autho
 1. Build the canonical art package from the consumer’s input manifest. Keep the package directory, its manifest and the exact identity files available through handback.
 2. Write one version-3 design question per independent candidate. Ask what the reviewer can judge in the images. Put original isolation stills in `now` and original context stills in `reference` as base64 data URLs. Put original videos in `media` with their role in the label. A video-only candidate also needs a representative still. Preserve the submitted bytes and protect the candidate paths.
 3. In each question’s `metadata`, set `batch_id`, `candidate_id`, `candidate_digest` and `gate` from the canonical manifest. Set its `revision` to the literal batch ID, an `@`, and the candidate digest. An updated submission gets a new review binding.
-4. Run the companion’s `check`, `init` and `prepare` against the consumer. Save its compact `status` as the prepared snapshot before sharing. Keep its session ID, sequence and question fingerprints in the driver’s private state.
+4. Run the companion’s `check`, `init --legacy` and `prepare` against the consumer. Save its compact `status` as the prepared snapshot before sharing. Keep its session ID, sequence and question fingerprints in the driver’s private state.
 5. Start `serve --tailscale` with the configured hub. Verify the live session is listed and the candidate pages load their source and context media. Give the reviewer the private URL and keep the host running. When the hub is unavailable, report the observed failure and the available review route.
+
+This workflow uses optional pass-through hub publication so the review can show
+the original media, including video. The companion's hub-stored mode currently
+accepts bounded inline PNG and PCM WAV. Use the pass-through workflow for art
+packages that require the original submitted media.
 
 ## Take the handback
 

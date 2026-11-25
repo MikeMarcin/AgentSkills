@@ -16,12 +16,13 @@ producer credential retains its process-only input. The change covers the
 shared AgentSkills skill and disposable local verification. Consumer installation,
 Athens changes and live enrollment are outside the assignment.
 
-- **AC01** Two consumers of the same skill can select their own project mode and
-  route. Missing configuration keeps the legacy default. Malformed or out-of-scope
-  configuration fails when consulted. Explicit mode flags and existing sessions
-  preserve the stored mode.
+- **AC01** Two consumers of the same skill can inspect and select their own project
+  mode and route. Missing configuration keeps the legacy default. Malformed or
+  out-of-scope configuration fails when consulted. An explicit mode selects a new
+  session's mode. Existing sessions keep their stored mode.
 - **AC02** First hosted publication requires explicit title and candidate selection.
-  Explicit routing flags override project defaults. Once staged locally, retries
+  A complete explicit route can override project defaults. Incompatible partial
+  overrides are refused. Once staged locally, retries
   and Hand Back use the saved package and binding, including when project settings
   change. Credentials, HTTPS validation and redirect refusal retain the native
   producer's boundaries.

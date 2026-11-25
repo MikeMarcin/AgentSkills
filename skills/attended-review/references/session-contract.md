@@ -7,6 +7,15 @@ For personal workflows, pass `--repo-root SOURCE --state RUNTIME/attended-review
 
 All commands print JSON. Errors print JSON to stderr and return 1. Supply `--repo-root ABSOLUTE_CHECKOUT` before the subcommand. Drivers for the same resolved checkout share its `.mask/attended-review/` runtime directory. Separate Git worktrees resolve to distinct roots. The tool does not infer roots from installed skill links.
 
+## Session routing
+
+Before initializing a new session, `project-config` shows the default mode and
+hosted producer route read under the selected checkout, without opening session
+state. `init --hosted` and `init --legacy` override that default for a new
+session. Existing sessions keep the mode selected at first initialization.
+See [Hosted review](hosted-review.md) for the checked profile format,
+first-publication routing and saved binding.
+
 ## Formats and compatible resume
 
 Version-1 manifests and decision imports keep their established meaning, including

@@ -5,7 +5,7 @@ A portable Python/HTML companion for user-started human acceptance sessions. It 
 See [SKILL.md](SKILL.md) for the agent workflow and [session contract](references/session-contract.md) for exact JSON and commands. The core runtime has no third-party dependencies, daemon, database, Git mutation, browser-triggered process execution, Bash or WSL requirement.
 
 Use [Tailscale Serve](references/tailscale-serve.md) on the existing tailnet by
-default for every session, including review at the source computer. Loopback and
+default for legacy sessions, including review at the source computer. Loopback and
 offline are explicit choices or deliberate fallbacks after missing setup. Share
 the complete private HTTPS link while useful independent work continues safely.
 Read [Driver waiting](references/driver-wait.md) before sharing: when human input
@@ -25,9 +25,9 @@ configure a [machine default](references/session-contract.md#machine-default) on
 python3 scripts/attended_review.py hub-config set https://HUB.ts.net
 ```
 
-An explicitly enrolled project can also choose [hosted review](references/hosted-review.md).
-The hub stores the selected review material and accepts the owner's decisions
-while the work machine is offline. The native helper receives the frozen Hand Back
+An enrolled project can select [hosted review](references/hosted-review.md) for
+new sessions in its checkout profile. The hub stores the selected review
+material and accepts the owner's decisions while the work machine is offline. The native helper receives the frozen Hand Back
 when the machine reconnects.
 
 The session directory is `<checkout>/.mask/attended-review/`. Ignore that generated directory in the consumer. Treat its verdicts as local acceptance records and transfer the relevant evidence to the authoritative issue/RFC records through the driver. Do not commit live host tokens, full incidental logs or unrelated session history.
