@@ -59,3 +59,33 @@ The tests used temporary consumer state and sockets. All task-owned test
 processes stopped. The next action is hub-side reconciliation of ARH-0012 and
 ARH-0013 using this native candidate. Hub deployment, consumer installation and
 real Serve or tailnet qualification are separate owner scopes.
+
+## Recovery correction after critical review
+
+The owner authorized a local correction round on the same milestone and
+mandate. This round started from `8bdb8ea8e05bae4affe68f0b48f9c12d36601c94`
+and used AttendedReviewHub `2e7dcd59ea36c597b4eedf6688109964c8138175`.
+The corrected native candidate is `24db66b9f10e66d2231703dceecfabcb44304086`.
+It supplements the original AC01–AC03 evidence above.
+
+| Finding | Verified behavior |
+|---|---|
+| Cached local ACK after hub restore | The original producer confirms the stored delivery against the live hub after verifying the durable archive. Restoring a pre-ACK backup left the hub waiting. A fresh matching ACK returned it to delivered without changing the local archive or events. |
+| Copied origin database | A backup opened from a different state directory of the same checkout was refused before an archive or producer request. A symlink that resolves to the original directory worked. An earlier unbound hosted database could not publish or ACK. |
+| Origin restored before intake | After restoring the origin to before intake and the hub to before ACK, an unrelated archive stayed in place and no decisions, receipts or export rows committed. Restoring the exact archive allowed the original producer to reconcile one Hand Back and ACK without replacing the file. |
+
+The [focused native tests](../../../skills/attended-review/tests/test_hosted_review.py)
+passed all seven cases on macOS, including the three regressions above.
+Run `ATTENDED_REVIEW_HUB_ROOT=../AttendedReviewHub python3 -B -m unittest discover -s skills/attended-review/tests -p test_hosted_review.py -v`
+from the AgentSkills checkout. The two existing SQLite lifecycle tests passed
+with `python3 -B -m unittest discover -s skills/attended-review/tests -p test_sqlite_lifecycle.py -v`.
+The staged BetterLeaks scan reported zero findings.
+
+Earlier unbound hosted states need a new bound session for publication.
+If a previous published review needs recovery, preserve its local files
+and use the owner's frozen export for manual reconciliation. An already
+acknowledged hub delivery also needs the owner's export if the origin's receipt
+is missing. The [operator instructions](../../../skills/attended-review/references/hosted-review.md)
+describe these boundaries.
+
+The same independent reviewer recheck is pending on the corrected candidate.
