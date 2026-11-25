@@ -130,5 +130,9 @@ the release issued no producer request, archive write or ACK.
 All nine focused hosted tests and both SQLite lifecycle tests passed using
 the commands above. Four existing release tests also passed with
 `python3 -B -m unittest discover -s skills/attended-review/tests -p test_attended_review.py -k release -v`.
-The worktree is quiescent. The same independent critical reviewer recheck
-is pending on this source.
+The same independent critical reviewer passed all nine hosted tests on
+`b7e5bcf` with Hub `4530e3b` and found no issues in scope. A separate
+interrupted-export check confirmed that sequential releases reported both
+released claims accurately, preserved an unrelated claim, and left staged
+handback data hidden. Standalone status still reads the durable snapshot
+preceding the pending export. Verification used macOS and loopback services.
