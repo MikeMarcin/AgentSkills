@@ -102,5 +102,11 @@ The final candidate passed all eight focused hosted tests and both SQLite
 lifecycle tests using the commands above. Documentation, board validation and
 the staged BetterLeaks scan passed. The broader 71-case run passed during the
 earlier correction round. The final release change was verified by the focused
-runs. The worktree is quiescent, and the same independent reviewer recheck is
-pending on the final candidate.
+runs. The same independent critical reviewer passed all three recovery regressions
+and the legacy resource-release regression on the final candidate against Hub
+`2e7dcd5`. All eight native tests passed. With an interrupted legacy export
+pending, an independent scoped release freed the selected resource while
+preserving other claims, issuing zero requests and leaving delivery waiting.
+The nested release response can still show the earlier protection flag in
+that legacy pending-export scenario. Windows and live Serve were outside
+this recheck.
