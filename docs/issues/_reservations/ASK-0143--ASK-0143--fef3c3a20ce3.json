@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0143"
+  ],
+  "reserve_for": "hosted-project-routing-20261124",
+  "purpose": "",
+  "created": "2026-11-25T06:18:34.434477+00:00",
+  "base": "3ecb86e458fcc2a96fdc7a6d7b9471c8a71b75b5"
+}
