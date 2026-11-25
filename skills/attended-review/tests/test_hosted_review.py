@@ -342,6 +342,48 @@ class NativeHubTests(HubFixture):
         self.assertFalse((original.state / "session.json").exists())
         self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
 
+    def test_unbound_release_reports_current_protection_with_a_pending_export(self):
+        earlier = self.earlier_helper(UNBOUND_HOSTED_BASELINE, "hosted_review.py")
+        original = self.consumer("pending-legacy-export", card("A", resources=["fixture-a"]),
+                                 card("B", resources=["fixture-b"]), initializer=earlier)
+        receipt = original.publish("A", "B", script=earlier)
+        review, _ = self.endpoints(original, receipt)
+        self.assertEqual(self.decision(review, "A", version=0, outcome="accept", note="Pending verdict")[0], 200)
+        self.assertEqual(self.freeze(review, receipt["revision"])[0], 200)
+        export_lock = original.state / ".export-lock.sqlite3"
+        export_lock.mkdir()
+        try:
+            self.assertIn("archive is pending", original.run("hosted-poll", script=earlier, code=1)["error"])
+        finally:
+            export_lock.rmdir()
+        with original.database() as db:
+            self.assertEqual(db.execute("SELECT receipt FROM exports").fetchall(), [(None,)])
+            pending = json.loads(db.execute("SELECT body FROM cards WHERE id='A'").fetchone()[0])
+            self.assertEqual(pending["decision"]["outcome"], "accept")
+
+        requests = len(self.requests)
+        registry = original.directory / "registry" / "resources.json"
+        before_claims = json.loads(registry.read_text())
+        self.assertEqual(set(before_claims), {"fixture-a", "fixture-b"})
+        before_status = original.run("status")
+        self.assertIsNone(before_status["handed_back"])
+        self.assertTrue(all(candidate["decision"] is None and candidate["feedback"] is None
+                            for candidate in before_status["candidates"]))
+        response = original.run("resume-development", "--candidate", "A")
+        self.assertEqual(response["affected"], ["A"])
+        expected = {"affected": ["A"], "status": before_status}
+        next(candidate for candidate in before_status["candidates"] if candidate["id"] == "A")["protected"] = False
+        self.assertEqual(response, expected)
+        self.assertEqual(json.loads(registry.read_text()), {"fixture-b": before_claims["fixture-b"]})
+        for args in (("hosted-publish",), ("hosted-poll",), ("wait", "--timeout", "0")):
+            self.assertIn("no recorded state directory", original.run(*args, code=1)["error"])
+        self.assertEqual(len(self.requests), requests)
+        self.assertFalse((original.state / "session.json").exists())
+        with original.database() as db:
+            self.assertEqual(db.execute("SELECT acknowledged FROM hosted_package").fetchone(), (0,))
+            self.assertEqual(db.execute("SELECT receipt FROM exports").fetchall(), [(None,)])
+        self.assertEqual(json.loads(self.human(review)[2])["delivery"], "waiting")
+
     def test_actual_hub_offline_publication_and_durable_handback(self):
         assets = [("image/png", png(), "image"), ("audio/wav", wav(), "audio")]
         media = [{"kind": kind, "url": f"data:{mime};base64,{base64.b64encode(raw).decode()}", "label": kind}
