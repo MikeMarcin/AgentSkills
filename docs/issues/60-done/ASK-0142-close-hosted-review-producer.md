@@ -88,4 +88,19 @@ acknowledged hub delivery also needs the owner's export if the origin's receipt
 is missing. The [operator instructions](../../../skills/attended-review/references/hosted-review.md)
 describe these boundaries.
 
-The same independent reviewer recheck is pending on the corrected candidate.
+The independent recheck passed the three recovery cases and identified a
+replacement-session blocker when an earlier published review owns an exclusive
+resource. Candidate `73c6034f971ef56532b5c709dd6565bd5b1d6fef` adds scoped
+offline `resume-development` for that earlier origin. The prior helper
+prepared and published a candidate with an exclusive named resource. A
+replacement using the same checkout and registry waited until the original
+released that candidate. The replacement then prepared successfully. The
+earlier origin continued to refuse publish, poll and archive recovery with
+zero producer requests.
+
+The final candidate passed all eight focused hosted tests and both SQLite
+lifecycle tests using the commands above. Documentation, board validation and
+the staged BetterLeaks scan passed. The broader 71-case run passed during the
+earlier correction round. The final release change was verified by the focused
+runs. The worktree is quiescent, and the same independent reviewer recheck is
+pending on the final candidate.
