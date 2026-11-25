@@ -13,7 +13,7 @@ The coordinator's current route is never an implicit engineering override.
 | `rfc-worker` | standard | Sol 6.2 high | Opus 5.5 medium |
 | `rfc-implementer` | implementation | Sol 6.2 xhigh | Opus 5.5 medium |
 | `rfc-integrator` | integration | Sol 6.2 high | Opus 5.5 high |
-| `rfc-worker-deep` | deep | Sol 6.2 max | Fable 5.2 high |
+| `rfc-worker-deep` | deep | Astra 6.2 xhigh | Fable 5.2 high |
 | `rfc-reviewer` | review | Sol 6.2 xhigh | Opus 5.5 xhigh |
 | `rfc-reviewer-critical` | critical | Astra 6.2 xhigh | Fable 5.2 xhigh |
 
@@ -25,8 +25,8 @@ See [delegated execution](delegated-execution.md) for selection and contracts.
 
 The owner authorized a public-evidence refresh of supporting roles on 2026-10-03
 and then amended the defaults above. Deep work remains reserved for named unresolved
-difficulty; Sol's max effort reflects the owner's preference for these infrequent
-assignments. Critical review retains Astra/Fable for model diversity.
+difficulty. Critical review retains Astra/Fable for model diversity relative to
+standard implementation.
 The owner selected Luna xhigh for mechanical roles after reviewing failure-reporting
 requirements and the comparison with Sonnet low. Similar aggregate intelligence
 does not establish equal terminal or error-handling performance.
@@ -63,12 +63,10 @@ explicit direct-max, native-ultra and planner-max strategy presets. Luna mechani
 routes and all Claude routes are unchanged. This is a model-version promotion,
 not a change to role authority, topology, effort or active assignments.
 
-This owner-directed allocation preserves Sol for routine and deep engineering and
-Astra for named critical review or explicit Astra strategies. No local quality,
-latency, cost, reviewer-recall or native-serving trial is claimed. Deterministic
-configuration tests do not establish model quality or host availability. The
-Codex companion's existing max-to-xhigh fallback is unchanged; verify the effective
-request at the actual host before dispatch. Source updates do not deploy the fleet.
+On 2026-11-24 the owner switched the Codex deep worker to Astra 6.2 xhigh and
+raised the Claude deep worker's turn cap to reduce forced resumes.
+Configuration checks verify the requested settings. Native serving and model
+quality require separate evidence.
 
 ## Fable quota fallback
 

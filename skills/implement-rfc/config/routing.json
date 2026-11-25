@@ -28,8 +28,8 @@
           "effort": "high"
         },
         "deep": {
-          "model": "gpt-6.2-sol",
-          "effort": "max"
+          "model": "gpt-6.2-astra",
+          "effort": "xhigh"
         },
         "critical": {
           "model": "gpt-6.2-astra",

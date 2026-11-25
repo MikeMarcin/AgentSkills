@@ -86,13 +86,11 @@ Lane rules:
 - Collect results with `codex_lane.py result -- <job-id> --cwd <lane cwd>`;
   cancel abandoned lanes with `codex_lane.py cancel` rather than leaving
   them running.
-- The companion runtime caps reasoning effort at `xhigh`. The checked-in
-  deep-worker route requests Sol 6.1 `max`; the launcher runs it at `xhigh`,
-  reports the downgrade and records requested/effective effort separately.
-  Record the downgrade in the closeout card per the standard fallback rule.
-  Review scope and acceptance gates never narrow because of the downgrade.
-  Native `.codex/agents` adapters retain `max`; use the native route when the
-  assignment requires that exact effort. Other checked-in leaf routes fit the cap.
+- The companion runtime caps reasoning effort at `xhigh`. If a route requests
+  `max`, the launcher reports the downgrade and records the requested and
+  effective efforts separately. Record the downgrade in the closeout card and
+  apply the assignment's full review scope and acceptance criteria. Use the
+  native route when the assignment requires `max`.
 
 ## Result Handling
 

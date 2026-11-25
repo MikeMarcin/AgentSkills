@@ -91,7 +91,7 @@ class RenderRuntimeAdaptersTests(MaskPathsFixture, unittest.TestCase):
             "rfc-scout": ("gpt-6.2-sol", "medium", "claude-sonnet-5-5", "medium", "read-only", False),
             "rfc-worker": ("gpt-6.2-sol", "high", "claude-opus-5-5", "medium", "workspace-write", False),
             "rfc-implementer": ("gpt-6.2-sol", "xhigh", "claude-opus-5-5", "medium", "workspace-write", False),
-            "rfc-worker-deep": ("gpt-6.2-sol", "max", "claude-fable-5-2", "high", "workspace-write", False),
+            "rfc-worker-deep": ("gpt-6.2-astra", "xhigh", "claude-fable-5-2", "high", "workspace-write", False),
             "rfc-reviewer": ("gpt-6.2-sol", "xhigh", "claude-opus-5-5", "xhigh", "read-only", False),
             "rfc-reviewer-critical": ("gpt-6.2-astra", "xhigh", "claude-fable-5-2", "xhigh", "read-only", False),
         }
@@ -133,7 +133,7 @@ class RenderRuntimeAdaptersTests(MaskPathsFixture, unittest.TestCase):
                         expected_tools.add("Agent(" + ",".join(configured["delegation"]["allowed_roles"]) + ")")
                         expected_tools.update(VALIDATOR_MODULE.renderer.COORDINATION_TOOLS)
                     self.assertEqual(tools, expected_tools)
-                    turns = configured.get("max_turns")
+                    turns = 200 if role == "rfc-worker-deep" else configured.get("max_turns")
                     self.assertEqual(header.get("maxTurns"), None if turns is None else str(turns))
                     self.assertEqual(turns is None, role in VALIDATOR_MODULE.renderer.UNCAPPED_ROLES)
                     body = claude.split(f"# {role}\n\n", 1)[1]

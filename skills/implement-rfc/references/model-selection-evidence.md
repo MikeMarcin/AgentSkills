@@ -17,7 +17,8 @@ the requested routes are rendered consistently. Native max/ultra availability an
 actual serving remain host-dependent; the companion still maps max to xhigh.
 No fleet rollout or changes to already active assignments are implied.
 
-The historical evidence below records earlier decisions, not current model IDs.
+These entries record earlier decisions. See [Model routing](model-routing.md)
+for current routes and later changes.
 
 # Supporting role selection, 2026-10-03
 
@@ -262,11 +263,10 @@ do not update installed clients automatically. The
 owner's Sonnet low and deep max preferences differ from the general medium
 recommendations; no local quality comparison at those efforts is claimed.
 
-The native Codex deep-worker route requests max; the Claude route requests xhigh
-since 2026-11-10. The existing Codex companion caps
-effort at xhigh, emits the effective-effort banner and logs requested max versus
-effective xhigh; see [Codex lanes](codex-lanes.md). That fallback is not execution
-at max and must be reported when used.
+During this evaluation the native Codex deep-worker route requested max. The
+Claude route moved to xhigh on 2026-11-10. The Codex companion caps effort at
+xhigh, emits the effective-effort banner and logs the requested and effective
+efforts. See [Codex lanes](codex-lanes.md) for current reporting instructions.
 
 Validation here covers source consistency, native rendering and fake-driver
 requests in disposable consumers. No local model-quality trial, native serving

@@ -110,7 +110,7 @@ class CodexLaneTest(unittest.TestCase):
             "rfc-test-runner": ("gpt-6-luna", "xhigh", "xhigh"),
             "rfc-scout": ("gpt-6.2-sol", "medium", "medium"),
             "rfc-worker": ("gpt-6.2-sol", "high", "high"),
-            "rfc-worker-deep": ("gpt-6.2-sol", "max", "xhigh"),
+            "rfc-worker-deep": ("gpt-6.2-astra", "xhigh", "xhigh"),
             "rfc-reviewer": ("gpt-6.2-sol", "xhigh", "xhigh"),
             "rfc-reviewer-critical": ("gpt-6.2-astra", "xhigh", "xhigh"),
         }

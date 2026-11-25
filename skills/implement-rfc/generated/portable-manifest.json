@@ -26,7 +26,7 @@
     },
     {
       "path": "config/roles.json",
-      "sha256": "71a32f4eb2afef97d845c447c50e0d29d47a5d37f2b049fe7af839752c5632c5"
+      "sha256": "8170f865fe813150c3d6e47fb74bb354e22f05a18490bfcc29e9ba5a6b9b5b84"
     },
     {
       "path": "config/routing-profiles.json",
@@ -34,7 +34,7 @@
     },
     {
       "path": "config/routing.json",
-      "sha256": "12967e4dc83b3d407774a931bfffd9bef14bc138759036823f47ef36e11b602f"
+      "sha256": "f1df1549c8d26e0fc8bcf14aca666cd610d2f8c5e2f7f5c7bc4bdf559cd5a873"
     },
     {
       "path": "config/strategy-catalog.json",
@@ -86,7 +86,7 @@
     },
     {
       "path": "references/codex-lanes.md",
-      "sha256": "1b1bcedfe8ac491993c6b75bcaf6f2fbec8257ccf79c9a16fecb70658e60e951"
+      "sha256": "2854a89e9703a5e6264dc941b4efc8a9e5064b51cb238e5854e420012344ef0e"
     },
     {
       "path": "references/coordination-handoff.md",
@@ -110,11 +110,11 @@
     },
     {
       "path": "references/model-routing.md",
-      "sha256": "d065c6dd0773fe1a4e10cdbdb333d3f39f2725b3580a9f55c211e508c7469de7"
+      "sha256": "24dbb975cd0150b484e9e146e1c5c75fcddcc3031d663a51bff0081d62d19acb"
     },
     {
       "path": "references/model-selection-evidence.md",
-      "sha256": "0c59976661509f2b994b8b899e769739a0d09582893eb56fd2ae429c748afc14"
+      "sha256": "525a66128cddd13fc1bcb48e863d250a275bebaa34fd25c94dd37f6a28963f89"
     },
     {
       "path": "references/native-coordination.md",
@@ -434,7 +434,7 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "b1e2a58fb75dc3767991e4dd731f9c9e52f467bbd88de558dc590f2c3c2450d1"
+      "sha256": "963ab4da8cc5314b17218d1faf86348cde74cc5cb8d29d8f3b189e3cc9542cc1"
     },
     {
       "path": "tests/test_coordinator_handoff.py",
@@ -542,7 +542,7 @@
     },
     {
       "path": "tests/test_render_runtime_adapters.py",
-      "sha256": "f7727df66d889cc2da70510c01991abb0523cfa81b568821977d4439c8c14725"
+      "sha256": "5a3ef2e268d1a432a356e49806be895fd21c4f39ea29ec8bda04d8e01c1db8fc"
     },
     {
       "path": "tests/test_role_migration.py",
@@ -629,6 +629,6 @@
       "sha256": "0682e5868fffb6ca4d0f3ea8e0cc5a351a90b46d9f98489b975e9b13163c7096"
     }
   ],
-  "portable_digest": "1bd8aeca546d94c0",
+  "portable_digest": "a76a2bab163845f0",
   "schema": "implement-rfc.portable-manifest.v1"
 }
