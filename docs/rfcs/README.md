@@ -50,4 +50,4 @@ Reconcile live IDs before adopting packet IDs. Keep original packet IDs in prove
 
 | RFC-ASK-0020 | Auto-Verified | Publish and receive hosted attended reviews |
 
-| RFC-ASK-0021 | Implementing | Route attended reviews by project |
+| RFC-ASK-0021 | Auto-Verified | Route attended reviews by project |
