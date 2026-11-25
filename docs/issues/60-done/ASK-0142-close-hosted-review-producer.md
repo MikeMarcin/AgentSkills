@@ -155,5 +155,10 @@ wrote no archive or ACK. The nine hosted tests, two SQLite lifecycle tests
 and four existing release tests passed using the commands above. Documentation,
 board validation and the staged BetterLeaks scan passed.
 
-All task-owned tests and listeners exited. The same critical reviewer recheck
-is pending on the corrected source.
+The same independent critical reviewer passed nine hosted and two SQLite
+lifecycle tests on `994e326` against Hub `4530e3b`. An independent
+interrupted-export check verified sequential releases in summary, full and
+cursor-based status. The unrelated claim stayed protected, the cursor stayed
+fixed, and staged decisions, feedback and events stayed hidden. No archive,
+ACK or producer request was observed. No findings in scope. Verification used
+macOS and loopback services.
