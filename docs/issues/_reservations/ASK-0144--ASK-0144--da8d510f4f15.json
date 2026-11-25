@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0144"
+  ],
+  "reserve_for": "deep-worker-cap-and-route",
+  "purpose": "",
+  "created": "2026-11-25T06:31:02.958534+00:00",
+  "base": "4affbc173c9e7fd69e34d258147a4752a2b358f1"
+}
