@@ -1,0 +1,19 @@
+{
+  "schema": "implement-rfc.milestone-plan.v1",
+  "id": "hosted-project-routing",
+  "scope": {"rfcs": ["RFC-ASK-0021"], "issues": ["ASK-0143"]},
+  "coverage": "complete",
+  "milestones": [
+    {
+      "id": "hosted-project-routing",
+      "outcome": "Enrolled projects can opt into hosted review through checked project-local routing.",
+      "work": [{"issue": "ASK-0143"}],
+      "depends_on": [],
+      "exit_criteria": [
+        "Public CLI checks pass for two project-local routing contexts, legacy behavior and changed config after binding.",
+        "Actual loopback hub checks pass for first publication and saved-binding retry and Hand Back."
+      ],
+      "boundary": "AgentSkills and disposable fixtures. No consumer changes, enrollment, deployment or push."
+    }
+  ]
+}
