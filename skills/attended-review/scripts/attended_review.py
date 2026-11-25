@@ -1052,16 +1052,7 @@ class Session:
             if affected:
                 state["handed_back"] = None
             self.event(state, "resume-development", candidates=affected, preparation_stopped=preparation_stopped)
-            protection = {}
-            if state.get("hosted_bound") and "hosted_directory" not in state:
-                protection = {item["id"]: item["protected"] for item in state["candidates"].values()}
-        status = self.status()
-        # A pending legacy export freezes the visible decision snapshot. Only
-        # report the current protection flags from the completed local release.
-        if protection:
-            for candidate in status["candidates"]:
-                candidate["protected"] = protection.get(candidate["id"], candidate["protected"])
-        return {"affected": affected, "status": status}
+        return {"affected": affected, "status": self.status()}
 
     def conflicts(self, paths=(), resource_keys=()):
         with self.transaction() as (state, resources):

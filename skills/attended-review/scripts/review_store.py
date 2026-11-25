@@ -259,6 +259,14 @@ class SQLiteStore:
             rows = self.card_rows(db, header["sequence"], current["sequence"],
                                   "body, media" if full else "summary")
             cards = [self.card(db, *row) if full else json.loads(row[0]) for row in rows]
+            if (not page and header["sequence"] < current["sequence"] and current.get("hosted_bound")
+                    and "hosted_directory" not in current):
+                # Legacy claims can be released while Hand Back is pending.
+                # Only protection comes from the current cards.
+                protection = {cid: json.loads(summary)["protected"] for cid, summary in db.execute(
+                    "SELECT id, summary FROM cards WHERE sequence>?", (header["sequence"],))}
+                for card in cards:
+                    card["protected"] = protection.get(card["id"], card["protected"])
             events = self.events(db, after, header["sequence"]) if after is not None and not page else []
             return header, cards, events
 

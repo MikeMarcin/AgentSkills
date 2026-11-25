@@ -369,11 +369,17 @@ class NativeHubTests(HubFixture):
         self.assertIsNone(before_status["handed_back"])
         self.assertTrue(all(candidate["decision"] is None and candidate["feedback"] is None
                             for candidate in before_status["candidates"]))
+        full_before = original.run("status", "--after", "0", "--full")
+        self.assertTrue(all(event["kind"] not in {"decision", "feedback", "handed-back", "resume-development"}
+                            for event in full_before["events"]))
         response = original.run("resume-development", "--candidate", "A")
         self.assertEqual(response["affected"], ["A"])
         expected = {"affected": ["A"], "status": before_status}
         next(candidate for candidate in before_status["candidates"] if candidate["id"] == "A")["protected"] = False
         self.assertEqual(response, expected)
+        self.assertEqual(original.run("status"), response["status"])
+        next(candidate for candidate in full_before["candidates"] if candidate["id"] == "A")["protected"] = False
+        self.assertEqual(original.run("status", "--after", "0", "--full"), full_before)
         self.assertEqual(json.loads(registry.read_text()), {"fixture-b": before_claims["fixture-b"]})
         for args in (("hosted-publish",), ("hosted-poll",), ("wait", "--timeout", "0")):
             self.assertIn("no recorded state directory", original.run(*args, code=1)["error"])
