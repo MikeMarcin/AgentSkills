@@ -336,6 +336,38 @@ class NativeHubTests(HubFixture):
         self.assertEqual(archive["candidates"]["Proof"]["decision"]["note"], "Accepted by reviewer")
         self.assertEqual(archive["candidates"]["OwnerProof"]["decision"]["outcome"], "reject")
 
+    def test_owner_hands_back_completed_collaborator_verdict(self):
+        reviewer = "reviewer@example.invalid"
+        self.members["alpha"][reviewer] = "reviewer-handback"
+        self.write_memberships()
+        consumer = self.consumer("owner-hands-back-peer", card("Proof"), card("OwnerProof"), card("Pending"))
+        receipt = consumer.publish("Proof", "OwnerProof", "Pending")
+        review, endpoint = self.endpoints(consumer, receipt)
+        revision = receipt["revision"]
+        self.assertEqual(self.sharing(review)[0], 200)
+        for item in ("Proof", "OwnerProof"):
+            self.assertEqual(self.human(f"{review}/items/{item}/feedback", method="PUT", actor=reviewer,
+                                        payload={"version": 0, "outcome": "accept", "note": "Reviewer note"})[0], 200)
+        self.assertEqual(self.human(f"{review}/items/Pending/feedback", method="PUT", actor=reviewer,
+                                    payload={"version": 0, "note": "Note without verdict"})[0], 200)
+        self.assertEqual(self.decision(review, "OwnerProof", version=1, outcome="reject", note="Owner decision")[0], 200)
+        self.assertEqual(self.human(review + "/completion", method="PUT", actor=reviewer,
+                                    payload={"revision": revision, "finished": True})[0], 200)
+        self.assertEqual(self.producer(endpoint, "GET", revision=revision)[0], 204)
+        self.assertEqual(self.freeze(review, revision)[0], 200)
+        item = json.loads(self.human(f"{review}/items/Proof")[2])
+        self.assertEqual(item["decision"]["actor"], reviewer)
+        snapshot = json.loads(self.producer(endpoint, "GET", revision=revision)[2])["snapshot"]
+        self.assertEqual(snapshot["schema"], "attended-review.hosted-handback.v3")
+        self.assertEqual(snapshot["contributors"], [reviewer])
+        self.assertEqual(consumer.run("hosted-poll")["state"], "delivered")
+        archive = json.loads((consumer.state / "session.json").read_bytes())
+        event = next(event for event in archive["events"] if event["kind"] == "handed-back")
+        self.assertEqual(event["actor"], OWNER)
+        self.assertEqual(archive["candidates"]["Proof"]["decision"]["note"], "Reviewer note")
+        self.assertEqual(archive["candidates"]["OwnerProof"]["decision"]["outcome"], "reject")
+        self.assertIsNone(archive["candidates"]["Pending"]["decision"])
+
     def test_locally_acknowledged_delivery_reconciles_restored_hub(self):
         consumer, review, delivery = self.frozen_consumer("ack-recovery")
         hub_backup = self.root / "hub-before-ack.sqlite3"

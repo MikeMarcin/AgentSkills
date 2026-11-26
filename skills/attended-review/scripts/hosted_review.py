@@ -475,12 +475,22 @@ def validate_snapshot(envelope, current):
         raise problem
     required = {"schema", "delivery", "target", "handed_back_at", "items"}
     schema = snapshot.get("schema")
-    if schema == "attended-review.hosted-handback.v2":
+    collaborators = set()
+    if schema in ("attended-review.hosted-handback.v2", "attended-review.hosted-handback.v3"):
         required.add("handed_back_by")
         if not matches(LOGIN, snapshot.get("handed_back_by")) or len(snapshot["handed_back_by"]) > 254:
             raise problem
     elif schema != "attended-review.hosted-handback.v1":
         raise problem
+    if schema == "attended-review.hosted-handback.v3":
+        required.add("contributors")
+        names = snapshot.get("contributors")
+        if not isinstance(names, list) or not names or len(names) > 1000 or any(
+                not matches(LOGIN, name) or len(name) > 254 for name in names):
+            raise problem
+        if names != sorted(set(names)):
+            raise problem
+        collaborators = set(names)
     if not fields(snapshot, required):
         raise problem
     target = {**current["manifest"]["origin"], "review": current["review"], "revision": current["revision"]}
@@ -497,6 +507,9 @@ def validate_snapshot(envelope, current):
     if not isinstance(items, list) or len(items) != len(published):
         raise problem
     actors = {current["manifest"]["owner"], snapshot.get("handed_back_by", current["manifest"]["owner"])}
+    if collaborators & actors:
+        raise problem
+    used = set()
     for item, original in zip(items, published):
         if (not fields(item, {"id", "fingerprint", "version", "decision"})
                 or any(item[key] != original[key] for key in ("id", "fingerprint"))
@@ -504,7 +517,10 @@ def validate_snapshot(envelope, current):
             raise problem
         decision = item["decision"]
         if decision is not None:
-            validate_decision(decision, original, actors, item["version"])
+            validate_decision(decision, original, actors | collaborators, item["version"])
+            used.add(decision["actor"])
+    if used - actors != collaborators:
+        raise problem
     return snapshot
 
 

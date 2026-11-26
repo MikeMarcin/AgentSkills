@@ -2,7 +2,7 @@
 
 Use hosted review when an enrolled project chooses to store review material and
 collect decisions on its hub. Hosted sessions use the hub collaboration page
-for decisions and Hand Back. A hub can let designated reviewers hand back a shared review without waiting for the owner. The upgraded poller accepts both owner v1 and attributed reviewer v2 snapshots. The work machine can disconnect after publication.
+for decisions and Hand Back. A hub can let designated reviewers hand back a shared review without waiting for the owner. The upgraded poller accepts owner-only v1, delegated v2, and multi-author v3 snapshots. The work machine can disconnect after publication.
 
 ## Configure a checkout
 
