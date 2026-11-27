@@ -2,10 +2,11 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0145"
 title: "Rename frontend-design to ux-design and deploy it to the fleet"
-status: "In Progress"
+status: "Done"
 rfcs: []
 depends_on: []
 metadata: {"baseline":"315940154e4db5036b2d5727a58c31ec4c363f07","requested_on":"2026-11-27"}
+acceptance: [{"criterion":"AC1","outcome":"pass","revision":"59096491d3a70726be03e99735bf95341a919bd3","evidence":{"kind":"observation","detail":"The 12-file ux-design package has payload digest sha256:7139eb892ec65fd57f811850560d4ceccce15220cfc70944903dd8fe1c306b2a. Its core routes to nine references, and a package search found no consumer project names. A five-task fresh-agent tabletop selected the intended references, and its three wording fixes were applied."}},{"criterion":"AC2","outcome":"pass","revision":"59096491d3a70726be03e99735bf95341a919bd3","evidence":{"kind":"command","detail":"Live references use ux-design, and clang-split-refactor is in the manifest. MASK validated both packages from a disposable bare tap and from the published tap with the same digest. The documentation, portable-source and skill-metadata checks passed. The offline suite passed 463 of 469 tests with 4 skipped; its two implement-rfc failures reproduce identically at baseline 3159401."}},{"criterion":"AC3","outcome":"pass","revision":"59096491d3a70726be03e99735bf95341a919bd3","evidence":{"kind":"observation","detail":"3159401..5909649 was pushed to origin/main; the outgoing history held only this card's reservation, record, claim and source commits."}},{"criterion":"AC4","outcome":"pass","revision":"59096491d3a70726be03e99735bf95341a919bd3","evidence":{"kind":"observation","detail":"Fleet operation b717b78da4910d7f40a259111c6b42a7 reported applied_verified on this-mac, intel-mac, jaegaw-windows and jaegaw-wsl, each binding ux-design at 5909649 for Claude and Codex. In aito, ux-design replaced frontend-design under status --check, was committed at 4401245266 and pushed with 904b7cf799. In Athens, MASK-0155 enabled a reviewed return to pinned for the renumbered attended-review dev link, which was not restored at the owner's direction; ux-design then replaced frontend-design and status --check reports ready_pinned. Temporary lanes, agent worktrees and other devices' project checkouts were intentionally excluded."}}]
 ---
 
 # Rename frontend-design to ux-design and deploy it to the fleet
