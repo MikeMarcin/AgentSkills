@@ -2,7 +2,7 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0145"
 title: "Rename frontend-design to ux-design and deploy it to the fleet"
-status: "Ready"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"baseline":"315940154e4db5036b2d5727a58c31ec4c363f07","requested_on":"2026-11-27"}
