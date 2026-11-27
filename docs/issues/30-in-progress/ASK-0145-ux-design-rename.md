@@ -2,11 +2,10 @@
 schema: "implement-rfc.card.v1"
 id: "ASK-0145"
 title: "Rename frontend-design to ux-design and deploy it to the fleet"
-status: "Blocked"
+status: "In Progress"
 rfcs: []
 depends_on: []
 metadata: {"baseline":"315940154e4db5036b2d5727a58c31ec4c363f07","requested_on":"2026-11-27"}
-blocked_by: "mask-dev-link-identity-repair"
 ---
 
 # Rename frontend-design to ux-design and deploy it to the fleet
@@ -90,15 +89,24 @@ AC4 remains incomplete:
   documented policy. Main was pushed `fb60bed610..904b7cf799`, uploading
   313 LFS objects (266 MB). Aito's `docs/lfs-storage.md` records the figures
   and backend-volume capacity evidence.
-- The Athens primary checkout is blocked. Its `attended-review` is dev-linked to
-  the AgentSkills authoring checkout. MASK refuses install, repair, return to
-  pinned and re-linking with `source.identity_mismatch`, because the recorded
-  authoring-root device number predates the volume change. MASK has no supported
-  repair for development-link identity. Athens keeps its working pinned
-  `frontend-design`.
+- The Athens primary checkout was first blocked. Its `attended-review` was
+  dev-linked to the AgentSkills authoring checkout, and MASK refused install,
+  repair, return to pinned and re-linking with `source.identity_mismatch`. The
+  recorded authoring-root device number (16777230) predated the volume change
+  (16777231, same inode). ManageAgentSkills MASK-0155 (`7f9b815`, landed on
+  local main, not pushed) extended durable identity to dev-link provenance with
+  a reviewed rebind exit. With it, `status --check` reported the binding as
+  rebindable. The owner then stated that no project should use dev links; a scan
+  of all 1,292 registered rows found this one. A reviewed `skill dev-link
+  --to-pinned` returned it to its locked payload, and the link was not restored.
+  Athens then installed `ux-design` and removed `frontend-design`. Its
+  `status --check` reports `ready_pinned`, and the new links match the
+  published bytes. Its wildcard `.gitignore` already covers the links; the
+  declaration and lock changes are uncommitted.
 - Temporary lanes and agent worktrees that still select `frontend-design` were
   left untouched. Project checkouts on other devices were not inspected.
 
-Remaining work: extend MASK's durable directory identity (RFC-MASK-0027) to
-development-link provenance, then swap Athens to `ux-design` and restore its dev
-link. Do not mark this card Done until Athens is migrated or explicitly retired.
+Both primary project consumers and all four personal fleet scopes now use
+`ux-design`. Temporary lanes and agent worktrees that still select
+`frontend-design` were left untouched by design, as were project checkouts on
+other devices.
