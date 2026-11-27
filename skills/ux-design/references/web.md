@@ -1,7 +1,9 @@
 # Web interfaces
 
-Read for browser-based pages and applications, including mobile web. Combine
-with the desktop reference for a desktop shell with embedded web content.
+Read for browser-based pages and applications, including mobile web, hosted
+dashboards and generated HTML pages. Combine with [Desktop](desktop.md) for a
+desktop shell with embedded web content, and with
+[Editors and tools](editors-and-tools.md) for browser-based developer tools.
 
 ## Layout and navigation
 
@@ -16,6 +18,8 @@ an explicit small-screen treatment rather than accidental page overflow.
 
 Use semantic HTML and native controls as the foundation. Links navigate; buttons
 act. Preserve deep links, browser Back/Forward and meaningful document structure.
+Anchor and in-page jumps should land with the whole target visible below any
+sticky header.
 On touch devices, every essential action needs a discoverable path without hover.
 Account for safe areas and the on-screen keyboard when positioning fixed controls.
 
@@ -30,6 +34,11 @@ during loading. Reserve media dimensions to limit layout shifts. Match image
 resolution to display size and defer nonessential media or motion when it would
 delay the main content. External assets or font services should fit the project's
 network, privacy and offline constraints.
+
+A generated page opened from disk or shared as a file, such as a report or review
+page, should carry its styles, scripts, fonts and images with it, or degrade to
+readable content without them. Keep it usable without a server unless the tool
+that produces it also serves it.
 
 ## Verify the affected flow
 

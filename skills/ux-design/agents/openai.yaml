@@ -1,0 +1,4 @@
+interface:
+  display_name: "UX Design"
+  short_description: "UX and UI for web, desktop, Qt, mobile, games and tools"
+  default_prompt: "Use $ux-design to design and implement this interface for its target platform, inputs and audience."

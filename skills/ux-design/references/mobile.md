@@ -1,8 +1,9 @@
 # Mobile applications
 
 Read for native or cross-platform phone and tablet applications. A site viewed
-on a phone uses the web reference; mobile-app guidance applies when the product
-also has native navigation, controls or lifecycle behavior.
+on a phone uses [Web](web.md); mobile-app guidance applies when the product also
+has native navigation, controls or lifecycle behavior. Games on phones and tablets
+use [Game UI](game-ui.md).
 
 ## Platform and layout
 

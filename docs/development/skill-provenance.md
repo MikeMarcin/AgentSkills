@@ -96,6 +96,16 @@ verification for web, mobile and desktop. Platform references and interface
 metadata were authored for this package. This change adds the source package and
 catalog entry; it does not select or install the skill for existing consumers.
 
+On 2026-11-27, `frontend-design` was renamed to `ux-design` so it is not confused
+with Anthropic's `frontend-design` plugin skill. Its scope now includes game UI in
+Roblox and custom engines, editors and developer tools, and Qt applications. The
+new game UI, Roblox experience, Roblox Studio plugin, editors and tools,
+immediate-mode and Qt references are original, as are lessons generalized from
+the owner's own projects; no upstream text was added. Live catalog,
+source-manifest and preview references use the new name; historical records
+retain the original name. This changes the canonical source only; it does not
+update existing MASK selections or installed artifacts.
+
 ## Technical book humanizer paragraph rhythm
 
 On 2026-11-17, the paragraph-rhythm check in `skills/technical-book-humanizer/SKILL.md` was informed by [blader/humanizer](https://github.com/blader/humanizer/blob/main/SKILL.md), whose reviewed metadata version was 4.0.0. The addition uses original wording to check recurring paragraph shapes and formulaic openings while preserving technical meaning and useful repetition. No upstream files or other upstream rules were imported. This changes the canonical source only; it does not update existing MASK selections or installed artifacts.

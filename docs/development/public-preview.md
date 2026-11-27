@@ -76,7 +76,7 @@ credentials are absent. No history rewriting is authorized by this preparation.
 The [provenance record](skill-provenance.md) identifies imports and known adapted
 sources. Author-rfc, grill-rfc and grill-me retain Matt Pocock's MIT licenses;
 writing-for-agents retains the complete notice in its package README. The original
-frontend-design package contains no upstream payload. The adopted root MIT license
+ux-design package (formerly frontend-design) contains no upstream payload. The adopted root MIT license
 preserves these notices and the recorded origin of older imports.
 
 Current bounded results are recorded in
