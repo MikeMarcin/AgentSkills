@@ -1,0 +1,10 @@
+{
+  "schema": "implement-rfc.reservation.v1",
+  "ids": [
+    "ASK-0145"
+  ],
+  "reserve_for": "ux-design-rename-20261127",
+  "purpose": "",
+  "created": "2026-11-27T19:59:30.315592+00:00",
+  "base": "315940154e4db5036b2d5727a58c31ec4c363f07"
+}
