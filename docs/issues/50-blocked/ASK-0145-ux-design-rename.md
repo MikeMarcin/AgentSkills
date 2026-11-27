@@ -82,10 +82,14 @@ AC4 remains incomplete:
   Codex. Existing packages kept their locked commits. MASK reports host loading
   as not verified; the controller's running session listed the new skill.
 - In the aito primary checkout, `ux-design` was installed and verified, then
-  `frontend-design` was removed; `status --check` passes. The declaration and
-  lock changes are uncommitted, and its name-based `.gitignore` has no
-  `ux-design` link entries yet. Its `main` is far ahead of `origin`, so nothing
-  was pushed there.
+  `frontend-design` was removed; `status --check` passes. On the owner's
+  instruction, aito commit `4401245266` recorded the declaration, lock and
+  `ux-design` link ignores. The owner then authorized pushing aito's main and
+  delegated LFS budget growth. Aito commit `904b7cf799` synced its resident
+  ledger, raised two scope caps and added exact-OID exceptions under its
+  documented policy. Main was pushed `fb60bed610..904b7cf799`, uploading
+  313 LFS objects (266 MB). Aito's `docs/lfs-storage.md` records the figures
+  and backend-volume capacity evidence.
 - The Athens primary checkout is blocked. Its `attended-review` is dev-linked to
   the AgentSkills authoring checkout. MASK refuses install, repair, return to
   pinned and re-linking with `source.identity_mismatch`, because the recorded
@@ -95,7 +99,6 @@ AC4 remains incomplete:
 - Temporary lanes and agent worktrees that still select `frontend-design` were
   left untouched. Project checkouts on other devices were not inspected.
 
-Remaining work: add or obtain a MASK repair for development-link identity, then
-swap Athens to `ux-design` and restore its dev link. Commit aito's control
-changes when the owner approves. Do not mark this card Done until both scopes are
-migrated or explicitly retired.
+Remaining work: extend MASK's durable directory identity (RFC-MASK-0027) to
+development-link provenance, then swap Athens to `ux-design` and restore its dev
+link. Do not mark this card Done until Athens is migrated or explicitly retired.
